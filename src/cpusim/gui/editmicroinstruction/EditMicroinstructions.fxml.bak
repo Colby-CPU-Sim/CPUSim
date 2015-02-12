@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane id="AnchorPane" fx:id="scene" maxHeight="-Infinity"
+            maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="cpusim.gui.editmicroinstruction.EditMicroinstructionsController">
+  <children>
+    <HBox id="HBox" fx:id="hBox" alignment="CENTER"
+          prefHeight="60.0" prefWidth="599.0" spacing="5.0">
+      <children>
+        <Label prefHeight="50.0" text="Type of Microinstruction:" />
+        <ComboBox fx:id="microinstructionCombo" prefWidth="146.0" value="Set">
+          <items>
+            <FXCollections fx:factory="observableArrayList">
+              <String fx:value="Set" />
+              <String fx:value="Test" />
+              <String fx:value="Increment" />
+              <String fx:value="Shift" />
+              <String fx:value="Logical" />
+              <String fx:value="Arithmetic" />
+              <String fx:value="Branch" />
+              <String fx:value="TransferRtoR" />
+              <String fx:value="TransferRtoA" />
+              <String fx:value="TransferAtoR" />
+              <String fx:value="Decode" />
+              <String fx:value="SetCondBit" />
+              <String fx:value="IO" />
+              <String fx:value="MemoryAccess" />
+            </FXCollections>
+          </items>
+        </ComboBox>
+      </children>
+    </HBox>
+    <Pane fx:id="tables" layoutX="1.0" layoutY="55.0"
+          prefHeight="244.0" prefWidth="598.0" />
+    <VBox id="VBox" fx:id="vBox" alignment="CENTER" layoutX="2.0" layoutY="306.0"
+          spacing="5.0">
+      <children>
+        <HBox id="HBox" alignment="CENTER" prefHeight="41.0" prefWidth="599.0"
+              spacing="5.0">
+          <children>
+            <Button fx:id="newButton" mnemonicParsing="false"
+                    onAction="#onNewButtonClick" prefWidth="80.0" text="New" />
+            <Button fx:id="deleteButton" disable="true" mnemonicParsing="false"
+                    onAction="#onDeleteButtonClick" prefWidth="80.0" text="Delete" />
+            <Button fx:id="duplicateButton" disable="true" mnemonicParsing="false"
+                    onAction="#onDuplicateButtonClick" prefWidth="80.0" text="Duplicate" />
+          </children>
+        </HBox>
+        <HBox id="HBox" alignment="CENTER" prefHeight="48.0" prefWidth="599.0"
+              spacing="5.0">
+          <children>
+            <Button fx:id="helpButton" contentDisplay="CENTER" mnemonicParsing="false"
+                    onAction="#onHelpButtonClick" text="?" />
+            <Pane prefHeight="21.0" prefWidth="200.0" />
+            <Button fx:id="okButton" mnemonicParsing="false"
+                    onAction="#onOKButtonClick" prefWidth="130.0" text="OK" />
+            <Button fx:id="cancelButton" mnemonicParsing="false"
+                    onAction="#onCancelButtonClick" prefWidth="130.0" text="Cancel" />
+          </children>
+        </HBox>
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>

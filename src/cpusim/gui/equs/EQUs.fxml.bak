@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<BorderPane prefHeight="250.0" prefWidth="470.0" styleClass="root" xmlns:fx="http://javafx.com/fxml">
+  <bottom>
+    <HBox id="HBox" alignment="CENTER" prefHeight="35.0" spacing="5.0">
+      <children>
+        <Button fx:id="helpButton" mnemonicParsing="false" onAction="#onHelpButtonClicked" prefHeight="25.0" prefWidth="25.0" styleClass="helpButton" text="?" />
+        <Pane prefHeight="35.0" prefWidth="78.0" />
+        <Button fx:id="okButton" defaultButton="true" minHeight="-Infinity" minWidth="70.0" mnemonicParsing="false" onAction="#onOkButtonClicked" prefHeight="22.0" prefWidth="140.0" styleClass="roundBlueButton" text="OK" />
+        <Button fx:id="cancelButton" cancelButton="true" minHeight="-Infinity" minWidth="70.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="22.0" prefWidth="140.0" styleClass="roundButton" text="Cancel" />
+      </children>
+    </HBox>
+  </bottom>
+  <center>
+    <BorderPane prefHeight="193.0">
+      <bottom>
+        <HBox id="HBox" alignment="CENTER" prefHeight="36.0" spacing="5.0">
+          <children>
+            <Button fx:id="newButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onNewButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="New" />
+            <Button id="duplicateButton" fx:id="deleteButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onDeleteButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="Delete" />
+            <Button fx:id="duplicateButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onDuplicateButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="Duplicate" />
+          </children>
+        </HBox>
+      </bottom>
+      <center>
+        <ScrollPane hbarPolicy="NEVER">
+          <TableView id="equTable" fx:id="equsTable" editable="true" prefHeight="142.0" prefWidth="455.0">
+            <columns>
+              <TableColumn text="Name" fx:id="nameColumn" />
+              <TableColumn text="Value" fx:id="valueColumn" />
+            </columns>
+          </TableView>
+        </ScrollPane>
+      </center>
+    </BorderPane>
+  </center>
+  <stylesheets>
+    <URL value="@../css/Dialogs.css" />
+  </stylesheets>
+  <top>
+    <HBox id="HBox" alignment="CENTER" prefHeight="36.0" prefWidth="450.0" spacing="5.0">
+      <children>
+        <Label minHeight="-Infinity" minWidth="-Infinity" text="Base:" />
+        <ComboBox id="baseCB" fx:id="baseComboBox" minHeight="-Infinity" minWidth="-Infinity" prefWidth="126.0">
+          <items>
+            <FXCollections fx:factory="observableArrayList">
+              <String fx:value="Item 1" />
+              <String fx:value="Item 2" />
+              <String fx:value="Item 3" />
+            </FXCollections>
+          </items>
+        </ComboBox>
+      </children>
+    </HBox>
+  </top>
+</BorderPane>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="597.999977929685" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <TableView id="regTable" fx:id="table" editable="true" layoutX="2.0" layoutY="13.0" prefHeight="204.0" prefWidth="596.0">
+      <columns>
+        <TableColumn minWidth="50.0" text="Address" fx:id="address" />
+        <TableColumn minWidth="50.0" text="Data" fx:id="data" />
+      </columns>
+    </TableView>
+  </children>
+</AnchorPane>

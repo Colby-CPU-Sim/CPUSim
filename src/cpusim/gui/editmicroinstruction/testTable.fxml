@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.control.TableView" id="testTable"
+           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+  <columns>
+    <TableColumn text="name" fx:id="name"/>
+    <TableColumn text="register" fx:id="register"/>
+    <TableColumn text="start" fx:id="start"/>
+    <TableColumn text="numBits" fx:id="numBits"/>
+    <TableColumn text="comparison" fx:id="comparison"/>
+    <TableColumn text="value" fx:id="value"/>
+    <TableColumn text="omission" fx:id="omission"/>
+  </columns>
+</fx:root>
+

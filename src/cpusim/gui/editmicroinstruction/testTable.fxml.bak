@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="599.0" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <TableView id="testTable" prefHeight="228.0" prefWidth="599.0">
+      <columns>
+        <TableColumn prefWidth="120.0" text="name" />
+        <TableColumn prefWidth="90.0" text="register" />
+        <TableColumn text="start" />
+        <TableColumn text="numBits" />
+        <TableColumn prefWidth="75.0" text="comparison" />
+        <TableColumn text="value" />
+        <TableColumn prefWidth="75.0" text="omission" />
+      </columns>
+    </TableView>
+  </children>
+</AnchorPane>

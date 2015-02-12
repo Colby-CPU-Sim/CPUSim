@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.control.TableView" id="memoryAccessTable"
+           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+  <columns>
+    <TableColumn text="name" fx:id="name"/>
+    <TableColumn text="direction" fx:id="direction"/>
+    <TableColumn text="memory" fx:id="memory"/>
+    <TableColumn text="data" fx:id="data"/>
+    <TableColumn text="address" fx:id="address"/>
+  </columns>
+</fx:root>

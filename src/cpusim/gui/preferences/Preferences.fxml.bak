@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<BorderPane fx:id="mainPane" prefHeight="618.0" prefWidth="345.0" styleClass="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+  <bottom>
+    <HBox id="HBox" alignment="CENTER" prefHeight="37.0" prefWidth="300.0" spacing="5.0">
+      <children>
+        <Button fx:id="applyButton" defaultButton="true" mnemonicParsing="false" onAction="#onApplyButtonClick" prefHeight="24.0" prefWidth="120.0" styleClass="roundBlueButton" text="Apply" />
+        <Button fx:id="closeButton" cancelButton="true" mnemonicParsing="false" onAction="#onCloseButtonClick" prefHeight="24.0" prefWidth="120.0" styleClass="roundButton" text="Close" />
+      </children>
+    </HBox>
+  </bottom>
+  <center>
+    <TabPane fx:id="tabPane" prefHeight="489.0" prefWidth="300.0">
+      <tabs>
+        <Tab closable="false" text="Font">
+          <content>
+            <VBox id="Content" alignment="CENTER_LEFT" minHeight="0.0" minWidth="0.0" prefHeight="-1.0" prefWidth="-1.0" spacing="3.0">
+              <children>
+                <Label text="Assembly code window" textOverrun="WORD_ELLIPSIS" />
+                <VBox alignment="CENTER" prefHeight="226.0" prefWidth="-1.0" spacing="3.0">
+                  <children>
+                    <Label prefWidth="28.0" text="Font" />
+                    <ComboBox fx:id="assemblyWindowFont" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Courier New" />
+                          <String fx:value="Lucida Console" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <Label text="Size" />
+                    <ChoiceBox fx:id="assemblyWindowSize" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="10" />
+                          <String fx:value="12" />
+                          <String fx:value="14" />
+                          <String fx:value="16" />
+                          <String fx:value="18" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <Label text="Style" />
+                    <ChoiceBox fx:id="assemblyWindowStyle" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="normal" />
+                          <String fx:value="bold" />
+                          <String fx:value="italic" />
+                          <String fx:value="bold and italic" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <Label text="Forground Color" />
+                    <ColorPicker fx:id="assemblyForground" />
+                    <Label text="Background Color" />
+                    <ColorPicker fx:id="assemblyBackground" />
+                  </children>
+                </VBox>
+                <Label text="RAM &amp; Register windows" />
+                <VBox alignment="CENTER" prefHeight="223.0" prefWidth="-1.0" spacing="3.0">
+                  <children>
+                    <Label prefWidth="28.0" text="Font" />
+                    <ComboBox fx:id="registerWindowFont" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Courier New" />
+                          <String fx:value="Lucida Console" />
+                        </FXCollections>
+                      </items>
+                    </ComboBox>
+                    <Label text="Size" />
+                    <ChoiceBox fx:id="registerWindowSize" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="10" />
+                          <String fx:value="12" />
+                          <String fx:value="14" />
+                          <String fx:value="16" />
+                          <String fx:value="18" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <Label text="Style" />
+                    <ChoiceBox fx:id="registerWindowStyle" prefWidth="220.0">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="normal" />
+                          <String fx:value="bold" />
+                          <String fx:value="italic" />
+                          <String fx:value="bold and italic" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <Label text="Forground Color" />
+                    <ColorPicker fx:id="registerForground" />
+                    <Label text="Background Color" />
+                    <ColorPicker fx:id="registerBackground" />
+                    <Label text="Border Color" />
+                    <ColorPicker fx:id="registerBorder" />
+                  </children>
+                </VBox>
+              </children>
+              <padding>
+                <Insets left="10.0" />
+              </padding>
+            </VBox>
+          </content>
+        </Tab>
+        <Tab fx:id="keyBindingsTab" closable="false" text="Key Bindings">
+          <content>
+            <ScrollPane id="ScrollPane" prefViewportHeight="482.0" prefViewportWidth="289.0">
+              <content>
+                <AnchorPane fx:id="menuItemsPane" minHeight="626.0" prefHeight="626.0" prefWidth="330.0000999999975">
+                  <children>
+                    <Label layoutX="5.0" layoutY="25.0" text="New text" />
+                    <Label layoutX="5.0" layoutY="41.0" text="Open text" />
+                    <Label layoutX="5.0" layoutY="57.0" text="Close text" />
+                    <Label layoutX="5.0" layoutY="73.0" text="Save text" />
+                    <Label layoutX="5.0" layoutY="89.0" text="Save text as" />
+                    <Label layoutX="5.0" layoutY="105.0" text="New machine" />
+                    <Label layoutX="5.0" layoutY="121.0" text="Open machine" />
+                    <Label layoutX="5.0" layoutY="137.0" text="Save machine" />
+                    <Label layoutX="5.0" layoutY="153.0" text="Save machine As" />
+                    <Label layoutX="5.0" layoutY="169.0" text="Save machine in HTML" />
+                    <Label layoutX="5.0" layoutY="185.0" text="Print preview" />
+                    <Label layoutX="5.0" layoutY="201.0" text="Print setup" />
+                    <Label layoutX="5.0" layoutY="217.0" text="Print" />
+                    <Label layoutX="5.0" layoutY="233.0" text="Quit" />
+                    <Label layoutX="5.0" layoutY="249.0" text="Undo" />
+                    <Label layoutX="5.0" layoutY="265.0" text="Redo" />
+                    <Label layoutX="5.0" layoutY="281.0" text="Cut" />
+                    <Label layoutX="5.0" layoutY="297.0" text="Copy" />
+                    <Label layoutX="5.0" layoutY="313.0" text="Paste" />
+                    <Label layoutX="5.0" layoutY="329.0" text="Select all" />
+                    <Label layoutX="5.0" layoutY="345.0" text="Find" />
+                    <Label layoutX="5.0" layoutY="361.0" text="Preferences" />
+                    <Label layoutX="5.0" layoutY="377.0" text="Machine instructions" />
+                    <Label layoutX="5.0" layoutY="393.0" text="Microinstructions" />
+                    <Label layoutX="5.0" layoutY="409.0" text="Hardware modules" />
+                    <Label layoutX="5.0" layoutY="425.0" text="EQUs" />
+                    <Label layoutX="5.0" layoutY="441.0" text="Fetch Sequence" />
+                    <Label layoutX="5.0" layoutY="457.0" text="Debug Mode" />
+                    <Label layoutX="5.0" layoutY="473.0" text="Assemble" />
+                    <Label layoutX="5.0" layoutY="489.0" text="Assemble &amp; load" />
+                    <Label layoutX="5.0" layoutY="505.0" text="Assemble, load &amp; run" />
+                    <Label layoutX="5.0" layoutY="521.0" text="Clear, assemble, load &amp; run" />
+                    <Label layoutX="5.0" layoutY="537.0" text="Run" />
+                    <Label layoutX="5.0" layoutY="555.0" text="Stop" />
+                    <Label layoutX="5.0" layoutY="569.0" text="Reset everything" />
+                    <Label layoutX="5.0" layoutY="585.0" text="Options" />
+                    <Label layoutX="5.0" layoutY="601.0" text="General CPUSim Help" />
+                    <Label layoutX="5.0" layoutY="617.0" text="About CPUSim" />
+                    <Label layoutX="40.0" layoutY="8.0" text="Menu Items" />
+                    <Label layoutX="172.0" layoutY="8.0" text="Key Bindings" />
+                    <Separator layoutY="22.0" prefWidth="345.0" />
+                    <AnchorPane fx:id="keyBindingsPane" layoutX="172.0" layoutY="23.0" prefHeight="613.0" />
+                  </children>
+                </AnchorPane>
+              </content>
+            </ScrollPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+  </center>
+  <stylesheets>
+    <URL value="@../css/Dialogs.css" />
+  </stylesheets>
+</BorderPane>

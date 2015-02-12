@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<VBox prefHeight="453.0" prefWidth="743.0" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <HBox prefHeight="439.0" prefWidth="743.0">
+      <children>
+        <VBox id="VBox" alignment="CENTER" prefHeight="328.0" prefWidth="203.0">
+          <children>
+            <TitledPane animated="false" collapsible="false" prefHeight="388.0" prefWidth="203.0" text="Instructions">
+              <content>
+                <ListView prefHeight="358.0" prefWidth="199.0" />
+              </content>
+            </TitledPane>
+            <ToolBar minHeight="21.0" prefHeight="29.0" prefWidth="203.0">
+              <items>
+                <Button mnemonicParsing="false" text="new" />
+                <Button mnemonicParsing="false" text="dup" />
+                <Button mnemonicParsing="false" text="del" />
+              </items>
+            </ToolBar>
+          </children>
+        </VBox>
+        <TabPane prefHeight="415.0" prefWidth="540.0" tabClosingPolicy="UNAVAILABLE">
+          <tabs>
+            <Tab text="Format">
+              <content>
+                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                    <TextField layoutX="71.0" layoutY="40.0" prefHeight="22.0" prefWidth="80.0" />
+                    <AnchorPane layoutX="35.0" layoutY="94.0" prefHeight="52.0" prefWidth="453.0">
+                      <children>
+                        <TextField layoutY="30.0" prefWidth="164.0" />
+                        <Label layoutX="65.0" layoutY="10.0" text="4" />
+                        <TextField layoutX="164.0" layoutY="30.0" prefWidth="289.9999000000025" />
+                      </children>
+                    </AnchorPane>
+                    <Separator layoutX="-2.0" layoutY="192.0" prefWidth="540.0" />
+                    <Label layoutX="43.0" layoutY="43.0" text="Bits" />
+                    <Label layoutX="14.0" layoutY="8.0" text="Instruction" />
+                    <Label layoutX="218.0" layoutY="43.0" text="Opcode" />
+                    <TextField layoutX="268.0" layoutY="40.0" prefHeight="22.0" prefWidth="80.0" />
+                    <Button layoutX="184.0" layoutY="158.0" mnemonicParsing="false" text="New Field" />
+                  </children>
+                </AnchorPane>
+              </content>
+            </Tab>
+            <Tab text="Implementation">
+              <content>
+                <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </Tab>
+          </tabs>
+        </TabPane>
+      </children>
+    </HBox>
+    <Separator prefWidth="200.0" />
+    <AnchorPane prefHeight="60.0" prefWidth="662.0">
+      <children>
+        <Button layoutX="513.0" layoutY="8.0" mnemonicParsing="false" text="Cancel" />
+        <Button layoutX="427.0" layoutY="8.0" mnemonicParsing="false" text="Okay" />
+        <Button layoutX="40.0" layoutY="9.0" mnemonicParsing="false" text="?" />
+      </children>
+    </AnchorPane>
+  </children>
+</VBox>

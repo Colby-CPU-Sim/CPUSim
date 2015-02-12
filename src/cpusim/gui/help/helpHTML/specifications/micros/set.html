@@ -1,0 +1,25 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Set</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Set</P></font></B><FONT FACE="Palatino"><P>The Set
+    microinstruction sets a sequence of consecutive bits of a register to a specified value.</P><B><I><P>Parameters:
+</i></B></FONT>
+<DIR><FONT FACE="Palatino">
+    <B>Register:</B> the register whose bits are to be set.
+    <P><B>Start:</B> the leftmost bit of the register that is to be set. This must be an integer from 0 to one less than
+        the width of the register.</P>
+
+    <P><B>NumBits:</B> the number of consecutive bits in the register to be set</P>
+
+    <P><B>Value:</B> the base-10 value to which the bits are to be set. This value must fit in the designated bits as
+        either an unsigned or signed (two's complement) decimal. Therefore the value must be from
+        -2<SUP><I>w</I>-1</SUP> to 2<SUP><I>w</I></SUP>-1, where <I>w</I> is the number of bits to be set in the
+        register.</P></FONT></DIR>
+</BODY>
+</HTML>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.control.TableView" id="shiftTable"
+           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+  <columns>
+    <TableColumn text="name" fx:id="name" />
+    <TableColumn text="source" fx:id="source"/>
+    <TableColumn text="destination" fx:id="destination"/>
+    <TableColumn text="type" fx:id="type"/>
+    <TableColumn text="direction" fx:id="direction"/>
+    <TableColumn text="distance" fx:id="distance"/>
+  </columns>
+</fx:root>
+

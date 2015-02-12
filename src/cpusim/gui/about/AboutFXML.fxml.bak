@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.web.*?>
+
+<BorderPane minWidth="450.0" prefHeight="700.0" prefWidth="450.0" styleClass="root" xmlns:fx="http://javafx.com/fxml">
+  <bottom>
+    <HBox id="HBox" alignment="CENTER" prefHeight="49.0" prefWidth="450.0" spacing="5.0">
+      <children>
+        <Button fx:id="okButton" contentDisplay="CENTER" defaultButton="true" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOkButtonClicked" prefHeight="22.0" prefWidth="160.0" styleClass="roundBlueButton" text="OK" />
+      </children>
+    </HBox>
+  </bottom>
+  <center>
+    <WebView fx:id="webView" prefHeight="270.0" prefWidth="450.0" />
+  </center>
+  <stylesheets>
+    <URL value="@../css/Dialogs.css" />
+  </stylesheets>
+  <top>
+    <AnchorPane prefHeight="225.0" prefWidth="429.0">
+      <children>
+        <ImageView fx:id="imageView" fitHeight="191.0" fitWidth="355.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="17.0" AnchorPane.leftAnchor="48.0" AnchorPane.rightAnchor="47.0" AnchorPane.topAnchor="17.0" />
+      </children>
+    </AnchorPane>
+  </top>
+</BorderPane>

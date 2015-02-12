@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.web.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="850.0" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <BorderPane prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <center>
+        <SplitPane dividerPositions="0.2688679245283019" focusTraversable="true" prefHeight="160.0" prefWidth="200.0">
+          <items>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+              <children>
+                <TreeView fx:id="treeView" prefHeight="752.0" prefWidth="207.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+              </children>
+            </AnchorPane>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+              <children>
+                <WebView fx:id="webView" prefHeight="752.0" prefWidth="385.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+              </children>
+            </AnchorPane>
+          </items>
+        </SplitPane>
+      </center>
+      <top>
+        <AnchorPane prefHeight="46.0" prefWidth="600.0">
+          <children>
+            <HBox id="HBox" alignment="CENTER" prefHeight="46.0" prefWidth="600.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <children>
+                <Button id="previous" fx:id="backButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBackButtonClicked" prefWidth="80.0" text="Back" />
+                <Button id="nextButton" fx:id="forwardButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onForwardButtonClicked" prefWidth="80.0" text="Forward" />
+                <Button fx:id="closeButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCloseButtonClicked" prefWidth="80.0" text="Close" />
+                <Label text="Search:">
+                  <HBox.margin>
+                    <Insets left="10.0" />
+                  </HBox.margin>
+                </Label>
+                <TextField prefWidth="155.0" />
+              </children>
+            </HBox>
+          </children>
+        </AnchorPane>
+      </top>
+    </BorderPane>
+  </children>
+</AnchorPane>

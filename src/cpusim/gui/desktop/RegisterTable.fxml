@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx/8">
+    <TitledPane fx:id="titledPane" animated="false" contentDisplay="TOP"
+                minWidth="0.0" collapsible="false" text="untitled">
+        <TableView id="regTable" fx:id="table" editable="true">
+            <columns>
+                <TableColumn text="Name" fx:id="name" editable="false"/>
+                <TableColumn text="Width" fx:id="width" editable="false"/>
+                <TableColumn text="Data" fx:id="data"/>
+            </columns>
+        </TableView>
+    </TitledPane>
+</AnchorPane>

@@ -1,0 +1,217 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type"
+	CONTENT="text/html; charset=windows-1252">
+
+<TITLE>Debug Mode</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+	<h3 ALIGN="CENTER">
+		<B><FONT FACE="Arial" COLOR="#0000ff">Debug Mode</font></B>
+	</h3>
+	<P>
+		<FONT FACE="Palatino">Debug mode provides you with several
+			tools for finding bugs in your code, including the following:</FONT>
+	</P>
+	<OL>
+		<LI><FONT FACE="Palatino">You can step through the code
+				one machine instruction or one microinstruction at a time. As you do
+				so, the name of the current machine instruction being executed is
+				displayed on the right end of the debug toolbar, along with the
+				microinstructions composing it, which are displayed in a scroll box.
+				The specific microinstruction being executed is highlighted in the
+				scroll box. If you step by microinstruction, then any register and
+				RAM cells that are changed during execution are outlined in green.
+				After each step you can inspect and change the values stored in any
+				register or RAM.</FONT></LI>
+		<LI><FONT FACE="Palatino">You can back up one machine
+				instruction at a time, which resets the values of the registers and
+				RAMs to their state at the start of the last machine cycle.</FONT></LI>
+		<LI><FONT FACE="Palatino">You can also back up one
+				microinstruction at a time, which resets the values of the registers
+				and RAMs to their state at the start of the last microinstruction.</FONT></LI>
+		<LI><FONT FACE="Palatino">Using the Highlighting tab
+				within the "<A HREF="../windows/OptionsDialog.html">Options
+					Dialog</A>", you can specify cells of RAMs to be highlighted as you
+				step through the code. For example, suppose you have a stack and a
+				stack top register. You can tell CPU Sim to highlight, after each
+				step, the row of the stack RAM whose address is in the stack top
+				register. Similarly, if you have a program counter, you can tell CPU
+				Sim to highlight the row of the code RAM whose address is in the
+				program counter during each step. In the latter case, CPU Sim will
+				also highlight the row of source code corresponding to the
+				highlighted row of RAM, as you step through the code.
+		</FONT></LI>
+		<LI><FONT FACE="Palatino">You can specify break points at
+				any line of code by checking the box on the left side of that line
+				in its text tab. When that line of code is used (via a <A
+				HREF="../specifications/micros/memoryAccess.html">MemoryAccess</A>
+				microinstruction) for either reading or writing, the MemoryAccess
+				microinstruction is executed and then execution halts. When the
+				program halts, the line of code that caused the break is selected in
+				the text editor. At that point, you can inspect and/or edit the
+				contents of all registers and RAMs and back up or resume execution.
+		</FONT></LI>
+	</OL>
+	<P>
+		<FONT FACE="Palatino">To enter debug mode, select the "Debug
+			mode" menu item in the <strong>Execute</strong> menu. This action
+			will cause (a) a debug toolbar to appear below the main menu (see
+			Figure 28) and (b) a new column of checkboxes to appear on the left
+			side of all RAM windows.
+		</FONT>
+	</P>
+	<P class="p3" ALIGN="CENTER">
+		<FONT FACE="Palatino"><IMG
+			SRC="../generalHelp/tour/DebugToolbar.jpg" HEIGHT="40" WIDTH="500"><BR>Figure
+			28. The debugging toolbar</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The label to the left of the scroll box
+			on the right end of the toolbar always displays the machine
+			instruction or fetch sequence that is about to be or is currently
+			being executed. In Figure 28 above, the fetch sequence is about to be
+			executed. At the start of each machine cycle, the toolbar displays
+			the fetch sequence first. The scroll box lists the microinstructions
+			comprising the current machine instruction or fetch sequence. The
+			microinstruction that is to be executed next is always highlighted.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Go</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Go" button causes execution to
+			continue without interruption until one of the following happens: </FONT>
+	</P>
+	<OL TYPE="a">
+
+		<LI><FONT FACE="Palatino">a condition bit that is
+				designated as halt bit has its value set to 1</FONT></LI>
+		<LI><FONT FACE="Palatino">a break point is reached</FONT></LI>
+		<LI><FONT FACE="Palatino">the user stops the current
+				execution by choosing "Stop" from the <b> Execute </b>menu
+		</FONT></LI>
+		<LI><FONT FACE="Palatino">the user chooses Cancel when an
+				input dialog appears</FONT></LI>
+		<LI><FONT FACE="Palatino">an error occurs.</FONT></LI>
+	</OL>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Step by Instr</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Step by Instr" button causes the
+			execution of one full machine cycle (a fetch sequence followed by the
+			execute sequence of the instruction decoded by the fetch sequence).
+			If part of a machine cycle has already been executed (for example, by
+			means of the "Step by Micro" button or if the execution of a whole
+			cycle was halted because of an error), then clicking this button
+			causes the rest of that machine cycle to be executed. The name of the
+			machine instruction currently being executed is displayed in the
+			label to the scroll box at the right end of the toolbar.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Step by Micro</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Step by Micro" button causes
+			execution of one microinstruction in the current fetch or execute
+			sequence. The name of the microinstruction to be executed is
+			highlighted in the scroll box on the right end of the debug toolbar.
+			After execution of the microinstruction, any values in registers that
+			were changed by it are highlighted with a green border.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Backup one
+					Instr</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Backup one Instr" button causes the
+			machine to back up to the state it was in at the beginning of the
+			last machine cycle. You can continue backing up one machine
+			instruction at a time all the way to the initial state of the machine
+			when you entered debug mode.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Backup one
+					Micro</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Backup one Micro" button causes the
+			machine to back up to the state it was in at the beginning of the
+			previous microinstruction. You can continue backing up one
+			microinstruction at a time all the way to the initial state of the
+			machine. If you have been backing up by microinstruction and then use
+			the "Backup one Instr" button, the machine will back up to the state
+			it was in at the beginning of the last machine cycle. From there you
+			can back up by machine instruction or microinstruction, or you can
+			step forward by machine instruction or microinstruction.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Start over</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The "Start over" button causes the
+			machine to back up all at once to the initial state it was in when
+			the user started executing the current program in debug mode using
+			the current machine. This action also causes the IO to be flushed and
+			reset and the control unit to be reset (to begin execution at the
+			start of the fetch sequence). This buttons functions similarly to
+			"Reset everything" in the <B>Execute </B>menu except that this button
+			does not clear the registers and RAMs (unless they were clear when
+			debug mode was entered).
+		</FONT>
+	</P>
+	<P>&nbsp;</P>
+	<P>
+		<FONT FACE="Palatino"><B><FONT FACE="Arial" COLOR="#0000ff">Setting
+					Break points in RAM windows</FONT></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><FONT FACE="Palatino">The column
+				of checkboxes in the text editor that appears when CPU Sim is in
+				debug mode is used for setting break points. CPU Sim will halt
+				execution whenever a MemoryAccess microinstruction reads or writes
+				to the address of RAM associated with the line of code that is
+				checked. More precisely, the MemoryAccess microinstruction will be
+				executed, the row of the RAM window with the associated checked box
+				will be highlighted, and then execution will halt. At that point,
+				you can inspect and/or change the contents of any register or RAM
+				and continue execution or back up. </FONT></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><FONT FACE="Palatino">By checking
+				the box in front of a line of code containing a machine instruction,
+				you can halt execution when that instruction is reached (since that
+				instruction needs to be loaded into a register via a MemoryAccess
+				microinstruction before it can be executed).</FONT></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><FONT FACE="Palatino">For example,
+				by checking the box in front of a .data pseudoinstruction you can
+				halt execution when that data is read from or written to.</FONT></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><FONT FACE="Arial" COLOR="#0000ff">Notes</FONT></B></FONT>
+	</P>
+	<OL TYPE="a">
+		<LI><FONT FACE="Palatino">Between every step forward or
+				backward, you can inspect and edit any values in the registers or
+				RAMs. </FONT></LI>
+		<LI><FONT FACE="Palatino">One way to find errors in your
+				programs is to step by machine instruction until you reach a point
+				where an error has already occurred. Then back up one
+				microinstruction at a time until you reach the precise
+				microinstruction in which the problem occurred. </FONT></LI>
+		<LI><FONT FACE="Palatino">If your program seems to be in
+				an infinite loop, you can to choose "Stop" from the Execute menu to
+				halt the execution.</FONT></LI>
+		<LI><FONT FACE="Palatino">You are able to back up when in
+				debug mode because CPU Sim saves the state of the machine just
+				before executing each microinstruction. However, if your program is
+				in an infinite loop, CPU Sim will quickly run out of memory. To
+				avoid this problem, CPU Sim saves at most the first 10,000 states.</FONT></LI>
+	</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.input.*?>
+
+<VBox id="MainPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="873.0" prefWidth="1400.0" fx:id="mainPane"
+      xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <MenuBar>
+      <menus>
+        <Menu mnemonicParsing="false" text="File" fx:id="fileMenu">
+          <items>
+            <MenuItem mnemonicParsing="false"  onAction="#handleNewText" text="New text">
+                <accelerator>
+                    <KeyCodeCombination code="N" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleOpenText" text="Open text...">
+                <accelerator>
+                    <KeyCodeCombination code="O" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <Menu mnemonicParsing="false" text="Reopen text" fx:id="reopenTextMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleCloseText" text="Close text">
+                <accelerator>
+                    <KeyCodeCombination code="W" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveText" text="Save text">
+                <accelerator>
+                    <KeyCodeCombination code="S" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveAsText" text="Save text as...">
+                <accelerator>
+                    <KeyCodeCombination code="S" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <Menu mnemonicParsing="false" fx:id="openRamMenu" text="Open RAM..."/>
+            <Menu mnemonicParsing="false" fx:id="saveRamMenu" text="Save RAM..."/>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleNewMachine" text="New machine" fx:id="newMachine">
+                <accelerator>
+                    <KeyCodeCombination code="N" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleOpenMachine" text="Open machine..." fx:id="openMachine">
+                <accelerator>
+                    <KeyCodeCombination code="O" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <Menu mnemonicParsing="false" text="Reopen machine" fx:id="reopenMachineMenu" />
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveMachine" text="Save machine">
+                <accelerator>
+                    <KeyCodeCombination code="B" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveAsMachine" text="Save machine as...">
+                <accelerator>
+                    <KeyCodeCombination code="B" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleSaveAsHTMLMachine" text="Save machine in HTML..." >
+            	<accelerator>
+                    <KeyCodeCombination code="B" shift="ANY" alt="DOWN" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handlePrintPreview" text="Print Preview" >
+            	<accelerator>
+                    <KeyCodeCombination code="P" shift="UP" alt="DOWN" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handlePrintSetup" text="Print setup..." >
+            	<accelerator>
+                    <KeyCodeCombination code="P" shift="DOWN" alt="UP" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handlePrint" text="Print...">
+                <accelerator>
+                    <KeyCodeCombination code="P" shift="UP" alt="UP" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleQuit" text="Quit" >
+            	<accelerator>
+                    <KeyCodeCombination code="Q" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit" fx:id="editMenu">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleUndo" text="Undo">
+                <accelerator>
+                    <KeyCodeCombination code="Z" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleRedo" text="Redo">
+                <accelerator>
+                    <KeyCodeCombination code="Z" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleCut" text="Cut">
+                <accelerator>
+                    <KeyCodeCombination code="X" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleCopy" text="Copy">
+                <accelerator>
+                    <KeyCodeCombination code="C" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handlePaste" text="Paste">
+                <accelerator>
+                    <KeyCodeCombination code="V" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleDelete" text="Delete" >
+            	<accelerator>
+                    <KeyCodeCombination code="DELETE" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="ANY"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleSelectAll" text="Select All">
+                <accelerator>
+                    <KeyCodeCombination code="A" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleFind" text="Find...">
+                <accelerator>
+                    <KeyCodeCombination code="F" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handlePreferences" text="Preferences..." >
+            	<accelerator>
+                    <KeyCodeCombination code="COMMA" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Modify" fx:id="modifyMenu">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleMachineInstructions" text="Machine instructions...">
+                <accelerator>
+                    <KeyCodeCombination code="M" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleMicroinstructions" text="Microinstructions...">
+                <accelerator>
+                    <KeyCodeCombination code="M" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleHardwareModules" text="Hardware Modules...">
+                <accelerator>
+                    <KeyCodeCombination code="K" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleEQUs" text="EQUs...">
+                <accelerator>
+                    <KeyCodeCombination code="E" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleFetchSequence" text="Fetch Sequence..." >
+            	<accelerator>
+                    <KeyCodeCombination code="Y" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Execute" fx:id="executeMenu">
+          <items>
+            <CheckMenuItem mnemonicParsing="false" text="Debug Mode" onAction="#handleDebug" fx:id="debugMode">
+                <accelerator>
+                    <KeyCodeCombination code="D" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </CheckMenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleAssemble" text="Assemble">
+                <accelerator>
+                    <KeyCodeCombination code="DIGIT1" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleAssembleLoad" text="Assemble &amp; load">
+                <accelerator>
+                    <KeyCodeCombination code="DIGIT2" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleAssembleLoadRun" text="Assemble, load &amp; run" fx:id="assembleLoadRun">
+            	<accelerator>
+                    <KeyCodeCombination code="DIGIT3" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleClearAssembleLoadRun" text="Clear, assemble, load &amp; run" fx:id="clearAssembleLoadRun">
+                <accelerator>
+                    <KeyCodeCombination code="G" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleRun" text="Run" fx:id="run" >
+            	<accelerator>
+                    <KeyCodeCombination code="R" shift="UP" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleStop" text="Stop">
+                <accelerator>
+                    <KeyCodeCombination code="PERIOD" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleResetEverything" text="Reset everything">
+                <accelerator>
+                    <KeyCodeCombination code="R" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#handleOptions" text="Options..." >
+            	<accelerator>
+                    <KeyCodeCombination code="I" shift="ANY" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help" fx:id="helpMenu">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#handleGeneralCPUSimHelp" text="General CPUSim Help" >
+            	<accelerator>
+                    <KeyCodeCombination code="H" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+            <MenuItem mnemonicParsing="false" onAction="#handleAboutCPUSim" text="About CPUSim" >
+            	<accelerator>
+                    <KeyCodeCombination code="A" shift="DOWN" alt="ANY" control="ANY" meta="ANY" shortcut="DOWN"/>
+                </accelerator>
+            </MenuItem>
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <SplitPane dividerPositions="0.82" focusTraversable="true" orientation="VERTICAL" prefHeight="809.0" prefWidth="996.0" VBox.vgrow="ALWAYS">
+      <items>
+        <SplitPane dividerPositions="0.3175403225806452, 0.81" focusTraversable="true" prefHeight="160.0" prefWidth="200.0">
+          <items>
+            <VBox id="VBox" fx:id="regVbox" alignment="CENTER" spacing="5.0">
+              <children>
+                <ToolBar>
+                  <items>
+                    <Label text="Data" />
+                    <ChoiceBox id="CB1" fx:id="registerDataDisplayCB" value="Binary">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Dec" />
+                          <String fx:value="Bin" />
+                          <String fx:value="Hex" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                  </items>
+                </ToolBar>
+                <SplitPane id="SplitPane" fx:id="regSplitPane" orientation="VERTICAL" />
+              </children>
+            </VBox>
+            <TabPane fx:id="textTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="ALL_TABS" />
+            <VBox id="VBox" fx:id="ramVbox" alignment="CENTER" spacing="5.0">
+              <children>
+                <Label fx:id="noRAMLabel" text="No RAMs Currently" />
+                <ToolBar fx:id="ramToolBar" disable="true">
+                  <items>
+                    <Label text="Addr" />
+                    <ChoiceBox id="CB2" fx:id="ramAddressDisplayCB">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Dec" />
+                          <String fx:value="Bin" />
+                          <String fx:value="Hex" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                    <Pane prefWidth="10" />
+                    <Label text="Data" />
+                    <ChoiceBox id="CB3" fx:id="ramDataDisplayCB" value="Binary">
+                      <items>
+                        <FXCollections fx:factory="observableArrayList">
+                          <String fx:value="Dec" />
+                          <String fx:value="Bin" />
+                          <String fx:value="Hex" />
+                        </FXCollections>
+                      </items>
+                    </ChoiceBox>
+                  </items>
+                </ToolBar>
+                <SplitPane id="SplitPane" fx:id="ramSplitPane" orientation="VERTICAL" />
+              </children>
+            </VBox>
+          </items>
+        </SplitPane>
+        <AnchorPane  maxHeight="Infinity" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+            <children>
+                <TextArea fx:id="ioConsole" wrapText="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            </children>
+        </AnchorPane>
+      </items>
+    </SplitPane>
+  </children>
+</VBox>

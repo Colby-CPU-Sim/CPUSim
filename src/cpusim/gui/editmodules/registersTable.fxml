@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+
+<fx:root type="javafx.scene.control.TableView" id="registerTable"
+           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+  <columns>
+    <TableColumn text="name" fx:id="name" />
+    <TableColumn text="width" fx:id="width"/>
+    <TableColumn text="initial value" fx:id="initialValue" />
+    <TableColumn text="read-only" fx:id="readOnly" />
+  </columns>
+</fx:root>

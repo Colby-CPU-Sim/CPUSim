@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Include directives</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Include directives</P></font></B>
+
+<FONT FACE="Palatino"><P>An <I>Include</I> directive is a pseudoinstruction used for temporarily inserting the text from
+    one file into the text of another file just before assembly. The pseudoinstruction has the following parts: </P>
+
+    <P>
+    <DD><b><I>label:</I> .include <I>text-file-name comment </I></b></DD>
+    <P>The word ".include" and the text file name must be included, but the comment and the label are optional. The text
+        file name must be a string of 1 or more characters surrounded by double quotes or chevron quotes. For example,
+        suppose a file <I> F</I> contains the Include directive:</P></FONT>
+<PRE>
+	.include "W1-0.h"
+</PRE>
+<P><font face="Palatino">Then, at the point in <I>F</I> at which the Include directive appears, the contents of file
+    "W1-0.h" are temporarily inserted for the purpose of assembly. The quoted part of the Include directive must be the
+    pathname of the file to be inserted. This pathname is relative to the file <I>F</I>. For example, the Include
+    directive above assumes that the file "W1-0.h" is in the same directory as <I>F</I>. If the file "W1-0.h" is in a
+    subdirectory called "defs", for example, then the include directive should say:</font></P>
+<PRE>
+	.include "defs/W1-0.h"
+</PRE>
+<FONT FACE="Palatino"><P>If the file "W1-0.h" is in the parent directory of <I>F</I>, then the Include directive should
+    say:</P></FONT>
+<PRE>
+	.include "../W1-0.h"
+</PRE>
+<FONT FACE="Palatino"><P>If the file <I>F</I> contains the Include directive:
+    <PRE>	.include &lt;W1-0.h&gt;</PRE>
+    then CPU Sim will search for the file W1-0.h relative to the directory containing the current machine (that is, the
+    .cpu file containing the current machine) instead of relative to the directory containing <I>F</I>.<P></P></FONT>
+</BODY>
+</HTML>

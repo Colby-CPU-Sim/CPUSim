@@ -1,0 +1,185 @@
+/*
+    Author: Jinghui Yu
+*/
+
+/*  background color */
+.root {
+    master-color: whitesmoke;
+    -fx-background-color: derive(master-color, 0%);
+}
+
+/*  Button */
+.button:disabled {
+     -fx-opacity: -fx-disabled-opacity;
+ }
+
+.roundButton {
+    -fx-background-radius: 30;
+    -fx-font: 13px "System";
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 0% 0% to 0% 80%, white, #D7D7D7, white);
+}
+
+.roundButton:armed {
+    -fx-body-color: linear-gradient(from 100% 100% to 100% 20%, white, #D7D7D7, white);
+}
+
+.roundBlueButton {
+    -fx-background-radius: 30;
+    -fx-font: 13px "System";
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 0% 0% to 0% 80%, #ACCDF7, #5599EF, #ACCDF7);
+}
+
+.roundBlueButton:armed {
+    -fx-body-color: linear-gradient(from 100% 100% to 100% 20%, #ACCDF7, #5599EF, #ACCDF7);
+}
+
+.smallButton {
+    -fx-background-radius: 5;
+    -fx-font: 13px "System";
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 0% 0% to 0% 80%, white, #D7D7D7, white);
+}
+
+.smallButton:armed {
+    -fx-body-color: linear-gradient(from 100% 100% to 100% 20%, white, #D7D7D7, white);
+}
+
+.helpButton {
+    -fx-background-radius: 30;
+    -fx-font: 13px "System";
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 10% 0% to 10% 70%, white, #d19bd0, white);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 0 );
+}
+
+.helpButton:armed {
+    -fx-body-color: linear-gradient(from 10% 0% to 10% 70%, white, #d17ed0, white);
+    -fx-effect: dropshadow(gaussian, #3354ff, 8, 0.49206349206349204, 0, 0);
+}
+
+/*  combo box */
+.combo-box-base, .choice-box {
+    -fx-background-radius: 5;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -fx-box-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 8, 0.0 , 0 , 0 );
+}
+
+/* choice box */
+.choice-box .open-button {
+    -fx-background-color: null;
+    -fx-padding: 0.083333em 0.4333em 0.0em 0.666667em; /* 1 0 0 8 */
+}
+
+/* label */
+.label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,0 );
+}
+
+/* table view */
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.table-row-cell:focused:odd {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1, 2;
+}
+
+/* When the table-row-cell is selected and focused */
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background: -fx-accent;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:selected, .table-view:row-selection .table-row-cell:filled:hover:selected {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+/* When the TableView is _not_ focused, we show alternate selection colors */
+.table-row-cell:filled:selected:focused, .table-row-cell:filled:selected {
+    -fx-background-color: lightgray;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-row-cell:selected:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.table-view:row-selection .table-row-cell:filled:hover {
+    -fx-background-color: -fx-table-cell-border-color, -fx-cell-hover-color;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.table-view:row-selection .table-row-cell:filled:focused:hover {
+    -fx-background-color: -fx-table-cell-border-color, -fx-focus-color, -fx-cell-focus-inner-border, -fx-cell-hover-color;
+    -fx-background-insets: 0, 0 0 1 0, 1 1 2 1, 2 2 3 2, 3 3 4 3;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+
+/* tool bar. */
+.tool-bar {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+    -fx-alignment: CENTER;
+}
+
+.debugToolBar {
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* titled pane. */
+.titled-pane > .title {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
+    -fx-padding: 0.166667em 0.833333em 0.25em 0.833333em; /* 2 10 3 10 */
+    -fx-text-fill: black;
+}
+
+.titled-pane:focused {
+    -fx-text-fill: black;
+}
+
+
+

@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Macro declarations and calls</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Macro declarations and calls</P></font></B><FONT
+        FACE="Palatino"><P>Macro declarations give a name to a block of code. This block is called the macro <I>body</I>.
+    A macro call is indicated by the use of a macro name as an instruction. The assembler textually inserts the macro
+    body wherever the macro is called in an assembly language program. For example, consider the following macro
+    declaration</P></FONT>
+<PRE>
+	MACRO foo
+	    add x, y
+	    load z
+	ENDM
+</PRE>
+<FONT FACE="Palatino"><P>Assume that the declaration appears in a file that includes the following 3 instruction
+    statements:</P></FONT>
+<PRE>
+	add a, b
+	foo ; macro call
+	store b
+</PRE>
+<FONT FACE="Palatino"><P>In this case, the text that is assembled is the following:</P></FONT>
+<PRE>
+	add a, b
+	add x, y
+	load z
+	store b
+</PRE>
+<FONT FACE="Palatino"><P>Macros can also have parameters, which get textually replaced by the arguments in the macro
+    call. For example, consider the following variation on the macro <FONT FACE="Courier New, Courier, mono">foo</FONT>,
+    which has one parameter <FONT FACE="Courier New, Courier, mono">n</FONT>:</P></FONT>
+<PRE>
+	MACRO foo n
+	    add x, n
+	    load z
+	ENDM
+</PRE>
+<FONT FACE="Palatino"><P>Assume that this declaration appears in a file that includes the following 3 instruction
+    statements:</P></FONT>
+<PRE>
+	add a, b
+	foo a ; macro call with argument a
+	store b
+</PRE>
+<FONT FACE="Palatino"><P>In this case, the text that is assembled is the following:</P></FONT>
+<PRE>
+	add a, b
+	add x, a
+	load z
+	store b
+</PRE>
+<FONT FACE="Palatino"><P>You can include arbitrary instructions inside a macro body, including labeled statements, data
+    pseudoinstructions, and calls to other macros. Note that macro declarations are always local, which means that these
+    macros can only be called in the file in which they are defined. Therefore, it is often useful to put the macro
+    definitions in files that are then included (using the .include directive) in all files in which you wish to make
+    macro calls.</P>
+
+    <P>Note: Because of the fact that macro calls are assembled via textual substitution, labels in macro bodies must be
+        treated specially. To understand the problem, consider a macro body in which one line has a label L and suppose
+        the macro is called twice in one file. If straight text substitution were performed, the label L would appear on
+        two lines of that file, violating the necessary uniqueness of all labels in a program. Therefore, before the
+        textual substitution of every macro call, the label and all references to the label in the macro body are
+        automatically replaced with a unique label by the assembler. For this reason, the label cannot be referenced
+        outside the macro body.</P></FONT>
+</BODY>
+</HTML>

@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+
+    <TITLE>Test</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+<h3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">Test</font></B></h3>
+
+<P><FONT FACE="Palatino">The Test microinstruction allows jumping to other microinstructions within the current fetch or
+    execute sequence. The test microinstruction compares the value in a part of a register with a specific value. If the
+    comparison succeeds, then a specified number of successive microinstructions in the current fetch or execute
+    sequence are skipped over.</FONT></P>
+
+<P><FONT FACE="Palatino"><B><I>Parameters:</I></B></FONT>
+<DIR>
+    <FONT FACE="Palatino"><B>Comparison: </B> the type of comparison be done:
+        <DIR>LT means "less than"
+            <BR>LE means "less than or equal to"
+            <BR>EQ means "equal to"
+            <BR>NE means "not equal to"
+            <BR>GE means "greater than or equal to"
+            <BR>GT means "greater than"
+        </DIR>
+    </font>
+
+    <P><FONT FACE="Palatino"><B>Comparison value: </B> the integer to be compared with the part of the register. The
+        Comparison value must be given in base-10 notation. </FONT></P>
+
+    <P><FONT FACE="Palatino"><B>Omission:</B> an integer (positive, negative or zero) indicating the size of the
+        relative jump. For example, if omission = 0, then no jump is performed. That is, the microinstruction following
+        the test microinstruction is the next microinstruction to be executed, as normally happens with other
+        microinstructions. If omission = 1, then the microinstruction immediately following the test microinstruction is
+        skipped over if the comparison succeeds. If omission = -1 and the comparison succeeds, then the test
+        microinstruction is repeatedly executed in an infinite loop.</FONT></P>
+
+    <P><font face="Palatino"><B>Register: </B>the register whose value is to be tested.
+    </FONT>
+
+    <P><font face="Palatino"><B>Start: </B>an integer indicating the leftmost bit to be tested in the register. The
+        value must be an integer between 0 and one less than the width of the register.</FONT></P>
+
+    <P><font face="Palatino"><B>Number of bits:</B> a non-negative integer indicating the number of bits to be tested.
+        The sum of the start and the number of bits must be at most the width of the register.</FONT></P>
+
+    <P><font face="Palatino">N.B. When you test a register or part of a register against a value, you can consider the
+        part of the register to designate a two's-complement integer value or an unsigned integer value. For example, if
+        you are testing to see whether two bits are "11", you can either test whether the value stored in the two bits
+        is -1 or test whether the value is 3. Similarly, to test whether one bit of a register is a "1", you can test to
+        see whether that part of the register contains the value 1 or -1. </FONT></P></DL></DIR>
+</BODY>
+</HTML>

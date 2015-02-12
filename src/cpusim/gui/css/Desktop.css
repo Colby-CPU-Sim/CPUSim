@@ -1,0 +1,170 @@
+/*
+    author: Jinghui Yu
+*/
+
+/* background color */
+.root {
+    master-color: whitesmoke;
+    -fx-background-color: derive(master-color, 0%);
+}
+
+/*  buttons */
+.Button {
+   -fx-background-radius: 5;
+   -fx-font: 13px "System";
+   -fx-font-weight: bold;
+   -fx-padding: 0 0 0 0;
+   -fx-shadow-highlight-color: f0f0f0;
+   -fx-body-color: linear-gradient(from 0% 0% to 0% 80%, white, #D7D7D7, white);
+}
+
+.Button:armed {
+   -fx-body-color: linear-gradient(from 100% 100% to 100% 20%, white, #D7D7D7, white);
+}
+
+/* table view. */
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+}
+
+/*----------------customer setting of background color---------------------------*/
+.table-row-cell:odd {
+    -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.table-row-cell:focused:odd {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-control-inner-background;
+    -fx-background-insets: 0, 1, 2;
+}
+
+/* When the table-row-cell is selected and focused */
+.table-view:focused .table-row-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background: -fx-accent;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:selected .table-cell {
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:selected, .table-view:row-selection .table-row-cell:filled:hover:selected {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-view:focused .table-row-cell:filled:focused:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+/* When the TableView is _not_ focused, we show alternate selection colors */
+.table-row-cell:filled:selected:focused, .table-row-cell:filled:selected {
+    -fx-background-color: lightgray;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.table-row-cell:selected:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.table-view:row-selection .table-row-cell:filled:hover {
+    -fx-background-color: -fx-table-cell-border-color, -fx-cell-hover-color;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.table-view:row-selection .table-row-cell:filled:focused:hover {
+    -fx-background-color: -fx-table-cell-border-color, -fx-focus-color, -fx-cell-focus-inner-border, -fx-cell-hover-color;
+    -fx-background-insets: 0, 0 0 1 0, 1 1 2 1, 2 2 3 2, 3 3 4 3;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.Outline {
+    -fx-border-color: #006400;
+    -fx-border-radius: 5;
+    -fx-border-insets: 3;
+}
+/*---------------------------------------------------------------------------*/
+
+/* choice box */
+.choice-box {
+    -fx-background-radius: 5;
+    -fx-padding: 0 0 0 0;
+    -fx-shadow-highlight-color: f0f0f0;
+    -fx-body-color: linear-gradient(from 0% 0% to 0% 100%, white, #D7D7D7, white);
+}
+
+.choice-box .open-button {
+    -fx-background-color: null;
+    -fx-padding: 0.083333em 0.4333em 0.0em 0.666667em; /* 1 0 0 8 */
+}
+
+/* list view */
+.list-view {
+    -fx-border-color: white black white white;
+}
+
+.list-cell:odd {
+     -fx-background-color: -fx-control-inner-background;
+ }
+
+.list-view:focused .list-cell:focused:odd {
+     -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-control-inner-background;
+     -fx-background-insets: 0, 1, 2;
+}
+
+/* When the list-cell is selected and focused */
+.list-view:focused .list-cell:filled:focused:selected {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background: -fx-accent;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.list-view:focused .list-cell:filled:selected, .list-view:focused .list-cell:filled:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-selection-bar;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.list-view:focused .list-cell:filled:focused:selected:hover {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+/* When the ListView is _not_ focused, we show alternate selection colors */
+.list-cell:filled:selected:focused, .list-cell:filled:selected, .list-view:horizontal .list-cell:filled:selected {
+    -fx-background-color: lightgray;
+    -fx-text-fill: -fx-selection-bar-text;
+}
+
+.list-cell:filled:selected:focused:disabled, .list-cell:filled:selected:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: -fx-cell-hover-color;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.list-view:focused .list-cell:filled:focused:hover {
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-cell-hover-color;
+    -fx-background-insets: 0, 1, 2;
+    -fx-text-fill: -fx-text-inner-color;
+}
+
+.list-view:horizontal .list-cell:filled:selected, .list-view:horizontal .list-cell:filled:selected:hover {
+    -fx-background-color: linear-gradient(
+                            to right, derive(-fx-accent,-7%), derive(-fx-accent,-25%));
+}
+
+
+

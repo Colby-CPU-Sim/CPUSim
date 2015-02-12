@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane prefHeight="453.0" prefWidth="907.0" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <VBox prefHeight="453.0" prefWidth="907.0">
+      <children>
+        <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="376.0" prefWidth="907.0">
+          <children>
+            <ScrollPane id="ScrollPane" layoutY="23.0" prefHeight="353.0" prefViewportHeight="16.0" prefViewportWidth="47.0" prefWidth="248.0">
+              <content>
+                <AnchorPane fx:id="implementationFormatPane" prefHeight="352.0" prefWidth="247.0" />
+              </content>
+            </ScrollPane>
+            <Label layoutX="1.0" layoutY="5.0" text="Fetch Sequence Implementation" />
+            <TitledPane animated="false" collapsible="false" layoutX="454.0" layoutY="-3.0" prefHeight="379.0" prefWidth="304.0" text="MicroInstructions">
+              <content>
+                <TreeView fx:id="microInstrTreeView" prefHeight="200.0" prefWidth="200.0" />
+              </content>
+            </TitledPane>
+          </children>
+        </AnchorPane>
+        <Separator prefWidth="200.0" />
+        <AnchorPane prefHeight="60.0" prefWidth="662.0">
+          <children>
+            <Button layoutX="513.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+            <Button layoutX="427.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleOkay" text="Okay" />
+            <Button layoutX="40.0" layoutY="9.0" mnemonicParsing="false" onAction="#handleHelp" text="?" />
+          </children>
+        </AnchorPane>
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>

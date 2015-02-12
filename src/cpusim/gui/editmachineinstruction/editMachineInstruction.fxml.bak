@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="453.0" prefWidth="739.0" styleClass="root" xmlns:fx="http://javafx.com/fxml">
+  <bottom>
+    <HBox alignment="CENTER" prefHeight="42.0" prefWidth="907.0" spacing="15.0">
+      <children>
+        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleHelp" prefHeight="25.0" prefWidth="25.0" styleClass="helpButton" text="?" />
+        <Pane fx:id="easter" onMouseClicked="#holidaySeason" prefHeight="42.0" prefWidth="260.0">
+          <children>
+            <Label fx:id="christmas" text="Did you know: There is not button in this space..." visible="false" />
+          </children>
+        </Pane>
+        <Button defaultButton="true" minHeight="-Infinity" minWidth="100.0" mnemonicParsing="false" onAction="#handleOkay" prefHeight="22.0" prefWidth="180.0" styleClass="roundBlueButton" text="OK" />
+        <Button cancelButton="true" minHeight="-Infinity" minWidth="100.0" mnemonicParsing="false" onAction="#handleCancel" prefHeight="22.0" prefWidth="180.0" styleClass="roundButton" text="Cancel" />
+      </children>
+    </HBox>
+  </bottom>
+  <center>
+    <TabPane prefWidth="581.0" tabClosingPolicy="UNAVAILABLE">
+      <tabs>
+        <Tab text="Format">
+          <content>
+            <BorderPane prefHeight="380.0" prefWidth="701.0">
+              <center>
+                <VBox id="VBox" alignment="CENTER" prefHeight="370.0" prefWidth="512.9998779296875" spacing="5.0">
+                  <children>
+                    <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="604.0" spacing="5.0">
+                      <children>
+                        <Label contentDisplay="CENTER" text="Instruction" />
+                      </children>
+                      <padding>
+                        <Insets left="15.0" fx:id="x1" />
+                      </padding>
+                    </HBox>
+                    <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1" spacing="5.0">
+                      <children>
+                        <Label text="Length" />
+                        <Label fx:id="lengthLabel" text="Length" />
+                        <Pane prefHeight="29.0" prefWidth="89.0" />
+                        <Label text="Opcode" />
+                        <TextField fx:id="opcodeTextField" prefHeight="22.0" prefWidth="80.0" />
+                      </children>
+                    </HBox>
+                    <AnchorPane fx:id="instructionFormatPane" prefHeight="88.0" prefWidth="412.9998779296875" />
+                    <Separator />
+                    <Label fx:id="noFieldsLabel" prefHeight="42.0" text="Drag fields in from the list of fields on the right. To delete fields, drag them out away from the other instructions" wrapText="true" />
+                    <Separator />
+                    <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1" prefHeight="30.0" spacing="5.0">
+                      <children>
+                        <Label text="Assembly" />
+                      </children>
+                    </HBox>
+                    <AnchorPane fx:id="assemblyFormatPane" prefHeight="88.0" prefWidth="412.9998779296875" />
+                  </children>
+                  <padding>
+                    <Insets left="5.0" right="5.0" />
+                  </padding>
+                </VBox>
+              </center>
+              <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" fx:id="x2" />
+              </padding>
+              <right>
+                <VBox id="VBox" alignment="CENTER" spacing="1.0">
+                  <children>
+                    <Label text="All Fields" />
+                    <ScrollPane id="ScrollPane" prefHeight="332.0" prefViewportHeight="16.0" prefViewportWidth="47.0" prefWidth="133.0">
+                      <content>
+                        <AnchorPane id="AnchorPane" fx:id="fieldPane" prefHeight="326.0" prefWidth="130.0">
+                          <children>
+                            <Label prefWidth="132.0" text="Length" />
+                          </children>
+                        </AnchorPane>
+                      </content>
+                    </ScrollPane>
+                    <ToolBar minHeight="22.0" prefHeight="29.0" prefWidth="133.0">
+                      <items>
+                        <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleEditFields" prefWidth="110.0" styleClass="smallButton" text="Edit Fields..." />
+                      </items>
+                    </ToolBar>
+                  </children>
+                </VBox>
+              </right>
+            </BorderPane>
+          </content>
+        </Tab>
+        <Tab text="Implementation">
+          <content>
+            <BorderPane padding="$x2">
+              <left>
+                <VBox id="VBox" alignment="TOP_CENTER" spacing="5.0">
+                  <children>
+                    <Label id="lengthLabel" text="Length" />
+                    <ScrollPane id="ScrollPane" prefHeight="353.9998779296875" prefViewportHeight="16.0" prefViewportWidth="47.0" prefWidth="248.0">
+                      <content>
+                        <AnchorPane id="AnchorPane" fx:id="implementationFormatPane" prefHeight="343.9998779296875" prefWidth="245.0" />
+                      </content>
+                    </ScrollPane>
+                  </children>
+                </VBox>
+              </left>
+              <right>
+                <TitledPane animated="false" collapsible="false" prefHeight="369.9998779296875" prefWidth="304.0" text="MicroInstructions">
+                  <content>
+                    <TreeView fx:id="microInstrTreeView" prefHeight="200.0" prefWidth="200.0" />
+                  </content>
+                </TitledPane>
+              </right>
+            </BorderPane>
+          </content>
+        </Tab>
+      </tabs>
+    </TabPane>
+  </center>
+  <left>
+    <VBox id="VBox" alignment="TOP_CENTER" minWidth="149.0" prefHeight="411.0" prefWidth="173.0" spacing="1.0">
+      <children>
+        <TitledPane animated="false" collapsible="false" minWidth="149.0" prefHeight="380.0" prefWidth="149.0" text="Instructions">
+          <content>
+            <ListView fx:id="instructionList" editable="true" prefHeight="358.0" prefWidth="199.0" />
+          </content>
+        </TitledPane>
+        <ToolBar minHeight="21.0" prefHeight="29.0" prefWidth="203.0">
+          <items>
+            <Button fx:id="newbutton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleNewInstruction" prefHeight="20.0" prefWidth="46.0" styleClass="smallButton" text="new" />
+            <Button fx:id="dupbutton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDuplicateInstruction" prefHeight="20.0" prefWidth="46.0" styleClass="smallButton" text="dup" />
+            <Button fx:id="delbutton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleDeleteInstruction" prefHeight="20.0" prefWidth="46.0" styleClass="smallButton" text="del" />
+          </items>
+        </ToolBar>
+      </children>
+    </VBox>
+  </left>
+  <stylesheets>
+    <URL value="@../css/Dialogs.css" />
+  </stylesheets>
+</BorderPane>

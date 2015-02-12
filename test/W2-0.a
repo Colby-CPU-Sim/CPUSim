@@ -1,0 +1,49 @@
+; W2-0.a
+; author: Dale Skrien
+; date: September 5, 2013
+
+; This program reads in two arbitrary (positive or negative)
+; integers m and n and outputs the product of m and n, 
+; without using the multiply machine instruction.
+; It reads m and n, and then stores the sign of m in the
+; variable sign and replaces m with absolute value of m.
+; Next it adds m copies of n to itself to get the product of
+; abs(m)*n.  Finally, it multiplies this product by sign, to
+; get the final answer, which it outputs.
+; It is for the Wombat2 computer.
+
+; Roles of the registers:
+; A0 holds n
+; A1 holds abs(m), which is decremented in a loop
+; A2 holds the sum so far
+; A3 holds the constant -1 for decrementing m
+	 
+	load A3 negOne	; load -1 -> A3
+	load A0 IO	; read n -> A0
+	load A1	IO	; read m -> A1
+	jmpn A1 fixSign	; if m < 0 jump to fixSign
+	jump Clear	; jump to clear
+fixSign: move A4 A1	; fixSign: m -> A4
+	subtract A1 A1	; A1 <- A1 - A1 = 0
+	subtract A1 A4	; A1 <- A1 - A4 = -m (= abs(m))
+	store A3 sign	; store -1 into sign
+Clear:	subtract A2 A2	; clear A2
+Start:	jmpz A1 Done  	; Start: jump to Done if m = 0.
+       	add A2 A0	; add n to the sum in A2
+	add A1 A3       ; decrement A1 by 1
+       	jump  Start	; go back to Start
+Done:  	load A0 sign 	; Done: load the sign into A0
+	jmpn A0 neg	; if sign < 0 jump to neg
+       	jump pos	; jump to pos
+neg:	subtract A1 A2	; A1 <- A1-A2 = 0-sum
+	move A2 A1	; copy A1 into A2
+pos:	store A2 IO	; pos: output the final sum in A2
+       	exit  		; stop
+
+; variables (the "2" after ".data" means use 2 bytes for the 
+;            variable and the number after the "2" is the
+;            initial value of the variable.)
+negOne:	.data 2 -1	; constant -1
+sign:	.data 2 1	; will hold 1 or -1
+one:	.data 2 1	; constant 1
+

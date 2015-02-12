@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<BorderPane fx:id="mainPane" prefHeight="453.0" prefWidth="473.0" xmlns:fx="http://javafx.com/fxml">
+  <bottom>
+    <VBox id="VBox" alignment="CENTER" spacing="5.0">
+      <children>
+        <HBox id="HBox" alignment="CENTER" prefHeight="36.0" prefWidth="473.0" spacing="15.0">
+          <children>
+            <Button id="new" graphicTextGap="15.0" mnemonicParsing="false" onAction="#handleNew" prefHeight="22.0" styleClass="roundButton" text="    New    " />
+            <Button fx:id="delete" graphicTextGap="15.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="22.0" styleClass="roundButton" text="   Delete   " />
+            <Button fx:id="duplicate" graphicTextGap="15.0" mnemonicParsing="false" onAction="#handleDuplicate" prefHeight="22.0" styleClass="roundButton" text="  Duplicate  " />
+            <Button fx:id="values" graphicTextGap="15.0" mnemonicParsing="false" onAction="#handleValues" prefHeight="22.0" styleClass="roundButton" text="   Values   " />
+          </children>
+        </HBox>
+        <Separator prefWidth="473.0" />
+        <HBox id="HBox" alignment="CENTER" prefHeight="36.0" prefWidth="473.0" spacing="15.0">
+          <children>
+            <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOkay" prefHeight="22.0" prefWidth="160.0" styleClass="roundBlueButton" text="OK" />
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancel" prefHeight="22.0" prefWidth="160.0" styleClass="roundButton" text="Cancel" />
+          </children>
+        </HBox>
+      </children>
+    </VBox>
+  </bottom>
+  <center>
+    <TableView fx:id="table" editable="true" prefHeight="370.0" prefWidth="437.0">
+      <columns>
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="Name" fx:id="name" />
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="Required" fx:id="type" />
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="NumBits" fx:id="numBits" />
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="Default Value" fx:id="defaultValue" />
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="Relativity" fx:id="relativity" />
+        <TableColumn minWidth="0.0" prefWidth="75.0" text="Signed" fx:id="signed" />
+      </columns>
+    </TableView>
+  </center>
+  <stylesheets>
+    <URL value="@../../css/Dialogs.css" />
+  </stylesheets>
+</BorderPane>

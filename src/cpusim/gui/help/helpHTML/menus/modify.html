@@ -1,0 +1,142 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type"
+	CONTENT="text/html; charset=windows-1252">
+
+<TITLE>The Modify Menu</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+	<h3 ALIGN="CENTER">
+		<B><FONT FACE="Arial" COLOR="#0000ff">The Modify Menu</font></B>
+	</h3>
+	<P>
+		<FONT FACE="Palatino">This menu is used to call up dialog boxes
+			for the purpose of changing the components of the current machine
+			(see Figure 12).</FONT>
+	</P>
+	<P class="p3" ALIGN="CENTER">
+		<FONT FACE="Palatino"><IMG border="1px" SRC="ModifyMenu.jpg"
+			HEIGHT="131" WIDTH="209"><BR>Figure 12. The Modify menu.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>Machine Instructions...</I></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Choosing "Machine Instructions..." from
+			the Modify menu brings up the <A
+			HREF="../windows/machineInstructions.html">machine instruction
+				dialog</A> in which you can modify <A
+			HREF="../specifications/machineInstrs.html">machine instructions</A>.
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>Microinstructions...</I></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Choosing "Microinstructions..." from the
+			Modify menu brings up the <A HREF="../windows/microinstructions.html">microinstruction
+				dialog</A> in which you can modify the <A
+			HREF="../specifications/microInstrs.html">microinstructions</A>.
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>Hardware modules...</I></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Choosing "Hardware modules..." from the
+			Modify menu brings up the <A HREF="../windows/hardwareModules.html">hardware
+				modules dialog</A> in which you can modify the <A
+			HREF="../specifications/hardware.html">hardware modules</A> (the
+			registers, register arrays, condition bits, and RAMs) of the current
+			machine.
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>EQU's...</I></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Choosing "EQU's..." from the Modify menu
+			brings up the <A HREF="../windows/globalEQUs.html">EQU dialog</A> in
+			which you can modify the <A HREF="../other/globalEqus.html">global
+				EQU</A>s.
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>Fetch Sequence...</I></B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Choosing "Fetch Sequence..." from the
+			Modify menu brings up the <A HREF="../windows/fetchSequence.html">fetch
+				sequence dialog</A> in which you can modify the <A
+			HREF="../specifications/fetchSequence.html">fetch sequence</A>.
+		</FONT>
+	</P>
+	<br>
+	<P>
+		<B><FONT FACE="Palatino">General Notes</font></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The Modify menu is disabled when CPU Sim
+			is in <A HREF="../other/debugMode.html">debug mode</A> (that is, when
+			the &quot;Debug Mode&quot; menu item is checked in the <B>Execute</B>
+			menu).
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">A</FONT><FONT FACE="Palatino">ll of the
+			dialog boxes mentioned above except the fetch sequence dialog display
+			a table in which you can inspect and edit the parameters of existing
+			components and in which you can add new components or delete
+			components, as illustrated in the <A
+			HREF="../generalHelp/tour/creatingNewMachines.html">tutorial on
+				creating new machines</A>. To delete a component displayed in the dialog
+			box, select it in the table and then drag it away from the table. To
+			create a new component, click in the "New" button, at which point a
+			new component will be added to the table. To edit a cell, just click
+			or double-click on it. Some cells are edited by typing new text in
+			them, some cells are edited by selecting items from popup menus, and
+			some cells are edited just by clicking in the check box in the cell.
+			If you try to enter an illegal value in a cell, either the cell will
+			become outlined in red (for example, if you type non-numeric values
+			in a cell expecting a numeric value) or an error message will appear
+			when you try to save the changes you made (for example, if you type
+			in a numeric value that is out of range for that particular cell).
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The columns in any of these tables can be
+			reordered by dragging the column headers left or right to a new
+			position. The column widths can also be adjusted by dragging the line
+			dividing the columns. The rows can be resorted by column by clicking
+			in any column header.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B>Help buttons</B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Almost every dialog box in which parts of
+			the machine can be modified contain a button labeled "?". Clicking on
+			the "?" button causes the appropriate window from the online help
+			to appear giving you some extra (hopefully helpful) information about
+			the current dialog box. </FONT>
+	<P>
+		<FONT FACE="Palatino"><B>Editing Microinstructions from the
+				Fetch Sequence or Machine Instruction Dialogs</B></FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"> It is often the case that, when you are
+			modifying the fetch sequence or the machine instructions, you will
+			find that you need to modify or create a new microinstruction. The
+			easiest way to do so is to double-click on the list of current
+			microinstructions on the right side of the dialog box, which will
+			bring up the dialog for editing microinstructions. When you are
+			finished editing the microinstructions, you can close that dialog box
+			and can resume editing the fetch sequence or the machine
+			instructions. Important note: Any changes that you make to
+			microinstructions are applied to the current machine, even if you
+			cancel any changes to the fetch sequence or machine instructions.</FONT>
+	</P>
+</BODY>
+</HTML>

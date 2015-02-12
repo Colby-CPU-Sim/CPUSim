@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane fx:id="mainPane" prefHeight="453.0" prefWidth="907.0" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <VBox prefHeight="453.0" prefWidth="907.0">
+      <children>
+        <HBox prefHeight="422.0" prefWidth="743.0">
+          <children>
+            <VBox id="VBox" alignment="CENTER" minWidth="149.0" prefHeight="406.0" prefWidth="149.0">
+              <children>
+                <TitledPane animated="false" collapsible="false" minWidth="149.0" prefHeight="380.0" prefWidth="149.0" text="Instructions">
+                  <content>
+                    <ListView fx:id="instructionList" editable="true" prefHeight="358.0" prefWidth="199.0" />
+                  </content>
+                </TitledPane>
+                <ToolBar minHeight="21.0" prefHeight="29.0" prefWidth="203.0">
+                  <items>
+                    <Button fx:id="newbutton" mnemonicParsing="false" onAction="#handleNewInstruction" text="new" />
+                    <Button fx:id="dupbutton" mnemonicParsing="false" onAction="#handleDuplicateInstruction" text="dup" />
+                    <Button fx:id="delbutton" mnemonicParsing="false" onAction="#handleDeleteInstruction" text="del" />
+                  </items>
+                </ToolBar>
+              </children>
+            </VBox>
+            <TabPane prefHeight="406.0" prefWidth="758.0" tabClosingPolicy="UNAVAILABLE">
+              <tabs>
+                <Tab text="Format">
+                  <content>
+                    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="375.0" prefWidth="670.0000999999975">
+                      <children>
+                        <AnchorPane fx:id="assemblyFormatPane" layoutX="26.0" layoutY="279.0" prefHeight="44.000099999997474" prefWidth="570.0" />
+                        <Label fx:id="noFieldsLabel" layoutX="23.0" layoutY="203.0" text="drag fields in from the list of fields on the left. To delete fields, drag them out away from the other instructions" />
+                        <AnchorPane fx:id="instructionFormatPane" layoutX="14.0" layoutY="94.0" prefHeight="50.0" prefWidth="593.0" />
+                        <Separator layoutX="-2.0" layoutY="230.0" prefWidth="625.0" />
+                        <Label layoutX="43.0" layoutY="43.0" text="Length" />
+                        <Label layoutX="14.0" layoutY="8.0" text="Instruction" />
+                        <Label layoutX="218.0" layoutY="43.0" text="Opcode" />
+                        <TextField fx:id="opcodeTextField" layoutX="268.0" layoutY="40.0" prefHeight="22.0" prefWidth="80.0" />
+                        <Label layoutX="14.0" layoutY="245.0" text="Assembly" />
+                        <ToolBar layoutX="625.0" layoutY="353.0" minHeight="22.0" prefHeight="22.0" prefWidth="133.0">
+                          <items>
+                            <Button mnemonicParsing="false" onAction="#handleEditFields" text="Edit Fields..." />
+                          </items>
+                        </ToolBar>
+                        <Label fx:id="lengthLabel" layoutX="92.0" layoutY="43.0" text="Length" />
+                        <Label layoutX="668.0" layoutY="5.0" text="All Fields" />
+                        <ScrollPane id="ScrollPane" layoutX="625.0" layoutY="24.0" prefHeight="332.0" prefViewportHeight="16.0" prefViewportWidth="47.0" prefWidth="133.0">
+                          <content>
+                            <AnchorPane id="AnchorPane" fx:id="fieldPane" prefHeight="330.0" prefWidth="132.0">
+                              <children>
+                                <Label prefWidth="132.0" text="Length" />
+                              </children>
+                            </AnchorPane>
+                          </content>
+                        </ScrollPane>
+                        <Separator layoutX="-4.0" layoutY="189.0" prefWidth="625.0" />
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Implementation">
+                  <content>
+                    <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                      <children>
+                        <ScrollPane id="ScrollPane" layoutY="23.0" prefHeight="353.0" prefViewportHeight="16.0" prefViewportWidth="47.0" prefWidth="248.0">
+                          <content>
+                            <AnchorPane id="AnchorPane" fx:id="implementationFormatPane" prefHeight="352.0" prefWidth="247.0"/>
+                          </content>
+                        </ScrollPane>
+                        <Label id="lengthLabel" layoutX="1.0" layoutY="5.0" text="Length" />
+                        <TitledPane animated="false" collapsible="false" layoutX="454.0" layoutY="-3.0" prefHeight="379.0" prefWidth="304.0" text="MicroInstructions">
+                          <content>
+                            <TreeView fx:id="microInstrTreeView" prefHeight="200.0" prefWidth="200.0" />
+                          </content>
+                        </TitledPane>
+                      </children>
+                    </AnchorPane>
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+          </children>
+        </HBox>
+        <Separator prefWidth="200.0" />
+        <AnchorPane prefHeight="60.0" prefWidth="662.0">
+          <children>
+            <Button layoutX="513.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+            <Button layoutX="427.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleOkay" text="Okay" />
+            <Button layoutX="40.0" layoutY="9.0" mnemonicParsing="false" onAction="#handleHelp" text="?" />
+          </children>
+        </AnchorPane>
+      </children>
+    </VBox>
+  </children>
+</AnchorPane>

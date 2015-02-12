@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Regular Instructions</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Regular Instructions</P></font></B><FONT FACE="Palatino">
+    <P>Regular instructions have the following
+        form (some of the parts are optional):
+</FONT>
+<DIR><FONT FACE="Palatino">
+
+    <B><I>label operator operands comments</i></b></FONT></DIR>
+<FONT FACE="Palatino">
+    <P>Space and tab characters are only required between two tokens
+        if the assembler might otherwise treat the tokens as one unit.
+        Statements are terminated by the newline character.
+        The label and comments are optional.</P>
+
+    <P>An <I>operator</I> is a symbol consisting of the name of a
+        <A HREF="../machineInstrs.html">machine instruction</A> of the current machine or the name of a macro.
+        Every regular instruction must have an operator.</P>
+
+    <P>An <I>operand</I> is a value for a <A HREF="../fields.html">field</A> of the instruction. If the field has 0
+        bits, then the operand must be the name of the field. For fields of positive numbers of bits, the operand must
+        be a symbol or literal. If it is a symbol,
+        the same symbol must appear somewhere in the program as a label or as an EQU constant or as the name of one of
+        the restricted values of the field.</P>
+
+    <P>For each instruction, there must
+        be one operand for each field specified in the format of that instruction, not counting the first field, which
+        corresponds to the opcode, and not counting the fields that are ignored or are optional.</P>
+
+    <P>Note that there are three types of symbols that can be used as operands for fields with unrestricted values:
+        local EQUs (defined in the file), global EQUs (defined in the machine), and labels (defined in the file). A
+        symbol might appear in all three types of sources. In that case, local EQUs have priority, followed by global
+        EQUs, and finally labels.</P></FONT>
+</BODY>
+</HTML>

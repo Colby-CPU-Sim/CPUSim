@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>MemoryAccess</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">MemoryAccess</P>
+</FONT></B>
+
+<FONT FACE="Palatino">
+    <P>The MemoryAccess microinstruction transfers (copies) data
+        between a register and a RAM. The number of bits transferred is equal to the
+        width of the register.
+        If the cells of RAM are wider than the register, then the register only reads or writes the leftmost (high
+        order) bits of the cell. If the register is wider than the cells of RAM, then the microinstruction will continue
+        reading or writing bits (starting with the high order bits) in successive registers until all bits in the
+        register have been read or
+        written.
+
+    <P><B><I>Parameters:</i></B>
+
+
+</FONT>
+<DIR><FONT FACE="Palatino"><B>Direction:</B> either "read" or "write" indicating whether data is to go from RAM to a
+    register (read) or from a register to RAM (write).
+    <P><B>Memory:</B> the RAM to or from which data is to be transferred.</P>
+
+    <P><B>Data:</B> the register to or from which data is to be transferred.</P>
+
+    <P><B>Address:</B> the register that contains the address indicating where in the RAM the data is to be read or
+        written.</P>
+</FONT>
+</DIR>
+</BODY>
+</HTML>

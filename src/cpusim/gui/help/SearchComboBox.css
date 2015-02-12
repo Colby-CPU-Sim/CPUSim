@@ -1,0 +1,40 @@
+/* 
+ *   Document   : SearchComboBox
+ *   Created on : Dec 6, 2013, 2:03:06 PM
+ *   Author     : Stephen Webel, Pratap Lutiel, Scott Franchi
+ *   Description:
+ *       Purpose of the stylesheet follows.
+ * This File is new as of 12/6/13
+ *
+ * Methods added:
+ *      Added All
+ *      
+ * Note this was a major change to a combo box to get our desired GUI look
+ */
+
+
+.combo-box{
+    -fx-cursor:hand;
+    -fx-background-radius: 15.0;
+    -fx-background-color:#8e66b5;
+    -fx-text-fill:#8e66b5;
+}
+
+.arrow-button{
+    visibility: hidden;
+}
+
+.arrow{
+    visibility: hidden;
+}
+
+.text-field{
+    -fx-background-radius: 20.0;
+    -fx-padding: 5;
+}
+
+.hbox{
+    -fx-padding: 3;
+    -fx-spacing: 10;
+    -fx-background-color: lightgrey;
+}

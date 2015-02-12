@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>microInstrs</TITLE>
+<META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Specifications of the Microinstructions</P></font></B>
+<FONT FACE="Palatino"><P>CPU Sim provides a variety of types of microinstructions that can be used in fetch sequences or execute sequences. Click on the type of a microinstruction below for help on that type. Note that every microinstruction must also have a name as described in  <A HREF="names.html">Naming Formats</A>.</P><TABLE CELLSPACING=0 BORDER=0 WIDTH=278>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/transfer.html">Transfer</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/memoryAccess.html">Memory Access</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/arithmetic.html">Arithmetic</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/set.html">Set</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/shift.html">Shift</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/setCondBit.html">SetCondBit</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/logical.html">Logical</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/branch.html">Branch</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/test.html">Test</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/decode.html">Decode</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/increment.html">Increment</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/end.html">End</A></TD></TR>
+<TR><TD WIDTH="50%" VALIGN="TOP">
+<P><A HREF="micros/io.html">IO</A></TD><TD WIDTH="50%" VALIGN="TOP">
+<P>&nbsp;</TD></TR>
+</TABLE></FONT>
+<FONT FACE="Palatino">
+<B><I><P>&nbsp;</P><P>Sign Convention</P></i></B><P>The sign convention used in CPU Sim is 2's complement.  All arithmetic calculations and tests are done using this convention. Therefore, whenever a sequence of bits is displayed in decimal, that decimal value displayed corresponds to the 2's complement value of the bits.  However, when the sequence of bits is displayed in binary or hexadecimal, the bits are treated as an unsigned integer value and so negative signs don't appear in the display. 
+Floating point operations are not supported by CPU Sim.
+</P><B><I><P>Overflow and Carry</P></i></B><P>If an arithmetic operation results in a value that it too large (positive or negative), as a 2's complement number, to fit in the destination register, then the machine is in a state of signed overflow.  When this occurs, a condition bit can optionally be set to 1.  The choice of which condition bit (if any) to set for signed overflow can be specified in the Arithmetic and Increment microinstructions.</P><P>Similarly, if an arithmetic addition or subtraction microinstruction yields a value that results in a carry in or out of the destination register, then the machine is in a state of unsigned overflow.  When this occurs, a condition bit can optionally be set to 1. The choice of which condition bit (if any) to set for unsigned overflow can be specified in the Arithmetic and Increment microinstructions.</P><B><I><P>Register Parts</P></i></B><P>Several microinstructions allow the user to specify parts of registers.  In CPU Sim, the bits of a register are indexed from left (the most significant bit) to right (the least significant bit), starting with 0 and ending with one less than the width of the register.  For example, if a register has 8 bits, the leftmost bit has index 0 and the rightmost bit has index 7.</P></FONT>
+</BODY>
+</HTML>

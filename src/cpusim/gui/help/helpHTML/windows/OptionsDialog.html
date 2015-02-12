@@ -1,0 +1,137 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+
+    <TITLE>components</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+<h3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">The Options Dialog</font></B></h3>
+
+<P><FONT FACE="Palatino">The Options menu item in the <B>Execute</B> menu brings up a dialog box with four tabs.
+    In the first tab, the IO Connections tab, the user can specify where each
+    <A HREF="../specifications/micros/io.html">IO microinstruction</A> will get or put data (see Figure 14).
+    In the second tab, the user can choose which lines of code are to be highlighted while stepping through
+    the code in debug mode. In the third tab, the Loading tab, the user specifies in which RAM and on which
+    starting line the code should be stored. And finally, in the last tab, the Punctuation tab, the user can
+    specify which ASCII characters are comments, tokens, symbols, pseudos, labels, or illegal.</FONT></P>
+
+<P id="IOConnections"><FONT FACE="Palatino"><B><I>Options|IO connections...</I></B></FONT></P>
+
+<P class="p3" ALIGN="CENTER"><FONT FACE="Palatino">
+    <IMG border="1px" SRC="Connections.png" HEIGHT="450" WIDTH="450">
+    <BR>Figure 14. The IO connections dialog.</FONT></P>
+
+<P><FONT FACE="Palatino">The table has one row for each IO microinstruction in the current machine. The "name" column
+    gives the name of the IO microinstruction. The "connection" column gives the current source or destination for the
+    data when the microinstruction is executed. If the connection is "[User]" then the data is sent to or read from the
+    user via a dialog box, one data value at a time. If the connection is "[Console]" then the data is sent to or read
+    from the user, one data value at a time, via the console panel at the bottom of the main desktop window.
+    The console panel is highlighted in yellow whenever it is waiting for the user to type in a value. If the connection
+    is a file name, then the data is sent to or read from that file. The file must be a text file. </FONT></P>
+
+<P><FONT FACE="Palatino">If you select "File..." from the popup menu, a dialog box will appear in which you can choose
+    a new text file to be the source or destination of the data. If two IO microinstructions both read from the same
+    file or both write to the same file, they do so using the same data stream. That is, if one IO microinstruction
+    reads a value from the file, then the other IO microinstruction cannot read that value from the file and instead
+    will read the next value.</FONT></P>
+
+<P><FONT FACE="Palatino">When CPU Sim attempts to read a base-10 integer from a text file, it reads past any white
+    space (space, new line, carriage return, and tab characters), reads an optional '+' or '-' character, and then
+    reads and appends digits (0-9) until a non-digit character is encountered. When CPU Sim attempts to read a character
+    (ASCII or Unicode) from a file, it just reads the next character of the file. If you want to store binary data
+    in a text file to be read by an IO microinstruction, precede the binary digits with a "0b". For example, if you
+    want to store the binary value of "-1101" then the text file should have the value "-0b1101". If you want to store
+    hexademical data in a file for later reading by an IO microinstruction, precede the hexadecimal value with the
+    prefix "0x". </FONT></P>
+
+<P><FONT FACE="Palatino">When CPU Sim attempts to write an integer to a text file, it first writes a space character
+    so that successively written integers can be distinguished from each other. It then writes the integer in base 10
+    format. When CPU Sim attempts to write a character (ASCII or Unicode) to a file, it writes the character
+    immediately with no additional spacing.</FONT></P>
+
+<P><FONT FACE="Palatino">When a program is run using the "Assemble, load, & run", "Run",
+    &quot;Clear registers &amp; run&quot;, or "Clear, assemble, load & run" menu items in the <B> Execute</B> menu,
+    the data files are opened just before running and are closed when execution is halted (for whatever reason).
+    If the user enters <A HREF="../other/debugMode.html">debug mode</A>, the files are opened when execution begins
+    for the first time (by clicking the "Go", "Step by Instr", or "Step by Micro" buttons). When in debug mode, the
+    files are not closed until the user exits from debug mode, the user clicks the "Start over" button in the debug
+    toolbar, or the user selects a new connection (using the "Options|IO connections..." menu item) for the IO
+    microinstruction connected to the file.</FONT></P>
+
+<P><FONT FACE="Palatino">NOTE: Clicking the "Backup one Instr" or "Backup one Micro" buttons in the debug toolbar
+    does not back up the reading or writing of text files. That is, the current position of reading from or writing
+    to text files does not change when you click the "Backup one Instr" or "Backup one Micro" button.</FONT></P>
+
+<P id="Highlighting"><FONT FACE="Palatino"><B><I>Options|Highlighting...</I></B></FONT></P>
+
+<P class="p3" ALIGN="CENTER"><FONT FACE="Palatino">
+    <IMG border="1px" SRC="Highlighting.png" HEIGHT="450" WIDTH="450"><BR>Figure 14. The IO connections dialog.</FONT>
+</P>
+<FONT FACE="Palatino"><P>The Highlighting tabbed pane includes a table in which the
+    user can choose which lines of code are to be highlighted while stepping through the code. Note that this
+    highlighting
+    occurs only when the code is executing in <A HREF="../other/debugMode.html">debug mode</A>. The highlighting is
+    specified via pairs consisting of a register and an RAM. The row of the RAM whose address corresponds to the value
+    of the register is highlighted. </P>
+
+    <P>For example, the user may wish to highlight the current top of the stack while stepping through the code. To do
+        so,
+        the user needs to create a new register/RAM pair where the register is the stack top pointer register
+        (containing
+        the address of the top of the stack) and the RAM is the stack RAM.</P>
+
+    <P>The user may also wish to highlight the cell of main memory containing the currently executing instruction. This
+        row normally corresponds to the address in the program counter register. In this case, the user would create a
+        new
+        register/RAM pair with the program counter register and the code store RAM. NOTE: If the user creates such a
+        pair,
+        then, when stepping through the code, the row of source code (in a source code file) corresponding to the
+        highlighted row of the code store RAM will also be highlighted.</P></FONT>
+
+<P><FONT FACE="Palatino">If the user wishes the highlighting to be updated after each microinstruction step, then
+    the &quot;dynamic&quot; checkbox should be checked. Otherwise, the highlighting is updated only at the beginning
+    of each machine cycle.</FONT></P>
+
+<P id="Loading"><FONT FACE="Palatino"><B><I>Options|Loading...</I></B></FONT></P>
+
+<P class="p3" ALIGN="CENTER"><FONT FACE="Palatino">
+    <IMG border="1px" SRC="Loading.png" HEIGHT="450" WIDTH="450"><BR>Figure 14. The IO connections dialog.</FONT></P>
+
+<P><FONT FACE="Palatino">The Loading tabbed pane includes a dialog box in which the user
+    can specify which RAM is the code store, i.e., the RAM in which assembled code is to be loaded. The user can also
+    specify which address of the code store is to be the starting address for loading.</FONT></P>
+
+<P id="Punctuation"><FONT FACE="Palatino"><B><I>Options|Punctuation...</I></B></FONT></P>
+
+<P class="p3" ALIGN="CENTER"><FONT FACE="Palatino">
+    <IMG border="1px" SRC="Punctuation.png" HEIGHT="450" WIDTH="450"><BR>Figure 27. The preferences dialog
+    Punctuation usage pane.</FONT></P>
+
+<P><FONT FACE="Palatino">The &quot;Punctuation &quot; tabbed pane (see Figure 27) is for specifying the uses of
+    some of the assembly syntax punctuation characters. To change the use of a character, choose a new item from the
+    popup menu in the right column next to the character. These changes are saved with the current machine. </FONT></P>
+
+<P><FONT FACE="Palatino">You can change the character indicating the start of a comment, the character indicating the
+    end of a label, and the first character in a pseudoinstruction. The default characters are semicolon (;),
+    colon (:), and period (.), respectively. There must be exactly one character used for each of these three roles,
+    and those three characters must be distinct from each other.</FONT></P>
+
+<P><FONT FACE="Palatino">You can also indicate whether a punctuation character should be considered a token all by
+    itself or whether it should be part of a symbol, which means it is joined with surrounding characters when forming
+    a token. For example, if the character '!' is used as part of a symbol (as indicated in Figure 27), then the
+    string &quot;ab!4&quot; will be parsed as one token. However, if '!' is used as a token by itself, then the string
+    &quot;ab!4&quot; will be parsed as three tokens: &quot;ab&quot;, &quot;!&quot;, and &quot;4&quot;. </FONT></P>
+
+<P><FONT FACE="Palatino">Finally, you can specify which punctuation characters are illegal, which means they are not
+    allowed to appear anywhere in an assembly language program except inside comments or strings.</FONT></P>
+
+<P><FONT FACE="Palatino">The plus (+) and minus (-) characters have some special behavior. They are always legal as
+    the first character of a number token but they can be symbol, token, or illegal characters otherwise. They cannot
+    be the comment, pseudo, or label characters.</FONT></P>
+
+<P><FONT FACE="Palatino">The &quot;Apply&quot; button applies the changes that have been made. The &quot;Close&quot;
+    button closes the dialog. The &quot;Help&quot; button brings up this help window.</FONT></P>
+</BODY>
+</HTML>

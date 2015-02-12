@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="controlsfx-8.20.8">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/jarfiles/controlsfx-8.20.8.jar!/" />
+      <root url="jar://$PROJECT_DIR$/jarfiles/openjfx-dialogs-1.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

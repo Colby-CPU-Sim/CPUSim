@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+
+    <TITLE>The Microinstruction Dialog</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+<h3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">The Microinstructions Dialog</font></B></h3>
+
+<P><FONT FACE="Palatino">The Microinstruction dialog (see Figure 24) has a table in which you can inspect and edit the
+    parameters of existing microinstructions and in which you can add new microinstructions or delete
+    microinstructions. </FONT></P>
+
+<P class="p3" ALIGN="CENTER"><FONT FACE="Palatino"><IMG border="1px" SRC="../generalHelp/tour/EditMicros.jpg"
+                                                        HEIGHT="200" WIDTH="467"><BR>Figure 24. The dialog for editing
+    microinstructions.</FONT></P>
+
+<P><FONT FACE="Palatino">First choose the type of microinstruction you wish to inspect or edit from the popup menu at
+    the top. To delete a microinstruction, select it in the table and then click the "Delete" button. To create a new
+    microinstruction, click in the "New" button, at which point a new microinstruction will be added to the end of the
+    table. To duplicate a microinstruction, select the microinstruction in the table and click the "Duplicate" button.
+    To edit a cell, just click or double-click on it. Some cells are edited by typing new text in them, some cells are
+    edited by selecting items from popup menus, and some cells are edited just by clicking in the check box in the cell.
+    If you try to enter an illegal value in a cell, either the cell will become filled in red (for example, if you
+    type non-numeric values in a cell expecting a numeric value) or an error message will appear when you try to save
+    the changes you made (for example, if you type in a numeric value that is out of range for that particular
+    cell).</FONT></P>
+
+<P><FONT FACE="Palatino">The columns in any of these tables can be reordered by dragging the column headers left or
+    right to a new position. The column widths can also be adjusted by dragging the line dividing the column headers.
+    The rows can be resorted by column by clicking in any column header.</FONT></P>
+
+<P><FONT FACE="Palatino">The names of the microinstructions can contain any characters. It is strongly recommended, but
+    not required, that all microinstructionss have unique names regardless of the type.</FONT></P><FONT FACE="Palatino">
+    <P>Clicking in the "Help" button will cause a window to appear giving you some extra (hopefully helpful) information
+        about the current type of microinstruction being displayed.</P>
+
+    <P>Note that any microinstruction may be used in the fetch sequence as well as several machine instructions.
+        Therefore, if you change the microinstruction by editing one or more of its parameters, then the change will
+        affect the fetch sequence (if the microinstruction is used in it) as well as all machine instructions that use
+        it. To avoid this behavior, duplicate the microinstruction, edit the duplicate, and then use the duplicate in
+        the fetch sequence or desired machine instructions.</P>
+
+    <P> Comment microinstructions don't appear in this dialog box since they are essentially pseudomicroinstructions.
+        That is, they behave differently than regular microinstructions. When executed, such a microinstruction does
+        nothing. Instead, it is used only to add comments to microinstruction sequences. Each Comment microinstruction
+        is unique and so you can edit its text without affecting the text in other Comment microinstructions.</P>
+
+    <P>The End microinstruction doesn't appear in this dialog box since it has no editable parameters.</P></FONT>
+</BODY>
+</HTML>

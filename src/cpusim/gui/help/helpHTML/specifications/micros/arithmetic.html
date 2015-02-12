@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Arithmetic</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER"><B>Arithmetic</B></P>
+</FONT><FONT FACE="Palatino"><P>The arithmetic microinstructions use three registers and optionally two condition bits.
+    The contents of the first two registers (the source registers) are added, subtracted, multiplied or divided and the
+    result is placed in the third register (the destination register). If signed overflow occurs, that is, if the result
+    is too big or too small to fit in the destination register using two's complement notation, then the overflow
+    condition bit will be set to 1, if a condition bit is used. Otherwise the value of the overflow condition bit is
+    left unchanged. In the case of overflow, the destination register will contain the rightmost <em>n</em> bits of the
+    result in two's complement notation, where <em>n</em> is the width of the destination register. If there is a carry
+    in/out, i.e., an unsigned integer overflow, in an addition or subtraction microinstruction, then the carry condition
+    bit is set, if a condition bit is used.</P>
+
+    <P><B><I>Parameters:</I></B>
+</FONT>
+<DIR><FONT FACE="Palatino"><FONT FACE="Palatino">
+    <B>Type:</B> the type of operation, namely addition, subtraction, multiplication, or division. Note that division is
+    integer division, which truncates the result (i.e., it produces the floor of the result). That is, dividing 7 by 2
+    yields 3, whereas dividing -7 by 2 yields -4.
+
+    <P><B>Source1</B>, <B>Source2</B>, <B>Destination:</B> the three registers. The operation consists of combining
+        Source1 and Source2 by the desired method (Source1+Source2, Source1-Source2, Source1*Source2, or
+        Source1/Source2) and then placing the result in Destination. The three registers need not all be distinct. For
+        example, the Destination could be the same register as Source1 and/or Source2. Parts of registers may not be
+        specified. The three registers need not have the same width.</P>
+
+    <P><B>Overflow:</B> an overflow condition bit. If not needed then "(none)" should be specified. </P>
+
+    <P><B>Carry:</B> a carry condition bit. Used only in addition and subtraction microinstructions and ignored by the
+        others. If not needed then "(none)" should be specified.</P>
+</FONT></font></DIR>
+</BODY>
+</HTML>

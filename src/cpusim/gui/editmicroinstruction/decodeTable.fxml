@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+
+<fx:root type="javafx.scene.control.TableView" id="decodeTable"
+         fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+    <columns>
+        <TableColumn text="name" fx:id="name"/>
+        <TableColumn text="ir" fx:id="ir"/>
+    </columns>
+</fx:root>

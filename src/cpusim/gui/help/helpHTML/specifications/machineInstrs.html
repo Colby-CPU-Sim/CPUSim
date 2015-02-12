@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+
+    <TITLE>Machine Instructions</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+<B>
+    <center><FONT FACE="Arial" size=+2 COLOR="#0000ff">Machine Instructions</font></center>
+</B>
+
+<P><FONT FACE="Palatino">A machine instruction consists of one or more bits, up to a maximum of 64 bits.</FONT></P>
+
+<P><FONT FACE="Palatino"><B><I><FONT COLOR="#0000FF">Format</FONT></I></B></FONT></p>
+
+<P><FONT FACE="Palatino">The user specifies the format of the instruction by specifying a list of fields for the
+    instruction. Each <A HREF="fields.html">field</A> corresponds to a certain number of bits of the instruction. The
+    first field stores the opcode of the instruction. The machine uses the opcode to determine which instruction it is.
+    The remaining fields include the operands of the instruction.</FONT></P>
+
+<P><FONT FACE="Palatino">For a very simple example, consider a 16-bit instruction named "load" with format &quot;op reg
+    addr&quot;, where &quot;op&quot; is a 4-bit field, &quot;reg&quot; is a 2-bit operand field, and &quot;addr&quot; is
+    a 10-bit operand field. When the user wants to include this instruction in an assembly language program, the user
+    must type in the program the name of the instruction and 2 operands, each consisting of a symbol or number. For this
+    example, a legal assembly language instruction is "load 1 96".</FONT></P>
+
+<P><FONT FACE="Palatino">There are many options regarding the format of the instruction. For example, you can include
+    0-bit fields, which are just used as punctuation in the assembly language instruction. For example, a &quot;loadr&quot;
+    instruction might have a format &quot;op reg delta[reg]&quot;, which contains six fields. Here &quot;op&quot; might
+    be a 4-bit field as before, &quot;reg&quot; is a 2-bit field, &quot;delta&quot; is an 8-bit field, and &quot;[&quot;
+    and &quot;]&quot; are 0-bit fields. To include this instruction in an assembly language program, you could write
+    &quot;loadr 1 -3[2]&quot;. Note that you don't supply values for the 0-bit fields and instead the names of those
+    fields are used as punctuation.</FONT></P>
+
+<P><FONT FACE="Palatino">You can also specify some fields as optional, which means that you need not include a value for
+    that field in assembly language programs. In that case, a default value is used for the field. Similarly, you can
+    specify some fields to be ignored, which means that you never specify a value for that field in assembly language
+    programs and instead a default value is always used.</FONT></P>
+
+<P><FONT FACE="Palatino">Furthermore, you can specify whether the address of the instruction or its successor should be
+    subtracted from the value of the field before it is assembled into machine language. Such subtractions are useful
+    for pc-relative addressing.</FONT></P>
+
+<P><FONT FACE="Palatino">Finally, you can specify a range of legal values for each field. In particular, you can say
+    that the field only takes positive integers as values or that it can take signed values. You can also specify
+    particular values as the only legal ones. In that case, you need to supply a name for each of those values and then
+    use those names in assembly language programs when supplying a value for the field.</FONT></P>
+
+<P><FONT FACE="Palatino"><B><I><FONT COLOR="#0000FF">Execute sequence</FONT></I></B></FONT></P>
+
+<P><FONT FACE="Palatino">Each machine instruction also specifies a list of microinstructions that form the
+    implementation of the machine instruction and that are executed when the machine instruction is to be executed. This
+    microinstruction list is called the "execute sequence" of the instruction. Every execute sequence should contain an
+    <A HREF="micros/end.html">End microinstruction</A>, which causes the machine to stop executing the current execution
+    sequence and start executing the <A HREF="fetchSequence.html">fetch sequence</A>, and so cause the start of a new
+    machine cycle.</FONT></P>
+
+<P><FONT FACE="Palatino"><B><I>Parameters:</I></B></FONT>
+<DIR><B>opcode:</B> a non-negative integer that fits in the
+    first field of the instruction.
+    <P><FONT FACE="Palatino"><B>format:</B> a list of 1 or more field names. The sum of the number of bits corresponding
+        to the fields must be at most 64.</FONT></P>
+
+    <P><FONT FACE="Palatino"><B>implementation:</B> a list of microinstructions that form the execute sequence of the
+        instruction.</FONT></P></DIR>
+</BODY>
+</HTML>

@@ -1,0 +1,27 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Decode</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Decode</P></font></B><FONT FACE="Palatino"><P>The decode
+    microinstruction is usually the last microinstruction in the fetch sequence. It is used to simulate a decoder. An
+    instruction register (<I>ir</I>) must be specified. CPU Sim will decode the instruction in the <I>ir</I>, i.e.,
+    determine which machine instruction is to be executed, as follows. </P>
+
+    <P>CPU Sim initially inspects the leftmost bit of the <I>ir</I>. If there is a machine instruction with an opcode of
+        one bit that matches the leftmost bit of the <I>ir</I>, then that machine instruction is chosen as the decoded
+        instruction. If there is no such machine instruction, then the leftmost two bits of the <I>ir</I> are inspected
+        and CPU Sim looks for a machine instruction with a 2-bit opcode that matches those two bits. CPU Sim continues
+        inspecting more and more bits of the <I>ir</I> until it finds a machine instruction whose opcode matches those
+        bits. Therefore, if you have one instruction with a one-bit opcode of 0 and another instruction with a two-bit
+        opcode of 01, then the second instruction will never be decoded and executed. Once a machine instruction has
+        been decoded, execution of the fetch sequence stops and execution of the decoded instruction begins, starting
+        with the first microinstruction in its execute sequence.</P><B><I><P>Parameters:</i></B></FONT>
+<DIR><FONT FACE="Palatino">
+    <B>ir:</B> the register that contains the instruction to be decoded.<p></P></FONT></DIR>
+</BODY>
+</HTML>

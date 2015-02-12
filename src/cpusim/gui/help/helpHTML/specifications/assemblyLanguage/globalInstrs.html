@@ -1,0 +1,39 @@
+
+<!--
+ * Michael Goldenberg, Ben Borchard, and Jinghui Yu created this file on 12/6/13
+-->
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Global Pseudoinstruction</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER"><B>Global Pseudoinstruction</B></P></font><FONT
+        FACE="Palatino"><P>The word ".global" signifies a pseudo-instruction in assembly language. It provides a way for
+    the user to declare a specific label's scope to be global (it can be referenced in code from the original file
+    or any files included in the original file. The pseudoinstruction has
+    the following parts:</FONT>
+<DIR><FONT FACE="Palatino">
+    <B>.global <I>label name</I></B></FONT></DIR>
+<FONT FACE="Palatino">
+
+    <P>The word ".global" and the label name must be included, but the comment is optional. The label can be
+        used as an operand in assembly language statements to refer to the first address of the data that is being
+        specified. The pseudoinstruction is terminated by the end-of-line character.</P>
+
+    <P>The operand must be a string of 0 or more characters. The string cannot include the
+        end-of-line or double-quote characters:</P></FONT><PRE>
+	.global  Start   ; legal
+	.global  Sta"rt  ; illegal--contains a double quote character.
+
+</PRE>
+<FONT FACE="Palatino">The effect of including an Global pseudoinstruction in your program is that the assembler remembers
+the specified label and do not replace it with a unique label in another file, but rather preserves its
+name so that the scope of the variable will truly be global.
+So the first example pseudoinstruction above will allow for any file to jump to the label Start, wherever
+that label happens to be declared.</FONT>
+</BODY>
+</HTML>

@@ -1,0 +1,30 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>IO</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">IO</P></font></B><FONT FACE="Palatino">
+    <P>An IO microinstruction simulates an IO port on a CPU. The microinstruction either (a) inputs into a buffer
+        register a value from the user or from a text file or (b) outputs the value of a register to a text file or to
+        the user. An IO microinstruction that outputs a value to the user does so by way of a dialog box or the console
+        panel. An IO microinstruction that inputs a value to the user does so by way of the console panel or a dialog
+        box, in which it asks the user to type in the value.</P>
+
+    <P>To specify the source or destination of the data (either to/from the user via a dialog box or the console panel
+        or to/from a text file), use the <B>Options|IO connections...</B> menu item from the <A
+                href="../../menus/execute.html"><B>Execute</B> menu</a>.</P><B><I><P>Parameters:</P></i></B>
+</FONT>
+<DIR><FONT FACE="Palatino">
+
+    <B>Direction:</b> either "input" or "output" indicating whether to get data from the user or from a file (input) or
+    send data to the user or to a file (output).
+    <P><B>Type:</b> either "integer", "ascii", or "unicode", indicating the type of data that is to be input or output.
+    </P>
+
+    <P><B>Buffer:</b> the register to or from which data is to be input or output.</P></FONT></DIR>
+</BODY>
+</HTML>

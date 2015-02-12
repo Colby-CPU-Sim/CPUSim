@@ -1,0 +1,122 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+
+    <TITLE>Fields</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+<center><B><FONT FACE="Arial" SIZE="+2" COLOR="#0000ff">Fields</FONT></B></center>
+<P><FONT FACE="Palatino">A field corresponds to a certain number of bits of a <A HREF="machineInstrs.html">machine
+    instruction</A>. The first field of an instruction stores the opcode of the instruction. The remaining fields
+    include the operands of the instruction. There can also be 0-bit fields, which just correspond to punctuation in the
+    instructional format.</FONT></P>
+
+<P><FONT FACE="Palatino"><B>Parameters:</B></FONT></P>
+<UL>
+    <LI><FONT FACE="Palatino"><B>name</B> <br>The names of the fields have a form that is a little different than
+        symbols in the assembly language. A field name can be either any single non-whitespace character or a mixture of
+        two or more letters, numbers, and hyphen (-) characters.</FONT></LI>
+    <LI><B>type</B> <br>The type is either <I>required</I>, <I>optional</I>, or <I>ignored</I>.
+        <UL>
+            <LI>A <I>required</I> field is one that must appear as an operand in the instruction. If the field has
+                positive length, then the assembly code must include an operand for that field consisting of a literal
+                or a symbol whose value will fit in the field. If the field has length 0, then the name of the field
+                must be included as an operand in the instruction in assembly language programs and is used just as
+                punctuation. Therefore, a field of length 0 must have a name that forms a token in assembly language.
+            </LI>
+            <LI>If a field is <I>optional</I>, then an operand need not be specified for that field in assembly
+                language, in which case the field's default value is used for the operand instead. If the field has
+                length 0 and is <I>optional</I>, then it may be omitted.
+            </LI>
+            <LI>An <I>ignored</I> field is one that is never included as an operand in assembly language. Instead, the
+                field's default value is always used for the field. Fields of length 0 may not have this type.
+            </LI>
+        </UL>
+    </LI>
+    <LI><B>numBits</B> <br>The length or number of bits in this field. It must be a base-10 integer that is 0 or
+        greater.
+    </LI>
+    <LI><B>relativity</B> <br>The relativity of a field is either <I>absolute</I>, <I>pcRelativePreIncr</I>, or <I>pcRelativePostIncr</I>.
+        This relativity allows for two pc-relative addressing modes.
+        <UL>
+            <LI>A field with <I>absolute</I> relativity is one whose operand's value is placed directly in the field
+                when assembled.
+            </LI>
+            <LI>If a field has <I>pcRelativePreIncr</I> relativity, then the value of the operand in the assembly
+                program for the
+                field is subtracted from the address of the instruction containing
+                the field. The assembler puts the difference as the actual value
+                of the operand in the field in the assembled instruction.
+            </LI>
+            <LI>If a field has <I>pcRelativePostIncr</I> relativity, then the value of the operand in the assembly
+                program for the field
+                is subtracted from the address of the instruction <I>after</I> the one
+                containing the field. The assembler puts the difference as the actual value
+                of the operand in the field in the assembled instruction.
+            </LI>
+        </UL>
+    </LI>
+    <LI><B>defaultValue</B> <br>The default value must be a base-10 integer that fits in the field. It is used as the
+        operand for fields of type <I>ignored</I> or for fields of type <I>optional</I> when operands for those fields
+        are not included in the assembly program.
+    </LI>
+    <LI><B>signed</B> <br>If a field is signed, it can legally hold any value from -2<sup><I>n</I>-1</sup>
+        to 2<sup><I>n</I></sup>-1 where <I>n</I> is the number of bits in the field. If the field is unsigned,
+        the values must be in the range 0 to 2<sup><I>n</I></sup>-1.
+    </LI>
+    <LI><B>values</B> <br>
+        If a field has <I>absolute</I> relativity and a positive number of bits, then you can optionally create a set of
+        named values for the field. If you create such a set, then the names for these values become the only legal
+        values for the field. Furthermore, in this case, you must use one of the names of those values as the operand in
+        the field in each assembly language program. If you do not specify a set of values, then any value that fits in
+        the field is acceptable.
+    </LI>
+</UL>
+<FONT FACE="Palatino"><p><B>Examples:</B>
+
+    <P class="p3" ALIGN="CENTER"><FONT FACE="Palatino"><IMG SRC="../generalHelp/tour/EditMachineFields.jpg" HEIGHT="450"
+                                                            WIDTH="450"><BR>Figure 23. The dialog for editing the fields
+        of machine instructions.</FONT></P>
+
+    <P>Consider the fields shown in Figure 23 above. Assume that the &quot;reg&quot; field has a set of three values
+        associated with it: A=2, B=3, and C=4. Also, assume that the three punctuation characters '[' and ']' and ','
+        are individual character tokens (see <A HREF="assemblyLanguage/tokens.html">the discussion of tokens</A> for
+        information on setting the token usage of punctuation characters). Now consider two machine instructions with
+        names &quot;foo&quot; and &quot;bar&quot; with opcodes 0 and 1 and the following respective formats:
+ <pre>    op reg, reg un6
+    op un6 delta[reg]</pre>
+    These instructions can be called in assembly language as shown in these examples:
+<pre>    foo B C
+    foo B, C
+    bar -2[A]
+</pre>
+    and will be assembled into the following bits (with spaces inserted to indicate the separate fields):
+<pre>    0000 011 100 000101
+    0000 011 100 000101
+    0001 000101 110 010</pre>
+    <P>Note that the delta value of -2 is converted to binary using 3-bit 2's complement notation.</P>
+
+    <P>If the three punctuation characters '[', ']', and ',' are not individual tokens and instead form parts of
+        symbols, then you need to separate them from neighboring characters in instruction calls to avoid ambiguity or
+        incorrect parsing. For example, you would need to write</P><pre>    foo B C
+    foo B , C
+    bar -2[ A ]
+</pre>
+</FONT>
+
+<P><FONT FACE="Palatino"><B>Notes:</B></FONT>
+<UL>
+    <LI>Fields of length 0 are just punctuation and their name must appear as the operand in assembly language. Such
+        fields must be of type <I>required</I> or <I>optional</I>. All other properties of such fields are unused.
+    </LI>
+    <LI>To preserve backward compatibility of this version of CPU Sim with previous versions that used field lengths
+        only instead of these new fields, CPU Sim looks for fields when loading a machine previously saved to a file. If
+        no such fields are included in the file and instead field lengths are included, then CPU Sim will add new fields
+        with names &quot;1&quot; through&quot;16&quot; and &quot;-16&quot; through&quot;-1&quot; to the machine when it
+        is loaded. In this way, the old field lengths become actual fields instead.
+    </LI>
+</UL>
+</BODY>
+</HTML>

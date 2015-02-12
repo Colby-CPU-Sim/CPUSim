@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.control.TableView" id="setTable"
+           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+  <columns>
+    <TableColumn text="name" fx:id="name"/>
+    <TableColumn text="source" fx:id="source"/>
+    <TableColumn text="srcStartBit" fx:id="srcStartBit"/>
+    <TableColumn text="dest" fx:id="dest" />
+    <TableColumn text="destStartBit" fx:id="destStartBit"/>
+    <TableColumn text="numBits" fx:id="numBits"/>
+    <TableColumn text="index" fx:id="index"/>
+    <TableColumn text="indexStart" fx:id="indexStart"/>
+    <TableColumn text="indexNumBits" fx:id="indexNumBits"/>
+  </columns>
+</fx:root>

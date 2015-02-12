@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+
+<BorderPane fx:id="scene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity" prefHeight="300.0" prefWidth="440.0" styleClass="root"
+            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+    <bottom>
+        <VBox id="VBox" fx:id="vBox" alignment="CENTER" spacing="5.0">
+            <HBox id="HBox" alignment="CENTER" prefHeight="50.0" prefWidth="440.0"
+                  spacing="5.0">
+                <Button fx:id="helpButton" contentDisplay="CENTER"
+                        minHeight="-Infinity" minWidth="-Infinity"
+                        mnemonicParsing="false" onAction="#onHelpButtonClick"
+                        prefHeight="25.0" prefWidth="25.0" styleClass="helpButton"
+                        text="?"/>
+                <Pane prefHeight="50.0" prefWidth="50.0"/>
+                <Button fx:id="okButton" defaultButton="true"
+                        minHeight="-Infinity" minWidth="100.0"
+                        mnemonicParsing="false" onAction="#onOKButtonClick"
+                        prefHeight="22.0" prefWidth="160.0"
+                        styleClass="roundBlueButton" text="OK"/>
+                <Button fx:id="cancelButton" cancelButton="true"
+                        minHeight="-Infinity" minWidth="100.0"
+                        mnemonicParsing="false" onAction="#onCancelButtonClick"
+                        prefHeight="22.0" prefWidth="160.0"
+                        styleClass="roundButton" text="Cancel"/>
+            </HBox>
+        </VBox>
+    </bottom>
+    <center>
+        <Pane fx:id="tables"/>
+    </center>
+    <stylesheets>
+        <URL value="@../../css/Dialogs.css"/>
+    </stylesheets>
+    <top>
+        <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
+            <Label prefHeight="50.0" text="Name of Register Arrays:"/>
+            <ComboBox fx:id="registerCombo" minWidth="80">
+                <items>
+                    <FXCollections fx:factory="observableArrayList"/>
+                </items>
+            </ComboBox>
+        </HBox>
+    </top>
+</BorderPane>

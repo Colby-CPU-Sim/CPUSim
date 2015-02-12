@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Transfer </TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Transfer</P></font></B><FONT FACE="Palatino"><P>There are
+    three types of transfers (copy) of data between registers and register arrays: </P>
+    <OL>
+
+        <LI>A register to a register, denoted by "TransferRtoR",</LI>
+        <LI>A register to a register array, denoted by "TransferRtoA",</LI>
+        <LI>A register array to a register, denoted by "TransferAtoR".</LI>
+    </OL>
+    <P>In all cases, the user is able to transfer data to or from any set of consecutive bits of a register. The old
+        data in the part of the register receiving the new data is lost and is replaced with the new data. The rest of
+        the receiving register is unchanged. That is, if you transfer 4 bits into the first 4 bits of a 16-bit register,
+        then the last 12 bits of the register are unchanged by the transfer.</P>
+
+    <P>When transferring to or from a register array, the user must specify an index register and a sequence of
+        consecutive bits of that register whose value will form the index of the register in the array to or from which
+        the data is to be transferred. For example, a TransferRtoA microinstruction might be created to transfer bits
+        from a register <I>r</I> to a register array <I>A</I> using bits 3-5 of an index register to specify which
+        register in the array is to receive the data. If bits 3-5 of the index register contain the value 0, then the
+        data in register <I>r</I> will be transferred to the first register in array <I>A</I>. </P>
+
+    <P><B><I>Parameters:</I></B>
+</FONT>
+<DIR><FONT FACE="Palatino">
+    <B>Source:</B> a register or register array from which data is to be transferred
+    <P><B>Source start bit:</B> this number designates the leftmost bit that is to be transferred. It must be a number
+        from 0 to one less than the width of the source register or register array. </P>
+
+    <P><B>Destination:</B> a register or register array to which data is to be transferred </P>
+
+    <P><B>Destination start bit:</B> this number designates where the leftmost transferred bit is to be placed in the
+        destination register.</P>
+
+    <P><B>Number of bits:</B> this specifies how many bits are to be transferred. The source start bit added to the
+        number of bits must yield a sum that is at most the width of the source register or register array. Similarly
+        for the destination register or register array. </P>
+
+    <P><B>Index:</B> a register which contains the index of the source or destination register in the array to or from
+        which data is to be transferred. This parameter is only used in transfers of type TransferRtoA or TransferAtoR.
+        The value of the bits in the index register that are used to compute the index are treated as an unsigned
+        integer (that is, they are not treated as a two's complement representation of an integer). </P>
+
+    <P><B>Index start bit:</B> this number designates the position of the leftmost bit of the index register used to
+        compute the index into the array.</P>
+
+    <P><B>Index number of bits:</B> this specifies how many consecutive bits of the index register are to be used to
+        compute the index into the array.</P></FONT></DIR>
+<FONT FACE="Palatino">
+    <BR>
+
+    <P>For example, if you specify 16-bit registers <I>r1</I> and <I>r2</I> as the source and destination registers, and
+        if you specify a source start bit of 0, a destination start bit of 12, and the number of bits as 4, then the
+        left-most 4 bits of <I>r1</I> will be transferred (more precisely, copied) into the right-most 4 bits of
+        <I>r2</I>.</P>
+
+    <P>For another example, suppose you specify a TransferRtoA
+        microinstruction with source register <I>r</I> and destination
+        register array <I>A</I> containing 8 registers. If you specify
+        an index register <I>i</I> and index start bit = 0 and index number
+        of bits = 3, then the leftmost 3 bits of <I>i</I> are treated as an
+        integer from 0 to 7 that is used to specify which of the 8 registers
+        in array <I>A</I> is to receive the data.</P></FONT>
+</BODY>
+</HTML>

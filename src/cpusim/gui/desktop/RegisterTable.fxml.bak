@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="228.0" prefWidth="597.999977929685" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <TitledPane fx:id="titledPane" animated="false" contentDisplay="TOP" minWidth="584.0" prefHeight="228.0" prefWidth="598.0" text="untitled">
+      <content>
+        <ScrollPane id="ScrollPane" prefViewportHeight="202.0" prefViewportWidth="594.0">
+          <content>
+            <TableView id="regTable" fx:id="table" editable="true" prefHeight="228.0" prefWidth="598.0">
+              <columns>
+                <TableColumn minWidth="50.0" text="Name" fx:id="name" />
+                <TableColumn minWidth="50.0" text="Width" fx:id="width" />
+                <TableColumn minWidth="50.0" text="Data" fx:id="data" />
+              </columns>
+            </TableView>
+          </content>
+        </ScrollPane>
+      </content>
+    </TitledPane>
+  </children>
+</AnchorPane>

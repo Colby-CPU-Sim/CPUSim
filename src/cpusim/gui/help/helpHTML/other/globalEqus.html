@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type"
+	CONTENT="text/html; charset=windows-1252">
+
+<TITLE>Global EQUs</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+	<h3 ALIGN="CENTER">
+		<FONT FACE="Arial" COLOR="#0000ff"><B>Global EQUs</B></FONT>
+	</h3>
+	<P>
+		<FONT FACE="Palatino">Each machine can have some equates (EQUs)
+			associated with them. These EQUs are global constants available for
+			use in any assembly language program written for that machine. For
+			example, if an EQU named "A0" with value 0 is available, then the
+			user can type in "A0" wherever a numerical value is expected in
+			assembly language programs and, during assembly, the symbol "A0" will
+			be replaced with the numeric value of 0. To create or edit the global
+			EQUs, select "EQU's..." from the <A HREF="../menus/modify.html">Modify
+				menu</A>, which will bring up the <A HREF="../windows/globalEQUs.html">global
+				EQU dialog box</A>. In that dialog, you can edit the cells of the table
+			as you would with any of the other tables. Note that the name of all
+			EQUs must be valid symbols in <A
+			HREF="../specifications/assemblyLanguage/syntax.html"> assembly
+				language syntax</A>. Note also that the value of an EQU must be a
+			decimal integer.
+		</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">These global EQUs are saved with the
+			machine when it is saved to a file.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Note that you can also type EQU
+			declarations directly in your assembly language code. However, these
+			EQU's are local in that they apply only to the program in which they
+			are declared. Therefore, they will not be saved with the current
+			machine and will not appear in the global EQU table.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Note also that if there is a local EQU in
+			a program with the same name as a global EQU, then the local EQU will
+			be used instead of the global EQU. If two or more of a local EQU, a
+			global EQU, and a label all have the same name, the local EQU will
+			have highest priority, followed by the global EQU, and finally the
+			label.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino"><B><I>Parameters:</I></B> </FONT>
+	<DIR>
+		<FONT FACE="Palatino"> <B>value:</B> the decimal integer
+			(positive, negative, or zero) with which the name of this EQU will be
+			replaced in all assembly language programs run in this machine. The
+			integer must be in the range -2<sup> 31</sup> to 2<sup>31</sup>-1
+			(-2147483648 to 2147483647). 
+		</FONT>
+	</DIR>
+</BODY>
+</HTML>
