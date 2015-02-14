@@ -1,330 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="Initial commit">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/Chart.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/Connections.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/DebugToolbar.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/other/DebugToolbar.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/EditFetchSequ.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/EditMachineFields.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/EditMachineInstr.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/EditMenu.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/EditMicros.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/EditModules.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/ExecuteMenu.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/FileIcon16x16.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/FileIcon16x16.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/FileMenu.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/FileMenu2.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/FolderIcon16x16.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/FolderIcon16x16.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/HelpMenu.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/Highlighting.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/IOConnections.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/Loading.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/ModifyMenu.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/Punctuation.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/Wombat1.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/WombatDesktopPC.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jarfiles/controlsfx-8.20.8.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/cpusim_icon.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/cpusim_logo.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/fetchSequence.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/fields.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/globalEQUs.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/lightning.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/lightning2.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/model.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jarfiles/openjfx-dialogs-1.0.2.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/preferencesFontTab.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/preferencesKeyBindingsTab.JPG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/preferencesOtherTab.JPG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/ram.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/registerArray.JPG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/registerArrays.JPG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/registers.JPG" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jarfiles/richtextfx-fat-0.6.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/.name" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/AboutController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/AboutFXML.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/AboutFXML.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Arithmetic.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/ArithmeticTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/AssembledInstructionCall.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/Assembler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/AssemblyException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/BackupManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/Base.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Branch.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/BranchTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/BreakException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/BufferedChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/CPUSim4.0b49.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/CPUSimConstants.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/CPUSimHelpBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/CodeGenerator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneTab.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/CommandLineChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Comment.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/ConditionBit.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/ConditionBitTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/ConsoleChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/ConsoleManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/ControlUnit.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/Convert.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/CpusimSet.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground1.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground2.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground3.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground4.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground5.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground6.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Debug.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBar.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBarController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Decode.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/DecodeTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/DefaultBackground.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/DialogChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/DragTreeCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/EQU.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/equs/EQUs.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/equs/EQUs.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/equs/EQUsController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/fetchsequence/EditFetchSequenceController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/EditFieldValuesController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/EditFieldsController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/EditMachineInstructionController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/EditMicroinstructions.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/EditMicroinstructions.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/EditMicroinstructionsController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/EditModules.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/EditModulesController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/editRegisters/EditRegisters.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/editRegisters/EditRegistersController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingIntCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingIntStyleCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingLongCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingMultiBaseStyleLongCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrListCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrStyleCell.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/End.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/ExecutionException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/FXUtilities.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Field.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/FieldValue.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/FileChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/find/FindReplaceController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/find/FindReplaceFXML.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/find/FindReplaceFXML.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/GUIMain.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/GeneralHelpBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/HelpController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/HelpFXML.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/HelpFXML.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/HighlightManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/xml/HtmlEncoder.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/IO.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/IOChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/options/IOOptionsData.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/IOTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Increment.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/IncrementTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/InstructionCall.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/xml/Lax.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/LineNumbers.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/LoadException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Logical.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/LogicalTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/MIFReaderException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/mif/MIFScanner.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Machine.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/xml/MachineHTMLWriter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/MachineInstruction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/xml/MachineReader.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/MachineReaderException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/xml/MachineWriter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/MacroDef.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Main.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Mediator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/MemoryAccess.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/MemoryAccessTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/MenusBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/MicroController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Microinstruction.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/MicroinstructionTreeView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/Module.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/ModuleController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/NamedObject.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/Normalizer.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/options/OptionsController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/OptionsDialog.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/options/OptionsFXML.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/options/OptionsFXML.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/OutlineChangesManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/Parser.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/PunctChar.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/PushBackReader.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/PushBackWriter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/RAM.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/RAMLocation.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/RAMsTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTable.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/Register.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/module/RegisterArray.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/RegisterArrayTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/RegisterRAMPair.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTable.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/RegistersTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/RegularExpressionGenerator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/Scanner.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/SearchComboBox.css" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/SearchController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/SetCondBit.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/SetCondBitTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/SetTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Shift.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/ShiftTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/SourceLine.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/StreamObject.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/StringChannel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/editRegisters/TableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/Test.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/TestTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/assembler/Token.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/TransferAtoR.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/TransferAtoRTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/TransferRtoA.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/TransferRtoATableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/microinstruction/TransferRtoR.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/TransferRtoRTableController.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/UpdateDisplayManager.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/Validate.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/util/ValidationException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/W2-0.a" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/Wombat2.cpu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/about/aboutCPUSim.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/arithmetic.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/arithmeticTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/asciiInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/assemblyLanguageBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/blank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/branch.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/branchTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware/conditionBit.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/conditionBitTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/controlsfx_8_20_8.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/creatingNewMachines.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/dataInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/other/debugMode.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/decode.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/decodeTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dictionaries/djskrien.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/edit.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/fetchsequence/editFetchSequence.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/fetchsequence/editFetchSequence.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFieldNames.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFieldValues.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFields.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFields.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editMachineInstruction.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/fetchsequence/editMachineInstruction.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editMachineInstruction.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/end.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/equDeclaration.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/execute.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/fetchSequence.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/fetchSequence.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/fields.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/fields.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/file.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/globalEQUs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/other/globalEqus.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/globalInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/hardwareModules.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/help.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/includeDirectives.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/increment.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/incrementTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/introduction.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/io.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/ioTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/other/keyboardShortcuts.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/logical.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/logicalTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/machineInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/machineInstruction.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/machineInstructions.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/machineSpecificationsBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/macroCalls.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/mainDisplay.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/memoryAccess.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/memoryAccessTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/microInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/microinstructions.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/menus/modify.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/modifyingMachines.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/names.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/ohterFeaturesBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/otherFeaturesBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/preferences.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware/ram.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/ramTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/ramsTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware/register.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware/registerArray.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/registerArrayTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windows/registerArrays.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/registerTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/registersTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/regularInstrs.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/richtextfx_fat_0_6.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/runningMachines.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/scopes/scope_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/set.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/setCondBit.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/setCondBitTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/setTable.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/setTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/shift.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/shiftTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/syntax.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmodules/editRegisters/tables.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/test.a" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/test.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/test1.cpu" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/testTable.fxml.bak" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/testTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/transfer.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/transferAtoRTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/transferRtoATable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/editmicroinstruction/transferRtoRTable.fxml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/tutorial.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/usingHelp.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/windowsBlank.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -350,108 +29,60 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AssemblyException.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/AssemblyException.java">
+      <file leaf-file-name="DesktopController.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="227" max-vertical-offset="4902">
-              <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
+            <state vertical-scroll-proportion="1.1455525" vertical-offset="61622" max-vertical-offset="62662">
+              <caret line="3394" column="9" selection-start-line="3394" selection-start-column="9" selection-end-line="3394" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#23737#23738#0" expanded="true" />
+                <element signature="e#23770#23771#0" expanded="true" />
+                <element signature="e#36899#36900#0" expanded="true" />
+                <element signature="e#36948#36949#0" expanded="true" />
+                <element signature="e#38956#38957#0" expanded="true" />
+                <element signature="e#38987#38988#0" expanded="true" />
+                <element signature="e#39458#39459#0" expanded="true" />
+                <element signature="e#39491#39492#0" expanded="true" />
+                <element signature="e#39648#39649#0" expanded="true" />
+                <element signature="e#39684#39685#0" expanded="true" />
+                <element signature="e#82020#82021#0" expanded="true" />
+                <element signature="e#82064#82065#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Mediator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/Mediator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="8844" max-vertical-offset="20235">
+              <caret line="610" column="30" selection-start-line="610" selection-start-column="30" selection-end-line="610" selection-end-column="30" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Assembler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Assembler.java">
+      <file leaf-file-name="PreferencesController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="94" max-vertical-offset="2812">
-              <caret line="29" column="13" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
-              <folding />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3961" max-vertical-offset="11666">
+              <caret line="250" column="17" selection-start-line="250" selection-start-column="17" selection-end-line="250" selection-end-column="17" />
+              <folding>
+                <element signature="e#0#20657#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AssembledInstructionCall.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/AssembledInstructionCall.java">
+      <file leaf-file-name="CPUSimConstants.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/util/CPUSimConstants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="969">
-              <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.a" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/test.a">
-          <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="912">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test1.cpu" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/test1.cpu">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="20520">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="W2-0.a" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/W2-0.a">
-          <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="1463">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Wombat2.cpu" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/Wombat2.cpu">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="19019">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CPUSim4.0b49.iml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CPUSim4.0b49.iml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="361">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LineNumbers.css" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/LineNumbers.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="247">
-              <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EQUs.fxml" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/equs/EQUs.fxml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33235726" vertical-offset="77" max-vertical-offset="1501">
-              <caret line="14" column="111" selection-start-line="14" selection-start-column="111" selection-end-line="14" selection-end-column="111" />
-              <folding />
+            <state vertical-scroll-proportion="0.0" vertical-offset="307" max-vertical-offset="1387">
+              <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
+              <folding>
+                <element signature="e#0#2528#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -509,12 +140,12 @@
         <option value="$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/EditFieldValuesController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/assembler/Token.java" />
         <option value="$PROJECT_DIR$/src/cpusim/assembler/StreamObject.java" />
         <option value="$PROJECT_DIR$/src/cpusim/assembler/Scanner.java" />
         <option value="$PROJECT_DIR$/src/cpusim/assembler/PunctChar.java" />
         <option value="$PROJECT_DIR$/test/test1.cpu" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
       </list>
     </option>
   </component>
@@ -522,10 +153,10 @@
     <detection-done>true</detection-done>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-264" />
+    <option name="x" value="-269" />
     <option name="y" value="-1200" />
     <option name="width" value="1558" />
-    <option name="height" value="1184" />
+    <option name="height" value="1200" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -569,6 +200,72 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cpusim" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cpusim" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="gui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cpusim" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="gui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="desktop" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -589,7 +286,7 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="dynamic.classpath" value="false" />
     <property name="LayoutCode.rearrangeEntriesJava" value="false" />
-    <property name="options.lastSelected" value="preferences.keymap" />
+    <property name="options.lastSelected" value="settings.github" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
   </component>
@@ -680,7 +377,13 @@
       <option name="PASS_PARENT_ENVS" value="true" />
       <module name="CPUSim4.0b49" />
       <envs />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="" />
+        <option name="TRANSPORT" value="0" />
+        <option name="LOCAL" value="true" />
+      </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Debug" />
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
@@ -707,33 +410,40 @@
       <created>1423675384646</created>
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
-      <workItem from="1423675385897" duration="14589000" />
+      <workItem from="1423675385897" duration="22498000" />
     </task>
+    <task id="LOCAL-00001" summary="Initial commit">
+      <created>1423758058006</created>
+      <option name="number" value="00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1423758058006</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14589000" />
+    <option name="totallyTimeSpent" value="22498000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-264" y="-1200" width="1558" height="1184" extended-state="0" />
+    <frame x="-269" y="-1200" width="1558" height="1200" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32874197" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.58402205" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26968327" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33089006" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24961598" sideWeight="0.5004517" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32966024" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874197" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285068" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285068" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24961598" sideWeight="0.5006748" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21437995" sideWeight="0.5006196" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21437995" sideWeight="0.49932525" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21437995" sideWeight="0.4993804" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -761,7 +471,28 @@
     <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java</url>
+          <line>2193</line>
+          <properties />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java</url>
+          <line>2876</line>
+          <properties />
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java</url>
+          <line>812</line>
+          <properties />
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="4" />
+    </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="antWorkspaceConfiguration">
@@ -769,353 +500,370 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFields.fxml.bak">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/CpusimSet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2109">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3895">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFields.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2508">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/editFieldNames.fxml.bak">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1710">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="211" max-vertical-offset="6061">
-          <caret line="39" column="13" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTable.fxml.bak">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="931">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTable.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="665">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2" max-vertical-offset="7733">
-          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RamTable.fxml.bak">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="608">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RamTable.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="760">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1633" max-vertical-offset="96292">
-          <caret line="131" column="13" selection-start-line="131" selection-start-column="13" selection-end-line="131" selection-end-column="13" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="n#!!doc" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml.bak">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/Decode.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="12008">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2603">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/End.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1824">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#2512#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/IO.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4693">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#8525#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/Increment.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3211">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/Logical.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3458">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/MemoryAccess.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7942">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3838">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBarController.java">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/SetCondBit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8930">
-          <caret line="33" column="13" selection-start-line="33" selection-start-column="13" selection-end-line="33" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2470">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBar.fxml">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/Shift.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1634">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4446">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#8084#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/Test.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4788">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/TransferAtoR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6460">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/TransferRtoA.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6707">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13358#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/microinstruction/TransferRtoR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4769">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/mif/MIFScanner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2774">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#4535#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/ConditionBit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3705">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#6266#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/ControlUnit.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3344">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#4918#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/RAM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8436">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#17289#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/RAMLocation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2413">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/Register.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4712">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#8439#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/module/RegisterArray.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5529">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#9727#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/BackupManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6859">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13227#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/ConsoleManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1995">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/Convert.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="13433">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#26050#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/FXUtilities.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="532">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/HighlightManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3572">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5966">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#11711#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneTab.java">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/LoadException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1520">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="817">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#1034#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/MIFReaderException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6631">
-          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="608">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#734#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/MachineReaderException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5111">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="627">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#731#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/NamedObject.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="475">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#565#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/OutlineChangesManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1995">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/PushBackReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5168">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1368">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#1592#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/PushBackWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2090">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#2402#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/RegisterRAMPair.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1805">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#2965#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/SourceLine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="684">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#637#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/UpdateDisplayManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1843">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/DefaultBackground.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/Validate.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2014">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="29070">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#65900#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground6.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/ValidationException.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="323">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="e#0#242#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground5.css">
+    <entry file="file://$PROJECT_DIR$/.idea/compiler.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="532">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground4.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground3.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground2.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground1.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2223">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/about/AboutFXML.fxml.bak">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1197">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/about/AboutFXML.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1216">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/about/aboutCPUSim.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1216">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/about/AboutController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="855">
-          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Token.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="56" max-vertical-offset="4256">
-          <caret line="35" column="13" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/StreamObject.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="113" max-vertical-offset="1938">
-          <caret line="30" column="13" selection-start-line="30" selection-start-column="13" selection-end-line="30" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Scanner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="493" max-vertical-offset="37829">
-          <caret line="41" column="13" selection-start-line="41" selection-start-column="13" selection-end-line="41" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/PunctChar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="32" max-vertical-offset="1406">
-          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Parser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="854" max-vertical-offset="34580">
-          <caret line="57" column="13" selection-start-line="57" selection-start-column="13" selection-end-line="57" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Normalizer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="86" max-vertical-offset="10735">
-          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/model.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/MacroDef.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="86" max-vertical-offset="855">
-          <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/InstructionCall.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2014">
-          <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/EQU.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1729">
-          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/CodeGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="10" max-vertical-offset="10792">
-          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/AssemblyException.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="227" max-vertical-offset="4902">
-          <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/Assembler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="94" max-vertical-offset="2812">
-          <caret line="29" column="13" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/assembler/AssembledInstructionCall.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="969">
-          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -1125,7 +873,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="912">
+        <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="912">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -1133,7 +881,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test1.cpu">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="20520">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="9215">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -1144,7 +892,7 @@
         <state />
       </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1463">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1045">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -1152,33 +900,109 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/Wombat2.cpu">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="19019">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8911">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CPUSim4.0b49.iml">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/HtmlEncoder.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="611">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="912">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!doc" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/Lax.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7353">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#13320#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/MachineHTMLWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6289">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#14833#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/MachineReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="35948">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#81113#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/MachineWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8379">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#21450#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/CPUSimConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="307" max-vertical-offset="1387">
+          <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#2528#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/Mediator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="8844" max-vertical-offset="20235">
+          <caret line="610" column="30" selection-start-line="610" selection-start-column="30" selection-end-line="610" selection-end-column="30" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/LineNumbers.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="247">
-          <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
-          <folding />
+        <state vertical-scroll-proportion="0.0" vertical-offset="3961" max-vertical-offset="11666">
+          <caret line="250" column="17" selection-start-line="250" selection-start-column="17" selection-end-line="250" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#20657#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/equs/EQUs.fxml">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33235726" vertical-offset="77" max-vertical-offset="1501">
-          <caret line="14" column="111" selection-start-line="14" selection-start-column="111" selection-end-line="14" selection-end-column="111" />
-          <folding />
+        <state vertical-scroll-proportion="1.1455525" vertical-offset="61622" max-vertical-offset="62662">
+          <caret line="3394" column="9" selection-start-line="3394" selection-start-column="9" selection-end-line="3394" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#23737#23738#0" expanded="true" />
+            <element signature="e#23770#23771#0" expanded="true" />
+            <element signature="e#36899#36900#0" expanded="true" />
+            <element signature="e#36948#36949#0" expanded="true" />
+            <element signature="e#38956#38957#0" expanded="true" />
+            <element signature="e#38987#38988#0" expanded="true" />
+            <element signature="e#39458#39459#0" expanded="true" />
+            <element signature="e#39491#39492#0" expanded="true" />
+            <element signature="e#39648#39649#0" expanded="true" />
+            <element signature="e#39684#39685#0" expanded="true" />
+            <element signature="e#82020#82021#0" expanded="true" />
+            <element signature="e#82064#82065#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

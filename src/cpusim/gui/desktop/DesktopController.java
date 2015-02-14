@@ -294,7 +294,6 @@ public class DesktopController implements Initializable {
         updateDisplayManager = new UpdateDisplayManager(mediator, this);
         debugToolBarController = new DebugToolBarController(mediator, this);
         codePaneController = new CodePaneController(mediator);
-
     }
 
     /**
@@ -435,6 +434,23 @@ public class DesktopController implements Initializable {
                 .getChannel())).setStage(stage);
         ((ConsoleChannel) (((BufferedChannel) (CPUSimConstants.CONSOLE_CHANNEL))
                 .getChannel())).setMediator(mediator);
+
+        // whenever a new tab in the code text area is selected,
+        // set the line numbers according to the settings
+        this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldTab, newTab) -> {
+                    StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
+                    if (otherSettings.showLineNumbers.get()) {
+                        codeArea.setParagraphGraphicFactory(
+                                LineNumberFactory.get(codeArea, (digits -> " %" +
+                                        digits + "d ")));
+                    }
+
+                    else {
+                        codeArea.setParagraphGraphicFactory(
+                                LineNumberFactory.get(codeArea, (digits -> " ")));
+                    }
+                });
     }
 
     //================ handlers for FILE menu ==================================
@@ -1350,23 +1366,18 @@ public class DesktopController implements Initializable {
      *                files)
      */
     public void addTab(String content, String title, File file) {
+        // create the new tab and text area
         final CodePaneTab newTab = new CodePaneTab();
         final File f = file;
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
         newTab.setContent(codeArea);
 
-        //set up the styles
-        IntFunction<String> format = (digits -> " %" + digits + "d ");
-        System.out.println(codeArea.getParagraphGraphicFactory());
-        codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea, format));
+        //set up the styles for the text area
+        // whenever the text is changed, recompute the highlighting and set it dirty
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
             codeArea.setStyleSpans(0, codePaneController.computeHighlighting(newText));
             newTab.setDirty(true);
-            codeArea.setParagraphGraphicFactory(
-                    codeArea.getParagraphGraphicFactory() == null ?
-                            LineNumberFactory.get(codeArea, format) :
-                            null);
         });
 
         // add the content, set what to do when closed, and set the tooltip
@@ -3360,28 +3371,27 @@ public class DesktopController implements Initializable {
 
         public OtherSettings() {
             showLineNumbers = new SimpleBooleanProperty(true);
-//            showLineNumbers.addListener(new ChangeListener<Boolean>() {
-//                @Override
-//                public void changed(ObservableValue<? extends Boolean> arg0,
-//                                    Boolean oldVal, Boolean newVal) {
-//                    if (newVal.booleanValue()) {
-//                        for (Tab t : textTabPane.getTabs()) {
-//                            if (!tabEditorControllers.get(t)
-//                                    .lineNumberListViewIsShowing()) {
-//                                tabEditorControllers.get(t).reinstateLineNumberColumn();
-//                            }
-//                        }
-//                    }
-//                    else {
-//                        for (Tab t : textTabPane.getTabs()) {
-//                            if (tabEditorControllers.get(t).lineNumberListViewIsShowing
-//                                    ()) {
-//                                tabEditorControllers.get(t).removeLineNumberColumn();
-//                            }
-//                        }
-//                    }
-//                }
-//            });
+            // add a listener that changes the line numbers for the selected tab
+            // The line numbers for other tabs are not changed until they are selected.
+            showLineNumbers.addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> arg0,
+                                    Boolean oldVal, Boolean newVal) {
+                    Tab t = textTabPane.getSelectionModel().getSelectedItem();
+                    if (t == null) {
+                        return;
+                    }
+                    StyledTextArea codeArea = (StyledTextArea) t.getContent();
+                    if (newVal) { // show line numbers
+                        codeArea.setParagraphGraphicFactory(LineNumberFactory.get
+                                (codeArea, (digits -> " %" + digits + "d ")));
+                    }
+                    else { // hide line numbers
+                        codeArea.setParagraphGraphicFactory(LineNumberFactory.get
+                                (codeArea, (digits -> " ")));
+                    }
+                }
+            });
         }
     }
 
