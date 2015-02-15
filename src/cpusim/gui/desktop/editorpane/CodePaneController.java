@@ -148,7 +148,10 @@ public class CodePaneController
         return spansBuilder.create();
     }
 
-//    THE FOLLOWING CODE IS UNUSED.
+//    THE FOLLOWING LINE WRAP CODE IS UNUSED.  IF WE USED IT, THEN EACH CONTINUANCE
+//    OF A LINE WOULD BE TREATED AS A SEPARATE LINE (THAT IS, A PARAGRAPH), WHICH
+//    WOULD MESS UP THE LINE COUNTS.  IT ALSO DOESN'T MAKE SENSE IN AN ASSEMBLY
+//    LANGUAGE PROGRAM, WHICH IS LINE ORIENTED, EXCEPT FOR THE DOCUMENTATION/COMMENTS.
 //    /**
 //     * Gives an array of each line of a string.
 //     * Assumes there is no wrapping.

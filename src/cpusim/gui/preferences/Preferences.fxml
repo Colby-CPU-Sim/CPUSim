@@ -273,6 +273,8 @@
                            text="Text Display Settings"/>
                     <CheckBox fx:id="showLineNumbers" mnemonicParsing="false"
                               text="Show line numbers." VBox.margin="$x1"/>
+                    <CheckBox fx:id="lineWrap" mnemonicParsing="false"
+                              text="Allow line wrap." VBox.margin="$x1"/>
                     <Label minHeight="13.999908447265625"
                            prefHeight="13.999908447265625"
                            text="Console Settings"/>

@@ -67,6 +67,7 @@ public class PreferencesController implements Initializable {
 
 	@FXML CheckBox autoSave;
 	@FXML CheckBox showLineNumbers;
+	@FXML CheckBox lineWrap;
 	@FXML CheckBox clearConsoleOnRun;
 
 	@FXML Button applyButton;
@@ -251,6 +252,7 @@ public class PreferencesController implements Initializable {
 	private void saveOtherTab() {
 		desktopController.getOtherSettings().autoSave = this.autoSave.isSelected();
 		desktopController.getOtherSettings().showLineNumbers.set(this.showLineNumbers.isSelected());
+		desktopController.getOtherSettings().lineWrap.set(this.lineWrap.isSelected());
 		desktopController.getOtherSettings().clearConsoleOnRun = this.clearConsoleOnRun.isSelected();
 	}
 
@@ -359,7 +361,8 @@ public class PreferencesController implements Initializable {
 		registerBorder.setValue(Color.web(tableFD.border));
 
 		autoSave.selectedProperty().set(desktopController.getOtherSettings().autoSave);
-		showLineNumbers.selectedProperty().set(desktopController.getOtherSettings().showLineNumbers.get());
+        showLineNumbers.selectedProperty().set(desktopController.getOtherSettings().showLineNumbers.get());
+        lineWrap.selectedProperty().set(desktopController.getOtherSettings().lineWrap.get());
 		clearConsoleOnRun.selectedProperty().set(desktopController.getOtherSettings().clearConsoleOnRun);
 	}
 

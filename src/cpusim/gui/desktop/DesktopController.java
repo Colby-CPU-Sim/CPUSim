@@ -436,11 +436,12 @@ public class DesktopController implements Initializable {
                 .getChannel())).setMediator(mediator);
 
         // whenever a new tab in the code text area is selected,
-        // set the line numbers according to the settings
+        // set the line numbers and line wrap according to the settings
         this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
                     if( newTab == null ) return; // there are no tabs left
                     StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
+                    codeArea.setWrapText(otherSettings.lineWrap.get());
                     LineNumAndBreakpointFactory lFactory =
                             (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
                     if (otherSettings.showLineNumbers.get()) {
@@ -464,7 +465,7 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleNewText(ActionEvent event) {
         ObservableList<Tab> tabs = textTabPane.getTabs();
-        ArrayList<String> titles = new ArrayList<String>();
+        ArrayList<String> titles = new ArrayList<>();
         for (Tab tab : tabs) {
             titles.add(tab.getText().trim());
         }
@@ -549,7 +550,6 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleNewMachine(ActionEvent event) {
-        //CHANGE: mediator is polled for machineDirty
         if (mediator.isMachineDirty()) {
 
             Action response = CPUSimConstants.dialog.
@@ -571,8 +571,6 @@ public class DesktopController implements Initializable {
 
         Machine machine = new Machine("New");
 
-        //CHANGE: changes to our machineFile and machineDirty are
-        //changed in the mediator rather than in a DesktopController field
         mediator.setMachine(machine);
         mediator.setMachineFile(null);
         mediator.setMachineDirty(true);
@@ -589,7 +587,6 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleOpenMachine(ActionEvent event) {
-        //CHANGE: mediator is polled for machineDirty
         if (mediator.isMachineDirty()) {
             Action response = CPUSimConstants.dialog.
                     owner(stage).
@@ -621,7 +618,6 @@ public class DesktopController implements Initializable {
             return;
         }
 
-        //CHANGE: mediator is asked to open the machine
         mediator.openMachine(fileToOpen);
 
     }
@@ -642,7 +638,6 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleSaveMachine(ActionEvent event) {
-        //CHANGE: mediator responsible for saving
         mediator.saveMachine();
     }
 
@@ -653,7 +648,6 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleSaveAsMachine(ActionEvent event) {
-        //CHANGE: mediator responsible for saving
         mediator.saveAsMachine();
     }
 
@@ -1376,6 +1370,7 @@ public class DesktopController implements Initializable {
         final File f = file;
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
+        codeArea.setWrapText(otherSettings.lineWrap.get());
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
                                                       (digits -> "")));
@@ -2131,7 +2126,6 @@ public class DesktopController implements Initializable {
             fileChooser.setInitialDirectory(new File(currentTextDirectory));
         }
         else {
-            //CHANGE: current machine directory is now stored in the mediator
             fileChooser.setInitialDirectory(new File(mediator
                     .getCurrentMachineDirectory()));
         }
@@ -2729,7 +2723,6 @@ public class DesktopController implements Initializable {
     /**
      * gets rid of all register and ram tables
      */
-    //CHANGE: made public for access by mediator
     public void clearTables() {
         ramSplitPane.getItems().clear();
         regSplitPane.getItems().clear();
@@ -2864,7 +2857,6 @@ public class DesktopController implements Initializable {
                 return false;
             }
         }
-        //CHANGE: mediator is asked is the machine is dirty
         if (mediator.isMachineDirty()) {
             Action response = CPUSimConstants.dialog.
                     owner(stage).
@@ -2874,7 +2866,6 @@ public class DesktopController implements Initializable {
                             + " before you close?").
                     showConfirm();
             if (response == Dialog.ACTION_YES) {
-                //CHANGE: mediator is told to save current machine
                 mediator.saveMachine();
             }
             else if (response == Dialog.ACTION_CANCEL) {
@@ -2909,7 +2900,6 @@ public class DesktopController implements Initializable {
         Preferences prefs = Preferences.userNodeForPackage(getClass());
 
         //save current text and machine directories
-        //CHANGE: current machine directory is not stored in mediator
         prefs.put("machineDirectory", mediator.getCurrentMachineDirectory());
         prefs.put("textDirectory", currentTextDirectory);
 
@@ -2963,7 +2953,6 @@ public class DesktopController implements Initializable {
      */
     public void loadPreferences() {
         Preferences prefs = Preferences.userNodeForPackage(getClass());
-        //CHANGE: machine Directory is now contained in mediator
         mediator.setCurrentMachineDirectory(System.getProperty("user.dir"));
         currentTextDirectory = System.getProperty("user.dir");
         // the next two lines sometimes cause problems (exceptions to be thrown)
@@ -3383,30 +3372,37 @@ public class DesktopController implements Initializable {
         public boolean autoSave;
         public SimpleBooleanProperty showLineNumbers;
         public boolean clearConsoleOnRun;
+        public SimpleBooleanProperty lineWrap;
 
         public OtherSettings() {
             showLineNumbers = new SimpleBooleanProperty(true);
             // add a listener that changes the line numbers for the selected tab
             // The line numbers for other tabs are not changed until they are selected.
-            showLineNumbers.addListener(new ChangeListener<Boolean>() {
-                @Override
-                public void changed(ObservableValue<? extends Boolean> arg0,
-                                    Boolean oldVal, Boolean newVal) {
-                    Tab t = textTabPane.getSelectionModel().getSelectedItem();
-                    if (t == null) {
-                        return;
-                    }
-                    StyledTextArea codeArea = (StyledTextArea) t.getContent();
-                    LineNumAndBreakpointFactory lFactory =
-                            (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
-
-                    if (newVal) { // show line numbers
-                        lFactory.setFormat(digits -> "%" + digits + "d");
-                    }
-                    else { // hide line numbers
-                        lFactory.setFormat(digits -> "");
-                    }
+            showLineNumbers.addListener((arg0, oldVal, newVal) -> {
+                Tab t = textTabPane.getSelectionModel().getSelectedItem();
+                if (t == null) {
+                    return;
                 }
+                StyledTextArea codeArea = (StyledTextArea) t.getContent();
+                LineNumAndBreakpointFactory lFactory =
+                        (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
+
+                if (newVal) { // show line numbers
+                    lFactory.setFormat(digits -> "%" + digits + "d");
+                }
+                else { // hide line numbers
+                    lFactory.setFormat(digits -> "");
+                }
+            });
+
+            lineWrap = new SimpleBooleanProperty(false);
+            lineWrap.addListener((arg0, oldVal, newVal) -> {
+                Tab t = textTabPane.getSelectionModel().getSelectedItem();
+                if (t == null) {
+                    return;
+                }
+                StyledTextArea codeArea = (StyledTextArea) t.getContent();
+                codeArea.setWrapText(newVal);
             });
         }
     }
