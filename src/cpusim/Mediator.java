@@ -83,6 +83,7 @@ import cpusim.assembler.Assembler;
 import cpusim.assembler.AssemblyException;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.editorpane.CodePaneController;
+import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.mif.MIFScanner;
 import cpusim.module.RAM;
 import cpusim.module.RAMLocation;
@@ -103,10 +104,14 @@ import javafx.stage.Stage;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.stage.FileChooser;
+import org.fxmisc.richtext.InlineStyleTextArea;
+import org.fxmisc.richtext.LineNumberFactory;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -689,8 +694,10 @@ public class Mediator {
             machine.get().getCodeStore().loadAssembledInstructions(instrs,
                     machine.get().getStartingAddressForLoading());
             
-    		// clear the code store of the current machine
-            CodePaneController.clearAllBreakPointsInRam(machine.get().getCodeStore());
+    		// remove the old breakpoints and add the new ones
+            clearAllBreakPointsInRam(machine.get().getCodeStore());
+            RAM r = machine.get().getCodeStore();
+            setBreakPointsInRam(r);
             return true;
         } catch (LoadException ex) {
             CPUSimConstants.dialog.
@@ -1192,4 +1199,36 @@ public class Mediator {
                 " record.").
                 showError();
     }
+
+
+    public void setBreakPointsInRam(RAM ram) {
+        if (ram == null) {
+            return;
+        }
+        for (RAMLocation rLoc : ram.data()) {
+            if (rLoc.getSourceLine() != null) {
+                SourceLine sourceLine = rLoc.getSourceLine();
+                Set<Integer> breakPoints = getBreakPointsForFile(sourceLine.getFileName());
+                rLoc.setBreak(breakPoints.contains(sourceLine.getLine()));
+            }
+        }
+    }
+
+    private Set<Integer> getBreakPointsForFile(String fileName) {
+        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) desktopController
+                .getTabForFile(new File(fileName))
+                .getContent()).getParagraphGraphicFactory()).getBreakPointLines();
+    }
+
+    public void clearAllBreakPointsInRam(RAM ram) {
+        if (ram == null) {
+            return;
+        }
+        for (RAMLocation rLoc : ram.data()) {
+            rLoc.setBreak(false);
+        }
+    }
+
+
+
 }

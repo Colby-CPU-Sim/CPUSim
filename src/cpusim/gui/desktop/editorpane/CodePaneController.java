@@ -5,17 +5,19 @@ import cpusim.Mediator;
 import cpusim.assembler.PunctChar;
 import cpusim.module.RAM;
 import cpusim.module.RAMLocation;
+import cpusim.util.SourceLine;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * File: CodePaneHelper
+ * File: CodePaneController
  * User: djskrien
  * Date: 2/8/15
  */
@@ -146,57 +148,49 @@ public class CodePaneController
         return spansBuilder.create();
     }
 
-    public static void clearAllBreakPointsInRam(RAM ram) {
-        if (ram == null) {
-            return;
-        }
-        for (RAMLocation rLoc : ram.data()) {
-            rLoc.setBreak(false);
-        }
-    }
-
-    /**
-     * Gives an array of each line of a string.
-     * Assumes there is no wrapping.
-     *
-     * @param s The string to split into lines.
-     * @return An Array of Strings, which contains
-     * the lines as they would appear on a text editor.
-     */
-    public static String[] getLines(String s) {
-        int num = numberOfLinesInString(s);
-        String[] sa = s.split("\n");
-        if (sa.length != num) {
-            String[] newSa = new String[num];
-            for (int i = 0; i < sa.length; i++) {
-                newSa[i] = sa[i];
-            }
-            newSa[num-1] = "";
-            sa = newSa;
-        }
-        return sa;
-    }
-
-    /**
-     * Given a string, this returns the number of lines
-     * it would take a text editor to display the string.
-     *
-     * @param s - The string in question.
-     * @return The number of lines it would take a text
-     * editor to display that string.
-     */
-    public static int numberOfLinesInString(String s) {
-        int numLines = 1;
-        // System.getProperty("line.separator") doesn't work
-        // on PCs, TextArea may only use "\n" char.
-        final String LINE_SEPARATOR = "\n";
-        while(!s.equals("")) {
-            if(s.startsWith(LINE_SEPARATOR)) {
-                numLines++;
-            }
-            s = s.substring(1);
-        }
-        return numLines;
-    }
+//    THE FOLLOWING CODE IS UNUSED.
+//    /**
+//     * Gives an array of each line of a string.
+//     * Assumes there is no wrapping.
+//     *
+//     * @param s The string to split into lines.
+//     * @return An Array of Strings, which contains
+//     * the lines as they would appear on a text editor.
+//     */
+//    public static String[] getLines(String s) {
+//        int num = numberOfLinesInString(s);
+//        String[] sa = s.split("\n");
+//        if (sa.length != num) {
+//            String[] newSa = new String[num];
+//            for (int i = 0; i < sa.length; i++) {
+//                newSa[i] = sa[i];
+//            }
+//            newSa[num-1] = "";
+//            sa = newSa;
+//        }
+//        return sa;
+//    }
+//
+//    /**
+//     * Given a string, this returns the number of lines
+//     * it would take a text editor to display the string.
+//     *
+//     * @param s - The string in question.
+//     * @return The number of lines it would take a text
+//     * editor to display that string.
+//     */
+//    public static int numberOfLinesInString(String s) {
+//        int numLines = 1;
+//        // System.getProperty("line.separator") doesn't work
+//        // on PCs, TextArea may only use "\n" char.
+//        final String LINE_SEPARATOR = "\n";
+//        while(!s.equals("")) {
+//            if(s.startsWith(LINE_SEPARATOR)) {
+//                numLines++;
+//            }
+//            s = s.substring(1);
+//        }
+//        return numLines;
+//    }
 
 }

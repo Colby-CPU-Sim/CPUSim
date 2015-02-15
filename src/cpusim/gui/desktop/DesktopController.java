@@ -70,6 +70,7 @@ import cpusim.assembler.Token;
 import cpusim.gui.about.AboutController;
 import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.CodePaneTab;
+import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
@@ -117,13 +118,12 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.InlineStyleTextArea;
-import org.fxmisc.richtext.LineNumberFactory;
+import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyledTextArea;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.function.IntFunction;
 import java.util.prefs.Preferences;
 
 /**
@@ -439,16 +439,16 @@ public class DesktopController implements Initializable {
         // set the line numbers according to the settings
         this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
+                    if( newTab == null ) return; // there are no tabs left
                     StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
+                    LineNumAndBreakpointFactory lFactory =
+                            (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
                     if (otherSettings.showLineNumbers.get()) {
-                        codeArea.setParagraphGraphicFactory(
-                                LineNumberFactory.get(codeArea, (digits -> " %" +
-                                        digits + "d ")));
+                        lFactory.setFormat(digits ->  "%" + digits + "d");
                     }
 
                     else {
-                        codeArea.setParagraphGraphicFactory(
-                                LineNumberFactory.get(codeArea, (digits -> " ")));
+                        lFactory.setFormat(digits -> "");
                     }
                 });
     }
@@ -769,8 +769,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleUndo(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
         behavior.callAction("Undo");
@@ -782,8 +782,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleRedo(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
         behavior.callAction("Redo");
@@ -796,8 +796,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCut(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
         behavior.callAction("Cut");
@@ -810,8 +810,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCopy(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
         behavior.callAction("Copy");
@@ -824,8 +824,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePaste(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
         behavior.callAction("Paste");
@@ -838,8 +838,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleDelete(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
         behavior.callAction("DeleteSelection");
@@ -852,8 +852,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleSelectAll(ActionEvent event) {
-        CodeArea codeArea =
-                (CodeArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea =
+                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
         TextInputControlBehavior<?> behavior =
                 ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
         behavior.callAction("SelectAll");
@@ -868,7 +868,7 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleToggleComment(ActionEvent event) {
         Tab currTab = textTabPane.getSelectionModel().getSelectedItem();
-        CodeArea ta = (CodeArea) currTab.getContent();
+        InlineStyleTextArea ta = (InlineStyleTextArea) currTab.getContent();
 
         int lower = Math.min(ta.getCaretPosition(), ta.getAnchor());
         int upper = Math.max(ta.getCaretPosition(), ta.getAnchor());
@@ -1254,8 +1254,13 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleAboutCPUSim(ActionEvent event) {
-        openModalDialog("About CPU Sim", "gui/about/AboutFXML.fxml",
-                new AboutController());
+//        openModalDialog("About CPU Sim", "gui/about/AboutFXML.fxml",
+//                new AboutController());
+        Tab tab = textTabPane.getSelectionModel().getSelectedItem();
+        StyledTextArea codeArea = (StyledTextArea) tab.getContent();
+        System.out.println(((LineNumAndBreakpointFactory) codeArea
+                .getParagraphGraphicFactory()).getBreakPointLines());
+
     }
 
     //======================= auxiliary methods ================================
@@ -1371,9 +1376,11 @@ public class DesktopController implements Initializable {
         final File f = file;
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
+        codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
+                otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
+                                                      (digits -> "")));
         newTab.setContent(codeArea);
 
-        //set up the styles for the text area
         // whenever the text is changed, recompute the highlighting and set it dirty
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
             codeArea.setStyleSpans(0, codePaneController.computeHighlighting(newText));
@@ -1391,6 +1398,20 @@ public class DesktopController implements Initializable {
             newTab.setTooltip(new Tooltip("File has not been saved."));
         }
 
+        // set the file, title, and context menu
+        newTab.setFile(file);
+        newTab.setText(title);
+        addContextMenu(newTab);
+
+        textTabPane.getTabs().add(newTab);
+        textTabPane.getSelectionModel().selectLast();
+    }
+
+    /**
+     * creates and adds a context menu for the new Tab
+     * @param newTab the Tab that gets the context menu
+     */
+    private void addContextMenu(CodePaneTab newTab) {
         //set up the context menu
         MenuItem close = new MenuItem("Close");
         close.setOnAction(e -> closeTab(newTab, true));
@@ -1421,10 +1442,10 @@ public class DesktopController implements Initializable {
 
         MenuItem copyPath = new MenuItem("Copy Path Name");
         copyPath.setOnAction(e -> {
-            if (f != null) {
+            if (newTab.getFile() != null) {
                 Clipboard clipboard = Clipboard.getSystemClipboard();
                 ClipboardContent content1 = new ClipboardContent();
-                content1.putString(f.getAbsolutePath());
+                content1.putString(newTab.getFile().getAbsolutePath());
                 clipboard.setContent(content1);
             }
         });
@@ -1435,12 +1456,6 @@ public class DesktopController implements Initializable {
         ContextMenu cm = new ContextMenu();
         cm.getItems().addAll(close, closeAll, closeOthers, copyPath);
         newTab.setContextMenu(cm);
-
-        // set the file, title, add to the tab pane, and select it
-        newTab.setFile(file);
-        newTab.setText(title);
-        textTabPane.getTabs().add(newTab);
-        textTabPane.getSelectionModel().selectLast();
     }
 
     /**
@@ -1720,7 +1735,7 @@ public class DesktopController implements Initializable {
 //            boolean ancEqCar = false;
 //            if (!noTabSelected.get()) {
 //                Tab currTab = textTabPane.getSelectionModel().getSelectedItem();
-//                CodeArea codeArea = (CodeArea) currTab.getContent();
+//                InlineStyleTextArea codeArea = (InlineStyleTextArea) currTab.getContent();
 //                Object o = codeArea.getSkin();
 //                System.out.println(o.getClass());
 //                TextInputControlBehavior<?> behavior =
@@ -2196,7 +2211,7 @@ public class DesktopController implements Initializable {
             return saveAs(theTab);
         }
 
-        CodeArea textToSave = (CodeArea) theTab.getContent();
+        InlineStyleTextArea textToSave = (InlineStyleTextArea) theTab.getContent();
         if (theTab.getDirty()) {
             boolean successfulSave = saveTextFile(theTab.getFile(), textToSave.getText
                     ());
@@ -2241,7 +2256,7 @@ public class DesktopController implements Initializable {
 
         if (finalFileToSave != null) {
 
-            CodeArea textToSave = (CodeArea) tab.getContent();
+            InlineStyleTextArea textToSave = (InlineStyleTextArea) tab.getContent();
 
             saveTextFile(finalFileToSave, textToSave.getText());
 
@@ -3338,7 +3353,7 @@ public class DesktopController implements Initializable {
                     showInformation();
             return;
         }
-        CodeArea textArea = (CodeArea) getTabForFile(file).getContent();
+        InlineStyleTextArea textArea = (InlineStyleTextArea) getTabForFile(file).getContent();
         textArea.selectRange(token.offset, token.offset + token.contents.length());
     }
 
@@ -3382,13 +3397,14 @@ public class DesktopController implements Initializable {
                         return;
                     }
                     StyledTextArea codeArea = (StyledTextArea) t.getContent();
+                    LineNumAndBreakpointFactory lFactory =
+                            (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
+
                     if (newVal) { // show line numbers
-                        codeArea.setParagraphGraphicFactory(LineNumberFactory.get
-                                (codeArea, (digits -> " %" + digits + "d ")));
+                        lFactory.setFormat(digits -> "%" + digits + "d");
                     }
                     else { // hide line numbers
-                        codeArea.setParagraphGraphicFactory(LineNumberFactory.get
-                                (codeArea, (digits -> " ")));
+                        lFactory.setFormat(digits -> "");
                     }
                 }
             });

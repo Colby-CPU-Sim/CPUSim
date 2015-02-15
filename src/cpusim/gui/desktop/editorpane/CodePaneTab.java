@@ -60,5 +60,4 @@ public class CodePaneTab extends Tab {
     public SimpleObjectProperty<File> fileProperty() {
         return file;
     }
-
 }
