@@ -9,10 +9,7 @@ import cpusim.util.SourceLine;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,27 +23,23 @@ public class CodePaneController
     private Mediator mediator;
 
     /** the style info for the various parts of an assm language program */
-    private StyleInfo defaultStyleInfo, instrStyleInfo, equStyleInfo, labelStyleInfo,
-                      literalStyleInfo, dataStyleInfo, macroStyleInfo, symbolStyleInfo,
-                      asciiStyleInfo, includeStyleInfo, stringStyleInfo, commentStyleInfo;
+    private Map<String,StyleInfo> styles;
 
     public CodePaneController(Mediator m) {
         this.mediator = m;
+        this.styles = new HashMap<>();
 
         // the default styles for each part.
-        this.defaultStyleInfo = new StyleInfo().updateFontSize(12).updateFontFamily
-                ("monospace");
-        this.instrStyleInfo = defaultStyleInfo.updateTextColor("#5a3").updateBold(true);
-        this.equStyleInfo = defaultStyleInfo.updateTextColor("#404");
-        this.labelStyleInfo = defaultStyleInfo.updateTextColor("#f00");
-        this.literalStyleInfo = defaultStyleInfo.updateTextColor("orange");
-        this.dataStyleInfo = defaultStyleInfo.updateTextColor("#044");
-        this.macroStyleInfo = defaultStyleInfo.updateTextColor("#a04");
-        this.symbolStyleInfo = defaultStyleInfo.updateTextColor("#000");
-        this.asciiStyleInfo = defaultStyleInfo.updateTextColor("#4aa");
-        this.includeStyleInfo = defaultStyleInfo.updateTextColor("#a44");
-        this.stringStyleInfo = defaultStyleInfo.updateTextColor("#44a").updateItalic(true);
-        this.commentStyleInfo = defaultStyleInfo.updateTextColor("#880").updateItalic(true);
+        StyleInfo base = new StyleInfo().updateFontSize(12).updateFontFamily("monospace")
+                          .updateBold(false).updateItalic(false).updateTextColor("#000");
+        this.styles.put("default",base);
+        this.styles.put("instr", base.updateTextColor("#5a3").updateBold(true));
+        this.styles.put("keyword", base.updateTextColor("#00b"));
+        this.styles.put("label", base.updateTextColor("#f00"));
+        this.styles.put("literal", base.updateTextColor("#f80"));
+        this.styles.put("symbol", base.updateTextColor("#000"));
+        this.styles.put("string", base.updateTextColor("#44a").updateItalic(true));
+        this.styles.put("comment", base.updateTextColor("#880").updateItalic(true));
     }
 
     /**
@@ -70,6 +63,8 @@ public class CodePaneController
         String includeRegExpr = "\\.include";
         String equRegExpr = "equ";
         String macroRegExpr = "MACRO|ENDM";
+        String keywordRegExpr = dataRegExpr+"|"+asciiRegExpr+"|"+includeRegExpr+"|"+
+                equRegExpr+"|"+macroRegExpr;
 
         // get the regExpr for "tokens" (special symbols consisting of exactly one char)
         PunctChar[] punctChars = mediator.getMachine().getPunctChars();
@@ -106,15 +101,12 @@ public class CodePaneController
                                 decimalLiteralRegExpr;
 
         // combine them all and compile it
-        String wholeRegExpr = "(?<INSTR>" + instrNameRegExpr + ")"
-                + "|(?<EQU>" + equRegExpr + ")"
-                + "|(?<MACRO>" + macroRegExpr + ")"
+        String wholeRegExpr =
+                   "(?<KEYWORD>" + keywordRegExpr + ")"
                 + "|(?<LABEL>" + labelRegExpr + ")"
+                + "|(?<INSTR>" + instrNameRegExpr + ")"
                 + "|(?<LITERAL>" + literalRegExpr + ")"
                 + "|(?<SYMBOL>" + symbolsRegExpr + ")"
-                + "|(?<DATA>" + dataRegExpr + ")"
-                + "|(?<ASCII>" + asciiRegExpr + ")"
-                + "|(?<INCLUDE>" + includeRegExpr + ")"
                 + "|(?<STRING>" + stringRegExpr + ")"
                 + "|(?<COMMENT>" + commentRegExpr + ")";
         return Pattern.compile(wholeRegExpr);
@@ -127,73 +119,41 @@ public class CodePaneController
         StyleSpansBuilder<StyleInfo> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
             StyleInfo styleInfo =
-                matcher.group("INSTR") != null ? instrStyleInfo :
-                matcher.group("EQU") != null ? equStyleInfo :
-                matcher.group("MACRO") != null ? macroStyleInfo :
-                matcher.group("LABEL") != null ? labelStyleInfo :
-                matcher.group("SYMBOL") != null ? symbolStyleInfo :
-                matcher.group("DATA") != null ? dataStyleInfo :
-                matcher.group("LITERAL") != null ? literalStyleInfo :
-                matcher.group("ASCII") != null ? asciiStyleInfo :
-                matcher.group("INCLUDE") != null ? includeStyleInfo :
-                matcher.group("STRING") != null ? stringStyleInfo :
-                matcher.group("COMMENT") != null ? commentStyleInfo :
+                matcher.group("INSTR") != null ? styles.get("instr") :
+                matcher.group("KEYWORD") != null ? styles.get("keyword") :
+                matcher.group("LABEL") != null ? styles.get("label") :
+                matcher.group("SYMBOL") != null ? styles.get("symbol") :
+                matcher.group("LITERAL") != null ? styles.get("literal") :
+                matcher.group("STRING") != null ? styles.get("string") :
+                matcher.group("COMMENT") != null ? styles.get("comment") :
                 null; /* never happens */
             assert styleInfo != null;
-            spansBuilder.add(defaultStyleInfo, matcher.start() - lastKwEnd);
+            spansBuilder.add(styles.get("default"), matcher.start() - lastKwEnd);
             spansBuilder.add(styleInfo, matcher.end() - matcher.start());
             lastKwEnd = matcher.end();
         }
-        spansBuilder.add(defaultStyleInfo, text.length() - lastKwEnd);
-        return spansBuilder.create();
+        spansBuilder.add(styles.get("default"), text.length() - lastKwEnd);
+        StyleSpans<StyleInfo> styleSpans = spansBuilder.create();
+        return styleSpans;
     }
 
-//    THE FOLLOWING LINE WRAP CODE IS UNUSED.  IF WE USED IT, THEN EACH CONTINUANCE
-//    OF A LINE WOULD BE TREATED AS A SEPARATE LINE (THAT IS, A PARAGRAPH), WHICH
-//    WOULD MESS UP THE LINE COUNTS.  IT ALSO DOESN'T MAKE SENSE IN AN ASSEMBLY
-//    LANGUAGE PROGRAM, WHICH IS LINE ORIENTED, EXCEPT FOR THE DOCUMENTATION/COMMENTS.
-//    /**
-//     * Gives an array of each line of a string.
-//     * Assumes there is no wrapping.
-//     *
-//     * @param s The string to split into lines.
-//     * @return An Array of Strings, which contains
-//     * the lines as they would appear on a text editor.
-//     */
-//    public static String[] getLines(String s) {
-//        int num = numberOfLinesInString(s);
-//        String[] sa = s.split("\n");
-//        if (sa.length != num) {
-//            String[] newSa = new String[num];
-//            for (int i = 0; i < sa.length; i++) {
-//                newSa[i] = sa[i];
-//            }
-//            newSa[num-1] = "";
-//            sa = newSa;
-//        }
-//        return sa;
-//    }
-//
-//    /**
-//     * Given a string, this returns the number of lines
-//     * it would take a text editor to display the string.
-//     *
-//     * @param s - The string in question.
-//     * @return The number of lines it would take a text
-//     * editor to display that string.
-//     */
-//    public static int numberOfLinesInString(String s) {
-//        int numLines = 1;
-//        // System.getProperty("line.separator") doesn't work
-//        // on PCs, TextArea may only use "\n" char.
-//        final String LINE_SEPARATOR = "\n";
-//        while(!s.equals("")) {
-//            if(s.startsWith(LINE_SEPARATOR)) {
-//                numLines++;
-//            }
-//            s = s.substring(1);
-//        }
-//        return numLines;
-//    }
+    /**
+     * returns the StyleInfo for the given group
+     * @param group one of the strings "instr", "keyword", "label", "symbol", "literal",
+     *              "string", "comment"
+     * @return its StyleInfo or null if the group is not one of the specified strings
+     */
+    public StyleInfo getStyleInfo(String group) {
+        return styles.get(group);
+    }
+
+    /**
+     * sets the style info for the given group.
+     * @param group
+     * @param style
+     */
+    public void setStyleInfo(String group, StyleInfo style) {
+        styles.put(group, style);
+    }
 
 }

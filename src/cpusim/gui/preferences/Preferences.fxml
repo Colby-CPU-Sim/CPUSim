@@ -1,289 +1,717 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.collections.*?>
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import java.net.URL?>
 <BorderPane fx:id="mainPane" prefHeight="618.0" prefWidth="400.0" styleClass="root"
-            xmlns:fx="http://javafx.com/fxml">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <HBox id="HBox" alignment="CENTER" prefHeight="37.0" prefWidth="300.0"
               spacing="5.0">
-            <HBox alignment="CENTER" prefHeight="37.0" prefWidth="70.0">
-                <Button minHeight="-Infinity" minWidth="-Infinity"
-                        mnemonicParsing="false" onAction="#handleHelp"
-                        prefHeight="25.0" prefWidth="25.0" styleClass="helpButton"
-                        text="?"/>
-            </HBox>
-            <HBox alignment="CENTER" prefHeight="37.0" prefWidth="330.0"
-                  spacing="10.0">
-                <Button fx:id="applyButton" mnemonicParsing="false"
-                        onAction="#onApplyButtonClick" prefHeight="24.0"
-                        prefWidth="100.0" styleClass="roundButton" text="Apply"/>
-                <Button fx:id="okayButton" defaultButton="true"
-                        mnemonicParsing="false" onAction="#onOKButtonClick"
-                        prefHeight="24.0" prefWidth="100.0"
-                        styleClass="roundBlueButton" text="OK"/>
-                <Button fx:id="closeButton" cancelButton="true"
-                        mnemonicParsing="false" onAction="#onCloseButtonClick"
-                        prefHeight="24.0" prefWidth="100.0"
-                        styleClass="roundButton" text="Close"/>
-            </HBox>
+            <children>
+                <HBox alignment="CENTER" prefHeight="37.0" prefWidth="70.0">
+                    <children>
+                        <Button minHeight="-Infinity" minWidth="-Infinity"
+                                mnemonicParsing="false" onAction="#handleHelp"
+                                prefHeight="25.0" prefWidth="25.0" styleClass="helpButton"
+                                text="?"/>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER" prefHeight="37.0" prefWidth="330.0"
+                      spacing="10.0">
+                    <children>
+                        <Button fx:id="applyButton" mnemonicParsing="false"
+                                onAction="#onApplyButtonClick" prefHeight="24.0"
+                                prefWidth="100.0" styleClass="roundButton" text="Apply"/>
+                        <Button fx:id="okayButton" defaultButton="true"
+                                mnemonicParsing="false" onAction="#onOKButtonClick"
+                                prefHeight="24.0" prefWidth="100.0"
+                                styleClass="roundBlueButton" text="OK"/>
+                        <Button fx:id="closeButton" cancelButton="true"
+                                mnemonicParsing="false" onAction="#onCloseButtonClick"
+                                prefHeight="24.0" prefWidth="100.0"
+                                styleClass="roundButton" text="Close"/>
+                    </children>
+                </HBox>
+            </children>
         </HBox>
     </bottom>
     <center>
         <TabPane fx:id="tabPane" prefHeight="489.0" prefWidth="300.0">
-            <Tab closable="false" text="Font">
-                <VBox id="Content" minHeight="0.0" minWidth="0.0" spacing="3.0">
-                    <padding>
-                        <Insets left="10.0" top="5.0" fx:id="x1"/>
-                    </padding>
-                    <Label text="Assembly code window"
-                           textOverrun="WORD_ELLIPSIS"/>
-                    <VBox alignment="CENTER" prefHeight="226.0" spacing="3.0">
-                        <Label prefWidth="28.0" text="Font"/>
-                        <ComboBox fx:id="assemblyWindowFont"
-                                  prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="Courier New"/>
-                                    <String fx:value="Lucida Console"/>
-                                </FXCollections>
-                            </items>
-                        </ComboBox>
-                        <Label text="Size"/>
-                        <ChoiceBox fx:id="assemblyWindowSize"
-                                   prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="10"/>
-                                    <String fx:value="12"/>
-                                    <String fx:value="14"/>
-                                    <String fx:value="16"/>
-                                    <String fx:value="18"/>
-                                </FXCollections>
-                            </items>
-                        </ChoiceBox>
-                        <Label text="Style"/>
-                        <ChoiceBox fx:id="assemblyWindowStyle"
-                                   prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="normal"/>
-                                    <String fx:value="bold"/>
-                                    <String fx:value="italic"/>
-                                    <String fx:value="bold and italic"/>
-                                </FXCollections>
-                            </items>
-                        </ChoiceBox>
-                        <Label text="Forground Color"/>
-                        <ColorPicker fx:id="assemblyForground"
-                                     minHeight="-Infinity"
-                                     minWidth="-Infinity"
-                                     prefHeight="25.0" prefWidth="100.0"/>
-                        <Label text="Background Color"/>
-                        <ColorPicker fx:id="assemblyBackground"
-                                     minHeight="-Infinity"
-                                     minWidth="-Infinity"
-                                     prefHeight="25.0" prefWidth="100.0"/>
-                    </VBox>
-                    <Label text="RAM &amp; Register windows"/>
-                    <VBox alignment="CENTER" prefHeight="275.0"
-                          prefWidth="335.0" spacing="3.0">
-                        <Label prefWidth="28.0" text="Font"/>
-                        <ComboBox fx:id="registerWindowFont"
-                                  prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="Courier New"/>
-                                    <String fx:value="Lucida Console"/>
-                                </FXCollections>
-                            </items>
-                        </ComboBox>
-                        <Label text="Size"/>
-                        <ChoiceBox fx:id="registerWindowSize"
-                                   prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="10"/>
-                                    <String fx:value="12"/>
-                                    <String fx:value="14"/>
-                                    <String fx:value="16"/>
-                                    <String fx:value="18"/>
-                                </FXCollections>
-                            </items>
-                        </ChoiceBox>
-                        <Label text="Style"/>
-                        <ChoiceBox fx:id="registerWindowStyle"
-                                   prefWidth="220.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="normal"/>
-                                    <String fx:value="bold"/>
-                                    <String fx:value="italic"/>
-                                    <String fx:value="bold and italic"/>
-                                </FXCollections>
-                            </items>
-                        </ChoiceBox>
-                        <Label text="Forground Color"/>
-                        <ColorPicker fx:id="registerForground"
-                                     minHeight="-Infinity"
-                                     minWidth="-Infinity"
-                                     prefHeight="25.0" prefWidth="100.0"/>
-                        <Label text="Background Color"/>
-                        <ChoiceBox fx:id="registerBackground"
-                                   minHeight="-Infinity"
-                                   minWidth="-Infinity" prefHeight="25.0"
-                                   prefWidth="100.0">
-                            <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
-                                    <String fx:value="WHITE"/>
-                                    <String fx:value="BLACK"/>
-                                    <String fx:value="AZURE"/>
-                                    <String fx:value="PURPLE"/>
-                                    <String fx:value="ORANGE"/>
-                                    <String fx:value="GREEN"/>
-                                    <String fx:value="MAGENTA"/>
-                                </FXCollections>
-                            </items>
-                        </ChoiceBox>
-                        <Label text="Border Color"/>
-                        <ColorPicker fx:id="registerBorder"
-                                     minHeight="-Infinity"
-                                     minWidth="-Infinity"
-                                     prefHeight="25.0" prefWidth="100.0"/>
-                    </VBox>
-                </VBox>
-            </Tab>
-            <Tab fx:id="keyBindingsTab" closable="false" text="Key Bindings">
-                <ScrollPane id="ScrollPane" fx:id="kbScrollPane"
-                            prefViewportHeight="482.0" prefViewportWidth="289.0">
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                        <ToolBar>
-                            <Button mnemonicParsing="false"
-                                    onAction="#handleDefault"
-                                    prefHeight="22.0" prefWidth="80.0"
-                                    styleClass="smallButton"
-                                    text="Set Default"/>
-                        </ToolBar>
-                        <AnchorPane fx:id="menuItemsPane"
-                                    minHeight="521.0" prefHeight="542.0"
-                                    prefWidth="390.0">
-                            <Label layoutX="5.0" layoutY="25.0"
-                                   text="New text"/>
-                            <Label layoutX="5.0" layoutY="41.0"
-                                   text="Open text"/>
-                            <Label layoutX="5.0" layoutY="57.0"
-                                   text="Close text"/>
-                            <Label layoutX="5.0" layoutY="73.0"
-                                   text="Save text"/>
-                            <Label layoutX="5.0" layoutY="89.0"
-                                   text="Save text as"/>
-                            <Label layoutX="5.0" layoutY="105.0"
-                                   text="New machine"/>
-                            <Label layoutX="5.0" layoutY="121.0"
-                                   text="Open machine"/>
-                            <Label layoutX="5.0" layoutY="137.0"
-                                   text="Save machine"/>
-                            <Label layoutX="5.0" layoutY="153.0"
-                                   text="Save machine As"/>
-                            <Label layoutX="5.0" layoutY="169.0"
-                                   text="Save machine in HTML"/>
-                            <Label layoutX="5.0" layoutY="185.0"
-                                   text="Print preview"/>
-                            <Label layoutX="5.0" layoutY="201.0"
-                                   text="Print setup"/>
-                            <Label layoutX="5.0" layoutY="217.0"
-                                   text="Print"/>
-                            <Label layoutX="5.0" layoutY="233.0"
-                                   text="Toggle Comment"/>
-                            <Label layoutX="5.0" layoutY="249.0"
-                                   text="Find"/>
-                            <Label layoutX="5.0" layoutY="265.0"
-                                   text="Preferences"/>
-                            <Label layoutX="5.0" layoutY="281.0"
-                                   text="Machine instructions"/>
-                            <Label layoutX="5.0" layoutY="297.0"
-                                   text="Microinstructions"/>
-                            <Label layoutX="5.0" layoutY="313.0"
-                                   text="Hardware modules"/>
-                            <Label layoutX="5.0" layoutY="329.0"
-                                   text="EQUs"/>
-                            <Label layoutX="5.0" layoutY="345.0"
-                                   text="Fetch Sequence"/>
-                            <Label layoutX="5.0" layoutY="361.0"
-                                   text="Debug Mode"/>
-                            <Label layoutX="5.0" layoutY="377.0"
-                                   text="Assemble"/>
-                            <Label layoutX="5.0" layoutY="393.0"
-                                   text="Assemble &amp; load"/>
-                            <Label layoutX="5.0" layoutY="409.0"
-                                   text="Assemble, load &amp; run"/>
-                            <Label layoutX="5.0" layoutY="425.0"
-                                   text="Clear, assemble, load &amp; run"/>
-                            <Label layoutX="5.0" layoutY="441.0"
-                                   text="Run"/>
-                            <Label layoutX="5.0" layoutY="457.0"
-                                   text="Stop"/>
-                            <Label layoutX="5.0" layoutY="473.0"
-                                   text="Clear Console"/>
-                            <Label layoutX="5.0" layoutY="489.0"
-                                   text="Reset everything"/>
-                            <Label layoutX="5.0" layoutY="505.0"
-                                   text="Options"/>
-                            <Label layoutX="5.0" layoutY="521.0"
-                                   text="General CPUSim Help"/>
-                            <Label layoutX="5.0" layoutY="537.0"
-                                   text="About CPUSim"/>
-                            <Label layoutX="40.0" layoutY="8.0"
-                                   text="Menu Items"/>
-                            <Label layoutX="172.0" layoutY="8.0"
-                                   text="Key Bindings"/>
-                            <Separator layoutY="22.0"
-                                       prefWidth="345.0"/>
-                            <AnchorPane fx:id="keyBindingsPane"
-                                        layoutX="172.0" layoutY="23.0"
-                                        prefHeight="613.0"/>
-                        </AnchorPane>
-                    </VBox>
-                </ScrollPane>
-            </Tab>
-            <Tab closable="false" text="Other">
-                <VBox spacing="10.0">
-                    <padding>
-                        <Insets left="10.0" top="10.0"/>
-                    </padding>
-                    <Label minHeight="13.999908447265625"
-                           prefHeight="13.999908447265625"
-                           text="File Settings"/>
-                    <CheckBox fx:id="autoSave" mnemonicParsing="false"
-                              text="Automatically save programs before assembly."
-                              VBox.margin="$x1"/>
-                    <Label minHeight="13.999908447265625"
-                           prefHeight="13.999908447265625"
-                           text="Text Display Settings"/>
-                    <CheckBox fx:id="showLineNumbers" mnemonicParsing="false"
-                              text="Show line numbers." VBox.margin="$x1"/>
-                    <CheckBox fx:id="lineWrap" mnemonicParsing="false"
-                              text="Allow line wrap." VBox.margin="$x1"/>
-                    <Label minHeight="13.999908447265625"
-                           prefHeight="13.999908447265625"
-                           text="Console Settings"/>
-                    <CheckBox fx:id="clearConsoleOnRun"
-                              mnemonicParsing="false"
-                              text="Clear the console on run."
-                              VBox.margin="$x1"/>
-                </VBox>
-            </Tab>
+            <tabs>
+                <Tab closable="false" text="Font">
+                    <content>
+                        <VBox prefHeight="600.0" prefWidth="490.0">
+                            <children>
+                                <GridPane BorderPane.alignment="CENTER">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="156.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="143.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="163.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="128.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="113.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="76.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="123.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="123.0"/>
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="PANELS" underline="true"
+                                               GridPane.halignment="LEFT"
+                                               GridPane.valignment="CENTER"/>
+                                        <Label text="Font" underline="true"
+                                               GridPane.columnIndex="1"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Size" underline="true"
+                                               GridPane.columnIndex="2"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Background" underline="true"
+                                               GridPane.columnIndex="3"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Assembly Code" GridPane.rowIndex="1">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Registers" GridPane.rowIndex="2">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="RAMs" GridPane.rowIndex="3">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <ColorPicker fx:id="assmBackground"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="1">
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ColorPicker>
+                                        <ColorPicker fx:id="registersBackground"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="2">
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ColorPicker>
+                                        <ColorPicker fx:id="ramsBackground"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="3">
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ColorPicker>
+                                        <ComboBox fx:id="assmFontSize" prefWidth="150.0"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="1">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="10"/>
+                                                    <String fx:value="12"/>
+                                                    <String fx:value="14"/>
+                                                    <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ComboBox>
+                                        <ComboBox fx:id="registersFontSize"
+                                                  prefWidth="150.0"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="2">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="10"/>
+                                                    <String fx:value="12"/>
+                                                    <String fx:value="14"/>
+                                                    <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ComboBox>
+                                        <ComboBox fx:id="ramsFontSize" prefWidth="150.0"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="3">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="10"/>
+                                                    <String fx:value="12"/>
+                                                    <String fx:value="14"/>
+                                                    <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ComboBox>
+                                        <ChoiceBox fx:id="assmFont" prefWidth="150.0"
+                                                   GridPane.columnIndex="1"
+                                                   GridPane.halignment="CENTER"
+                                                   GridPane.rowIndex="1">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="Courier New"/>
+                                                    <String fx:value="Lucida Console"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ChoiceBox>
+                                        <ChoiceBox fx:id="registersFont" prefWidth="150.0"
+                                                   GridPane.columnIndex="1"
+                                                   GridPane.halignment="CENTER"
+                                                   GridPane.rowIndex="2">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="Courier New"/>
+                                                    <String fx:value="Lucida Console"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ChoiceBox>
+                                        <ChoiceBox fx:id="ramsFont" prefWidth="150.0"
+                                                   GridPane.columnIndex="1"
+                                                   GridPane.halignment="CENTER"
+                                                   GridPane.rowIndex="3">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="Courier New"/>
+                                                    <String fx:value="Lucida Console"/>
+                                                </FXCollections>
+                                            </items>
+                                            <GridPane.margin>
+                                                <Insets bottom="5.0" left="5.0"
+                                                        right="5.0" top="5.0"/>
+                                            </GridPane.margin>
+                                        </ChoiceBox>
+
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets/>
+                                    </VBox.margin>
+                                </GridPane>
+                                <GridPane>
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="184.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="183.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="119.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="76.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="155.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="82.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           maxWidth="175.0"
+                                                           minWidth="10.0"
+                                                           prefWidth="149.0"/>
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                        vgrow="SOMETIMES"/>
+                                    </rowConstraints>
+                                    <children>
+                                        <Label text="ASSEMBLY LANGUAGE" underline="true">
+                                            <GridPane.margin>
+                                                <Insets/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Bold" underline="true"
+                                               GridPane.columnIndex="1"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Italic" underline="true"
+                                               GridPane.columnIndex="2"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Color" underline="true"
+                                               GridPane.columnIndex="3"
+                                               GridPane.halignment="CENTER"/>
+                                        <Label text="Instructions" GridPane.rowIndex="1">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Keywords" GridPane.rowIndex="2">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Labels" GridPane.rowIndex="3">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Literals" GridPane.rowIndex="4">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Symbols" GridPane.rowIndex="5">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Strings" GridPane.rowIndex="6">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <Label text="Comments" GridPane.rowIndex="7">
+                                            <GridPane.margin>
+                                                <Insets left="20.0"/>
+                                            </GridPane.margin>
+                                        </Label>
+                                        <CheckBox fx:id="instrsBold" alignment="CENTER"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="1"/>
+                                        <CheckBox fx:id="keywordsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="2"/>
+                                        <CheckBox fx:id="instrsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="1"/>
+                                        <CheckBox fx:id="keywordsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="2"/>
+                                        <CheckBox fx:id="labelsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="3"/>
+                                        <CheckBox fx:id="labelsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="3"/>
+                                        <CheckBox fx:id="literalsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="4"/>
+                                        <CheckBox fx:id="literalsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="4"/>
+                                        <CheckBox fx:id="symbolsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="5"/>
+                                        <CheckBox fx:id="symbolsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="5"/>
+                                        <CheckBox fx:id="stringsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="6"/>
+                                        <CheckBox fx:id="stringsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="6"/>
+                                        <CheckBox fx:id="commentsBold"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="1"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="7"/>
+                                        <CheckBox fx:id="commentsItalic"
+                                                  mnemonicParsing="false"
+                                                  GridPane.columnIndex="2"
+                                                  GridPane.halignment="CENTER"
+                                                  GridPane.rowIndex="7"/>
+                                        <ColorPicker fx:id="instrsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="1"/>
+                                        <ColorPicker fx:id="keywordsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="2"/>
+                                        <ColorPicker fx:id="labelsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="3"/>
+                                        <ColorPicker fx:id="literalsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="4"/>
+                                        <ColorPicker fx:id="symbolsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="5"/>
+                                        <ColorPicker fx:id="stringsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="6"/>
+                                        <ColorPicker fx:id="commentsColor"
+                                                     GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="7"/>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="20.0"/>
+                                    </VBox.margin>
+                                </GridPane>
+                            </children>
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0"
+                                        top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="Font">
+                    <content>
+                        <VBox id="Content" minHeight="0.0" minWidth="0.0" spacing="3.0">
+                            <padding>
+                                <Insets left="10.0" top="5.0" fx:id="x1"/>
+                            </padding>
+                            <children>
+                                <Label text="Assembly code window"
+                                       textOverrun="WORD_ELLIPSIS"/>
+                                <VBox alignment="CENTER" prefHeight="226.0" spacing="3.0">
+                                    <children>
+                                        <Label prefWidth="28.0" text="Font"/>
+                                        <ComboBox fx:id="assemblyWindowFont"
+                                                  prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="Courier New"/>
+                                                    <String fx:value="Lucida Console"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ComboBox>
+                                        <Label text="Size"/>
+                                        <ChoiceBox fx:id="assemblyWindowSize"
+                                                   prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="10"/>
+                                                    <String fx:value="12"/>
+                                                    <String fx:value="14"/>
+                                                    <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ChoiceBox>
+                                        <Label text="Style"/>
+                                        <ChoiceBox fx:id="assemblyWindowStyle"
+                                                   prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="normal"/>
+                                                    <String fx:value="bold"/>
+                                                    <String fx:value="italic"/>
+                                                    <String fx:value="bold and italic"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ChoiceBox>
+                                        <Label text="Forground Color"/>
+                                        <ColorPicker fx:id="assemblyForground"
+                                                     minHeight="-Infinity"
+                                                     minWidth="-Infinity"
+                                                     prefHeight="25.0" prefWidth="100.0"/>
+                                        <Label text="Background Color"/>
+                                        <ColorPicker fx:id="assemblyBackground"
+                                                     minHeight="-Infinity"
+                                                     minWidth="-Infinity"
+                                                     prefHeight="25.0" prefWidth="100.0"/>
+                                    </children>
+                                </VBox>
+                                <Label text="RAM &amp; Register windows"/>
+                                <VBox alignment="CENTER" prefHeight="275.0"
+                                      prefWidth="335.0" spacing="3.0">
+                                    <children>
+                                        <Label prefWidth="28.0" text="Font"/>
+                                        <ComboBox fx:id="registerWindowFont"
+                                                  prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="Courier New"/>
+                                                    <String fx:value="Lucida Console"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ComboBox>
+                                        <Label text="Size"/>
+                                        <ChoiceBox fx:id="registerWindowSize"
+                                                   prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="10"/>
+                                                    <String fx:value="12"/>
+                                                    <String fx:value="14"/>
+                                                    <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ChoiceBox>
+                                        <Label text="Style"/>
+                                        <ChoiceBox fx:id="registerWindowStyle"
+                                                   prefWidth="220.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="normal"/>
+                                                    <String fx:value="bold"/>
+                                                    <String fx:value="italic"/>
+                                                    <String fx:value="bold and italic"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ChoiceBox>
+                                        <Label text="Forground Color"/>
+                                        <ColorPicker fx:id="registerForground"
+                                                     minHeight="-Infinity"
+                                                     minWidth="-Infinity"
+                                                     prefHeight="25.0" prefWidth="100.0"/>
+                                        <Label text="Background Color"/>
+                                        <ChoiceBox fx:id="registerBackground"
+                                                   minHeight="-Infinity"
+                                                   minWidth="-Infinity" prefHeight="25.0"
+                                                   prefWidth="100.0">
+                                            <items>
+                                                <FXCollections
+                                                        fx:factory="observableArrayList">
+                                                    <String fx:value="WHITE"/>
+                                                    <String fx:value="BLACK"/>
+                                                    <String fx:value="AZURE"/>
+                                                    <String fx:value="PURPLE"/>
+                                                    <String fx:value="ORANGE"/>
+                                                    <String fx:value="GREEN"/>
+                                                    <String fx:value="MAGENTA"/>
+                                                </FXCollections>
+                                            </items>
+                                        </ChoiceBox>
+                                        <Label text="Border Color"/>
+                                        <ColorPicker fx:id="registerBorder"
+                                                     minHeight="-Infinity"
+                                                     minWidth="-Infinity"
+                                                     prefHeight="25.0" prefWidth="100.0"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab fx:id="keyBindingsTab" closable="false" text="Key Bindings">
+                    <content>
+                        <ScrollPane id="ScrollPane" fx:id="kbScrollPane"
+                                    prefViewportHeight="482.0" prefViewportWidth="289.0">
+                            <content>
+                                <VBox id="VBox" alignment="CENTER" spacing="5.0">
+                                    <children>
+                                        <ToolBar>
+                                            <items>
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#handleDefault"
+                                                        prefHeight="22.0" prefWidth="80.0"
+                                                        styleClass="smallButton"
+                                                        text="Set Default"/>
+                                            </items>
+                                        </ToolBar>
+                                        <AnchorPane fx:id="menuItemsPane"
+                                                    minHeight="521.0" prefHeight="542.0"
+                                                    prefWidth="390.0">
+                                            <children>
+                                                <Label layoutX="5.0" layoutY="25.0"
+                                                       text="New text"/>
+                                                <Label layoutX="5.0" layoutY="41.0"
+                                                       text="Open text"/>
+                                                <Label layoutX="5.0" layoutY="57.0"
+                                                       text="Close text"/>
+                                                <Label layoutX="5.0" layoutY="73.0"
+                                                       text="Save text"/>
+                                                <Label layoutX="5.0" layoutY="89.0"
+                                                       text="Save text as"/>
+                                                <Label layoutX="5.0" layoutY="105.0"
+                                                       text="New machine"/>
+                                                <Label layoutX="5.0" layoutY="121.0"
+                                                       text="Open machine"/>
+                                                <Label layoutX="5.0" layoutY="137.0"
+                                                       text="Save machine"/>
+                                                <Label layoutX="5.0" layoutY="153.0"
+                                                       text="Save machine As"/>
+                                                <Label layoutX="5.0" layoutY="169.0"
+                                                       text="Save machine in HTML"/>
+                                                <Label layoutX="5.0" layoutY="185.0"
+                                                       text="Print preview"/>
+                                                <Label layoutX="5.0" layoutY="201.0"
+                                                       text="Print setup"/>
+                                                <Label layoutX="5.0" layoutY="217.0"
+                                                       text="Print"/>
+                                                <Label layoutX="5.0" layoutY="233.0"
+                                                       text="Toggle Comment"/>
+                                                <Label layoutX="5.0" layoutY="249.0"
+                                                       text="Find"/>
+                                                <Label layoutX="5.0" layoutY="265.0"
+                                                       text="Preferences"/>
+                                                <Label layoutX="5.0" layoutY="281.0"
+                                                       text="Machine instructions"/>
+                                                <Label layoutX="5.0" layoutY="297.0"
+                                                       text="Microinstructions"/>
+                                                <Label layoutX="5.0" layoutY="313.0"
+                                                       text="Hardware modules"/>
+                                                <Label layoutX="5.0" layoutY="329.0"
+                                                       text="EQUs"/>
+                                                <Label layoutX="5.0" layoutY="345.0"
+                                                       text="Fetch Sequence"/>
+                                                <Label layoutX="5.0" layoutY="361.0"
+                                                       text="Debug Mode"/>
+                                                <Label layoutX="5.0" layoutY="377.0"
+                                                       text="Assemble"/>
+                                                <Label layoutX="5.0" layoutY="393.0"
+                                                       text="Assemble &amp; load"/>
+                                                <Label layoutX="5.0" layoutY="409.0"
+                                                       text="Assemble, load &amp; run"/>
+                                                <Label layoutX="5.0" layoutY="425.0"
+                                                       text="Clear, assemble, load &amp; run"/>
+                                                <Label layoutX="5.0" layoutY="441.0"
+                                                       text="Run"/>
+                                                <Label layoutX="5.0" layoutY="457.0"
+                                                       text="Stop"/>
+                                                <Label layoutX="5.0" layoutY="473.0"
+                                                       text="Clear Console"/>
+                                                <Label layoutX="5.0" layoutY="489.0"
+                                                       text="Reset everything"/>
+                                                <Label layoutX="5.0" layoutY="505.0"
+                                                       text="Options"/>
+                                                <Label layoutX="5.0" layoutY="521.0"
+                                                       text="General CPUSim Help"/>
+                                                <Label layoutX="5.0" layoutY="537.0"
+                                                       text="About CPUSim"/>
+                                                <Label layoutX="40.0" layoutY="8.0"
+                                                       text="Menu Items"/>
+                                                <Label layoutX="172.0" layoutY="8.0"
+                                                       text="Key Bindings"/>
+                                                <Separator layoutY="22.0"
+                                                           prefWidth="345.0"/>
+                                                <AnchorPane fx:id="keyBindingsPane"
+                                                            layoutX="172.0" layoutY="23.0"
+                                                            prefHeight="613.0"/>
+                                            </children>
+                                        </AnchorPane>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab closable="false" text="Other">
+                    <content>
+                        <VBox spacing="10.0">
+                            <padding>
+                                <Insets left="10.0" top="10.0"/>
+                            </padding>
+                            <children>
+                                <Label minHeight="13.999908447265625"
+                                       prefHeight="13.999908447265625"
+                                       text="File Settings"/>
+                                <CheckBox fx:id="autoSave" mnemonicParsing="false"
+                                          text="Automatically save programs before assembly."
+                                          VBox.margin="$x1"/>
+                                <Label minHeight="13.999908447265625"
+                                       prefHeight="13.999908447265625"
+                                       text="Text Display Settings"/>
+                                <CheckBox fx:id="showLineNumbers" mnemonicParsing="false"
+                                          text="Show line numbers." VBox.margin="$x1"/>
+                                <CheckBox fx:id="lineWrap" mnemonicParsing="false"
+                                          text="Allow line wrap." VBox.margin="$x1"/>
+                                <Label minHeight="13.999908447265625"
+                                       prefHeight="13.999908447265625"
+                                       text="Console Settings"/>
+                                <CheckBox fx:id="clearConsoleOnRun"
+                                          mnemonicParsing="false"
+                                          text="Clear the console on run."
+                                          VBox.margin="$x1"/>
+                            </children>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
         </TabPane>
     </center>
     <stylesheets>

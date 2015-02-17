@@ -1,7 +1,5 @@
 package cpusim.gui.desktop.editorpane;
 
-import javafx.scene.paint.Color;
-
 import java.util.Optional;
 
 /**
@@ -12,6 +10,11 @@ import java.util.Optional;
 public class StyleInfo {
     public static final StyleInfo EMPTY = new StyleInfo();
 
+    /**
+     * return a new StyleInfo that is empty except for the given font size
+     * @param fontSize the font size
+     * @return the StyleInfo with the font size
+     */
     public static StyleInfo fontSize(int fontSize) {
         return EMPTY.updateFontSize(fontSize);
     }
@@ -24,11 +27,11 @@ public class StyleInfo {
         return EMPTY.updateTextColor(color);
     }
 
-    final Optional<Boolean> bold;
-    final Optional<Boolean> italic;
-    final Optional<Integer> fontSize;
-    final Optional<String> fontFamily;
-    final Optional<String> textColor;
+    public final Optional<Boolean> bold;
+    public final Optional<Boolean> italic;
+    public final Optional<Integer> fontSize;
+    public final Optional<String> fontFamily;
+    public final Optional<String> textColor; // of form #xxyyzz for web colors in hex
 
     public StyleInfo() {
         bold = Optional.empty();
@@ -51,6 +54,10 @@ public class StyleInfo {
         this.textColor = textColor;
     }
 
+    /**
+     * converts it all to CSS
+     * @return a String with the CSS form of the data
+     */
     public String toCss() {
         StringBuilder sb = new StringBuilder();
 
@@ -98,11 +105,11 @@ public class StyleInfo {
 
     public StyleInfo updateWith(StyleInfo mixin) {
         return new StyleInfo(
-                mixin.bold.isPresent() ? mixin.bold : bold,
-                mixin.italic.isPresent() ? mixin.italic : italic,
-                mixin.fontSize.isPresent() ? mixin.fontSize : fontSize,
-                mixin.fontFamily.isPresent() ? mixin.fontFamily : fontFamily,
-                mixin.textColor.isPresent() ? mixin.textColor : textColor);
+                mixin.bold.isPresent() ? mixin.bold : this.bold,
+                mixin.italic.isPresent() ? mixin.italic : this.italic,
+                mixin.fontSize.isPresent() ? mixin.fontSize : this.fontSize,
+                mixin.fontFamily.isPresent() ? mixin.fontFamily : this.fontFamily,
+                mixin.textColor.isPresent() ? mixin.textColor : this.textColor);
     }
 
     public StyleInfo updateBold(boolean bold) {

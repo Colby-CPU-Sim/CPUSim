@@ -116,10 +116,7 @@ import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.InlineStyleTextArea;
-import org.fxmisc.richtext.Paragraph;
-import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.*;
 
 import java.io.*;
 import java.net.URL;
@@ -436,7 +433,7 @@ public class DesktopController implements Initializable {
                 .getChannel())).setMediator(mediator);
 
         // whenever a new tab in the code text area is selected,
-        // set the line numbers and line wrap according to the settings
+        // set the line numbers and line wrap and style according to the settings
         this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
                     if( newTab == null ) return; // there are no tabs left
@@ -451,6 +448,7 @@ public class DesktopController implements Initializable {
                     else {
                         lFactory.setFormat(digits -> "");
                     }
+                    refreshTopTabPane();
                 });
     }
 
@@ -1357,6 +1355,26 @@ public class DesktopController implements Initializable {
     }
 
     /**
+     * redraws all tab panes to take into account any preference changes.
+     * Does nothing if there are no tab panes.
+     */
+    public void refreshTopTabPane() {
+        CodePaneTab t = (CodePaneTab) textTabPane.getSelectionModel().getSelectedItem();
+        if (t == null) {
+            return;
+        }
+        StyledTextArea codeArea = (StyledTextArea) t.getContent();
+        String text = codeArea.getText();
+        int from = 0;
+        StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
+        codeArea.setStyleSpans(0,styleSpans);
+//        for(StyleSpan<StyleInfo> span: styleSpans) {
+//            codeArea.setStyle(from, from + span.getLength(), span.getStyle());
+//            from += span.getLength();
+//        }
+    }
+
+    /**
      * adds a new tab to the text tab pane
      *
      * @param content the text that is in the file
@@ -1937,6 +1955,15 @@ public class DesktopController implements Initializable {
      */
     public DebugToolBarController getDebugToolBarController() {
         return debugToolBarController;
+    }
+
+    /**
+     * gets the CodePaneController.
+     *
+     * @return the CodePaneController.
+     */
+    public CodePaneController getCodePaneController() {
+        return codePaneController;
     }
 
     /**
