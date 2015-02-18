@@ -30,6 +30,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.InlineStyleTextArea;
 
 import java.io.File;
 import java.util.*;
@@ -179,7 +180,7 @@ public class HighlightManager
                     return;
                 }
                 Tab newTabForFile = desktop.getTabForFile(file);
-                CodeArea text = (CodeArea) newTabForFile.getContent();
+                InlineStyleTextArea text = (InlineStyleTextArea)newTabForFile.getContent();
                 int line = sourceLine.getLine();
                 int start = getLineStartOffset(text.getText(), line);
                 int end = getLineEndOffset(text.getText(), line);
