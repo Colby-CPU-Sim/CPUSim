@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="remove -fx-disabled-opacity from all CSS files">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CPUSim4.0b49.iml" afterPath="$PROJECT_DIR$/CPUSim4.0b49.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground1.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground1.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground2.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground2.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground3.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground3.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground4.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground4.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground5.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground5.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground6.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/CustomerBackground6.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/DefaultBackground.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/DefaultBackground.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css" afterPath="$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css" />
+    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/util/HighlightManager.java" afterPath="$PROJECT_DIR$/src/cpusim/util/HighlightManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/W2-0.a" afterPath="$PROJECT_DIR$/test/W2-0.a" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
@@ -121,11 +104,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HighlightManager.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="HighlightManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cpusim/util/HighlightManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2679" max-vertical-offset="5985">
-              <caret line="176" column="7" selection-start-line="176" selection-start-column="7" selection-end-line="176" selection-end-column="7" />
+            <state vertical-scroll-proportion="0.7259552" vertical-offset="2622" max-vertical-offset="5985">
+              <caret line="182" column="63" selection-start-line="182" selection-start-column="63" selection-end-line="182" selection-end-column="63" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -133,10 +116,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Desktop.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Desktop.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.30428955" vertical-offset="96" max-vertical-offset="3477">
+            <state vertical-scroll-proportion="0.0" vertical-offset="96" max-vertical-offset="3477">
               <caret line="17" column="35" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
               <folding />
             </state>
@@ -719,7 +702,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="65876000" />
+      <workItem from="1423928233792" duration="66119000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -757,19 +740,31 @@
       <option name="project" value="LOCAL" />
       <updated>1424202793066</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="remove -fx-disabled-opacity from all CSS files">
+      <created>1424257519319</created>
+      <option name="number" value="00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1424257519319</updated>
+    </task>
+    <task id="LOCAL-00008" summary="remove -fx-disabled-opacity from all CSS files">
+      <created>1424257716742</created>
+      <option name="number" value="00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1424257716742</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="93443000" />
+    <option name="totallyTimeSpent" value="93686000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26968327" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26968327" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33089006" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1305,21 +1300,21 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/util/HighlightManager.java">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2679" max-vertical-offset="5985">
-          <caret line="176" column="7" selection-start-line="176" selection-start-column="7" selection-end-line="176" selection-end-column="7" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.0" vertical-offset="96" max-vertical-offset="3477">
+          <caret line="17" column="35" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Desktop.css">
+    <entry file="file://$PROJECT_DIR$/src/cpusim/util/HighlightManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.30428955" vertical-offset="96" max-vertical-offset="3477">
-          <caret line="17" column="35" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
-          <folding />
+        <state vertical-scroll-proportion="0.7259552" vertical-offset="2622" max-vertical-offset="5985">
+          <caret line="182" column="63" selection-start-line="182" selection-start-column="63" selection-end-line="182" selection-end-column="63" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
