@@ -67,7 +67,6 @@ import com.sun.javafx.scene.control.behavior.TextInputControlBehavior;
 import com.sun.javafx.scene.control.skin.TextInputControlSkin;
 import cpusim.*;
 import cpusim.assembler.Token;
-import cpusim.gui.about.AboutController;
 import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.CodePaneTab;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
@@ -187,10 +186,11 @@ public class DesktopController implements Initializable {
     static final String NEWLINE = "\n";
 
     private String currentTextDirectory;
-    private SimpleStringProperty tableStyle;
+    private SimpleStringProperty registerTableStyle;
+    private SimpleStringProperty ramTableStyle;
 
-    private FontData textFontData;
-    private FontData tableFontData;
+    private FontData registerTableFontData;
+    private FontData ramTableFontData;
     private HashMap<String, String> backgroundSetting;
     private OtherSettings otherSettings;
 
@@ -315,7 +315,7 @@ public class DesktopController implements Initializable {
         //initialize the html writer
         htmlWriter = new MachineHTMLWriter();
 
-        tableStyle = new SimpleStringProperty("");
+        registerTableStyle = new SimpleStringProperty("");
 
         //add listener for the stage for closing
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -342,9 +342,9 @@ public class DesktopController implements Initializable {
         reopenTextFiles = new ArrayDeque<String>();
         reopenMachineFiles = new ArrayDeque<String>();
 
-        //initialize table and text data
-        textFontData = new FontData();
-        tableFontData = new FontData();
+        //initialize table data
+        registerTableFontData = new FontData();
+        ramTableFontData = new FontData();
 
         backgroundSetting = new HashMap<String, String>() {{
             put("WHITE", "cpusim/gui/css/DefaultBackground.css");
@@ -2949,20 +2949,13 @@ public class DesktopController implements Initializable {
         prefs.put("ramAddressBase", ramAddressBase);
         prefs.put("ramDataBase", ramDataBase);
 
-        prefs.put("textFontSize", textFontData.fontSize);
-        prefs.put("textFont", textFontData.font);
-        prefs.putBoolean("textBold", textFontData.bold);
-        prefs.putBoolean("textItalic", textFontData.italic);
-        prefs.put("textForground", textFontData.foreground);
-        prefs.put("textBackground", textFontData.background);
+        prefs.put("registerTableFontSize", registerTableFontData.fontSize);
+        prefs.put("registerTableFont", registerTableFontData.font);
+        prefs.put("registerTableBackground", registerTableFontData.background);
 
-        prefs.put("tableFontSize", tableFontData.fontSize);
-        prefs.put("tableFont", tableFontData.font);
-        prefs.putBoolean("tableBold", tableFontData.bold);
-        prefs.putBoolean("tableItalic", tableFontData.italic);
-        prefs.put("tableForground", tableFontData.foreground);
-        prefs.put("tableBackground", tableFontData.background);
-        prefs.put("tableBorder", tableFontData.border);
+        prefs.put("ramTableFontSize", ramTableFontData.fontSize);
+        prefs.put("ramTableFont", ramTableFontData.font);
+        prefs.put("ramTableBackground", ramTableFontData.background);
 
         i = 0;
         for (String binding : keyBindings) {
@@ -3007,20 +3000,13 @@ public class DesktopController implements Initializable {
         ramAddressBase = prefs.get("ramAddressBase", "Dec");
         ramDataBase = prefs.get("ramDataBase", "Decimal");
 
-        textFontData.fontSize = prefs.get("textFontSize", "12");
-        textFontData.font = prefs.get("textFont", "\"Courier New\"");
-        textFontData.bold = prefs.getBoolean("textBold", false);
-        textFontData.italic = prefs.getBoolean("textItalic", false);
-        textFontData.foreground = prefs.get("textForground", "#000000");
-        textFontData.background = prefs.get("textBackground", "#FFFFFF");
+        registerTableFontData.fontSize = prefs.get("registerTableFontSize", "12");
+        registerTableFontData.font = prefs.get("registerTableFont", "\"Courier New\"");
+        registerTableFontData.background = prefs.get("registerTableBackground", "WHITE");
 
-        tableFontData.fontSize = prefs.get("tableFontSize", "12");
-        tableFontData.font = prefs.get("tableFont", "\"Courier New\"");
-        tableFontData.bold = prefs.getBoolean("tableBold", false);
-        tableFontData.italic = prefs.getBoolean("tableItalic", false);
-        tableFontData.foreground = prefs.get("tableForground", "#000000");
-        tableFontData.background = prefs.get("tableBackground", "WHITE");
-        tableFontData.border = prefs.get("tableBorder", "#D3D3D3");
+        ramTableFontData.fontSize = prefs.get("ramTableFontSize", "12");
+        ramTableFontData.font = prefs.get("ramTableFont", "\"Courier New\"");
+        ramTableFontData.background = prefs.get("ramTableBackground", "WHITE");
 
         for (int i = 0; i < DEFAULT_KEY_BINDINGS.length; i++) {
             String keyString = prefs.get("keyBinding" + i, DEFAULT_KEY_BINDINGS[i]);
@@ -3056,58 +3042,68 @@ public class DesktopController implements Initializable {
      * sets the style of the text in the tables area;
      */
     public void updateStyleOfTables() {
-        String boldString = textFontData.bold ? "bold" : "normal";
-        String italicString = textFontData.italic ? "italic" : "normal";
-        tableStyle.set("-fx-font-size:" + tableFontData.fontSize + "; "
-                + "-fx-font-family:" + tableFontData.font + "; -fx-font-style:" +
-                italicString + "; "
-                + "-fx-font-weight:" + boldString +
-                "; -fx-text-fill:" + tableFontData.foreground +
-                "; -fx-border-color:" + tableFontData.border + ";");
+        registerTableStyle.set("-fx-font-size:" + registerTableFontData.fontSize + "; "
+                + "-fx-font-family:" + registerTableFontData.font + ";");
 
         if (mainPane.getStyleClass().size() > 1) {
             mainPane.getStyleClass().remove(1);
         }
 
-        if (!backgroundSetting.keySet().contains(tableFontData.background)) {
-            tableFontData.background = "WHITE";
+        if (!backgroundSetting.keySet().contains(registerTableFontData.background)) {
+            registerTableFontData.background = "#fff";
         }
 
-        mainPane.getStylesheets().add(backgroundSetting.get(tableFontData.background));
+        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
 
         for (RegisterTableController rtc : registerControllers) {
-            rtc.setColor(tableStyle.get());
+            rtc.setColor(registerTableStyle.get());
         }
         for (RamTableController rtc : ramControllers) {
-            rtc.setColor(tableStyle.get());
+            rtc.setColor(registerTableStyle.get());
         }
     }
 
     /**
-     * returns the table style string
-     *
-     * @return table style string
+     * returns the register table style string
+     * @return register table style string
      */
-    public SimpleStringProperty getTableStyle() {
-        return tableStyle;
+    public SimpleStringProperty getRegisterTableStyle() {
+        return registerTableStyle;
     }
 
     /**
-     * Returns the text font data object
-     *
-     * @return the text font data object
+     * returns the ram table style string
+     * @return ram table style string
      */
-    public FontData getTextFontData() {
-        return textFontData;
+    public String getRamTableStyle() {
+        return ramTableStyle.get();
+    }
+
+    public SimpleStringProperty ramTableStyleProperty() {
+        return ramTableStyle;
     }
 
     /**
-     * Returns the table font data object
+     * Returns the font data object for the assembly code panes
      *
-     * @return the table font data object
+     * @return the font data object
      */
-    public FontData getTableFontData() {
-        return tableFontData;
+    public FontData getAssemblyPaneFontData() {
+        FontData fontData = new FontData();
+        StyleInfo styleInfo = codePaneController.getStyleInfo("default");
+        fontData.font = styleInfo.fontFamily.get();
+        fontData.fontSize = styleInfo.fontSize.get() + "";
+        fontData.background = styleInfo.backgroundColor.get();
+        return fontData;
+    }
+
+    /**
+     * Returns the register table font data object
+     *
+     * @return the register table font data object
+     */
+    public FontData getRegisterTableFontData() {
+        return registerTableFontData;
     }
 
     /**
@@ -3377,6 +3373,10 @@ public class DesktopController implements Initializable {
         consoleManager.printlnToConsole(s);
     }
 
+    public FontData getRamTableFontData() {
+        return ramTableFontData;
+    }
+
     /**
      * Just a class to hold all the data for the font
      * so that it can be passed around different object
@@ -3385,11 +3385,7 @@ public class DesktopController implements Initializable {
     public class FontData {
         public String font;
         public String fontSize;
-        public boolean bold;
-        public boolean italic;
-        public String foreground;
         public String background;
-        public String border;
     }
 
     /**

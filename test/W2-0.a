@@ -8,8 +8,8 @@
 ; It reads m and n, and then stores the sign of m in the
 ; variable sign and replaces m with absolute value of m.
 ; Next it adds m copies of n to itself to get the product of
-; abs(m)*n.  Finally, it multiplies this product by sign, to
-; get the final answer, which it outputs.
+; abs(m)*n.  Finally, it multiplies this product by the
+; sign to get the final answer, which it outputs.
 ; It is for the Wombat2 computer.
 
 ; Roles of the registers:

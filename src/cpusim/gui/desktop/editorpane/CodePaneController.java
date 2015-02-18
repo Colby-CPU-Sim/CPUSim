@@ -31,11 +31,12 @@ public class CodePaneController
 
         // the default styles for each part.
         StyleInfo base = new StyleInfo().updateFontSize(12).updateFontFamily("monospace")
-                          .updateBold(false).updateItalic(false).updateTextColor("#000");
+                          .updateBold(false).updateItalic(false).updateTextColor("#000")
+                          .updateBackgroundColor("#fff");
         this.styles.put("default",base);
         this.styles.put("instr", base.updateTextColor("#5a3").updateBold(true));
         this.styles.put("keyword", base.updateTextColor("#00b"));
-        this.styles.put("label", base.updateTextColor("#f00"));
+        this.styles.put("label", base.updateTextColor("#c00"));
         this.styles.put("literal", base.updateTextColor("#f80"));
         this.styles.put("symbol", base.updateTextColor("#000"));
         this.styles.put("string", base.updateTextColor("#44a").updateItalic(true));
@@ -133,8 +134,7 @@ public class CodePaneController
             lastKwEnd = matcher.end();
         }
         spansBuilder.add(styles.get("default"), text.length() - lastKwEnd);
-        StyleSpans<StyleInfo> styleSpans = spansBuilder.create();
-        return styleSpans;
+        return spansBuilder.create();
     }
 
     /**
@@ -149,11 +149,44 @@ public class CodePaneController
 
     /**
      * sets the style info for the given group.
-     * @param group
-     * @param style
+     * @param group one of the strings "instr", "keyword", "label", "symbol", "literal",
+     *              "string", "comment"
+     * @param style the new StyleInfo to be assigned to the group
      */
     public void setStyleInfo(String group, StyleInfo style) {
         styles.put(group, style);
     }
 
+    /**
+     * sets the font family for all groups
+     * @param fontFamily the new font family for all groups
+     */
+    public void setAllforFontFamily(String fontFamily) {
+        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
+                "string", "comment"};
+        for(String group : groups)
+            setStyleInfo(group, getStyleInfo(group).updateFontFamily(fontFamily));
+    }
+
+    /**
+     * sets the font size for all groups
+     * @param fontSize the new font size for all groups
+     */
+    public void setAllforFontSize(int fontSize) {
+        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
+                "string", "comment"};
+        for(String group : groups)
+            setStyleInfo(group, getStyleInfo(group).updateFontSize(fontSize));
+    }
+
+    /**
+     * sets the background color for all groups
+     * @param color the new background color for all groups
+     */
+    public void setAllforBackgroundColor(String color) {
+        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
+                "string", "comment"};
+        for(String group : groups)
+            setStyleInfo(group, getStyleInfo(group).updateBackgroundColor(color));
+    }
 }

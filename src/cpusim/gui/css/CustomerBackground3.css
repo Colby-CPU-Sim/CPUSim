@@ -50,7 +50,7 @@
 }
 
 .table-row-cell:selected:disabled {
-    -fx-opacity: -fx-disabled-opacity;
+    /* -fx-opacity: -fx-disabled-opacity; */
 }
 
 .table-view:row-selection .table-row-cell:filled:hover {

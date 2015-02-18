@@ -9,10 +9,6 @@
 }
 
 /*  Button */
-.button:disabled {
-     -fx-opacity: -fx-disabled-opacity;
- }
-
 .roundButton {
     -fx-background-radius: 30;
     -fx-font: 13px "System";
@@ -142,7 +138,7 @@
 }
 
 .table-row-cell:selected:disabled {
-    -fx-opacity: -fx-disabled-opacity;
+    /* -fx-opacity: -fx-disabled-opacity; */
 }
 
 .table-view:row-selection .table-row-cell:filled:hover {

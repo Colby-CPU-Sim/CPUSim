@@ -241,7 +241,7 @@ public class PreferencesController implements Initializable {
 
         currLabel = (Label) keyBindingsPane.getChildren().get(0);
 
-        setValues();
+        setInitialValuesOfControls();
     }
 
     @FXML
@@ -279,53 +279,15 @@ public class PreferencesController implements Initializable {
     }
 
     private void saveFontTab() {
-        DesktopController.FontData textFD = desktopController.getTextFontData();
-        DesktopController.FontData tableFD = desktopController.getTableFontData();
+        DesktopController.FontData textFD = desktopController.getAssemblyPaneFontData();
+        DesktopController.FontData tableFD = desktopController.getRegisterTableFontData();
 
         textFD.font = "\"" + assemblyWindowFont.getValue() + "\"";
         textFD.fontSize = assemblyWindowSize.getValue();
-        switch (assemblyWindowStyle.getValue()) {
-            case "normal":
-                textFD.bold = false;
-                textFD.italic = false;
-                break;
-            case "bold":
-                textFD.bold = true;
-                textFD.italic = false;
-                break;
-            case "italic":
-                textFD.bold = false;
-                textFD.italic = true;
-                break;
-            default:
-                textFD.bold = true;
-                textFD.italic = true;
-                break;
-        }
-        textFD.foreground = "#" + assemblyForground.getValue().toString().substring(2, 8);
         textFD.background = "#" + assemblyBackground.getValue().toString().substring(2,
                 8);
-
         tableFD.font = "\"" + registerWindowFont.getValue() + "\"";
         tableFD.fontSize = registerWindowSize.getValue();
-        switch (registerWindowStyle.getValue()) {
-            case "normal":
-                tableFD.bold = false;
-                tableFD.italic = false;
-                break;
-            case "bold":
-                tableFD.bold = true;
-                tableFD.italic = false;
-                break;
-            case "italic":
-                tableFD.bold = false;
-                tableFD.italic = true;
-                break;
-            default:
-                tableFD.bold = true;
-                tableFD.italic = true;
-                break;
-        }
 
         if (!tableFD.background.equals(registerBackground.getValue().toString())) {
             CPUSimConstants.dialog.
@@ -336,10 +298,7 @@ public class PreferencesController implements Initializable {
                     showWarning();
         }
 
-        tableFD.foreground = "#" + registerForground.getValue().toString().substring(2,
-                8);
         tableFD.background = registerBackground.getValue().toString();
-        tableFD.border = "#" + registerBorder.getValue().toString().substring(2, 8);
 
         // save the assembly language styles
         saveAssemblyLanguageStyles();
@@ -370,7 +329,7 @@ public class PreferencesController implements Initializable {
         Stage stage = (Stage) closeButton.getScene().getWindow();
 
         //reset values
-        setValues();
+        setInitialValuesOfControls();
 
         //close window.
         stage.close();
@@ -404,67 +363,25 @@ public class PreferencesController implements Initializable {
      * sets the initial values for the combo boxes based on what the values are
      * in the desktopController
      */
-    private void setValues() {
+    private void setInitialValuesOfControls() {
         // Text
-        DesktopController.FontData textFD = desktopController.getTextFontData();
-        DesktopController.FontData tableFD = desktopController.getTableFontData();
-        CodePaneController codePaneController = desktopController.getCodePaneController();
+        DesktopController.FontData assmFontData = desktopController.getAssemblyPaneFontData();
+        DesktopController.FontData registerTableFontData =
+                                            desktopController.getRegisterTableFontData();
+        DesktopController.FontData ramTableFontData =
+                                            desktopController.getRamTableFontData();
 
-        String newTextFont = textFD.font;
-        if (newTextFont.contains("\"")) {
-            String[] text = newTextFont.split("\"");
-            newTextFont = "";
-            for (String part : text) {
-                newTextFont += part;
-            }
-        }
-        assemblyWindowFont.setValue(newTextFont);
-        assemblyWindowSize.setValue(textFD.fontSize);
+        assmFont.setValue(assmFontData.font);
+        assmFontSize.setValue(assmFontData.fontSize);
+        assmBackground.setValue(Color.web(assmFontData.background));
 
-        if (textFD.bold && textFD.italic) {
-            assemblyWindowStyle.setValue("bold and italic");
-        }
-        else if (textFD.bold) {
-            assemblyWindowStyle.setValue("bold");
-        }
-        else if (textFD.italic) {
-            assemblyWindowStyle.setValue("italic");
-        }
-        else {
-            assemblyWindowStyle.setValue("normal");
-        }
+        registersFont.setValue(registerTableFontData.font);
+        registersFontSize.setValue(registerTableFontData.fontSize);
+        registersBackground.setValue(Color.web(registerTableFontData.background));
 
-        assemblyForground.setValue(Color.web(textFD.foreground));
-        assemblyBackground.setValue(Color.web(textFD.background));
-
-        // Table
-        String newTableFont = tableFD.font;
-        if (newTableFont.contains("\"")) {
-            String[] text = newTableFont.split("\"");
-            newTableFont = "";
-            for (String part : text) {
-                newTableFont += part;
-            }
-        }
-        registerWindowFont.setValue(newTableFont);
-        registerWindowSize.setValue(tableFD.fontSize);
-
-        if (tableFD.bold && tableFD.italic) {
-            registerWindowStyle.setValue("bold and italic");
-        }
-        else if (tableFD.bold) {
-            registerWindowStyle.setValue("bold");
-        }
-        else if (tableFD.italic) {
-            registerWindowStyle.setValue("italic");
-        }
-        else {
-            registerWindowStyle.setValue("normal");
-        }
-
-        registerForground.setValue(Color.web(tableFD.foreground));
-        registerBackground.setValue(tableFD.background);
-        registerBorder.setValue(Color.web(tableFD.border));
+        ramsFont.setValue(ramTableFontData.font);
+        ramsFontSize.setValue(ramTableFontData.fontSize);
+        ramsBackground.setValue(Color.web(ramTableFontData.background));
 
         // initialize the settings for styles for the parts of an assembly language
         // program
@@ -812,7 +729,7 @@ public class PreferencesController implements Initializable {
 
                         String conflictMenuItem = ((Label) menuItemsPane.getChildren()
                                 .get(
-                                keyBindingsPane.getChildren().indexOf(label))).getText();
+                                        keyBindingsPane.getChildren().indexOf(label))).getText();
                         Action response = CPUSimConstants.dialog.
                                 owner(((Stage) keyBindingsPane.getScene().getWindow())).
                                 masthead("Key Binding Conflict").

@@ -83,7 +83,7 @@ public class RegisterTableController implements Initializable {
         AnchorPane.setBottomAnchor(titledPane, 0.0);
         
         base = new Base("Dec");
-        color = desktop.getTableStyle().get();
+        color = desktop.getRegisterTableStyle().get();
         
         table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener(){
             @Override

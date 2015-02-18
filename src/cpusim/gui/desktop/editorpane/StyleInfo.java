@@ -32,6 +32,7 @@ public class StyleInfo {
     public final Optional<Integer> fontSize;
     public final Optional<String> fontFamily;
     public final Optional<String> textColor; // of form #xxyyzz for web colors in hex
+    public final Optional<String> backgroundColor; // of form #xxyyzz for web colors in hex
 
     public StyleInfo() {
         bold = Optional.empty();
@@ -39,6 +40,7 @@ public class StyleInfo {
         fontSize = Optional.empty();
         fontFamily = Optional.empty();
         textColor = Optional.empty();
+        backgroundColor = Optional.empty();
     }
 
     public StyleInfo(
@@ -46,12 +48,14 @@ public class StyleInfo {
             Optional<Boolean> italic,
             Optional<Integer> fontSize,
             Optional<String> fontFamily,
-            Optional<String> textColor) {
+            Optional<String> textColor,
+            Optional<String> backgroundColor) {
         this.bold = bold;
         this.italic = italic;
         this.fontSize = fontSize;
         this.fontFamily = fontFamily;
         this.textColor = textColor;
+        this.backgroundColor = backgroundColor;
     }
 
     /**
@@ -90,7 +94,12 @@ public class StyleInfo {
         if (textColor.isPresent()) {
             String color = textColor.get();
             sb.append("-fx-fill: " + color + ";");
+        }
 
+        if (backgroundColor.isPresent()) {
+            String color = backgroundColor.get();
+            sb.append("-fx-background-color: " + color + ";");
+        }
             // use the following lines instead of the preceding two
             // if I decide to store textColor as a Color instead of as a string
             // Color color = textColor.get()
@@ -98,7 +107,6 @@ public class StyleInfo {
             // int green = (int) (color.getGreen() * 255);
             // int blue = (int) (color.getBlue() * 255);
             //sb.append("-fx-fill: rgb(" + red + ", " + green + ", " + blue + ")");
-        }
 
         return sb.toString();
     }
@@ -109,30 +117,37 @@ public class StyleInfo {
                 mixin.italic.isPresent() ? mixin.italic : this.italic,
                 mixin.fontSize.isPresent() ? mixin.fontSize : this.fontSize,
                 mixin.fontFamily.isPresent() ? mixin.fontFamily : this.fontFamily,
-                mixin.textColor.isPresent() ? mixin.textColor : this.textColor);
+                mixin.textColor.isPresent() ? mixin.textColor : this.textColor,
+                mixin.backgroundColor.isPresent() ? mixin.backgroundColor : this.backgroundColor);
     }
 
     public StyleInfo updateBold(boolean bold) {
         return new StyleInfo(Optional.of(bold), italic,
-                fontSize, fontFamily, textColor);
+                fontSize, fontFamily, textColor, backgroundColor);
     }
 
     public StyleInfo updateItalic(boolean italic) {
         return new StyleInfo(bold, Optional.of(italic),
-                fontSize, fontFamily, textColor);
+                fontSize, fontFamily, textColor, backgroundColor);
     }
 
     public StyleInfo updateFontSize(int fontSize) {
         return new StyleInfo(bold, italic, Optional.of
-                (fontSize), fontFamily, textColor);
+                (fontSize), fontFamily, textColor, backgroundColor);
     }
 
     public StyleInfo updateFontFamily(String fontFamily) {
         return new StyleInfo(bold, italic, fontSize, Optional
-                .of(fontFamily), textColor);
+                .of(fontFamily), textColor, backgroundColor);
     }
 
     public StyleInfo updateTextColor(String textColor) {
-        return new StyleInfo(bold, italic, fontSize, fontFamily, Optional.of(textColor));
+        return new StyleInfo(bold, italic, fontSize, fontFamily, Optional.of(textColor),
+                backgroundColor);
+    }
+
+    public StyleInfo updateBackgroundColor(String backgroundColor) {
+        return new StyleInfo(bold, italic, fontSize, fontFamily, textColor,
+                Optional.of(backgroundColor));
     }
 }

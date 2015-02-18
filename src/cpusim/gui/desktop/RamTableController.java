@@ -81,7 +81,7 @@ public class RamTableController implements Initializable {
         valBase = new Base("Dec");
         addrBase = new Base("Dec");
         
-        color = desktop.getTableStyle().get();
+        color = desktop.getRegisterTableStyle().get();
         
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         
