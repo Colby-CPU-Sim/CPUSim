@@ -55,40 +55,17 @@ import java.util.ResourceBundle;
  */
 public class PreferencesController implements Initializable {
     @FXML
-    ComboBox<String> assemblyWindowFont;
-    @FXML
-    ChoiceBox<String> assemblyWindowSize;
-    @FXML
-    ChoiceBox<String> assemblyWindowStyle;
-    @FXML
-    ColorPicker assemblyForground;
-    @FXML
-    ColorPicker assemblyBackground;
-    @FXML
-    ComboBox<String> registerWindowFont;
-    @FXML
-    ChoiceBox<String> registerWindowSize;
-    @FXML
-    ChoiceBox<String> registerWindowStyle;
-    @FXML
-    ColorPicker registerForground;
-    @FXML
-    ChoiceBox registerBackground;
-    @FXML
-    ColorPicker registerBorder;
-
-    @FXML
     ChoiceBox<String> assmFont;
     @FXML
     ChoiceBox<String> registersFont;
     @FXML
     ChoiceBox<String> ramsFont;
     @FXML
-    ComboBox<String> assmFontSize;
+    ChoiceBox<String> assmFontSize;
     @FXML
-    ComboBox<String> registersFontSize;
+    ChoiceBox<String> registersFontSize;
     @FXML
-    ComboBox<String> ramsFontSize;
+    ChoiceBox<String> ramsFontSize;
     @FXML
     ColorPicker assmBackground;
     @FXML
@@ -200,26 +177,29 @@ public class PreferencesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        assemblyWindowFont.setVisibleRowCount(8);
-        registerWindowFont.setVisibleRowCount(8);
-
-        listening = false;
-
-        // find the screen width
-        double screenwidth = Screen.getPrimary().getBounds().getWidth();
-        double screenheight = Screen.getPrimary().getBounds().getHeight();
-
         // fit main pane to the screen (roughly)
-        if (mainPane.getPrefWidth() > screenwidth) {
-            mainPane.setPrefWidth(screenwidth - 75);
+        double screenWidth = Screen.getPrimary().getBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getBounds().getHeight();
+        if (mainPane.getPrefWidth() > screenWidth) {
+            mainPane.setPrefWidth(screenWidth - 75);
+        }
+        if (mainPane.getPrefHeight() > screenHeight) {
+            mainPane.setPrefHeight(screenHeight - 40);
         }
 
-        if (mainPane.getPrefHeight() > screenheight) {
-            mainPane.setPrefHeight(screenheight - 40);
-        }
+        // initialize some keyboard shortcut settings
+        initializeKeyTab();
 
+        // initialize the values of all controls
+        initializeFontTab();
+
+        // set the values of the other settings
+        initializeOtherTab();
+    }
+
+    private void initializeKeyTab() {
+        listening = false;
         kbScrollPane.setStyle("-fx-background-color:white;");
-
         tabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> ov, Number t, Number
@@ -234,142 +214,33 @@ public class PreferencesController implements Initializable {
                 }
             }
         });
-
         initKeyBindings();
-
         updateKeyBindingDisplay();
-
         currLabel = (Label) keyBindingsPane.getChildren().get(0);
-
-        setInitialValuesOfControls();
     }
 
-    @FXML
-    protected void onApplyButtonClick(ActionEvent e) {
-        if (tabPane.getTabs().get(0).isSelected()) {
-            saveFontTab();
-        }
-        else if (tabPane.getTabs().get(1).isSelected()) {
-            saveKeyBindingsTab();
-        }
-        else {
-            saveOtherTab();
-        }
-        desktopController.updateStyleOfTabs();
-        desktopController.updateStyleOfTables();
-        desktopController.refreshTopTabPane();
-    }
-
-    /**
-     * save the changes after clicking the ok button.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    protected void onOKButtonClick(ActionEvent e) {
-        saveFontTab();
-        saveKeyBindingsTab();
-        saveOtherTab();
-
-        desktopController.updateStyleOfTabs();
-        desktopController.updateStyleOfTables();
-        desktopController.refreshTopTabPane();
-
-        onCloseButtonClick(null);
-    }
-
-    private void saveFontTab() {
-        DesktopController.FontData textFD = desktopController.getAssemblyPaneFontData();
-        DesktopController.FontData tableFD = desktopController.getRegisterTableFontData();
-
-        textFD.font = "\"" + assemblyWindowFont.getValue() + "\"";
-        textFD.fontSize = assemblyWindowSize.getValue();
-        textFD.background = "#" + assemblyBackground.getValue().toString().substring(2,
-                8);
-        tableFD.font = "\"" + registerWindowFont.getValue() + "\"";
-        tableFD.fontSize = registerWindowSize.getValue();
-
-        if (!tableFD.background.equals(registerBackground.getValue().toString())) {
-            CPUSimConstants.dialog.
-                    owner((Stage) applyButton.getScene().getWindow()).
-                    masthead("Table Color Change Warning").
-                    message("The change of background color in register and RAM tables " +
-                            "will not be applied until you restart the application.").
-                    showWarning();
-        }
-
-        tableFD.background = registerBackground.getValue().toString();
-
-        // save the assembly language styles
-        saveAssemblyLanguageStyles();
-    }
-
-    private void saveKeyBindingsTab() {
-        desktopController.setKeyBindings(keyBindings);
-    }
-
-    private void saveOtherTab() {
-        desktopController.getOtherSettings().autoSave = this.autoSave.isSelected();
-        desktopController.getOtherSettings().showLineNumbers.set(this.showLineNumbers
-                .isSelected());
-        desktopController.getOtherSettings().lineWrap.set(this.lineWrap.isSelected());
-        desktopController.getOtherSettings().clearConsoleOnRun = this.clearConsoleOnRun
-                .isSelected();
-    }
-
-
-    /**
-     * close the window without saving the changes.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    protected void onCloseButtonClick(ActionEvent e) {
-        //get a handle to the stage.
-        Stage stage = (Stage) closeButton.getScene().getWindow();
-
-        //reset values
-        setInitialValuesOfControls();
-
-        //close window.
-        stage.close();
-    }
-
-    @FXML
-    protected void handleDefault(ActionEvent e) {
-        keyBindings.clear();
-        for (String kb : desktopController.DEFAULT_KEY_BINDINGS) {
-            keyBindings.add(kb);
-        }
-        updateKeyBindingDisplay();
-    }
-
-    @FXML
-    protected void handleHelp(ActionEvent e) {
-        String startString = "Preferences Dialog";
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString);
-            mediator.getDesktopController().setHelpController(helpController);
-        }
-        else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString);
-        }
+    private void initializeOtherTab() {
+        autoSave.selectedProperty().set(desktopController.getOtherSettings().autoSave);
+        showLineNumbers.selectedProperty().set(desktopController.getOtherSettings()
+                .showLineNumbers.get());
+        lineWrap.selectedProperty().set(desktopController.getOtherSettings().lineWrap
+                .get());
+        clearConsoleOnRun.selectedProperty().set(desktopController.getOtherSettings()
+                .clearConsoleOnRun);
     }
 
     /**
      * sets the initial values for the combo boxes based on what the values are
      * in the desktopController
      */
-    private void setInitialValuesOfControls() {
-        // Text
-        DesktopController.FontData assmFontData = desktopController.getAssemblyPaneFontData();
+    private void initializeFontTab() {
+        // initialize the font family, font size, and background color for all panes
+        DesktopController.FontData assmFontData =
+                desktopController.getAssemblyPaneFontData();
         DesktopController.FontData registerTableFontData =
-                                            desktopController.getRegisterTableFontData();
+                desktopController.getRegisterTableFontData();
         DesktopController.FontData ramTableFontData =
-                                            desktopController.getRamTableFontData();
+                desktopController.getRamTableFontData();
 
         assmFont.setValue(assmFontData.font);
         assmFontSize.setValue(assmFontData.fontSize);
@@ -386,15 +257,6 @@ public class PreferencesController implements Initializable {
         // initialize the settings for styles for the parts of an assembly language
         // program
         initializeAssemblyLanguageStyles();
-
-        // set the values of the other settings
-        autoSave.selectedProperty().set(desktopController.getOtherSettings().autoSave);
-        showLineNumbers.selectedProperty().set(desktopController.getOtherSettings()
-                .showLineNumbers.get());
-        lineWrap.selectedProperty().set(desktopController.getOtherSettings().lineWrap
-                .get());
-        clearConsoleOnRun.selectedProperty().set(desktopController.getOtherSettings()
-                .clearConsoleOnRun);
     }
 
     private void initializeAssemblyLanguageStyles() {
@@ -470,50 +332,176 @@ public class PreferencesController implements Initializable {
                 Color.web(defaultStyle.textColor.get()));
     }
 
-    private void saveAssemblyLanguageStyles() {
-        CodePaneController codePaneController = desktopController.getCodePaneController();
+    @FXML
+    protected void onApplyButtonClick(ActionEvent e) {
+        if (tabPane.getTabs().get(0).isSelected()) {
+            saveFontTab();
+        }
+        else if (tabPane.getTabs().get(1).isSelected()) {
+            saveKeyBindingsTab();
+        }
+        else {
+            saveOtherTab();
+        }
+        desktopController.updateStyleOfTabs();
+        desktopController.updateStyleOfTables();
+        desktopController.refreshTopTabPane();
+    }
 
-        StyleInfo instrStyle = codePaneController.getStyleInfo("instr");
-        StyleInfo newStyle = instrStyle.updateWith(new StyleInfo().updateBold
-                (instrsBold.isSelected()).updateItalic(instrsItalic.isSelected()).
-                updateTextColor(toRGBCode(instrsColor.getValue())));
+    /**
+     * save the changes after clicking the ok button.
+     *
+     * @param e a type of action when a button is clicked.
+     */
+    @FXML
+    protected void onOKButtonClick(ActionEvent e) {
+        saveFontTab();
+        saveKeyBindingsTab();
+        saveOtherTab();
+
+        desktopController.updateStyleOfTabs();
+        desktopController.updateStyleOfTables();
+        desktopController.refreshTopTabPane();
+
+        onCloseButtonClick(null);
+    }
+
+    private void saveFontTab() {
+        DesktopController.FontData assmFontData =
+                desktopController.getAssemblyPaneFontData();
+        DesktopController.FontData registerTableFontData =
+                desktopController.getRegisterTableFontData();
+        DesktopController.FontData ramTableFontData =
+                desktopController.getRamTableFontData();
+
+        assmFontData.font = assmFont.getValue();
+        assmFontData.fontSize = assmFontSize.getValue();
+        assmFontData.background = toRGBCode(assmBackground.getValue());
+        registerTableFontData.font = registersFont.getValue();
+        registerTableFontData.fontSize = registersFontSize.getValue();
+        registerTableFontData.background = toRGBCode(registersBackground.getValue());
+        ramTableFontData.font = ramsFont.getValue();
+        ramTableFontData.fontSize = ramsFontSize.getValue();
+        ramTableFontData.background = toRGBCode(ramsBackground.getValue());
+
+//        if (!registerTableFontData.background.equals(registerBackground.getValue().toString())) {
+//            CPUSimConstants.dialog.
+//                    owner((Stage) applyButton.getScene().getWindow()).
+//                    masthead("Table Color Change Warning").
+//                    message("The change of background color in register and RAM tables " +
+//                            "will not be applied until you restart the application.").
+//                    showWarning();
+//        }
+//        registerTableFontData.background = registerBackground.getValue().toString();
+
+        // save the assembly language styles
+        saveAssemblyLanguageStyles();
+    }
+
+    private void saveKeyBindingsTab() {
+        desktopController.setKeyBindings(keyBindings);
+    }
+
+    private void saveOtherTab() {
+        desktopController.getOtherSettings().autoSave = this.autoSave.isSelected();
+        desktopController.getOtherSettings().showLineNumbers.set(this.showLineNumbers
+                .isSelected());
+        desktopController.getOtherSettings().lineWrap.set(this.lineWrap.isSelected());
+        desktopController.getOtherSettings().clearConsoleOnRun = this.clearConsoleOnRun
+                .isSelected();
+    }
+
+
+    /**
+     * close the window without saving the changes.
+     *
+     * @param e a type of action when a button is clicked.
+     */
+    @FXML
+    protected void onCloseButtonClick(ActionEvent e) {
+        //get a handle to the stage.
+        Stage stage = (Stage) closeButton.getScene().getWindow();
+
+        //reset values for the Fonts tab and Other tab
+        initializeFontTab();
+        initializeOtherTab();
+
+        //close window.
+        stage.close();
+    }
+
+    @FXML
+    protected void handleDefault(ActionEvent e) {
+        keyBindings.clear();
+        for (String kb : desktopController.DEFAULT_KEY_BINDINGS) {
+            keyBindings.add(kb);
+        }
+        updateKeyBindingDisplay();
+    }
+
+    @FXML
+    protected void handleHelp(ActionEvent e) {
+        String startString = "Preferences Dialog";
+        if (mediator.getDesktopController().getHelpController() == null) {
+            HelpController helpController = HelpController.openHelpDialog(
+                    mediator.getDesktopController(), startString);
+            mediator.getDesktopController().setHelpController(helpController);
+        }
+        else {
+            HelpController hc = mediator.getDesktopController().getHelpController();
+            hc.getStage().toFront();
+            hc.selectTreeItem(startString);
+        }
+    }
+
+    private void saveAssemblyLanguageStyles() {
+
+        CodePaneController codePaneController = desktopController.getCodePaneController();
+        StyleInfo defaultStyle = codePaneController.getStyleInfo("default");
+
+        StyleInfo newStyle = defaultStyle.
+                updateBold(instrsBold.isSelected()).
+                updateItalic(instrsItalic.isSelected()).
+                updateTextColor(toRGBCode(instrsColor.getValue()));
         codePaneController.setStyleInfo("instr", newStyle);
 
-        StyleInfo keywordStyle = codePaneController.getStyleInfo("keyword");
-        newStyle = keywordStyle.updateWith(new StyleInfo().updateBold(keywordsBold
-                .isSelected()).updateItalic(keywordsItalic.isSelected()).updateTextColor(
-                toRGBCode(keywordsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(keywordsBold.isSelected()).
+                updateItalic(keywordsItalic.isSelected()).
+                updateTextColor(toRGBCode(keywordsColor.getValue()));
         codePaneController.setStyleInfo("keyword", newStyle);
 
-        StyleInfo labelStyle = codePaneController.getStyleInfo("label");
-        newStyle = labelStyle.updateWith(new StyleInfo().updateBold(labelsBold
-                .isSelected()).updateItalic(labelsItalic.isSelected()).updateTextColor(
-                toRGBCode(labelsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(labelsBold.isSelected()).
+                updateItalic(labelsItalic.isSelected()).
+                updateTextColor(toRGBCode(labelsColor.getValue()));
         codePaneController.setStyleInfo("label", newStyle);
 
-        StyleInfo commentStyle = codePaneController.getStyleInfo("comment");
-        newStyle = commentStyle.updateWith(new StyleInfo().updateBold(commentsBold
-                .isSelected()).updateItalic(commentsItalic.isSelected()).updateTextColor(
-                toRGBCode(commentsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(commentsBold.isSelected()).
+                updateItalic(commentsItalic.isSelected()).
+                updateTextColor(toRGBCode(commentsColor.getValue()));
         codePaneController.setStyleInfo("comment", newStyle);
 
-        StyleInfo stringStyle = codePaneController.getStyleInfo("string");
-        newStyle = stringStyle.updateWith(new StyleInfo().updateBold(stringsBold
-                .isSelected()).updateItalic(stringsItalic.isSelected()).updateTextColor(
-                toRGBCode(stringsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(stringsBold.isSelected()).
+                updateItalic(stringsItalic.isSelected()).
+                updateTextColor(toRGBCode(stringsColor.getValue()));
         codePaneController.setStyleInfo("string", newStyle);
 
-        StyleInfo symbolStyle = codePaneController.getStyleInfo("symbol");
-        newStyle = symbolStyle.updateWith(new StyleInfo().updateBold(symbolsBold
-                .isSelected()).updateItalic(symbolsItalic.isSelected()).updateTextColor(
-                toRGBCode(symbolsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(symbolsBold.isSelected()).
+                updateItalic(symbolsItalic.isSelected()).
+                updateTextColor(toRGBCode(symbolsColor.getValue()));
         codePaneController.setStyleInfo("symbol", newStyle);
 
-        StyleInfo literalStyle = codePaneController.getStyleInfo("literal");
-        newStyle = literalStyle.updateWith(new StyleInfo().updateBold(literalsBold
-                .isSelected()).updateItalic(literalsItalic.isSelected()).updateTextColor(
-                toRGBCode(literalsColor.getValue())));
+        newStyle = defaultStyle.
+                updateBold(literalsBold.isSelected()).
+                updateItalic(literalsItalic.isSelected()).
+                updateTextColor(toRGBCode(literalsColor.getValue()));
         codePaneController.setStyleInfo("literal", newStyle);
+
+        int x = 3;
     }
 
     /**

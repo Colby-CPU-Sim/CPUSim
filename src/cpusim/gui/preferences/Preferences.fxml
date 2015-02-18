@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import java.net.URL?>
-<BorderPane fx:id="mainPane" prefHeight="618.0" prefWidth="400.0" styleClass="root"
+<BorderPane fx:id="mainPane" prefHeight="618.0" prefWidth="438.0" styleClass="root"
             xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <HBox id="HBox" alignment="CENTER" prefHeight="37.0" prefWidth="300.0"
@@ -40,7 +40,7 @@
         </HBox>
     </bottom>
     <center>
-        <TabPane fx:id="tabPane" prefHeight="489.0" prefWidth="300.0">
+        <TabPane fx:id="tabPane" prefHeight="581.0" prefWidth="409.0">
             <tabs>
                 <Tab closable="false" text="Font">
                     <content>
@@ -51,19 +51,19 @@
                                         <ColumnConstraints hgrow="SOMETIMES"
                                                            maxWidth="156.0"
                                                            minWidth="10.0"
-                                                           prefWidth="143.0"/>
+                                                           prefWidth="78.0"/>
                                         <ColumnConstraints hgrow="SOMETIMES"
                                                            maxWidth="163.0"
                                                            minWidth="10.0"
-                                                           prefWidth="128.0"/>
+                                                           prefWidth="150.0"/>
                                         <ColumnConstraints hgrow="SOMETIMES"
                                                            maxWidth="113.0"
                                                            minWidth="10.0"
-                                                           prefWidth="76.0"/>
+                                                           prefWidth="91.0"/>
                                         <ColumnConstraints hgrow="SOMETIMES"
                                                            maxWidth="123.0"
                                                            minWidth="10.0"
-                                                           prefWidth="123.0"/>
+                                                           prefWidth="95.0"/>
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="10.0" prefHeight="30.0"
@@ -88,7 +88,7 @@
                                         <Label text="Background" underline="true"
                                                GridPane.columnIndex="3"
                                                GridPane.halignment="CENTER"/>
-                                        <Label text="Assembly Code" GridPane.rowIndex="1">
+                                        <Label text="Assembly" GridPane.rowIndex="1">
                                             <GridPane.margin>
                                                 <Insets left="20.0"/>
                                             </GridPane.margin>
@@ -130,26 +130,28 @@
                                                         right="5.0" top="5.0"/>
                                             </GridPane.margin>
                                         </ColorPicker>
-                                        <ComboBox fx:id="assmFontSize" prefWidth="150.0"
+                                        <ChoiceBox fx:id="assmFontSize" prefWidth="150.0"
                                                   GridPane.columnIndex="2"
                                                   GridPane.halignment="CENTER"
                                                   GridPane.rowIndex="1">
                                             <items>
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
+                                                    <String fx:value="8"/>
                                                     <String fx:value="10"/>
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
-                                                    <String fx:value="16"/>
                                                     <String fx:value="18"/>
+                                                    <String fx:value="24"/>
+                                                    <String fx:value="36"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
                                                 <Insets bottom="5.0" left="5.0"
                                                         right="5.0" top="5.0"/>
                                             </GridPane.margin>
-                                        </ComboBox>
-                                        <ComboBox fx:id="registersFontSize"
+                                        </ChoiceBox>
+                                        <ChoiceBox fx:id="registersFontSize"
                                                   prefWidth="150.0"
                                                   GridPane.columnIndex="2"
                                                   GridPane.halignment="CENTER"
@@ -157,37 +159,41 @@
                                             <items>
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
+                                                    <String fx:value="8"/>
                                                     <String fx:value="10"/>
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
-                                                    <String fx:value="16"/>
                                                     <String fx:value="18"/>
+                                                    <String fx:value="24"/>
+                                                    <String fx:value="36"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
                                                 <Insets bottom="5.0" left="5.0"
                                                         right="5.0" top="5.0"/>
                                             </GridPane.margin>
-                                        </ComboBox>
-                                        <ComboBox fx:id="ramsFontSize" prefWidth="150.0"
+                                        </ChoiceBox>
+                                        <ChoiceBox fx:id="ramsFontSize" prefWidth="150.0"
                                                   GridPane.columnIndex="2"
                                                   GridPane.halignment="CENTER"
                                                   GridPane.rowIndex="3">
                                             <items>
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
+                                                    <String fx:value="8"/>
                                                     <String fx:value="10"/>
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
-                                                    <String fx:value="16"/>
                                                     <String fx:value="18"/>
+                                                    <String fx:value="24"/>
+                                                    <String fx:value="36"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
                                                 <Insets bottom="5.0" left="5.0"
                                                         right="5.0" top="5.0"/>
                                             </GridPane.margin>
-                                        </ComboBox>
+                                        </ChoiceBox>
                                         <ChoiceBox fx:id="assmFont" prefWidth="150.0"
                                                    GridPane.columnIndex="1"
                                                    GridPane.halignment="CENTER"
@@ -197,6 +203,7 @@
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
                                                     <String fx:value="Lucida Console"/>
+                                                    <String fx:value="Monaco"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
@@ -213,6 +220,7 @@
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
                                                     <String fx:value="Lucida Console"/>
+                                                    <String fx:value="Monaco"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
@@ -229,6 +237,7 @@
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
                                                     <String fx:value="Lucida Console"/>
+                                                    <String fx:value="Monaco"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
@@ -459,6 +468,7 @@
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
                                                     <String fx:value="Lucida Console"/>
+                                                    <String fx:value="Monaco"/>
                                                 </FXCollections>
                                             </items>
                                         </ComboBox>
@@ -513,6 +523,7 @@
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
                                                     <String fx:value="Lucida Console"/>
+                                                    <String fx:value="Monaco"/>
                                                 </FXCollections>
                                             </items>
                                         </ComboBox>

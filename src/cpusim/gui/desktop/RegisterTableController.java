@@ -85,45 +85,30 @@ public class RegisterTableController implements Initializable {
         base = new Base("Dec");
         color = desktop.getRegisterTableStyle().get();
         
-        table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener(){
-            @Override
-            public void changed(ObservableValue ov, Object t, Object t1) {
-                updateTable();
-            }
+        table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
+            updateTable();
         });
         
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellMultiBaseLongFactory =
-                new Callback<TableColumn<Register, Long>, TableCell<Register, Long>>() {
-                    @Override
-                    public TableCell<Register, Long> call(
-                            TableColumn<Register, Long> setStringTableColumn) {
-                        final EditingMultiBaseStyleLongCell<Register> a =
-                                new EditingMultiBaseStyleLongCell<>(base, color);
-                    	// Tooltip
-                    	a.setTooltip(new Tooltip());
-                    	a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
-                    	return a;
-                    }
+                setStringTableColumn -> {
+                    final EditingMultiBaseStyleLongCell<Register> a =
+                            new EditingMultiBaseStyleLongCell<>(base, color);
+                    // Tooltip
+                    a.setTooltip(new Tooltip());
+                    a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
+                    return a;
                 };
         
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStringFactory =
-                new Callback<TableColumn<Register, String>, TableCell<Register, String>>() {
-                    @Override
-                    public TableCell<Register, String> call(
-                            TableColumn<Register, String> setStringTableColumn) {
-                        final EditingStrStyleCell<Register> a = new EditingStrStyleCell<Register>(color);
-                        return a;
-                    }
+                setStringTableColumn -> {
+                    final EditingStrStyleCell<Register> a = new EditingStrStyleCell<>(color);
+                    return a;
                 };
         
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntegerFactory =
-                new Callback<TableColumn<Register, Integer>, TableCell<Register, Integer>>() {
-                    @Override
-                    public TableCell<Register, Integer> call(
-                            TableColumn<Register, Integer> setStringTableColumn) {
-                        final EditingIntStyleCell<Register> a = new EditingIntStyleCell<Register>(color);
-                        return a;
-                    }
+                setStringTableColumn -> {
+                    final EditingIntStyleCell<Register> a = new EditingIntStyleCell<>(color);
+                    return a;
                 };
         data.setCellFactory(cellMultiBaseLongFactory);
         name.setCellFactory(cellStringFactory);
@@ -134,17 +119,12 @@ public class RegisterTableController implements Initializable {
         width.prefWidthProperty().bind(table.widthProperty().divide(100 / 15.0));
         data.prefWidthProperty().bind(table.widthProperty().divide(100 / 60.0));
 
-        name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
-        width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
-        data.setCellValueFactory(new PropertyValueFactory<Register, Long>("value"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        width.setCellValueFactory(new PropertyValueFactory<>("width"));
+        data.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         data.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Long>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Long> text) {
-                        text.getRowValue().setValue(text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setValue(text.getNewValue())
         );
 
         table.setItems(registers);
@@ -152,21 +132,19 @@ public class RegisterTableController implements Initializable {
         // Right clicks on table
         ContextMenu cm = new ContextMenu();
         MenuItem edit = new MenuItem("Edit Hardware");
-        edit.setOnAction(new EventHandler<ActionEvent>() {
-        	public void handle(ActionEvent e) {
-        		ObservableList<RegisterTableController> RTCs = 
-        				desktop.getRegisterController();
-        		for (RegisterTableController RTC : RTCs) {
-        			if (RTC == RegisterTableController.this) {
-        				if (RTC.title.equals("Registers")) {
-        					desktop.openHardwareModulesDialog(0);
-        				}
-        				else {
-        					desktop.openHardwareModulesDialog(1);
-        				}
-        			}
-        		}
-        	}
+        edit.setOnAction(e -> {
+            ObservableList<RegisterTableController> RTCs =
+                    desktop.getRegisterController();
+            for (RegisterTableController RTC : RTCs) {
+                if (RTC == RegisterTableController.this) {
+                    if (RTC.title.equals("Registers")) {
+                        desktop.openHardwareModulesDialog(0);
+                    }
+                    else {
+                        desktop.openHardwareModulesDialog(1);
+                    }
+                }
+            }
         });
         edit.disableProperty().bind(desktop.modifyMenu.disableProperty());
         cm.getItems().add(edit);

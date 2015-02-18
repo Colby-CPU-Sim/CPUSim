@@ -30,9 +30,10 @@ public class CodePaneController
         this.styles = new HashMap<>();
 
         // the default styles for each part.
-        StyleInfo base = new StyleInfo().updateFontSize(12).updateFontFamily("monospace")
-                          .updateBold(false).updateItalic(false).updateTextColor("#000")
-                          .updateBackgroundColor("#fff");
+        StyleInfo base = new StyleInfo().
+                updateBold(false).
+                updateItalic(false).
+                updateTextColor("#000");
         this.styles.put("default",base);
         this.styles.put("instr", base.updateTextColor("#5a3").updateBold(true));
         this.styles.put("keyword", base.updateTextColor("#00b"));
@@ -155,38 +156,5 @@ public class CodePaneController
      */
     public void setStyleInfo(String group, StyleInfo style) {
         styles.put(group, style);
-    }
-
-    /**
-     * sets the font family for all groups
-     * @param fontFamily the new font family for all groups
-     */
-    public void setAllforFontFamily(String fontFamily) {
-        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
-                "string", "comment"};
-        for(String group : groups)
-            setStyleInfo(group, getStyleInfo(group).updateFontFamily(fontFamily));
-    }
-
-    /**
-     * sets the font size for all groups
-     * @param fontSize the new font size for all groups
-     */
-    public void setAllforFontSize(int fontSize) {
-        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
-                "string", "comment"};
-        for(String group : groups)
-            setStyleInfo(group, getStyleInfo(group).updateFontSize(fontSize));
-    }
-
-    /**
-     * sets the background color for all groups
-     * @param color the new background color for all groups
-     */
-    public void setAllforBackgroundColor(String color) {
-        String[] groups = {"instr", "keyword", "label", "symbol", "literal",
-                "string", "comment"};
-        for(String group : groups)
-            setStyleInfo(group, getStyleInfo(group).updateBackgroundColor(color));
     }
 }

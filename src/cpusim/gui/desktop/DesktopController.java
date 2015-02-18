@@ -107,10 +107,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
 import org.controlsfx.control.action.Action;
@@ -189,9 +188,9 @@ public class DesktopController implements Initializable {
     private SimpleStringProperty registerTableStyle;
     private SimpleStringProperty ramTableStyle;
 
+    private FontData assmFontData;
     private FontData registerTableFontData;
     private FontData ramTableFontData;
-    private HashMap<String, String> backgroundSetting;
     private OtherSettings otherSettings;
 
     private ArrayDeque<String> reopenTextFiles;
@@ -316,6 +315,7 @@ public class DesktopController implements Initializable {
         htmlWriter = new MachineHTMLWriter();
 
         registerTableStyle = new SimpleStringProperty("");
+        ramTableStyle = new SimpleStringProperty("");
 
         //add listener for the stage for closing
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -345,16 +345,17 @@ public class DesktopController implements Initializable {
         //initialize table data
         registerTableFontData = new FontData();
         ramTableFontData = new FontData();
+        assmFontData = new FontData();
 
-        backgroundSetting = new HashMap<String, String>() {{
-            put("WHITE", "cpusim/gui/css/DefaultBackground.css");
-            put("BLACK", "cpusim/gui/css/CustomerBackground1.css");
-            put("AZURE", "cpusim/gui/css/CustomerBackground2.css");
-            put("PURPLE", "cpusim/gui/css/CustomerBackground3.css");
-            put("ORANGE", "cpusim/gui/css/CustomerBackground4.css");
-            put("GREEN", "cpusim/gui/css/CustomerBackground5.css");
-            put("MAGENTA", "cpusim/gui/css/CustomerBackground6.css");
-        }};
+//        backgroundSetting = new HashMap<String, String>() {{
+//            put("WHITE", "cpusim/gui/css/DefaultBackground.css");
+//            put("BLACK", "cpusim/gui/css/CustomerBackground1.css");
+//            put("AZURE", "cpusim/gui/css/CustomerBackground2.css");
+//            put("PURPLE", "cpusim/gui/css/CustomerBackground3.css");
+//            put("ORANGE", "cpusim/gui/css/CustomerBackground4.css");
+//            put("GREEN", "cpusim/gui/css/CustomerBackground5.css");
+//            put("MAGENTA", "cpusim/gui/css/CustomerBackground6.css");
+//        }};
 
         otherSettings = new OtherSettings();
 
@@ -1363,15 +1364,12 @@ public class DesktopController implements Initializable {
         if (t == null) {
             return;
         }
-        StyledTextArea codeArea = (StyledTextArea) t.getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
+        setFontAndBackground(codeArea);
         String text = codeArea.getText();
         int from = 0;
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
         codeArea.setStyleSpans(0,styleSpans);
-//        for(StyleSpan<StyleInfo> span: styleSpans) {
-//            codeArea.setStyle(from, from + span.getLength(), span.getStyle());
-//            from += span.getLength();
-//        }
     }
 
     /**
@@ -1389,9 +1387,10 @@ public class DesktopController implements Initializable {
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
         codeArea.setWrapText(otherSettings.lineWrap.get());
+        setFontAndBackground(codeArea);
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
-                                                      (digits -> "")));
+                        (digits -> "")));
         newTab.setContent(codeArea);
 
         // whenever the text is changed, recompute the highlighting and set it dirty
@@ -1418,6 +1417,17 @@ public class DesktopController implements Initializable {
 
         textTabPane.getTabs().add(newTab);
         textTabPane.getSelectionModel().selectLast();
+    }
+
+    private void setFontAndBackground(InlineStyleTextArea<StyleInfo> codeArea) {
+        codeArea.setBackground(new Background(new BackgroundFill(Color.web(
+                assmFontData.background), null, null)));
+        codeArea.setStyle("-fx-font-size:" + assmFontData.fontSize + "; "
+                + "-fx-font-family: \"" + assmFontData.font + "\"");
+        // the next line should do the same as the preceding line, but it doesn't
+        // seem to work
+        //codeArea.setFont(Font.font(assmFontData.font, Integer.parseInt(assmFontData
+        //        .fontSize)));
     }
 
     /**
@@ -2949,6 +2959,10 @@ public class DesktopController implements Initializable {
         prefs.put("ramAddressBase", ramAddressBase);
         prefs.put("ramDataBase", ramDataBase);
 
+        prefs.put("assmFontSize", assmFontData.fontSize);
+        prefs.put("assmFont", assmFontData.font);
+        prefs.put("assmBackground", assmFontData.background);
+
         prefs.put("registerTableFontSize", registerTableFontData.fontSize);
         prefs.put("registerTableFont", registerTableFontData.font);
         prefs.put("registerTableBackground", registerTableFontData.background);
@@ -3000,13 +3014,17 @@ public class DesktopController implements Initializable {
         ramAddressBase = prefs.get("ramAddressBase", "Dec");
         ramDataBase = prefs.get("ramDataBase", "Decimal");
 
+        assmFontData.fontSize = prefs.get("assmFontSize", "12");
+        assmFontData.font = prefs.get("assmFont", "Courier New");
+        assmFontData.background = prefs.get("assmBackground", "#fff");
+
         registerTableFontData.fontSize = prefs.get("registerTableFontSize", "12");
-        registerTableFontData.font = prefs.get("registerTableFont", "\"Courier New\"");
-        registerTableFontData.background = prefs.get("registerTableBackground", "WHITE");
+        registerTableFontData.font = prefs.get("registerTableFont", "Courier New");
+        registerTableFontData.background = prefs.get("registerTableBackground", "#fff");
 
         ramTableFontData.fontSize = prefs.get("ramTableFontSize", "12");
-        ramTableFontData.font = prefs.get("ramTableFont", "\"Courier New\"");
-        ramTableFontData.background = prefs.get("ramTableBackground", "WHITE");
+        ramTableFontData.font = prefs.get("ramTableFont", "Courier New");
+        ramTableFontData.background = prefs.get("ramTableBackground", "#fff");
 
         for (int i = 0; i < DEFAULT_KEY_BINDINGS.length; i++) {
             String keyString = prefs.get("keyBinding" + i, DEFAULT_KEY_BINDINGS[i]);
@@ -3043,23 +3061,29 @@ public class DesktopController implements Initializable {
      */
     public void updateStyleOfTables() {
         registerTableStyle.set("-fx-font-size:" + registerTableFontData.fontSize + "; "
-                + "-fx-font-family:" + registerTableFontData.font + ";");
+                + "-fx-font-family:\"" + registerTableFontData.font + "\"; "
+                + "-fx-background-color:" + registerTableFontData.background + ";");
+        ramTableStyle.set("-fx-font-size:" + ramTableFontData.fontSize + "; "
+                + "-fx-font-family:\"" + ramTableFontData.font + "\";"
+                + "-fx-background-color:" + ramTableFontData.background + ";");
 
+        //  WHAT IS THIS CODE FOR?????
         if (mainPane.getStyleClass().size() > 1) {
             mainPane.getStyleClass().remove(1);
         }
 
-        if (!backgroundSetting.keySet().contains(registerTableFontData.background)) {
-            registerTableFontData.background = "#fff";
-        }
-
-        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
+        // old code from when background was a choicebox instead of colorpicker
+//        if (!backgroundSetting.keySet().contains(registerTableFontData.background)) {
+//            registerTableFontData.background = "#fff";
+//        }
+//
+//        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
 
         for (RegisterTableController rtc : registerControllers) {
             rtc.setColor(registerTableStyle.get());
         }
         for (RamTableController rtc : ramControllers) {
-            rtc.setColor(registerTableStyle.get());
+            rtc.setColor(ramTableStyle.get());
         }
     }
 
@@ -3075,11 +3099,7 @@ public class DesktopController implements Initializable {
      * returns the ram table style string
      * @return ram table style string
      */
-    public String getRamTableStyle() {
-        return ramTableStyle.get();
-    }
-
-    public SimpleStringProperty ramTableStyleProperty() {
+    public SimpleStringProperty getRamTableStyle() {
         return ramTableStyle;
     }
 
@@ -3089,12 +3109,7 @@ public class DesktopController implements Initializable {
      * @return the font data object
      */
     public FontData getAssemblyPaneFontData() {
-        FontData fontData = new FontData();
-        StyleInfo styleInfo = codePaneController.getStyleInfo("default");
-        fontData.font = styleInfo.fontFamily.get();
-        fontData.fontSize = styleInfo.fontSize.get() + "";
-        fontData.background = styleInfo.backgroundColor.get();
-        return fontData;
+        return assmFontData;
     }
 
     /**
@@ -3386,6 +3401,12 @@ public class DesktopController implements Initializable {
         public String font;
         public String fontSize;
         public String background;
+
+        public FontData() {
+            font = "Courier New";
+            fontSize = "12";
+            background = "#fff";
+        }
     }
 
     /**
