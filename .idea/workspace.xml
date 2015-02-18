@@ -702,7 +702,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="66119000" />
+      <workItem from="1423928233792" duration="66126000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -752,11 +752,17 @@
       <option name="project" value="LOCAL" />
       <updated>1424257716742</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="remove -fx-disabled-opacity from all CSS files">
+      <created>1424257753447</created>
+      <option name="number" value="00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1424257753447</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="93686000" />
+    <option name="totallyTimeSpent" value="93693000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
