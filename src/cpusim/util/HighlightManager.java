@@ -180,7 +180,7 @@ public class HighlightManager
                     return;
                 }
                 Tab newTabForFile = desktop.getTabForFile(file);
-                CodeArea text = (CodeArea) newTabForFile.getContent();
+                InlineStyleTextArea text = (InlineStyleTextArea)newTabForFile.getContent();
                 int line = sourceLine.getLine();
                 int start = getLineStartOffset(text.getText(), line);
                 int end = getLineEndOffset(text.getText(), line);
