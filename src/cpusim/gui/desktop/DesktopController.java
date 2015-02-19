@@ -112,8 +112,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
+
 import org.fxmisc.richtext.*;
 
 import java.io.*;
@@ -232,6 +231,10 @@ public class DesktopController implements Initializable {
 
     private PrinterJob printController;
 
+    private final ButtonType buttonTypeYes = new ButtonType("Yes");
+    private final ButtonType buttonTypeNo = new ButtonType("No");
+    private final ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
     public static final String[] DEFAULT_KEY_BINDINGS = {
@@ -330,8 +333,7 @@ public class DesktopController implements Initializable {
                         findReplaceController.getStage().close();
                     }
                     storePreferences();
-                }
-                else {
+                } else {
                     t.consume();
                 }
 
@@ -437,16 +439,14 @@ public class DesktopController implements Initializable {
         // set the line numbers and line wrap and style according to the settings
         this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldTab, newTab) -> {
-                    if( newTab == null ) return; // there are no tabs left
+                    if (newTab == null) return; // there are no tabs left
                     StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
                     codeArea.setWrapText(otherSettings.lineWrap.get());
                     LineNumAndBreakpointFactory lFactory =
                             (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
                     if (otherSettings.showLineNumbers.get()) {
-                        lFactory.setFormat(digits ->  "%" + digits + "d");
-                    }
-
-                    else {
+                        lFactory.setFormat(digits -> "%" + digits + "d");
+                    } else {
                         lFactory.setFormat(digits -> "");
                     }
                     refreshTopTabPane();
@@ -550,20 +550,14 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you open a new machine?");
 
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on is unsaved.  " +
-                            "Would you "
-                            + "like to save it before you open a new machine?").
-                    showConfirm();
-
-            if (response == Dialog.ACTION_YES) {
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
-            }
-            else if (response == Dialog.ACTION_CANCEL || response == Dialog
-                    .ACTION_CLOSE) {
+            } else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -587,18 +581,15 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on is unsaved.  " +
-                            "Would you "
-                            + "like to save it before you open a new machine?").
-                    showConfirm();
-            if (response == Dialog.ACTION_YES) {
+
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you open a new machine?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
-            }
-            else if (response == Dialog.ACTION_CANCEL || response == Dialog
-                    .ACTION_CLOSE) {
+            } else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -707,8 +698,7 @@ public class DesktopController implements Initializable {
             if (!success) {
                 // Not sure what do do here
             }
-        }
-        else /* computer has no printers associated with it */ {
+        } else /* computer has no printers associated with it */ {
             // not sure what to do here...
         }
     }
@@ -949,15 +939,12 @@ public class DesktopController implements Initializable {
                 //character
                 else if (origLine.startsWith(commentChar)) {
                     editedLine = (origLine.substring(1));
-                }
-                else {
+                } else {
                     editedLine = origLine;
                 }
                 newText += editedLine;
                 numIncreasedChars += editedLine.length() - origLine.length();
-            }
-
-            else {
+            } else {
                 newText += origLine;
             }
             //add a newline character unless we are on the last line
@@ -999,8 +986,7 @@ public class DesktopController implements Initializable {
 
         if (commenting) {
             ta.selectRange(lower + 1, upper + numIncreasedChars);
-        }
-        else {
+        } else {
             ta.selectRange(lower - 1, upper + numIncreasedChars);
         }
     }
@@ -1015,8 +1001,7 @@ public class DesktopController implements Initializable {
         if (findReplaceController == null) {
             findReplaceController = FindReplaceController.openFindReplaceDialog
                     (mediator, ioConsole.isFocused());
-        }
-        else {
+        } else {
             findReplaceController.setUseConsole(ioConsole.isFocused());
             findReplaceController.getStage().toFront();
             findReplaceController.getStage().requestFocus();
@@ -1233,8 +1218,7 @@ public class DesktopController implements Initializable {
     protected void handleGeneralCPUSimHelp(ActionEvent event) {
         if (helpController == null) {
             helpController = HelpController.openHelpDialog(this);
-        }
-        else {
+        } else {
             helpController.selectTreeItem("Introduction");
             helpController.getStage().toFront();
         }
@@ -1284,31 +1268,26 @@ public class DesktopController implements Initializable {
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save File").
-                    message("Would you like to save your work before you close this " +
-                            "tab?").
-                    showConfirm();
-            System.out.println(response);
-            if (response == Dialog.ACTION_YES) {
+            Alert dialog = createCustomizedConfirmationDialog("Save File",
+                    "Would you like to save your work before you close this " +
+                            "tab?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes) {
                 if (save(tab) && close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            }
-            else if (response == Dialog.ACTION_NO) {
+            } else if (result.get() == buttonTypeNo) {
                 if (close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            }
-            else {
+            } else {
                 if (!close) {
                     textTabPane.getTabs().add(tab);
                     textTabPane.getSelectionModel().selectLast();
                 }
             }
-        }
-        else {
+        } else {
             if (close) {
                 textTabPane.getTabs().remove(tab);
             }
@@ -1330,22 +1309,17 @@ public class DesktopController implements Initializable {
                 .getSelectedItem();
         if (currTab.getFile() != null && !currTab.getDirty()) {
             return currTab.getFile();
-        }
-        else if (otherSettings.autoSave) {
+        } else if (otherSettings.autoSave) {
             boolean savedSuccessfully = save(currTab);
             if (savedSuccessfully) {
                 return currTab.getFile();
             }
-        }
-        else {  //there is no file or there is a file but the tab is dirty.
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    actions(Dialog.ACTION_CANCEL, Dialog.ACTION_OK).
-                    masthead("Save File?").
-                    message("Current Tab is not saved. It needs to be saved"
-                            + " before assembly. Save and continue?").
-                    showConfirm();
-            if (response == Dialog.ACTION_OK) {
+        } else {  //there is no file or there is a file but the tab is dirty.
+            Alert dialog = createConfirmationDialog("Save File?",
+                    "Current Tab is not saved. It needs to be saved"
+                            + " before assembly. Save and continue?");
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == ButtonType.OK) {
                 boolean savedSuccessfully = save(currTab);
                 if (savedSuccessfully) {
                     return currTab.getFile();
@@ -1368,7 +1342,7 @@ public class DesktopController implements Initializable {
         setFontAndBackground(codeArea);
         String text = codeArea.getText();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
-        codeArea.setStyleSpans(0,styleSpans);
+        codeArea.setStyleSpans(0, styleSpans);
     }
 
     /**
@@ -1404,8 +1378,7 @@ public class DesktopController implements Initializable {
         newTab.setOnClosed(this::handleTabClosed);
         if (file != null) {
             newTab.setTooltip(new Tooltip(file.getAbsolutePath()));
-        }
-        else {
+        } else {
             newTab.setTooltip(new Tooltip("File has not been saved."));
         }
 
@@ -1432,6 +1405,7 @@ public class DesktopController implements Initializable {
 
     /**
      * creates and adds a context menu for the new Tab
+     *
      * @param newTab the Tab that gets the context menu
      */
     private void addContextMenu(CodePaneTab newTab) {
@@ -1497,8 +1471,7 @@ public class DesktopController implements Initializable {
             Tab currentTab = existingTab.get();
             textTabPane.getSelectionModel().select(currentTab);
             return currentTab;
-        }
-        else {
+        } else {
             open(file);
             return textTabPane.getTabs().get(textTabPane.getTabs().size() - 1);
         }
@@ -1647,8 +1620,7 @@ public class DesktopController implements Initializable {
             //debugToolBarController = new DebugToolBarController(mediator, this);
             mainPane.getChildren().add(1, debugToolBarController);
             debugToolBarController.prefWidthProperty().bind(mainPane.widthProperty());
-        }
-        else {
+        } else {
             mainPane.getChildren().remove(1);
             debugToolBarController.clearAllOutlines();
             mediator.getBackupManager().flushBackups();
@@ -1855,8 +1827,7 @@ public class DesktopController implements Initializable {
                     if (inRunMode) {
                         ioConsole.setStyle("-fx-background-color: yellow");
                         ioConsole.requestFocus();
-                    }
-                    else {
+                    } else {
                         ioConsole.setStyle("-fx-background-color: white");
                     }
                 }
@@ -1882,53 +1853,41 @@ public class DesktopController implements Initializable {
                         if (finalType.equals("registerData")) {
                             if (new_value.equals(0)) {
                                 regDataBase = "Dec";
-                            }
-                            else if (new_value.equals(1)) {
+                            } else if (new_value.equals(1)) {
                                 regDataBase = "Bin";
-                            }
-                            else if (new_value.equals(2)) {
+                            } else if (new_value.equals(2)) {
                                 regDataBase = "Hex";
-                            }
-                            else if (new_value.equals(3)) {
+                            } else if (new_value.equals(3)) {
                                 regDataBase = "Unsigned Dec";
-                            }
-                            else {
+                            } else {
                                 regDataBase = "Ascii";
                             }
                             for (RegisterTableController registerTableController
                                     : registerControllers) {
                                 registerTableController.setDataBase(regDataBase);
                             }
-                        }
-                        else if (finalType.equals("ramAddress")) {
+                        } else if (finalType.equals("ramAddress")) {
                             if (new_value.equals(0)) {
                                 ramAddressBase = "Dec";
-                            }
-                            else if (new_value.equals(1)) {
+                            } else if (new_value.equals(1)) {
                                 ramAddressBase = "Bin";
-                            }
-                            else {
+                            } else {
                                 ramAddressBase = "Hex";
                             }
                             for (RamTableController ramTableController
                                     : ramControllers) {
                                 ramTableController.setAddressBase(ramAddressBase);
                             }
-                        }
-                        else {  //type == "ramData"
+                        } else {  //type == "ramData"
                             if (new_value.equals(0)) {
                                 ramDataBase = "Dec";
-                            }
-                            else if (new_value.equals(1)) {
+                            } else if (new_value.equals(1)) {
                                 ramDataBase = "Bin";
-                            }
-                            else if (new_value.equals(2)) {
+                            } else if (new_value.equals(2)) {
                                 ramDataBase = "Hex";
-                            }
-                            else if (new_value.equals(3)) {
+                            } else if (new_value.equals(3)) {
                                 ramDataBase = "Unsigned Dec";
-                            }
-                            else {
+                            } else {
                                 ramDataBase = "Ascii";
                             }
                             for (RamTableController ramTableController
@@ -1988,8 +1947,7 @@ public class DesktopController implements Initializable {
             openModalDialog("Edit Modules",
                     "gui/editmodules/EditModules.fxml", controller);
             controller.selectSection(initialSection);
-        }
-        else {
+        } else {
             openHardwareModulesDialog(0);
         }
     }
@@ -2006,8 +1964,7 @@ public class DesktopController implements Initializable {
             openModalDialog("Options", "gui/options/OptionsFXML.fxml",
                     controller);
             controller.selectTab(initialSection);
-        }
-        else {
+        } else {
             openOptionsDialog(0);
         }
     }
@@ -2161,8 +2118,7 @@ public class DesktopController implements Initializable {
         fileChooser.setTitle(title);
         if (text) {
             fileChooser.setInitialDirectory(new File(currentTextDirectory));
-        }
-        else {
+        } else {
             fileChooser.setInitialDirectory(new File(mediator
                     .getCurrentMachineDirectory()));
         }
@@ -2252,8 +2208,7 @@ public class DesktopController implements Initializable {
                 return true;
             }
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -2344,8 +2299,7 @@ public class DesktopController implements Initializable {
         if (existingTab.isPresent()) {
             textTabPane.getSelectionModel().select(existingTab.get());
             currentTextDirectory = fileToOpen.getParent();
-        }
-        else {
+        } else {
             addTab(content, fileToOpen.getName(), fileToOpen);
         }
     }
@@ -2414,18 +2368,14 @@ public class DesktopController implements Initializable {
             MenuItem menuItem = new MenuItem(filePath);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
-                    Action response = CPUSimConstants.dialog.
-                            owner(stage).
-                            masthead("Save Machine").
-                            message("The machine you are currently "
-                                    + "working on is unsaved.  Would "
-                                    + "you like to save it before "
-                                    + "you open a new machine?").
-                            showConfirm();
-                    if (response == Dialog.ACTION_YES) {
+                    Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                            "The machine you are currently working on is unsaved.  " +
+                                    "Would you like to save it before you open a new machine?");
+
+                    Optional<ButtonType> result = dialog.showAndWait();
+                    if (result.get() == buttonTypeYes) {
                         handleSaveMachine(e);
-                    }
-                    else if (response == Dialog.ACTION_CANCEL) {
+                    } else if (result.get() == buttonTypeCancel) {
                         return;
                     }
                 }
@@ -2502,9 +2452,7 @@ public class DesktopController implements Initializable {
                         message(e.getMessage()).
                         showError();
             }
-        }
-
-        else {
+        } else {
             mediator.parseIntelHexFile(extractTextFromFile(fileToOpen), ram,
                     fileToOpen.getAbsolutePath());
         }
@@ -2551,8 +2499,7 @@ public class DesktopController implements Initializable {
             extensionFilter = new ExtensionFilter(
                     "Machine Instruction Files (.mif)", "*.mif");
             asMIF = true;
-        }
-        else {
+        } else {
             extensionFilter = new ExtensionFilter(
                     "Intel Hex Format (.hex)", "*.hex");
             asMIF = false;
@@ -2595,8 +2542,7 @@ public class DesktopController implements Initializable {
                         showError();
             }
 
-        }
-        else {
+        } else {
             if (fileToSave.getAbsolutePath().lastIndexOf(".hex") !=
                     fileToSave.getAbsolutePath().length() - 4) {
                 fileToSave = new File(fileToSave.getAbsolutePath() + ".hex");
@@ -2739,8 +2685,7 @@ public class DesktopController implements Initializable {
 
             updateRamMenus();
             ramVbox.getChildren().addAll();
-        }
-        else {
+        } else {
             if (!ramVbox.getChildren().contains(noRAMLabel)) {
                 ramVbox.getChildren().add(1, noRAMLabel);
             }
@@ -2849,8 +2794,7 @@ public class DesktopController implements Initializable {
 
             updateRamMenus();
             ramVbox.getChildren().addAll();
-        }
-        else {
+        } else {
             if (!ramVbox.getChildren().contains(noRAMLabel)) {
                 ramVbox.getChildren().add(0, noRAMLabel);
             }
@@ -2882,45 +2826,38 @@ public class DesktopController implements Initializable {
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Running Program").
-                    message("There is a program running. " +
+            Alert dialog = createCustomizedConfirmationDialog("Running Program",
+                    "There is a program running. " +
                             "Closing the application will also quit the program. " +
-                            "Do you want to quit the running program?").
-                    showConfirm();
-            if (response == Dialog.ACTION_CANCEL ||
-                    response == Dialog.ACTION_NO) {
+                            "Do you want to quit the running program?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeNo || result.get() == buttonTypeCancel) {
                 return false;
             }
         }
         if (mediator.isMachineDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on "
-                            + "is unsaved.  Would you like to save it"
-                            + " before you close?").
-                    showConfirm();
-            if (response == Dialog.ACTION_YES) {
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you close?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes) {
                 mediator.saveMachine();
-            }
-            else if (response == Dialog.ACTION_CANCEL) {
+            } else if (result.get() == buttonTypeCancel) {
                 return false;
             }
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Action response = CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Save Text").
-                        message("Would you like to save your work before you "
-                                + "close " + tab.getText().substring(1) + "?").
-                        showConfirm();
-                if (response == Dialog.ACTION_YES) {
+                Alert dialog = createCustomizedConfirmationDialog("Save Text",
+                        "Would you like to save your work before you "
+                                + "close " + tab.getText().substring(1) + "?");
+
+                Optional<ButtonType> result = dialog.showAndWait();
+                if (result.get() == buttonTypeYes) {
                     save(tab);
-                }
-                else if (response == Dialog.ACTION_CANCEL) {
+                } else if (result.get() == buttonTypeCancel) {
                     return false;
                 }
             }
@@ -3069,6 +3006,7 @@ public class DesktopController implements Initializable {
 
     /**
      * returns the register table style string
+     *
      * @return register table style string
      */
     public SimpleStringProperty getRegisterTableStyle() {
@@ -3077,6 +3015,7 @@ public class DesktopController implements Initializable {
 
     /**
      * returns the ram table style string
+     *
      * @return ram table style string
      */
     public SimpleStringProperty getRamTableStyle() {
@@ -3143,8 +3082,7 @@ public class DesktopController implements Initializable {
                                 if (!System.getProperty("os.name").startsWith
                                         ("Windows")) {
                                     ctrl = KeyCodeCombination.ModifierValue.DOWN;
-                                }
-                                else {
+                                } else {
                                     shortcut = KeyCodeCombination.ModifierValue.DOWN;
                                 }
                                 break;
@@ -3413,8 +3351,7 @@ public class DesktopController implements Initializable {
 
                 if (newVal) { // show line numbers
                     lFactory.setFormat(digits -> "%" + digits + "d");
-                }
-                else { // hide line numbers
+                } else { // hide line numbers
                     lFactory.setFormat(digits -> "");
                 }
             });
@@ -3429,6 +3366,42 @@ public class DesktopController implements Initializable {
                 codeArea.setWrapText(newVal);
             });
         }
+    }
+
+    /**
+     * Creates confirmation dialog.
+     *
+     * @param header  head text of the confirmation dialog
+     * @param content content of the confirmation dialog
+     * @return an dialog object
+     */
+    public Alert createConfirmationDialog(String header, String content) {
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.initOwner(stage);
+        dialog.setTitle("CPU Sim");
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+
+        return dialog;
+    }
+
+    /**
+     * Creates customized confirmation dialog for saving, closing, new actions.
+     *
+     * @param header  head text of the confirmation dialog
+     * @param content content of the confirmation dialog
+     * @return an dialog object
+     */
+    public Alert createCustomizedConfirmationDialog(String header, String content) {
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.initOwner(stage);
+        dialog.setTitle("CPU Sim");
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+
+        dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
+
+        return dialog;
     }
 
 }
