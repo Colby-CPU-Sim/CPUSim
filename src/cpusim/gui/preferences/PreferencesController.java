@@ -343,7 +343,6 @@ public class PreferencesController implements Initializable {
         else {
             saveOtherTab();
         }
-        desktopController.updateStyleOfTabs();
         desktopController.updateStyleOfTables();
         desktopController.refreshTopTabPane();
     }
@@ -359,7 +358,6 @@ public class PreferencesController implements Initializable {
         saveKeyBindingsTab();
         saveOtherTab();
 
-        desktopController.updateStyleOfTabs();
         desktopController.updateStyleOfTables();
         desktopController.refreshTopTabPane();
 
@@ -500,8 +498,6 @@ public class PreferencesController implements Initializable {
                 updateItalic(literalsItalic.isSelected()).
                 updateTextColor(toRGBCode(literalsColor.getValue()));
         codePaneController.setStyleInfo("literal", newStyle);
-
-        int x = 3;
     }
 
     /**

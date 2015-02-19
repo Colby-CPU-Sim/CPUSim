@@ -1367,7 +1367,6 @@ public class DesktopController implements Initializable {
         InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
         setFontAndBackground(codeArea);
         String text = codeArea.getText();
-        int from = 0;
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
         codeArea.setStyleSpans(0,styleSpans);
     }
@@ -1422,8 +1421,9 @@ public class DesktopController implements Initializable {
     private void setFontAndBackground(InlineStyleTextArea<StyleInfo> codeArea) {
         codeArea.setBackground(new Background(new BackgroundFill(Color.web(
                 assmFontData.background), null, null)));
+        String optQuote = assmFontData.font.contains(" ") ? "\"" : "";
         codeArea.setStyle("-fx-font-size:" + assmFontData.fontSize + "; "
-                + "-fx-font-family: \"" + assmFontData.font + "\"");
+                + "-fx-font-family:" + optQuote + assmFontData.font + optQuote);
         // the next line should do the same as the preceding line, but it doesn't
         // seem to work
         //codeArea.setFont(Font.font(assmFontData.font, Integer.parseInt(assmFontData
@@ -3034,26 +3034,6 @@ public class DesktopController implements Initializable {
         otherSettings.autoSave = prefs.getBoolean("autoSave", false);
         otherSettings.showLineNumbers.set(prefs.getBoolean("showLineNumbers", true));
         otherSettings.clearConsoleOnRun = prefs.getBoolean("clearConsoleOnRun", true);
-    }
-
-    /**
-     * sets the style of the text in the text area;
-     * TODO:  Fix updateStyleOfTabs for CodeAreas
-     */
-    public void updateStyleOfTabs() {
-//        String boldString = textFontData.bold ? "bold" : "normal";
-//        String italicString = textFontData.italic ? "italic" : "normal";
-//        for (Tab tab : tabFiles.keySet()) {
-//            EditorPaneController controller = tabEditorControllers.get(tab);
-//            TextArea ta = controller.getTextArea();
-//            ta.setStyle("-fx-font-size:" + textFontData.fontSize + "; "
-//                    + "-fx-font-family:" + textFontData.font + "; -fx-font-style:" +
-//                    italicString + "; "
-//                    + "-fx-font-weight:" + boldString + "; -fx-background-color:" +
-//                    textFontData.background +
-//                    "; -fx-text-fill:" + textFontData.foreground + ";");
-//            controller.setRowHeights(Integer.parseInt(textFontData.fontSize));
-//        }
     }
 
     /**

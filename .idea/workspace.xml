@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
+    <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="Clean up Preferences dialog further.">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
@@ -35,42 +32,32 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DesktopController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="DesktopController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="25511" max-vertical-offset="64790">
-              <caret line="1371" column="0" selection-start-line="1371" selection-start-column="0" selection-end-line="1371" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.60468143" vertical-offset="57048" max-vertical-offset="64410">
+              <caret line="3073" column="39" selection-start-line="3073" selection-start-column="39" selection-end-line="3073" selection-end-column="39" />
               <folding>
-                <element signature="e#0#121964#0" expanded="true" />
+                <element signature="e#0#121034#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#54833#54834#0" expanded="true" />
-                <element signature="e#54873#54874#0" expanded="true" />
-                <element signature="e#66928#66929#0" expanded="true" />
-                <element signature="e#66969#66970#0" expanded="true" />
-                <element signature="e#86887#86895#0" expanded="true" />
-                <element signature="e#108264#108265#0" expanded="true" />
-                <element signature="e#108305#108306#0" expanded="true" />
-                <element signature="e#108455#108456#0" expanded="true" />
-                <element signature="e#108491#108492#0" expanded="true" />
-                <element signature="e#108663#108664#0" expanded="true" />
-                <element signature="e#108698#108699#0" expanded="true" />
-                <element signature="e#108873#108874#0" expanded="true" />
-                <element signature="e#108917#108918#0" expanded="true" />
-                <element signature="e#119708#119709#0" expanded="true" />
-                <element signature="e#119758#119759#0" expanded="true" />
-                <element signature="e#119803#119804#0" expanded="true" />
-                <element signature="e#119842#119843#0" expanded="true" />
+                <element signature="e#54894#54895#0" expanded="true" />
+                <element signature="e#54934#54935#0" expanded="true" />
+                <element signature="e#66989#66990#0" expanded="true" />
+                <element signature="e#67030#67031#0" expanded="true" />
+                <element signature="e#86948#86956#0" expanded="true" />
+                <element signature="e#107334#107335#0" expanded="true" />
+                <element signature="e#107375#107376#0" expanded="true" />
+                <element signature="e#107525#107526#0" expanded="true" />
+                <element signature="e#107561#107562#0" expanded="true" />
+                <element signature="e#107733#107734#0" expanded="true" />
+                <element signature="e#107768#107769#0" expanded="true" />
+                <element signature="e#107943#107944#0" expanded="true" />
+                <element signature="e#107987#107988#0" expanded="true" />
+                <element signature="e#118778#118779#0" expanded="true" />
+                <element signature="e#118828#118829#0" expanded="true" />
+                <element signature="e#118873#118874#0" expanded="true" />
+                <element signature="e#118912#118913#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="StyledTextArea.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/StyledTextArea.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.3043478" vertical-offset="10687" max-vertical-offset="13661">
-              <caret line="629" column="0" selection-start-line="629" selection-start-column="0" selection-end-line="629" selection-end-column="0" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -78,8 +65,18 @@
       <file leaf-file-name="Preferences.fxml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="71" max-vertical-offset="14003">
-              <caret line="23" column="37" selection-start-line="23" selection-start-column="37" selection-end-line="23" selection-end-column="37" />
+            <state vertical-scroll-proportion="-11.407408" vertical-offset="2637" max-vertical-offset="13908">
+              <caret line="155" column="27" selection-start-line="155" selection-start-column="27" selection-end-line="155" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JavaKeywords.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1431" max-vertical-offset="3439">
+              <caret line="100" column="15" selection-start-line="100" selection-start-column="15" selection-end-line="100" selection-end-column="15" />
               <folding />
             </state>
           </provider>
@@ -89,7 +86,7 @@
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1900">
-              <caret line="44" column="35" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="35" />
+              <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -100,13 +97,13 @@
       <file leaf-file-name="PreferencesController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6359" max-vertical-offset="15390">
-              <caret line="347" column="0" selection-start-line="347" selection-start-column="0" selection-end-line="347" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="12478" max-vertical-offset="15314">
+              <caret line="360" column="0" selection-start-line="360" selection-start-column="0" selection-end-line="360" selection-end-column="0" />
               <folding>
-                <element signature="e#0#32127#0" expanded="true" />
+                <element signature="e#0#32013#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#14394#14395#0" expanded="true" />
-                <element signature="e#14455#14456#0" expanded="true" />
+                <element signature="e#14300#14301#0" expanded="true" />
+                <element signature="e#14361#14362#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -115,13 +112,13 @@
       <file leaf-file-name="CodePaneController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="196" max-vertical-offset="2945">
-              <caret line="32" column="33" selection-start-line="32" selection-start-column="33" selection-end-line="32" selection-end-column="33" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1881" max-vertical-offset="2945">
+              <caret line="119" column="86" selection-start-line="119" selection-start-column="86" selection-end-line="119" selection-end-column="86" />
               <folding>
-                <element signature="e#6912#6913#0" expanded="true" />
-                <element signature="e#6952#6953#0" expanded="true" />
-                <element signature="e#7274#7275#0" expanded="true" />
-                <element signature="e#7314#7315#0" expanded="true" />
+                <element signature="e#6981#6982#0" expanded="true" />
+                <element signature="e#7021#7022#0" expanded="true" />
+                <element signature="e#7343#7344#0" expanded="true" />
+                <element signature="e#7383#7384#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -135,7 +132,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/end.html" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/micros/decode.html" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/hardware/conditionBit.html" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/specifications/assemblyLanguage/globalInstrs.html" />
@@ -180,12 +176,13 @@
         <option value="$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css" />
         <option value="$PROJECT_DIR$/src/cpusim/util/HighlightManager.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
-        <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" />
-        <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
+        <option value="$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
       </list>
     </option>
   </component>
@@ -300,6 +297,36 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="reactfx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="CPUSim4.0b49" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="reactfx" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="util" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -740,7 +767,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="81575000" />
+      <workItem from="1423928233792" duration="89652000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -802,11 +829,17 @@
       <option name="project" value="LOCAL" />
       <updated>1424257760456</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Fix preferences dialog for editor pane (not yet for registers or rams).">
+      <created>1424303418320</created>
+      <option name="number" value="00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1424303418320</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109142000" />
+    <option name="totallyTimeSpent" value="117219000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
@@ -857,7 +890,8 @@
     <MESSAGE value="Add line wrap preference to the text areas." />
     <MESSAGE value="Add code text area styles to the Preferences dialog." />
     <MESSAGE value="remove -fx-disabled-opacity from all CSS files" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove -fx-disabled-opacity from all CSS files" />
+    <MESSAGE value="Fix preferences dialog for editor pane (not yet for registers or rams)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix preferences dialog for editor pane (not yet for registers or rams)." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -868,14 +902,8 @@
           <properties />
           <option name="timeStamp" value="19" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java</url>
-          <line>503</line>
-          <properties />
-          <option name="timeStamp" value="31" />
-        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="38" />
+      <option name="time" value="42" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -888,43 +916,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/test/test1.cpu">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="9215">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/W2-0.a">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1045">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/Wombat2.cpu">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8911">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/xml/HtmlEncoder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="912">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="n#!!doc" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/xml/Lax.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7353">
@@ -1257,22 +1248,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6" max-vertical-offset="3591">
-          <caret line="110" column="29" selection-start-line="110" selection-start-column="29" selection-end-line="110" selection-end-column="29" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/skin/StyledTextAreaVisual.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1878" max-vertical-offset="8759">
-          <caret line="165" column="0" selection-start-line="165" selection-start-column="0" selection-end-line="165" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/util/BackupManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="776" max-vertical-offset="6422">
@@ -1289,83 +1264,131 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/StyledTextArea.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="71" max-vertical-offset="14003">
-          <caret line="23" column="37" selection-start-line="23" selection-start-column="37" selection-end-line="23" selection-end-column="37" />
+        <state vertical-scroll-proportion="2.4424553" vertical-offset="9243" max-vertical-offset="13661">
+          <caret line="641" column="7" selection-start-line="641" selection-start-column="7" selection-end-line="641" selection-end-column="7" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java">
+    <entry file="jar://$PROJECT_DIR$/jarfiles/richtextfx-fat-0.6.jar!/org/reactfx/util/Lists.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="196" max-vertical-offset="2945">
-          <caret line="32" column="33" selection-start-line="32" selection-start-column="33" selection-end-line="32" selection-end-column="33" />
-          <folding>
-            <element signature="e#6912#6913#0" expanded="true" />
-            <element signature="e#6952#6953#0" expanded="true" />
-            <element signature="e#7274#7275#0" expanded="true" />
-            <element signature="e#7314#7315#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="2.8983052" vertical-offset="0" max-vertical-offset="3591">
+          <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/skin/StyledTextAreaVisual.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.19493908" vertical-offset="3763" max-vertical-offset="8759">
+          <caret line="267" column="0" selection-start-line="267" selection-start-column="0" selection-end-line="267" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/reactfx/util/Lists.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4541">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/java-keywords.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="703">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-11.407408" vertical-offset="2637" max-vertical-offset="13908">
+          <caret line="155" column="27" selection-start-line="155" selection-start-column="27" selection-end-line="155" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1431" max-vertical-offset="3439">
+          <caret line="100" column="15" selection-start-line="100" selection-start-column="15" selection-end-line="100" selection-end-column="15" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1900">
-          <caret line="44" column="35" selection-start-line="44" selection-start-column="31" selection-end-line="44" selection-end-column="35" />
+          <caret line="41" column="0" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1881" max-vertical-offset="2945">
+          <caret line="119" column="86" selection-start-line="119" selection-start-column="86" selection-end-line="119" selection-end-column="86" />
+          <folding>
+            <element signature="e#6981#6982#0" expanded="true" />
+            <element signature="e#7021#7022#0" expanded="true" />
+            <element signature="e#7343#7344#0" expanded="true" />
+            <element signature="e#7383#7384#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="966" max-vertical-offset="3591">
+          <caret line="85" column="8" selection-start-line="85" selection-start-column="8" selection-end-line="85" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6359" max-vertical-offset="15390">
-          <caret line="347" column="0" selection-start-line="347" selection-start-column="0" selection-end-line="347" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="12478" max-vertical-offset="15314">
+          <caret line="360" column="0" selection-start-line="360" selection-start-column="0" selection-end-line="360" selection-end-column="0" />
           <folding>
-            <element signature="e#0#32127#0" expanded="true" />
+            <element signature="e#0#32013#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#14394#14395#0" expanded="true" />
-            <element signature="e#14455#14456#0" expanded="true" />
+            <element signature="e#14300#14301#0" expanded="true" />
+            <element signature="e#14361#14362#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="25511" max-vertical-offset="64790">
-          <caret line="1371" column="0" selection-start-line="1371" selection-start-column="0" selection-end-line="1371" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.60468143" vertical-offset="57048" max-vertical-offset="64410">
+          <caret line="3073" column="39" selection-start-line="3073" selection-start-column="39" selection-end-line="3073" selection-end-column="39" />
           <folding>
-            <element signature="e#0#121964#0" expanded="true" />
+            <element signature="e#0#121034#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#54833#54834#0" expanded="true" />
-            <element signature="e#54873#54874#0" expanded="true" />
-            <element signature="e#66928#66929#0" expanded="true" />
-            <element signature="e#66969#66970#0" expanded="true" />
-            <element signature="e#86887#86895#0" expanded="true" />
-            <element signature="e#108264#108265#0" expanded="true" />
-            <element signature="e#108305#108306#0" expanded="true" />
-            <element signature="e#108455#108456#0" expanded="true" />
-            <element signature="e#108491#108492#0" expanded="true" />
-            <element signature="e#108663#108664#0" expanded="true" />
-            <element signature="e#108698#108699#0" expanded="true" />
-            <element signature="e#108873#108874#0" expanded="true" />
-            <element signature="e#108917#108918#0" expanded="true" />
-            <element signature="e#119708#119709#0" expanded="true" />
-            <element signature="e#119758#119759#0" expanded="true" />
-            <element signature="e#119803#119804#0" expanded="true" />
-            <element signature="e#119842#119843#0" expanded="true" />
+            <element signature="e#54894#54895#0" expanded="true" />
+            <element signature="e#54934#54935#0" expanded="true" />
+            <element signature="e#66989#66990#0" expanded="true" />
+            <element signature="e#67030#67031#0" expanded="true" />
+            <element signature="e#86948#86956#0" expanded="true" />
+            <element signature="e#107334#107335#0" expanded="true" />
+            <element signature="e#107375#107376#0" expanded="true" />
+            <element signature="e#107525#107526#0" expanded="true" />
+            <element signature="e#107561#107562#0" expanded="true" />
+            <element signature="e#107733#107734#0" expanded="true" />
+            <element signature="e#107768#107769#0" expanded="true" />
+            <element signature="e#107943#107944#0" expanded="true" />
+            <element signature="e#107987#107988#0" expanded="true" />
+            <element signature="e#118778#118779#0" expanded="true" />
+            <element signature="e#118828#118829#0" expanded="true" />
+            <element signature="e#118873#118874#0" expanded="true" />
+            <element signature="e#118912#118913#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/StyledTextArea.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3043478" vertical-offset="10687" max-vertical-offset="13661">
-          <caret line="629" column="0" selection-start-line="629" selection-start-column="0" selection-end-line="629" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>

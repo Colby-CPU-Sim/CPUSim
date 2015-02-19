@@ -117,7 +117,7 @@ public class CodePaneController
     public StyleSpans<StyleInfo> computeHighlighting(String text) {
         Pattern codePattern = computePatternForMachine();
         Matcher matcher = codePattern.matcher(text);
-        int lastKwEnd = 0;
+        int lastGroupEnd = 0; // index of the last character in the group to be styled
         StyleSpansBuilder<StyleInfo> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
             StyleInfo styleInfo =
@@ -130,11 +130,11 @@ public class CodePaneController
                 matcher.group("COMMENT") != null ? styles.get("comment") :
                 null; /* never happens */
             assert styleInfo != null;
-            spansBuilder.add(styles.get("default"), matcher.start() - lastKwEnd);
+            spansBuilder.add(styles.get("default"), matcher.start() - lastGroupEnd);
             spansBuilder.add(styleInfo, matcher.end() - matcher.start());
-            lastKwEnd = matcher.end();
+            lastGroupEnd = matcher.end();
         }
-        spansBuilder.add(styles.get("default"), text.length() - lastKwEnd);
+        spansBuilder.add(styles.get("default"), text.length() - lastGroupEnd);
         return spansBuilder.create();
     }
 
