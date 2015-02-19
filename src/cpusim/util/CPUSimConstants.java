@@ -46,11 +46,6 @@ public interface CPUSimConstants {
     
     // standard baseline for a dialog (lightweight dialog with 'CPU Sim' as the title)
     public static final Dialogs dialog = Dialogs.create().title("CPU Sim").lightweight();
-    
-    public static final Dialogs errorDialog = dialog.masthead("Error");
-    
-    public static final Dialogs confirmDialog = dialog.masthead("Confirm");
-    
 
     //is this a Macintosh?  This constant is used to set up the menus
     //differently for Macs and for other OS's.

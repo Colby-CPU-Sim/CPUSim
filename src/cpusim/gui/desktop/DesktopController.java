@@ -112,8 +112,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
+
 import org.fxmisc.richtext.*;
 
 import java.io.*;
@@ -231,6 +230,10 @@ public class DesktopController implements Initializable {
     private FindReplaceController findReplaceController;
 
     private PrinterJob printController;
+
+    private final ButtonType buttonTypeYes = new ButtonType("Yes");
+    private final ButtonType buttonTypeNo = new ButtonType("No");
+    private final ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
@@ -550,20 +553,14 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you open a new machine?");
 
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on is unsaved.  " +
-                            "Would you "
-                            + "like to save it before you open a new machine?").
-                    showConfirm();
-
-            if (response == Dialog.ACTION_YES) {
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes){
                 handleSaveMachine(event);
-            }
-            else if (response == Dialog.ACTION_CANCEL || response == Dialog
-                    .ACTION_CLOSE) {
+            } else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -587,18 +584,15 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on is unsaved.  " +
-                            "Would you "
-                            + "like to save it before you open a new machine?").
-                    showConfirm();
-            if (response == Dialog.ACTION_YES) {
+
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you open a new machine?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes){
                 handleSaveMachine(event);
-            }
-            else if (response == Dialog.ACTION_CANCEL || response == Dialog
-                    .ACTION_CLOSE) {
+            } else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -1284,24 +1278,20 @@ public class DesktopController implements Initializable {
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save File").
-                    message("Would you like to save your work before you close this " +
-                            "tab?").
-                    showConfirm();
-            System.out.println(response);
-            if (response == Dialog.ACTION_YES) {
+            Alert dialog = createCustomizedConfirmationDialog("Save File",
+                    "Would you like to save your work before you close this " +
+                            "tab?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes) {
                 if (save(tab) && close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            }
-            else if (response == Dialog.ACTION_NO) {
+            } else if (result.get() == buttonTypeNo) {
                 if (close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            }
-            else {
+            } else {
                 if (!close) {
                     textTabPane.getTabs().add(tab);
                     textTabPane.getSelectionModel().selectLast();
@@ -1338,14 +1328,11 @@ public class DesktopController implements Initializable {
             }
         }
         else {  //there is no file or there is a file but the tab is dirty.
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    actions(Dialog.ACTION_CANCEL, Dialog.ACTION_OK).
-                    masthead("Save File?").
-                    message("Current Tab is not saved. It needs to be saved"
-                            + " before assembly. Save and continue?").
-                    showConfirm();
-            if (response == Dialog.ACTION_OK) {
+            Alert dialog = createConfirmationDialog("Save File?",
+                    "Current Tab is not saved. It needs to be saved"
+                            + " before assembly. Save and continue?");
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == ButtonType.OK){
                 boolean savedSuccessfully = save(currTab);
                 if (savedSuccessfully) {
                     return currTab.getFile();
@@ -2413,21 +2400,15 @@ public class DesktopController implements Initializable {
             final File finalFile = new File(filePath);
             MenuItem menuItem = new MenuItem(filePath);
             menuItem.setOnAction(e -> {
-                if (mediator.isMachineDirty()) {
-                    Action response = CPUSimConstants.dialog.
-                            owner(stage).
-                            masthead("Save Machine").
-                            message("The machine you are currently "
-                                    + "working on is unsaved.  Would "
-                                    + "you like to save it before "
-                                    + "you open a new machine?").
-                            showConfirm();
-                    if (response == Dialog.ACTION_YES) {
-                        handleSaveMachine(e);
-                    }
-                    else if (response == Dialog.ACTION_CANCEL) {
-                        return;
-                    }
+                Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                        "The machine you are currently working on is unsaved.  " +
+                                "Would you like to save it before you open a new machine?");
+
+                Optional<ButtonType> result = dialog.showAndWait();
+                if (result.get() == buttonTypeYes){
+                    handleSaveMachine(e);
+                } else if (result.get() == buttonTypeCancel) {
+                    return;
                 }
                 mediator.openMachine(finalFile);
             });
@@ -2882,45 +2863,38 @@ public class DesktopController implements Initializable {
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Running Program").
-                    message("There is a program running. " +
+            Alert dialog = createCustomizedConfirmationDialog("Running Program",
+                    "There is a program running. " +
                             "Closing the application will also quit the program. " +
-                            "Do you want to quit the running program?").
-                    showConfirm();
-            if (response == Dialog.ACTION_CANCEL ||
-                    response == Dialog.ACTION_NO) {
+                            "Do you want to quit the running program?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeNo || result.get() == buttonTypeCancel){
                 return false;
             }
         }
         if (mediator.isMachineDirty()) {
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Save Machine").
-                    message("The machine you are currently working on "
-                            + "is unsaved.  Would you like to save it"
-                            + " before you close?").
-                    showConfirm();
-            if (response == Dialog.ACTION_YES) {
+            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    "The machine you are currently working on is unsaved.  " +
+                            "Would you like to save it before you close?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == buttonTypeYes){
                 mediator.saveMachine();
-            }
-            else if (response == Dialog.ACTION_CANCEL) {
+            } else if (result.get() == buttonTypeCancel) {
                 return false;
             }
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Action response = CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Save Text").
-                        message("Would you like to save your work before you "
-                                + "close " + tab.getText().substring(1) + "?").
-                        showConfirm();
-                if (response == Dialog.ACTION_YES) {
+                Alert dialog = createCustomizedConfirmationDialog("Save Text",
+                        "Would you like to save your work before you "
+                                + "close " + tab.getText().substring(1) + "?");
+
+                Optional<ButtonType> result = dialog.showAndWait();
+                if (result.get() == buttonTypeYes){
                     save(tab);
-                }
-                else if (response == Dialog.ACTION_CANCEL) {
+                } else if (result.get() == buttonTypeCancel) {
                     return false;
                 }
             }
@@ -3449,6 +3423,42 @@ public class DesktopController implements Initializable {
                 codeArea.setWrapText(newVal);
             });
         }
+    }
+
+    /**
+     * Creates confirmation dialog.
+     *
+     * @param header head text of the confirmation dialog
+     * @param content content of the confirmation dialog
+     * @return an dialog object
+     */
+    public Alert createConfirmationDialog(String header, String content) {
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.initOwner(stage);
+        dialog.setTitle("CPU Sim");
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+
+        return dialog;
+    }
+
+    /**
+     * Creates customized confirmation dialog for saving, closing, new actions.
+     *
+     * @param header head text of the confirmation dialog
+     * @param content content of the confirmation dialog
+     * @return an dialog object
+     */
+    public Alert createCustomizedConfirmationDialog(String header, String content) {
+        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+        dialog.initOwner(stage);
+        dialog.setTitle("CPU Sim");
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+
+        dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
+
+        return dialog;
     }
 
 }
