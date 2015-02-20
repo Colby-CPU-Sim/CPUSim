@@ -90,7 +90,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -108,8 +107,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -184,8 +181,6 @@ public class DesktopController implements Initializable {
     static final String NEWLINE = "\n";
 
     private String currentTextDirectory;
-    private SimpleStringProperty registerTableStyle;
-    private SimpleStringProperty ramTableStyle;
 
     private FontData assmFontData;
     private FontData registerTableFontData;
@@ -316,9 +311,6 @@ public class DesktopController implements Initializable {
 
         //initialize the html writer
         htmlWriter = new MachineHTMLWriter();
-
-        registerTableStyle = new SimpleStringProperty("");
-        ramTableStyle = new SimpleStringProperty("");
 
         //add listener for the stage for closing
         stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -1339,7 +1331,7 @@ public class DesktopController implements Initializable {
             return;
         }
         InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
-        setFontAndBackground(codeArea);
+        assmFontData.setFontAndBackground(codeArea);
         String text = codeArea.getText();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
         codeArea.setStyleSpans(0, styleSpans);
@@ -1360,7 +1352,7 @@ public class DesktopController implements Initializable {
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
         codeArea.setWrapText(otherSettings.lineWrap.get());
-        setFontAndBackground(codeArea);
+        assmFontData.setFontAndBackground(codeArea);
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
                         (digits -> "")));
@@ -1389,18 +1381,6 @@ public class DesktopController implements Initializable {
 
         textTabPane.getTabs().add(newTab);
         textTabPane.getSelectionModel().selectLast();
-    }
-
-    private void setFontAndBackground(InlineStyleTextArea<StyleInfo> codeArea) {
-        codeArea.setBackground(new Background(new BackgroundFill(Color.web(
-                assmFontData.background), null, null)));
-        String optQuote = assmFontData.font.contains(" ") ? "\"" : "";
-        codeArea.setStyle("-fx-font-size:" + assmFontData.fontSize + "; "
-                + "-fx-font-family:" + optQuote + assmFontData.font + optQuote);
-        // the next line should do the same as the preceding line, but it doesn't
-        // seem to work
-        //codeArea.setFont(Font.font(assmFontData.font, Integer.parseInt(assmFontData
-        //        .fontSize)));
     }
 
     /**
@@ -2977,17 +2957,11 @@ public class DesktopController implements Initializable {
      * sets the style of the text in the tables area;
      */
     public void updateStyleOfTables() {
-        registerTableStyle.set("-fx-font-size:" + registerTableFontData.fontSize + "; "
-                + "-fx-font-family:\"" + registerTableFontData.font + "\"; "
-                + "-fx-background-color:" + registerTableFontData.background + ";");
-        ramTableStyle.set("-fx-font-size:" + ramTableFontData.fontSize + "; "
-                + "-fx-font-family:\"" + ramTableFontData.font + "\";"
-                + "-fx-background-color:" + ramTableFontData.background + ";");
-
         //  WHAT IS THIS CODE FOR?????
-        if (mainPane.getStyleClass().size() > 1) {
-            mainPane.getStyleClass().remove(1);
-        }
+        //  I COULDN'T TELL SO I COMMENTED IT OUT.
+//        if (mainPane.getStyleClass().size() > 1) {
+//            mainPane.getStyleClass().remove(1);
+//        }
 
         // old code from when background was a choicebox instead of colorpicker
 //        if (!backgroundSetting.keySet().contains(registerTableFontData.background)) {
@@ -2997,29 +2971,11 @@ public class DesktopController implements Initializable {
 //        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
 
         for (RegisterTableController rtc : registerControllers) {
-            rtc.setColor(registerTableStyle.get());
+            rtc.updateTable();
         }
         for (RamTableController rtc : ramControllers) {
-            rtc.setColor(ramTableStyle.get());
+            rtc.updateTable();
         }
-    }
-
-    /**
-     * returns the register table style string
-     *
-     * @return register table style string
-     */
-    public SimpleStringProperty getRegisterTableStyle() {
-        return registerTableStyle;
-    }
-
-    /**
-     * returns the ram table style string
-     *
-     * @return ram table style string
-     */
-    public SimpleStringProperty getRamTableStyle() {
-        return ramTableStyle;
     }
 
     /**
@@ -3308,23 +3264,6 @@ public class DesktopController implements Initializable {
 
     public FontData getRamTableFontData() {
         return ramTableFontData;
-    }
-
-    /**
-     * Just a class to hold all the data for the font
-     * so that it can be passed around different object
-     * and retain proper modifications
-     */
-    public class FontData {
-        public String font;
-        public String fontSize;
-        public String background;
-
-        public FontData() {
-            font = "Courier New";
-            fontSize = "12";
-            background = "#fff";
-        }
     }
 
     /**

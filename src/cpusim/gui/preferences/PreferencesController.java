@@ -22,6 +22,7 @@ package cpusim.gui.preferences;
 
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
+import cpusim.gui.desktop.FontData;
 import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.help.HelpController;
@@ -235,11 +236,11 @@ public class PreferencesController implements Initializable {
      */
     private void initializeFontTab() {
         // initialize the font family, font size, and background color for all panes
-        DesktopController.FontData assmFontData =
+        FontData assmFontData =
                 desktopController.getAssemblyPaneFontData();
-        DesktopController.FontData registerTableFontData =
+        FontData registerTableFontData =
                 desktopController.getRegisterTableFontData();
-        DesktopController.FontData ramTableFontData =
+        FontData ramTableFontData =
                 desktopController.getRamTableFontData();
 
         assmFont.setValue(assmFontData.font);
@@ -365,11 +366,11 @@ public class PreferencesController implements Initializable {
     }
 
     private void saveFontTab() {
-        DesktopController.FontData assmFontData =
+        FontData assmFontData =
                 desktopController.getAssemblyPaneFontData();
-        DesktopController.FontData registerTableFontData =
+        FontData registerTableFontData =
                 desktopController.getRegisterTableFontData();
-        DesktopController.FontData ramTableFontData =
+        FontData ramTableFontData =
                 desktopController.getRamTableFontData();
 
         assmFontData.font = assmFont.getValue();
@@ -420,9 +421,11 @@ public class PreferencesController implements Initializable {
         //get a handle to the stage.
         Stage stage = (Stage) closeButton.getScene().getWindow();
 
+        // WHY WERE THE FOLLOWING TWO LINES OF CODE INCLUDED?
+        // I COULDN'T SEE WHY SO I COMMENTED THEM OUT.
         //reset values for the Fonts tab and Other tab
-        initializeFontTab();
-        initializeOtherTab();
+//        initializeFontTab();
+//        initializeOtherTab();
 
         //close window.
         stage.close();

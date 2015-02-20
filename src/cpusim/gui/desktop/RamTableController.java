@@ -48,9 +48,7 @@ public class RamTableController implements Initializable {
     
     Base valBase;
     Base addrBase;
-    
-    String color;
-        
+
     int breakRow;
 
     private DesktopController desktop;
@@ -80,9 +78,9 @@ public class RamTableController implements Initializable {
         
         valBase = new Base("Dec");
         addrBase = new Base("Dec");
-        
-        color = desktop.getRamTableStyle().get();
-        
+
+        FontData styleInfo = desktop.getRamTableFontData();
+
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         
         table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<RAMLocation>(){
@@ -99,7 +97,7 @@ public class RamTableController implements Initializable {
                     public TableCell<RAMLocation, Long> call(
                             TableColumn<RAMLocation, Long> setStringTableColumn) {
                     	EditingMultiBaseStyleLongCell<RAMLocation> a =
-                    			new EditingMultiBaseStyleLongCell<>(valBase, color);
+                    			new EditingMultiBaseStyleLongCell<>(valBase, styleInfo);
                         // we set the tooltip in the cell's setToolTipsAndCellSize() method
                     	//a.setTooltip(new Tooltip());
                     	//a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
@@ -113,7 +111,7 @@ public class RamTableController implements Initializable {
                     public TableCell<RAMLocation, Long> call(
                             TableColumn<RAMLocation, Long> setStringTableColumn) {
                     	EditingMultiBaseStyleLongCell<RAMLocation> a =
-                                new EditingMultiBaseStyleLongCell<RAMLocation>(addrBase, color);
+                                new EditingMultiBaseStyleLongCell<RAMLocation>(addrBase, styleInfo);
                     	// we dont' need tooltips for the addresses
                     	// a.setTooltip(new Tooltip());
                     	//a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
@@ -225,15 +223,6 @@ public class RamTableController implements Initializable {
     public void setDataBase(String newBase) {
         valBase.setBase(newBase);
         
-        updateTable();
-    }
-    
-    /**
-     * Sets the colors for the table
-     * @param color style string that dictates the colors to be used at the table
-     */
-    public void setColor(String color){
-        this.color = color;
         updateTable();
     }
 

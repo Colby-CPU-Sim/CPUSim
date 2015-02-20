@@ -5,6 +5,7 @@
 
 package cpusim.gui.util;
 
+import cpusim.gui.desktop.FontData;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -21,15 +22,10 @@ public class EditingStrStyleCell<T> extends TableCell<T, String> {
     protected TextField textField;
     protected int cellSize;
     protected boolean valid;
-    protected String errorMessage;
-    protected String color;
+    protected FontData styleInfo;
 
-    public EditingStrStyleCell(String color) {
-        this.color = color;
-    }
-
-    public EditingStrStyleCell() {
-
+    public EditingStrStyleCell(FontData style) {
+        this.styleInfo = style;
     }
 
     /**
@@ -55,7 +51,7 @@ public class EditingStrStyleCell<T> extends TableCell<T, String> {
     public void cancelEdit() {
         super.cancelEdit();
 
-        setText((String) getItem());
+        setText(getItem());
         setGraphic(null);
     }
 
@@ -68,7 +64,7 @@ public class EditingStrStyleCell<T> extends TableCell<T, String> {
     public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
 
-        setStyle(color);
+        styleInfo.setFontAndBackground(this);
         
         if (empty) {
             setText(null);
@@ -120,6 +116,6 @@ public class EditingStrStyleCell<T> extends TableCell<T, String> {
      * @return a string value of the item in the table cell
      */
     protected String getString() {
-        return getItem() == null ? "" : getItem().toString();
+        return getItem() == null ? "" : getItem();
     }
 }

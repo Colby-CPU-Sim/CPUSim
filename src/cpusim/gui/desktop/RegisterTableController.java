@@ -7,11 +7,7 @@ package cpusim.gui.desktop;
 
 import cpusim.gui.util.*;
 import cpusim.module.Register;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -59,7 +55,6 @@ public class RegisterTableController implements Initializable {
     private DesktopController desktop;
     String title;
     Base base;
-    String color;
 
     public RegisterTableController(DesktopController d, ObservableList<Register> regs, String t) {
     	desktop = d;
@@ -83,8 +78,8 @@ public class RegisterTableController implements Initializable {
         AnchorPane.setBottomAnchor(titledPane, 0.0);
         
         base = new Base("Dec");
-        color = desktop.getRegisterTableStyle().get();
-        
+        FontData styleInfo = desktop.getRegisterTableFontData();
+
         table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
             updateTable();
         });
@@ -92,7 +87,7 @@ public class RegisterTableController implements Initializable {
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellMultiBaseLongFactory =
                 setStringTableColumn -> {
                     final EditingMultiBaseStyleLongCell<Register> a =
-                            new EditingMultiBaseStyleLongCell<>(base, color);
+                            new EditingMultiBaseStyleLongCell<>(base, styleInfo);
                     // Tooltip
                     a.setTooltip(new Tooltip());
                     a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
@@ -101,13 +96,13 @@ public class RegisterTableController implements Initializable {
         
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStringFactory =
                 setStringTableColumn -> {
-                    final EditingStrStyleCell<Register> a = new EditingStrStyleCell<>(color);
+                    final EditingStrStyleCell<Register> a = new EditingStrStyleCell<>(styleInfo);
                     return a;
                 };
         
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntegerFactory =
                 setStringTableColumn -> {
-                    final EditingIntStyleCell<Register> a = new EditingIntStyleCell<>(color);
+                    final EditingIntStyleCell<Register> a = new EditingIntStyleCell<>(styleInfo);
                     return a;
                 };
         data.setCellFactory(cellMultiBaseLongFactory);
@@ -158,15 +153,6 @@ public class RegisterTableController implements Initializable {
     void setDataBase(String newBase) {
         base.setBase(newBase);
 
-        updateTable();
-    }
-    
-    /**
-     * Sets the colors for the table
-     * @param color style string that dictates the colors to be used at the table
-     */
-    public void setColor(String color){
-        this.color = color;
         updateTable();
     }
 
