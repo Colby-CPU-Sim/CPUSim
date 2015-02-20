@@ -2,16 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/FontData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/equs/EQUsController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/equs/EQUsController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/util/EditingIntStyleCell.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingIntStyleCell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/util/EditingMultiBaseStyleLongCell.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingMultiBaseStyleLongCell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrStyleCell.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrStyleCell.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
@@ -867,7 +857,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="97498000" />
+      <workItem from="1423928233792" duration="97532000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -941,11 +931,17 @@
       <option name="project" value="LOCAL" />
       <updated>1424389365947</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Finish fixing Preferences dialog.">
+      <created>1424439800869</created>
+      <option name="number" value="00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1424439800869</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="125065000" />
+    <option name="totallyTimeSpent" value="125099000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
@@ -998,7 +994,8 @@
     <MESSAGE value="remove -fx-disabled-opacity from all CSS files" />
     <MESSAGE value="Fix preferences dialog for editor pane (not yet for registers or rams)." />
     <MESSAGE value="Clean up Preferences dialog further." />
-    <option name="LAST_COMMIT_MESSAGE" value="Clean up Preferences dialog further." />
+    <MESSAGE value="Finish fixing Preferences dialog." />
+    <option name="LAST_COMMIT_MESSAGE" value="Finish fixing Preferences dialog." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
