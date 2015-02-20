@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
@@ -107,9 +108,13 @@
       <file leaf-file-name="Preferences.fxml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33069828" vertical-offset="205" max-vertical-offset="13889">
-              <caret line="24" column="30" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
-              <folding />
+            <state vertical-scroll-proportion="1.0171278" vertical-offset="83" max-vertical-offset="1140">
+              <caret line="445" column="11" selection-start-line="445" selection-start-column="11" selection-end-line="445" selection-end-column="11" />
+              <folding>
+                <element signature="n#Tab#0;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+                <element signature="n#Tab#1;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+                <element signature="n#Tab#2;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -857,7 +862,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="97532000" />
+      <workItem from="1423928233792" duration="97681000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -937,11 +942,17 @@
       <option name="project" value="LOCAL" />
       <updated>1424439800869</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Finish fixing Preferences dialog.">
+      <created>1424439808559</created>
+      <option name="number" value="00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1424439808559</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="125099000" />
+    <option name="totallyTimeSpent" value="125248000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
@@ -1530,9 +1541,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33069828" vertical-offset="205" max-vertical-offset="13889">
-          <caret line="24" column="30" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
-          <folding />
+        <state vertical-scroll-proportion="1.0171278" vertical-offset="83" max-vertical-offset="1140">
+          <caret line="445" column="11" selection-start-line="445" selection-start-column="11" selection-end-line="445" selection-end-column="11" />
+          <folding>
+            <element signature="n#Tab#0;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+            <element signature="n#Tab#1;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+            <element signature="n#Tab#2;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
