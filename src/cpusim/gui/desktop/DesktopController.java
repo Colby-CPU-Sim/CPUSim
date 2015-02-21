@@ -100,13 +100,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.PrinterJob;
+import javafx.print.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.transform.Scale;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -216,15 +217,11 @@ public class DesktopController implements Initializable {
     private SimpleBooleanProperty inRunningMode;
     private SimpleBooleanProperty inDebugOrRunningMode;
     private SimpleBooleanProperty noTabSelected;
-    private SimpleBooleanProperty canUndoProperty;
-    private SimpleBooleanProperty canRedoProperty;
     private SimpleBooleanProperty anchorEqualsCarret;
     private SimpleBooleanProperty codeStoreIsNull;
 
     private HelpController helpController;
     private FindReplaceController findReplaceController;
-
-    private PrinterJob printController;
 
     private final ButtonType buttonTypeYes = new ButtonType("Yes");
     private final ButtonType buttonTypeNo = new ButtonType("No");
@@ -270,6 +267,7 @@ public class DesktopController implements Initializable {
             SHORTCUT + "-Shift-H",         // open general cpusim help
             SHORTCUT + "-Shift-A"          // open about cpusim
     };
+    private PrinterJob currentPrinterJob;
 
     /**
      * constructor method that takes in a mediator and a stage
@@ -415,8 +413,6 @@ public class DesktopController implements Initializable {
         inRunningMode = new SimpleBooleanProperty(false);
         inDebugOrRunningMode = new SimpleBooleanProperty(false);
         inDebugOrRunningMode.bind(inDebugMode.or(inRunningMode));
-        canUndoProperty = new SimpleBooleanProperty(false);
-        canRedoProperty = new SimpleBooleanProperty(false);
         anchorEqualsCarret = new SimpleBooleanProperty(false);
         codeStoreIsNull = new SimpleBooleanProperty(true);
         bindItemDisablesToSimpleBooleanProperties();
@@ -682,37 +678,62 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handlePrintSetup(ActionEvent event) {
 
-        // make sure there is a printController
-        if (printController != null) {
+        currentPrinterJob = PrinterJob.createPrinterJob();
+        if (currentPrinterJob != null) {
             // show the printsetup dialog
-            boolean success = printController.showPageSetupDialog(stage);
-            // if they cancelled the dialog
-            if (!success) {
-                // Not sure what do do here
-            }
-        } else /* computer has no printers associated with it */ {
-            // not sure what to do here...
+            currentPrinterJob.showPageSetupDialog(stage);
         }
     }
 
     /**
-     * Not implemented yet...
+     * prints the top page of code
      *
-     * @param event
+     * @param event the ignored Event (selection of Print from File menu)
      */
     @FXML
     protected void handlePrint(ActionEvent event) {
 
-        // make sure there is a printController
-        if (printController != null) {
+        if( currentPrinterJob == null)
+            currentPrinterJob = PrinterJob.createPrinterJob();
+        if (currentPrinterJob != null) {
             // show the print dialog
-            boolean success = printController.showPrintDialog(stage);
-            // if it wasn't cancelled the print the current tabs text area
-            if (success) {
-                printController.printPage(
-                        textTabPane.getSelectionModel().getSelectedItem().getContent());
+            boolean ok = currentPrinterJob.showPrintDialog(stage);
+            // if it wasn't cancelled then print the current text area
+            if (ok) {
+                Node nodeToBePrinted =
+                        textTabPane.getSelectionModel().getSelectedItem().getContent();
+
+//                Sample code that scales the node to be printed, based on the standard
+//                letter size in portrait mode.
+//                Printer printer = Printer.getDefaultPrinter();
+//                PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
+//                        PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+//                double scaleX = pageLayout.getPrintableWidth() /
+//                        nodeToBePrinted.getBoundsInParent().getWidth();
+//                double scaleY = pageLayout.getPrintableHeight() /
+//                        nodeToBePrinted.getBoundsInParent().getHeight();
+//                nodeToBePrinted.getTransforms().add(new Scale(scaleX, scaleY));
+
+                // Now do the actual printing
+                boolean success = currentPrinterJob.printPage(nodeToBePrinted);
+                if (success ) {
+                    currentPrinterJob.endJob();
+                }
             }
         }
+        currentPrinterJob = null;
+        /*
+            // Scale the node to be printed, based on the standard letter,
+            // portrait paper.
+            Printer printer = Printer.getDefaultPrinter();
+            PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
+                                   PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+            double scaleX = pageLayout.getPrintableWidth() /
+                            node.getBoundsInParent().getWidth();
+            double scaleY = pageLayout.getPrintableHeight() /
+                            node.getBoundsInParent().getHeight();
+            node.getTransforms().add(new Scale(scaleX, scaleY));
+       */
     }
 
     /**
@@ -744,11 +765,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleUndo(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
-        behavior.callAction("Undo");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.undo();
     }
 
     /**
@@ -757,11 +776,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleRedo(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
-        behavior.callAction("Redo");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.redo();
     }
 
     /**
@@ -771,11 +788,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCut(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
-        behavior.callAction("Cut");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.cut();
     }
 
     /**
@@ -785,11 +800,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCopy(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                (((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior());
-        behavior.callAction("Copy");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.copy();
     }
 
     /**
@@ -799,25 +812,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePaste(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
-        behavior.callAction("Paste");
-    }
-
-    /**
-     * Deletes selected text.
-     *
-     * @param event unused action event
-     */
-    @FXML
-    protected void handleDelete(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
-        behavior.callAction("DeleteSelection");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.paste();
     }
 
     /**
@@ -827,11 +824,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleSelectAll(ActionEvent event) {
-        InlineStyleTextArea codeArea =
-                (InlineStyleTextArea) textTabPane.getSelectionModel().getSelectedItem().getContent();
-        TextInputControlBehavior<?> behavior =
-                ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
-        behavior.callAction("SelectAll");
+        InlineStyleTextArea codeArea = (InlineStyleTextArea)
+                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        codeArea.selectAll();
     }
 
     /**
@@ -1704,7 +1699,7 @@ public class DesktopController implements Initializable {
 
 
         // Edit Menu
-        editMenu.setOnMenuValidation(event -> {
+//        editMenu.setOnMenuValidation(event -> {
 //            boolean canUndo = false;
 //            boolean canRedo = false;
 //            boolean ancEqCar = false;
@@ -1722,13 +1717,11 @@ public class DesktopController implements Initializable {
 //            canUndoProperty.set(canUndo);
 //            canRedoProperty.set(canRedo);
 //            anchorEqualsCarret.set(ancEqCar);
-        });
+//        });
         // Undo
-        editMenu.getItems().get(0).disableProperty().bind(noTabSelected.or
-                (canUndoProperty.not()));
+        editMenu.getItems().get(0).disableProperty().bind(noTabSelected);
         // Redo
-        editMenu.getItems().get(1).disableProperty().bind(noTabSelected.or
-                (canRedoProperty.not()));
+        editMenu.getItems().get(1).disableProperty().bind(noTabSelected);
         // Cut
         editMenu.getItems().get(3).disableProperty().bind(noTabSelected.or
                 (anchorEqualsCarret));
@@ -1737,15 +1730,12 @@ public class DesktopController implements Initializable {
                 (anchorEqualsCarret));
         // Paste
         editMenu.getItems().get(5).disableProperty().bind(noTabSelected);
-        // Delete
-        editMenu.getItems().get(6).disableProperty().bind(noTabSelected.or
-                (anchorEqualsCarret));
         // Select All
-        editMenu.getItems().get(7).disableProperty().bind(noTabSelected);
+        editMenu.getItems().get(6).disableProperty().bind(noTabSelected);
         // Toggle Comment
-        editMenu.getItems().get(9).disableProperty().bind(noTabSelected);
+        editMenu.getItems().get(8).disableProperty().bind(noTabSelected);
         // Find
-        editMenu.getItems().get(10).disableProperty().bind(noTabSelected);
+        editMenu.getItems().get(9).disableProperty().bind(noTabSelected);
 
         // Modify Menu
         modifyMenu.disableProperty().bind(inDebugOrRunningMode);

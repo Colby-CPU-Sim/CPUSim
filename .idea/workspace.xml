@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d4a2918d-9cb9-4bea-b97e-89c64ca8afcf" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" afterPath="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml" afterPath="$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="CPUSim4.0b49.iws" />
@@ -29,161 +30,117 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DesktopController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="DesktopController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="61865" max-vertical-offset="63707">
-              <caret line="3268" column="4" selection-start-line="3268" selection-start-column="4" selection-end-line="3268" selection-end-column="4" />
+            <state vertical-scroll-proportion="0.30294907" vertical-offset="25291" max-vertical-offset="63536">
+              <caret line="1342" column="16" selection-start-line="1342" selection-start-column="16" selection-end-line="1342" selection-end-column="16" />
               <folding>
-                <element signature="e#0#118687#0" expanded="true" />
+                <element signature="e#0#118471#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#14556#14557#0" expanded="true" />
-                <element signature="e#14647#14648#0" expanded="true" />
-                <element signature="e#21568#21569#0" expanded="true" />
-                <element signature="e#21606#21607#0" expanded="true" />
-                <element signature="e#21763#21764#0" expanded="true" />
-                <element signature="e#21803#21804#0" expanded="true" />
-                <element signature="e#22970#22971#0" expanded="true" />
-                <element signature="e#23003#23004#0" expanded="true" />
-                <element signature="e#36255#36256#0" expanded="true" />
-                <element signature="e#36304#36305#0" expanded="true" />
-                <element signature="e#38312#38313#0" expanded="true" />
-                <element signature="e#38343#38344#0" expanded="true" />
-                <element signature="e#38814#38815#0" expanded="true" />
-                <element signature="e#38847#38848#0" expanded="true" />
-                <element signature="e#39004#39005#0" expanded="true" />
-                <element signature="e#39040#39041#0" expanded="true" />
-                <element signature="e#49329#49330#0" expanded="true" />
-                <element signature="e#49357#49358#0" expanded="true" />
-                <element signature="e#49485#49486#0" expanded="true" />
-                <element signature="e#49519#49520#0" expanded="true" />
-                <element signature="e#49664#49665#0" expanded="true" />
-                <element signature="e#49696#49697#0" expanded="true" />
-                <element signature="e#49848#49849#0" expanded="true" />
-                <element signature="e#49892#49893#0" expanded="true" />
-                <element signature="e#50310#50311#0" expanded="true" />
-                <element signature="e#50347#50348#0" expanded="true" />
-                <element signature="e#50558#50559#0" expanded="true" />
-                <element signature="e#50593#50594#0" expanded="true" />
-                <element signature="e#51368#51369#0" expanded="true" />
-                <element signature="e#51409#51410#0" expanded="true" />
-                <element signature="e#51793#51794#0" expanded="true" />
-                <element signature="e#51835#51836#0" expanded="true" />
-                <element signature="e#53458#53459#0" expanded="true" />
-                <element signature="e#53498#53499#0" expanded="true" />
-                <element signature="e#53769#53770#0" expanded="true" />
-                <element signature="e#53803#53804#0" expanded="true" />
-                <element signature="e#53940#53941#0" expanded="true" />
-                <element signature="e#53978#53979#0" expanded="true" />
-                <element signature="e#54127#54128#0" expanded="true" />
-                <element signature="e#54169#54170#0" expanded="true" />
-                <element signature="e#54353#54354#0" expanded="true" />
-                <element signature="e#54389#54390#0" expanded="true" />
-                <element signature="e#65205#65206#0" expanded="true" />
-                <element signature="e#65246#65247#0" expanded="true" />
-                <element signature="e#82186#82187#0" expanded="true" />
-                <element signature="e#82230#82231#0" expanded="true" />
-                <element signature="e#82893#82894#0" expanded="true" />
-                <element signature="e#82950#82951#0" expanded="true" />
-                <element signature="e#83245#83246#0" expanded="true" />
-                <element signature="e#83302#83303#0" expanded="true" />
-                <element signature="e#84963#84971#0" expanded="true" />
-                <element signature="e#104673#104674#0" expanded="true" />
-                <element signature="e#104708#104709#0" expanded="true" />
-                <element signature="e#104883#104884#0" expanded="true" />
-                <element signature="e#104927#104928#0" expanded="true" />
-                <element signature="e#105093#105094#0" expanded="true" />
-                <element signature="e#105129#105130#0" expanded="true" />
-                <element signature="e#113974#113975#0" expanded="true" />
-                <element signature="e#114008#114009#0" expanded="true" />
-                <element signature="e#115686#115687#0" expanded="true" />
-                <element signature="e#115736#115737#0" expanded="true" />
-                <element signature="e#115781#115782#0" expanded="true" />
-                <element signature="e#115820#115821#0" expanded="true" />
+                <element signature="e#14483#14484#0" expanded="true" />
+                <element signature="e#14574#14575#0" expanded="true" />
+                <element signature="e#21375#21376#0" expanded="true" />
+                <element signature="e#21413#21414#0" expanded="true" />
+                <element signature="e#21570#21571#0" expanded="true" />
+                <element signature="e#21610#21611#0" expanded="true" />
+                <element signature="e#22777#22778#0" expanded="true" />
+                <element signature="e#22810#22811#0" expanded="true" />
+                <element signature="e#36254#36255#0" expanded="true" />
+                <element signature="e#36303#36304#0" expanded="true" />
+                <element signature="e#38311#38312#0" expanded="true" />
+                <element signature="e#38342#38343#0" expanded="true" />
+                <element signature="e#38813#38814#0" expanded="true" />
+                <element signature="e#38846#38847#0" expanded="true" />
+                <element signature="e#39003#39004#0" expanded="true" />
+                <element signature="e#39039#39040#0" expanded="true" />
+                <element signature="e#49328#49329#0" expanded="true" />
+                <element signature="e#49356#49357#0" expanded="true" />
+                <element signature="e#49484#49485#0" expanded="true" />
+                <element signature="e#49518#49519#0" expanded="true" />
+                <element signature="e#49663#49664#0" expanded="true" />
+                <element signature="e#49695#49696#0" expanded="true" />
+                <element signature="e#49847#49848#0" expanded="true" />
+                <element signature="e#49891#49892#0" expanded="true" />
+                <element signature="e#50309#50310#0" expanded="true" />
+                <element signature="e#50346#50347#0" expanded="true" />
+                <element signature="e#50557#50558#0" expanded="true" />
+                <element signature="e#50592#50593#0" expanded="true" />
+                <element signature="e#51367#51368#0" expanded="true" />
+                <element signature="e#51408#51409#0" expanded="true" />
+                <element signature="e#51792#51793#0" expanded="true" />
+                <element signature="e#51834#51835#0" expanded="true" />
+                <element signature="e#53457#53458#0" expanded="true" />
+                <element signature="e#53497#53498#0" expanded="true" />
+                <element signature="e#53768#53769#0" expanded="true" />
+                <element signature="e#53802#53803#0" expanded="true" />
+                <element signature="e#53939#53940#0" expanded="true" />
+                <element signature="e#53977#53978#0" expanded="true" />
+                <element signature="e#54126#54127#0" expanded="true" />
+                <element signature="e#54168#54169#0" expanded="true" />
+                <element signature="e#54352#54353#0" expanded="true" />
+                <element signature="e#54388#54389#0" expanded="true" />
+                <element signature="e#64989#64990#0" expanded="true" />
+                <element signature="e#65030#65031#0" expanded="true" />
+                <element signature="e#81970#81971#0" expanded="true" />
+                <element signature="e#82014#82015#0" expanded="true" />
+                <element signature="e#82677#82678#0" expanded="true" />
+                <element signature="e#82734#82735#0" expanded="true" />
+                <element signature="e#83029#83030#0" expanded="true" />
+                <element signature="e#83086#83087#0" expanded="true" />
+                <element signature="e#84747#84755#0" expanded="true" />
+                <element signature="e#104457#104458#0" expanded="true" />
+                <element signature="e#104492#104493#0" expanded="true" />
+                <element signature="e#104667#104668#0" expanded="true" />
+                <element signature="e#104711#104712#0" expanded="true" />
+                <element signature="e#104877#104878#0" expanded="true" />
+                <element signature="e#104913#104914#0" expanded="true" />
+                <element signature="e#113758#113759#0" expanded="true" />
+                <element signature="e#113792#113793#0" expanded="true" />
+                <element signature="e#115470#115471#0" expanded="true" />
+                <element signature="e#115520#115521#0" expanded="true" />
+                <element signature="e#115565#115566#0" expanded="true" />
+                <element signature="e#115604#115605#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Preferences.fxml" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
+      <file leaf-file-name="JavaKeywords.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.0171278" vertical-offset="83" max-vertical-offset="1140">
-              <caret line="445" column="11" selection-start-line="445" selection-start-column="11" selection-end-line="445" selection-end-column="11" />
-              <folding>
-                <element signature="n#Tab#0;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
-                <element signature="n#Tab#1;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
-                <element signature="n#Tab#2;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EQUsController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/equs/EQUsController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="35" max-vertical-offset="7828">
-              <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#13043#0" expanded="true" />
-                <element signature="e#2391#2392#0" expanded="true" />
-                <element signature="e#2419#2420#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RegisterTableController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3401">
-              <caret line="157" column="0" selection-start-line="157" selection-start-column="0" selection-end-line="157" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1957" max-vertical-offset="3496">
+              <caret line="146" column="33" selection-start-line="146" selection-start-column="33" selection-end-line="146" selection-end-column="33" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EditingMultiBaseStyleLongCell.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/util/EditingMultiBaseStyleLongCell.java">
+      <file leaf-file-name="RichText.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/RichText.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="874" max-vertical-offset="10336">
-              <caret line="28" column="34" selection-start-line="28" selection-start-column="34" selection-end-line="28" selection-end-column="34" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2723" max-vertical-offset="7391">
+              <caret line="169" column="24" selection-start-line="370" selection-start-column="24" selection-end-line="370" selection-end-column="26" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EditingIntStyleCell.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/util/EditingIntStyleCell.java">
+      <file leaf-file-name="desktop.fxml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="399" max-vertical-offset="4085">
-              <caret line="17" column="34" selection-start-line="17" selection-start-column="34" selection-end-line="17" selection-end-column="34" />
-              <folding>
-                <element signature="n#!!doc" expanded="true" />
-                <element signature="e#8043#8044#0" expanded="true" />
-                <element signature="e#8111#8112#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4009">
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="EditingStrStyleCell.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/util/EditingStrStyleCell.java">
+      <file leaf-file-name="DebugToolBarController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBarController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="542" max-vertical-offset="2318">
-              <caret line="118" column="45" selection-start-line="118" selection-start-column="45" selection-end-line="118" selection-end-column="45" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RamTableController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="3477" max-vertical-offset="4845">
-              <caret line="227" column="0" selection-start-line="227" selection-start-column="0" selection-end-line="227" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="4766" max-vertical-offset="5795">
+              <caret line="290" column="31" selection-start-line="290" selection-start-column="31" selection-end-line="290" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -192,28 +149,11 @@
       <file leaf-file-name="PreferencesController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6690" max-vertical-offset="15371">
-              <caret line="361" column="37" selection-start-line="361" selection-start-column="37" selection-end-line="361" selection-end-column="37" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="7419" max-vertical-offset="15390">
+              <caret line="407" column="48" selection-start-line="407" selection-start-column="48" selection-end-line="407" selection-end-column="48" />
               <folding>
                 <element signature="e#0#32062#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#14228#14229#0" expanded="true" />
-                <element signature="e#14289#14290#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CodePaneController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1881" max-vertical-offset="2945">
-              <caret line="119" column="86" selection-start-line="119" selection-start-column="86" selection-end-line="119" selection-end-column="86" />
-              <folding>
-                <element signature="e#6981#6982#0" expanded="true" />
-                <element signature="e#7021#7022#0" expanded="true" />
-                <element signature="e#7343#7344#0" expanded="true" />
-                <element signature="e#7383#7384#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -227,7 +167,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/cpusim/gui/help/helpHTML/generalHelp/tour/tutorial.html" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/fetchsequence/EditFetchSequenceController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/editmodules/RegistersTableController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/editmodules/RegisterArrayTableController.java" />
@@ -266,7 +205,6 @@
         <option value="$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css" />
         <option value="$PROJECT_DIR$/src/cpusim/util/HighlightManager.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java" />
-        <option value="$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/util/EditingStrStyleCell.java" />
@@ -274,10 +212,12 @@
         <option value="$PROJECT_DIR$/src/cpusim/gui/util/EditingMultiBaseStyleLongCell.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RamTableController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/RegisterTableController.java" />
-        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/FontData.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/equs/EQUsController.java" />
         <option value="$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml" />
+        <option value="$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml" />
+        <option value="$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java" />
       </list>
     </option>
   </component>
@@ -587,36 +527,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CPUSim4.0b49" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="CPUSim4.0b49" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cpusim" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gui" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="desktop" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="editorpane" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope">
@@ -785,6 +695,36 @@
       <envs />
       <method />
     </configuration>
+    <configuration default="false" name="RichText" type="Application" factoryName="Application" nameIsGenerated="true">
+      <extension name="chronon">
+        <include>
+          <pattern>
+            <option name="PATTERN" value="org.fxmisc.richtext.demo.**" />
+            <option name="ENABLED" value="true" />
+          </pattern>
+        </include>
+      </extension>
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+        <pattern>
+          <option name="PATTERN" value="org.fxmisc.richtext.demo.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="MAIN_CLASS_NAME" value="org.fxmisc.richtext.demo.RichText" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="-m test/Wombat2.cpu -t test/W2-0.a" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="CPUSim4.0b49" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
     <configuration default="false" name="Main" type="Application" factoryName="Application">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="cpusim.Main" />
@@ -831,10 +771,11 @@
       <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
-    <list size="3">
-      <item index="0" class="java.lang.String" itemvalue="Application.Main" />
-      <item index="1" class="java.lang.String" itemvalue="Application.Main no textfile" />
-      <item index="2" class="java.lang.String" itemvalue="Application.JavaKeywords" />
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Application.RichText" />
+      <item index="1" class="java.lang.String" itemvalue="Application.Main" />
+      <item index="2" class="java.lang.String" itemvalue="Application.Main no textfile" />
+      <item index="3" class="java.lang.String" itemvalue="Application.JavaKeywords" />
     </list>
     <recent_temporary>
       <list size="1">
@@ -862,7 +803,7 @@
       <option name="number" value="Default" />
       <updated>1423675384646</updated>
       <workItem from="1423675385897" duration="27567000" />
-      <workItem from="1423928233792" duration="97681000" />
+      <workItem from="1423928233792" duration="104603000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1423758058006</created>
@@ -948,11 +889,17 @@
       <option name="project" value="LOCAL" />
       <updated>1424439808559</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Remove unused old font tab from Preferences dialog.">
+      <created>1424439975757</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1424439975757</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="125248000" />
+    <option name="totallyTimeSpent" value="132170000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-278" y="-1200" width="1440" height="1200" extended-state="6" />
@@ -971,9 +918,9 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285068" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285068" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2353362" sideWeight="0.5006196" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28183118" sideWeight="0.5006196" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2353362" sideWeight="0.4993804" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28183118" sideWeight="0.4993804" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32941177" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1006,7 +953,8 @@
     <MESSAGE value="Fix preferences dialog for editor pane (not yet for registers or rams)." />
     <MESSAGE value="Clean up Preferences dialog further." />
     <MESSAGE value="Finish fixing Preferences dialog." />
-    <option name="LAST_COMMIT_MESSAGE" value="Finish fixing Preferences dialog." />
+    <MESSAGE value="Remove unused old font tab from Preferences dialog." />
+    <option name="LAST_COMMIT_MESSAGE" value="Remove unused old font tab from Preferences dialog." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1018,7 +966,7 @@
           <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="43" />
+      <option name="time" value="44" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
@@ -1031,36 +979,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/cpusim/util/SourceLine.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="570">
-          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/CodePaneTab.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="599" max-vertical-offset="1292">
-          <caret line="40" column="27" selection-start-line="40" selection-start-column="27" selection-end-line="40" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1424#1425#0" expanded="false" />
-            <element signature="e#1458#1459#0" expanded="false" />
-            <element signature="e#1510#1511#0" expanded="false" />
-            <element signature="e#1538#1539#0" expanded="false" />
-            <element signature="e#1581#1582#0" expanded="false" />
-            <element signature="e#1618#1619#0" expanded="false" />
-            <element signature="e#1647#1648#0" expanded="false" />
-            <element signature="e#1680#1681#0" expanded="false" />
-            <element signature="e#1718#1719#0" expanded="false" />
-            <element signature="e#1753#1754#0" expanded="false" />
-            <element signature="e#1809#1810#0" expanded="false" />
-            <element signature="e#1836#1837#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/LineNumAndBreakpointFactory.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1467" max-vertical-offset="2717">
@@ -1235,26 +1153,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.19351852" vertical-offset="0" max-vertical-offset="3610">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/editmachineinstruction/editfields/EditFieldsController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="11495">
           <caret line="61" column="3" selection-start-line="61" selection-start-column="3" selection-end-line="61" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/LineNumbers.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="247">
-          <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
           <folding />
         </state>
       </provider>
@@ -1279,14 +1181,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="776" max-vertical-offset="6422">
           <caret line="93" column="45" selection-start-line="93" selection-start-column="45" selection-end-line="93" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/RichText.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5720721" vertical-offset="6459" max-vertical-offset="7277">
-          <caret line="370" column="26" selection-start-line="370" selection-start-column="24" selection-end-line="370" selection-end-column="26" />
           <folding />
         </state>
       </provider>
@@ -1331,14 +1225,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1431" max-vertical-offset="3439">
-          <caret line="100" column="15" selection-start-line="100" selection-start-column="15" selection-end-line="100" selection-end-column="15" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/editorpane/StyleInfo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1900">
@@ -1375,19 +1261,6 @@
         <state vertical-scroll-proportion="0.33233082" vertical-offset="7" max-vertical-offset="1007">
           <caret line="12" column="18" selection-start-line="12" selection-start-column="18" selection-end-line="12" selection-end-column="18" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6690" max-vertical-offset="15371">
-          <caret line="361" column="37" selection-start-line="361" selection-start-column="37" selection-end-line="361" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#32062#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-            <element signature="e#14228#14229#0" expanded="true" />
-            <element signature="e#14289#14290#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1457,96 +1330,155 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="83" max-vertical-offset="1140">
+          <caret line="445" column="11" selection-start-line="445" selection-start-column="11" selection-end-line="445" selection-end-column="11" />
+          <folding>
+            <element signature="n#Tab#0;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+            <element signature="n#Tab#1;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+            <element signature="n#Tab#2;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/LineNumbers.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="247">
+          <caret line="1" column="21" selection-start-line="1" selection-start-column="21" selection-end-line="1" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/help/SearchComboBox.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="855">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/css/Dialogs.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1634" max-vertical-offset="3610">
+          <caret line="95" column="87" selection-start-line="95" selection-start-column="26" selection-end-line="95" selection-end-column="87" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/PreferencesController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7419" max-vertical-offset="15390">
+          <caret line="407" column="48" selection-start-line="407" selection-start-column="48" selection-end-line="407" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#32062#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/JavaKeywords.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1957" max-vertical-offset="3496">
+          <caret line="146" column="33" selection-start-line="146" selection-start-column="33" selection-end-line="146" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/fxmisc/richtext/demo/RichText.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2723" max-vertical-offset="7391">
+          <caret line="169" column="24" selection-start-line="370" selection-start-column="24" selection-end-line="370" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/desktop.fxml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.0671712" vertical-offset="1128" max-vertical-offset="4066">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4009">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DebugToolBarController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4766" max-vertical-offset="5795">
+          <caret line="290" column="31" selection-start-line="290" selection-start-column="31" selection-end-line="290" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cpusim/gui/desktop/DesktopController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="61865" max-vertical-offset="63688">
-          <caret line="3268" column="4" selection-start-line="3268" selection-start-column="4" selection-end-line="3268" selection-end-column="4" />
+        <state vertical-scroll-proportion="0.30294907" vertical-offset="25291" max-vertical-offset="63536">
+          <caret line="1342" column="16" selection-start-line="1342" selection-start-column="16" selection-end-line="1342" selection-end-column="16" />
           <folding>
-            <element signature="e#0#118687#0" expanded="true" />
+            <element signature="e#0#118471#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#14556#14557#0" expanded="true" />
-            <element signature="e#14647#14648#0" expanded="true" />
-            <element signature="e#21568#21569#0" expanded="true" />
-            <element signature="e#21606#21607#0" expanded="true" />
-            <element signature="e#21763#21764#0" expanded="true" />
-            <element signature="e#21803#21804#0" expanded="true" />
-            <element signature="e#22970#22971#0" expanded="true" />
-            <element signature="e#23003#23004#0" expanded="true" />
-            <element signature="e#36255#36256#0" expanded="true" />
-            <element signature="e#36304#36305#0" expanded="true" />
-            <element signature="e#38312#38313#0" expanded="true" />
-            <element signature="e#38343#38344#0" expanded="true" />
-            <element signature="e#38814#38815#0" expanded="true" />
-            <element signature="e#38847#38848#0" expanded="true" />
-            <element signature="e#39004#39005#0" expanded="true" />
-            <element signature="e#39040#39041#0" expanded="true" />
-            <element signature="e#49329#49330#0" expanded="true" />
-            <element signature="e#49357#49358#0" expanded="true" />
-            <element signature="e#49485#49486#0" expanded="true" />
-            <element signature="e#49519#49520#0" expanded="true" />
-            <element signature="e#49664#49665#0" expanded="true" />
-            <element signature="e#49696#49697#0" expanded="true" />
-            <element signature="e#49848#49849#0" expanded="true" />
-            <element signature="e#49892#49893#0" expanded="true" />
-            <element signature="e#50310#50311#0" expanded="true" />
-            <element signature="e#50347#50348#0" expanded="true" />
-            <element signature="e#50558#50559#0" expanded="true" />
-            <element signature="e#50593#50594#0" expanded="true" />
-            <element signature="e#51368#51369#0" expanded="true" />
-            <element signature="e#51409#51410#0" expanded="true" />
-            <element signature="e#51793#51794#0" expanded="true" />
-            <element signature="e#51835#51836#0" expanded="true" />
-            <element signature="e#53458#53459#0" expanded="true" />
-            <element signature="e#53498#53499#0" expanded="true" />
-            <element signature="e#53769#53770#0" expanded="true" />
-            <element signature="e#53803#53804#0" expanded="true" />
-            <element signature="e#53940#53941#0" expanded="true" />
-            <element signature="e#53978#53979#0" expanded="true" />
-            <element signature="e#54127#54128#0" expanded="true" />
-            <element signature="e#54169#54170#0" expanded="true" />
-            <element signature="e#54353#54354#0" expanded="true" />
-            <element signature="e#54389#54390#0" expanded="true" />
-            <element signature="e#65205#65206#0" expanded="true" />
-            <element signature="e#65246#65247#0" expanded="true" />
-            <element signature="e#82186#82187#0" expanded="true" />
-            <element signature="e#82230#82231#0" expanded="true" />
-            <element signature="e#82893#82894#0" expanded="true" />
-            <element signature="e#82950#82951#0" expanded="true" />
-            <element signature="e#83245#83246#0" expanded="true" />
-            <element signature="e#83302#83303#0" expanded="true" />
-            <element signature="e#84963#84971#0" expanded="true" />
-            <element signature="e#104673#104674#0" expanded="true" />
-            <element signature="e#104708#104709#0" expanded="true" />
-            <element signature="e#104883#104884#0" expanded="true" />
-            <element signature="e#104927#104928#0" expanded="true" />
-            <element signature="e#105093#105094#0" expanded="true" />
-            <element signature="e#105129#105130#0" expanded="true" />
-            <element signature="e#113974#113975#0" expanded="true" />
-            <element signature="e#114008#114009#0" expanded="true" />
-            <element signature="e#115686#115687#0" expanded="true" />
-            <element signature="e#115736#115737#0" expanded="true" />
-            <element signature="e#115781#115782#0" expanded="true" />
-            <element signature="e#115820#115821#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/cpusim/gui/preferences/Preferences.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.0171278" vertical-offset="83" max-vertical-offset="1140">
-          <caret line="445" column="11" selection-start-line="445" selection-start-column="11" selection-end-line="445" selection-end-column="11" />
-          <folding>
-            <element signature="n#Tab#0;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
-            <element signature="n#Tab#1;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
-            <element signature="n#Tab#2;n#tabs#0;n#TabPane#0;n#center#0;n#BorderPane#0;n#!!top" expanded="false" />
+            <element signature="e#14483#14484#0" expanded="true" />
+            <element signature="e#14574#14575#0" expanded="true" />
+            <element signature="e#21375#21376#0" expanded="true" />
+            <element signature="e#21413#21414#0" expanded="true" />
+            <element signature="e#21570#21571#0" expanded="true" />
+            <element signature="e#21610#21611#0" expanded="true" />
+            <element signature="e#22777#22778#0" expanded="true" />
+            <element signature="e#22810#22811#0" expanded="true" />
+            <element signature="e#36254#36255#0" expanded="true" />
+            <element signature="e#36303#36304#0" expanded="true" />
+            <element signature="e#38311#38312#0" expanded="true" />
+            <element signature="e#38342#38343#0" expanded="true" />
+            <element signature="e#38813#38814#0" expanded="true" />
+            <element signature="e#38846#38847#0" expanded="true" />
+            <element signature="e#39003#39004#0" expanded="true" />
+            <element signature="e#39039#39040#0" expanded="true" />
+            <element signature="e#49328#49329#0" expanded="true" />
+            <element signature="e#49356#49357#0" expanded="true" />
+            <element signature="e#49484#49485#0" expanded="true" />
+            <element signature="e#49518#49519#0" expanded="true" />
+            <element signature="e#49663#49664#0" expanded="true" />
+            <element signature="e#49695#49696#0" expanded="true" />
+            <element signature="e#49847#49848#0" expanded="true" />
+            <element signature="e#49891#49892#0" expanded="true" />
+            <element signature="e#50309#50310#0" expanded="true" />
+            <element signature="e#50346#50347#0" expanded="true" />
+            <element signature="e#50557#50558#0" expanded="true" />
+            <element signature="e#50592#50593#0" expanded="true" />
+            <element signature="e#51367#51368#0" expanded="true" />
+            <element signature="e#51408#51409#0" expanded="true" />
+            <element signature="e#51792#51793#0" expanded="true" />
+            <element signature="e#51834#51835#0" expanded="true" />
+            <element signature="e#53457#53458#0" expanded="true" />
+            <element signature="e#53497#53498#0" expanded="true" />
+            <element signature="e#53768#53769#0" expanded="true" />
+            <element signature="e#53802#53803#0" expanded="true" />
+            <element signature="e#53939#53940#0" expanded="true" />
+            <element signature="e#53977#53978#0" expanded="true" />
+            <element signature="e#54126#54127#0" expanded="true" />
+            <element signature="e#54168#54169#0" expanded="true" />
+            <element signature="e#54352#54353#0" expanded="true" />
+            <element signature="e#54388#54389#0" expanded="true" />
+            <element signature="e#64989#64990#0" expanded="true" />
+            <element signature="e#65030#65031#0" expanded="true" />
+            <element signature="e#81970#81971#0" expanded="true" />
+            <element signature="e#82014#82015#0" expanded="true" />
+            <element signature="e#82677#82678#0" expanded="true" />
+            <element signature="e#82734#82735#0" expanded="true" />
+            <element signature="e#83029#83030#0" expanded="true" />
+            <element signature="e#83086#83087#0" expanded="true" />
+            <element signature="e#84747#84755#0" expanded="true" />
+            <element signature="e#104457#104458#0" expanded="true" />
+            <element signature="e#104492#104493#0" expanded="true" />
+            <element signature="e#104667#104668#0" expanded="true" />
+            <element signature="e#104711#104712#0" expanded="true" />
+            <element signature="e#104877#104878#0" expanded="true" />
+            <element signature="e#104913#104914#0" expanded="true" />
+            <element signature="e#113758#113759#0" expanded="true" />
+            <element signature="e#113792#113793#0" expanded="true" />
+            <element signature="e#115470#115471#0" expanded="true" />
+            <element signature="e#115520#115521#0" expanded="true" />
+            <element signature="e#115565#115566#0" expanded="true" />
+            <element signature="e#115604#115605#0" expanded="true" />
           </folding>
         </state>
       </provider>

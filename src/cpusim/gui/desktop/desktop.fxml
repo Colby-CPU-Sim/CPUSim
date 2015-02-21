@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import java.net.URL?>
-<?import org.fxmisc.richtext.StyledTextArea ?>
 
 <VBox id="MainPane" fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity" minWidth="-Infinity" prefHeight="873.0" prefWidth="1400.0"
@@ -71,8 +70,6 @@
                       text="Copy"/>
             <MenuItem mnemonicParsing="false" onAction="#handlePaste"
                       text="Paste"/>
-            <MenuItem mnemonicParsing="false" onAction="#handleDelete"
-                      text="Delete"/>
             <MenuItem mnemonicParsing="false" onAction="#handleSelectAll"
                       text="Select All"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
