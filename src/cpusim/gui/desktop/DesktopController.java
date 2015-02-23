@@ -67,10 +67,7 @@ import com.sun.javafx.scene.control.behavior.TextInputControlBehavior;
 import com.sun.javafx.scene.control.skin.TextInputControlSkin;
 import cpusim.*;
 import cpusim.assembler.Token;
-import cpusim.gui.desktop.editorpane.CodePaneController;
-import cpusim.gui.desktop.editorpane.CodePaneTab;
-import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
-import cpusim.gui.desktop.editorpane.StyleInfo;
+import cpusim.gui.desktop.editorpane.*;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.editmodules.EditModulesController;
@@ -101,12 +98,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.print.*;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -679,20 +679,33 @@ public class DesktopController implements Initializable {
     protected void handlePrintSetup(ActionEvent event) {
 
         currentPrinterJob = PrinterJob.createPrinterJob();
-        if (currentPrinterJob != null) {
-            // show the printsetup dialog
-            currentPrinterJob.showPageSetupDialog(stage);
-        }
+        currentPrinterJob.showPageSetupDialog(stage);
     }
 
     /**
-     * prints the top page of code
+     * prints all the code from the selected tab of assembly programs
      *
      * @param event the ignored Event (selection of Print from File menu)
      */
     @FXML
     protected void handlePrint(ActionEvent event) {
+        if(currentPrinterJob == null)
+            currentPrinterJob = PrinterJob.createPrinterJob();
+        Printer printer = Printer.getDefaultPrinter();
+        PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
+                PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+        Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem().getContent();
+        final List<Node> pages =
+                getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted, pageLayout);
+        final boolean print = currentPrinterJob.showPrintDialog(stage);
+        if (print) {
+            pages.forEach(currentPrinterJob::printPage);
+            currentPrinterJob.endJob();
+            currentPrinterJob = null;
+        }
 
+        /*
+        OLD VERSION that just prints one page.
         if( currentPrinterJob == null)
             currentPrinterJob = PrinterJob.createPrinterJob();
         if (currentPrinterJob != null) {
@@ -700,19 +713,9 @@ public class DesktopController implements Initializable {
             boolean ok = currentPrinterJob.showPrintDialog(stage);
             // if it wasn't cancelled then print the current text area
             if (ok) {
+                currentPrinterJob.getJobSettings().setPageRanges(new PageRange(1, 5));
                 Node nodeToBePrinted =
                         textTabPane.getSelectionModel().getSelectedItem().getContent();
-
-//                Sample code that scales the node to be printed, based on the standard
-//                letter size in portrait mode.
-//                Printer printer = Printer.getDefaultPrinter();
-//                PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
-//                        PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
-//                double scaleX = pageLayout.getPrintableWidth() /
-//                        nodeToBePrinted.getBoundsInParent().getWidth();
-//                double scaleY = pageLayout.getPrintableHeight() /
-//                        nodeToBePrinted.getBoundsInParent().getHeight();
-//                nodeToBePrinted.getTransforms().add(new Scale(scaleX, scaleY));
 
                 // Now do the actual printing
                 boolean success = currentPrinterJob.printPage(nodeToBePrinted);
@@ -722,9 +725,11 @@ public class DesktopController implements Initializable {
             }
         }
         currentPrinterJob = null;
+        */
+
         /*
-            // Scale the node to be printed, based on the standard letter,
-            // portrait paper.
+            // Sample code that scales the node to be printed, based on the standard
+            //                letter size in portrait mode.
             Printer printer = Printer.getDefaultPrinter();
             PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
                                    PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
@@ -734,6 +739,70 @@ public class DesktopController implements Initializable {
                             node.getBoundsInParent().getHeight();
             node.getTransforms().add(new Scale(scaleX, scaleY));
        */
+    }
+
+    /**
+     * constructs a list of pages to be printed
+     * @param nodeToBePrinted the StyledTextArea that has all the data to be printed
+     * @param layout the PageLayout to use when constructing the pages
+     * @return a List of the StyledTextAreas each constituting one page to be printed.
+     */
+    private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted,
+                                PageLayout layout) {
+        LinkedList<Node> result = new LinkedList<>();
+        double lineHeight = computeParagraphHeight();
+        double printableHeight = layout.getPrintableHeight();
+        final int numLinesPerPage = (int) Math.floor(printableHeight/lineHeight);
+        int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
+        int pageCount = 0; // the number of pages so far
+        int totalNumLines = nodeToBePrinted.getParagraphs().size();
+        int numPages = totalNumLines/numLinesPerPage +
+                (totalNumLines % numLinesPerPage == 0 ? 0 : 1); // last partial page
+        InlineStyleTextArea<StyleInfo> page = null;
+        for (Paragraph<StyleInfo> p : nodeToBePrinted.getParagraphs()) {
+            if (lineCount >= numLinesPerPage) {
+                // start a new page to be filled with lines of text
+                page = new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
+                assmFontData.setFontAndBackground(page);
+                page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
+                        numLinesPerPage * pageCount, totalNumLines,
+                        otherSettings.showLineNumbers.get() ?
+                                (digits -> "%" + digits + "d") : (digits -> "")));
+                final InlineStyleTextArea<StyleInfo> immutablePage = page;
+                page.textProperty().addListener((obs, oldText, newText) -> {
+                    immutablePage.setStyleSpans(0, codePaneController.computeHighlighting
+                            (newText));
+                });
+                lineCount = 0;
+                pageCount++;
+                page.setPrefWidth(layout.getPrintableWidth());
+                page.setPrefHeight(
+                        pageCount != numPages ? lineHeight * numLinesPerPage :
+                        totalNumLines % numLinesPerPage == 0 ? lineHeight * numLinesPerPage :
+                        (totalNumLines % numLinesPerPage) * lineHeight);
+                result.add(page);
+            }
+            lineCount++;
+            if(page != null) // added to stop a compiler warning: possibly uninitialized
+                if(lineCount == numLinesPerPage)
+                    page.appendText(p.toString()); // skip newline char for the last line
+                else
+                    page.appendText(p.fullText()); // text plus newline
+
+        }
+        return result;
+    }
+
+    /**
+     * computes the number of pixels in the text's height, based on the current font
+     * and font size for assembly language panes
+     * @return the number of pixels in height of each line
+     */
+    private double computeParagraphHeight() {
+        Text text = new Text("HELLO");  // arbitrary text
+        text.setFont(new Font(assmFontData.font, Double.valueOf(assmFontData.fontSize)));
+        new Scene(new Group(text));  // to get it to layout the Text
+        return text.getLayoutBounds().getHeight();
     }
 
     /**
