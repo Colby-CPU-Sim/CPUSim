@@ -6,18 +6,10 @@
 package cpusim.gui.desktop.editorpane;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import org.fxmisc.richtext.Paragraph;
 import org.fxmisc.richtext.StyledTextArea;
-import org.reactfx.EventStream;
-import org.reactfx.EventStreams;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.IntFunction;
 
 /**

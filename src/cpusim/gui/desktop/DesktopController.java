@@ -661,7 +661,7 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * Not implemented yet...
+     * TODO: implement this or remove it
      *
      * @param event
      */
@@ -671,7 +671,7 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * Not implemented yet...
+     * TODO:  implement this
      *
      * @param event
      */
