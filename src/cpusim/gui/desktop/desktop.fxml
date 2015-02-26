@@ -48,8 +48,6 @@
                       onAction="#handleSaveAsHTMLMachine"
                       text="Save machine in HTML..."/>
             <SeparatorMenuItem mnemonicParsing="false"/>
-            <MenuItem mnemonicParsing="false" onAction="#handlePrintPreview"
-                      text="Print Preview"/>
             <MenuItem mnemonicParsing="false" onAction="#handlePrintSetup"
                       text="Print setup..."/>
             <MenuItem mnemonicParsing="false" onAction="#handlePrint"

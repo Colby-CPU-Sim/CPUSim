@@ -23,6 +23,7 @@ package cpusim.gui.preferences;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.FontData;
+import cpusim.gui.desktop.KeyCodeInfo;
 import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.help.HelpController;
@@ -49,6 +50,9 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -153,13 +157,11 @@ public class PreferencesController implements Initializable {
     private final Mediator mediator;
     private final DesktopController desktopController;
 
-    private ObservableList<String> keyBindings;
-
+    // fields for the key bindings tab
+    private List<String> keyBindings;  // local copy of the bindings for editing
     private boolean listening;
-
-    private Label currLabel;
-
-    private String currBinding;
+    private Label currLabel; // the current binding label
+    private String currBinding; // the binding in the currLabel
 
 
     public PreferencesController(Mediator mediator, DesktopController desktopController) {
@@ -188,13 +190,8 @@ public class PreferencesController implements Initializable {
             mainPane.setPrefHeight(screenHeight - 40);
         }
 
-        // initialize some keyboard shortcut settings
         initializeKeyTab();
-
-        // initialize the values of all controls
         initializeFontTab();
-
-        // set the values of the other settings
         initializeOtherTab();
     }
 
@@ -215,7 +212,7 @@ public class PreferencesController implements Initializable {
                 }
             }
         });
-        initKeyBindings();
+        initKeyBindingsField();
         updateKeyBindingDisplay();
         currLabel = (Label) keyBindingsPane.getChildren().get(0);
     }
@@ -383,22 +380,17 @@ public class PreferencesController implements Initializable {
         ramTableFontData.fontSize = ramsFontSize.getValue();
         ramTableFontData.background = toRGBCode(ramsBackground.getValue());
 
-//        if (!registerTableFontData.background.equals(registerBackground.getValue().toString())) {
-//            CPUSimConstants.dialog.
-//                    owner((Stage) applyButton.getScene().getWindow()).
-//                    masthead("Table Color Change Warning").
-//                    message("The change of background color in register and RAM tables " +
-//                            "will not be applied until you restart the application.").
-//                    showWarning();
-//        }
-//        registerTableFontData.background = registerBackground.getValue().toString();
-
         // save the assembly language styles
         saveAssemblyLanguageStyles();
     }
 
     private void saveKeyBindingsTab() {
-        desktopController.setKeyBindings(keyBindings);
+        Map<String,KeyCodeInfo> realBindings = desktopController.getKeyBindings();
+        int i = 0;
+        for(KeyCodeInfo info : realBindings.values()) {
+            info.setKeyCode(keyBindings.get(i));
+            i++;
+        }
     }
 
     private void saveOtherTab() {
@@ -434,8 +426,8 @@ public class PreferencesController implements Initializable {
     @FXML
     protected void handleDefault(ActionEvent e) {
         keyBindings.clear();
-        for (String kb : desktopController.DEFAULT_KEY_BINDINGS) {
-            keyBindings.add(kb);
+        for (String[] kb : desktopController.DEFAULT_KEY_BINDINGS) {
+            keyBindings.add(kb[1]);
         }
         updateKeyBindingDisplay();
     }
@@ -507,13 +499,13 @@ public class PreferencesController implements Initializable {
      * initializes the keyBindings variable based on what the key bindings according
      * to the desktop controller
      */
-    private void initKeyBindings() {
-        keyBindings = FXCollections.observableArrayList();
+    private void initKeyBindingsField() {
+        keyBindings = new ArrayList<>();
 
-        ObservableList<String> realKeyBindings = desktopController.getKeyBindings();
+        Map<String, KeyCodeInfo> realKeyBindings = desktopController.getKeyBindings();
 
-        for (String binding : realKeyBindings) {
-            keyBindings.add(binding);
+        for (String menuItem : realKeyBindings.keySet()) {
+            keyBindings.add(realKeyBindings.get(menuItem).getKeyCode());
         }
     }
 
@@ -548,20 +540,20 @@ public class PreferencesController implements Initializable {
                 }
             });
             setToDefault.setOnAction(t -> {
-                String kbString = desktopController
+                String kbString = DesktopController
                         .DEFAULT_KEY_BINDINGS[keyBindingsPane.getChildren().indexOf
-                        (currLabel)];
+                        (currLabel)][1];
                 boolean conflict = false;
                 for (Node label : keyBindingsPane.getChildren()) {
                     if (((Label) label).getText().equals(kbString)
-                            && !((Label) label).equals(currLabel)) {
+                            && !label.equals(currLabel)) {
                         conflict = true;
                         String conflictMenuItem = ((Label) menuItemsPane.getChildren()
                                 .get(
                                         keyBindingsPane.getChildren().indexOf(label)))
                                 .getText();
                         Action response = CPUSimConstants.dialog.
-                                owner(((Stage) keyBindingsPane.getScene().getWindow())).
+                                owner(keyBindingsPane.getScene().getWindow()).
                                 masthead("Key Binding Conflict").
                                 message("The key binding of the menu item '" +
                                         conflictMenuItem
@@ -608,15 +600,13 @@ public class PreferencesController implements Initializable {
                             kbString);
                 }
             });
-            setToNoKeyBinding.setOnAction(new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent t) {
-                    currLabel.setText("         ");
-                    keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel), "" +
-                            "       ");
-                    stopListening();
-                    currLabel.setStyle("-fx-background-color:white;" +
-                            "-fx-border-color:white;");
-                }
+            setToNoKeyBinding.setOnAction(t -> {
+                currLabel.setText("         ");
+                keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel), "" +
+                        "       ");
+                stopListening();
+                currLabel.setStyle("-fx-background-color:white;" +
+                        "-fx-border-color:white;");
             });
             contextMenu.getItems().clear();
             contextMenu.getItems().addAll(setToDefault, setToNoKeyBinding);

@@ -484,50 +484,48 @@
                                                 <Label layoutX="5.0" layoutY="169.0"
                                                        text="Save machine in HTML"/>
                                                 <Label layoutX="5.0" layoutY="185.0"
-                                                       text="Print preview"/>
-                                                <Label layoutX="5.0" layoutY="201.0"
                                                        text="Print setup"/>
-                                                <Label layoutX="5.0" layoutY="217.0"
+                                                <Label layoutX="5.0" layoutY="201.0"
                                                        text="Print"/>
-                                                <Label layoutX="5.0" layoutY="233.0"
+                                                <Label layoutX="5.0" layoutY="217.0"
                                                        text="Toggle Comment"/>
-                                                <Label layoutX="5.0" layoutY="249.0"
+                                                <Label layoutX="5.0" layoutY="233.0"
                                                        text="Find"/>
-                                                <Label layoutX="5.0" layoutY="265.0"
+                                                <Label layoutX="5.0" layoutY="249.0"
                                                        text="Preferences"/>
-                                                <Label layoutX="5.0" layoutY="281.0"
+                                                <Label layoutX="5.0" layoutY="265.0"
                                                        text="Machine instructions"/>
-                                                <Label layoutX="5.0" layoutY="297.0"
+                                                <Label layoutX="5.0" layoutY="281.0"
                                                        text="Microinstructions"/>
-                                                <Label layoutX="5.0" layoutY="313.0"
+                                                <Label layoutX="5.0" layoutY="297.0"
                                                        text="Hardware modules"/>
-                                                <Label layoutX="5.0" layoutY="329.0"
+                                                <Label layoutX="5.0" layoutY="313.0"
                                                        text="EQUs"/>
-                                                <Label layoutX="5.0" layoutY="345.0"
+                                                <Label layoutX="5.0" layoutY="329.0"
                                                        text="Fetch Sequence"/>
-                                                <Label layoutX="5.0" layoutY="361.0"
+                                                <Label layoutX="5.0" layoutY="345.0"
                                                        text="Debug Mode"/>
-                                                <Label layoutX="5.0" layoutY="377.0"
+                                                <Label layoutX="5.0" layoutY="361.0"
                                                        text="Assemble"/>
-                                                <Label layoutX="5.0" layoutY="393.0"
+                                                <Label layoutX="5.0" layoutY="377.0"
                                                        text="Assemble &amp; load"/>
-                                                <Label layoutX="5.0" layoutY="409.0"
+                                                <Label layoutX="5.0" layoutY="393.0"
                                                        text="Assemble, load &amp; run"/>
-                                                <Label layoutX="5.0" layoutY="425.0"
+                                                <Label layoutX="5.0" layoutY="409.0"
                                                        text="Clear, assemble, load &amp; run"/>
-                                                <Label layoutX="5.0" layoutY="441.0"
+                                                <Label layoutX="5.0" layoutY="425.0"
                                                        text="Run"/>
-                                                <Label layoutX="5.0" layoutY="457.0"
+                                                <Label layoutX="5.0" layoutY="441.0"
                                                        text="Stop"/>
-                                                <Label layoutX="5.0" layoutY="473.0"
+                                                <Label layoutX="5.0" layoutY="457.0"
                                                        text="Clear Console"/>
-                                                <Label layoutX="5.0" layoutY="489.0"
+                                                <Label layoutX="5.0" layoutY="473.0"
                                                        text="Reset everything"/>
-                                                <Label layoutX="5.0" layoutY="505.0"
+                                                <Label layoutX="5.0" layoutY="489.0"
                                                        text="Options"/>
-                                                <Label layoutX="5.0" layoutY="521.0"
+                                                <Label layoutX="5.0" layoutY="505.0"
                                                        text="General CPUSim Help"/>
-                                                <Label layoutX="5.0" layoutY="537.0"
+                                                <Label layoutX="5.0" layoutY="521.0"
                                                        text="About CPUSim"/>
                                                 <Label layoutX="40.0" layoutY="8.0"
                                                        text="Menu Items"/>

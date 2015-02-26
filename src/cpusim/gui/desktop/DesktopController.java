@@ -63,8 +63,6 @@
  */
 package cpusim.gui.desktop;
 
-import com.sun.javafx.scene.control.behavior.TextInputControlBehavior;
-import com.sun.javafx.scene.control.skin.TextInputControlSkin;
 import cpusim.*;
 import cpusim.assembler.Token;
 import cpusim.gui.desktop.editorpane.*;
@@ -107,7 +105,6 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Scale;
 import javafx.stage.*;
 import javafx.stage.FileChooser.ExtensionFilter;
 
@@ -183,6 +180,8 @@ public class DesktopController implements Initializable {
 
     private String currentTextDirectory;
 
+    private PrinterJob currentPrinterJob;
+
     private FontData assmFontData;
     private FontData registerTableFontData;
     private FontData ramTableFontData;
@@ -200,8 +199,7 @@ public class DesktopController implements Initializable {
 
     private Stage stage;
 
-    private ObservableList<String> keyBindings;
-    private ObservableList<ObjectProperty<KeyCodeCombination>> keyCodeCombinations;
+    private Map<String,KeyCodeInfo> keyBindings; //key=menu name, value=keyboard shortcut
 
     private Mediator mediator;
 
@@ -225,49 +223,46 @@ public class DesktopController implements Initializable {
 
     private final ButtonType buttonTypeYes = new ButtonType("Yes");
     private final ButtonType buttonTypeNo = new ButtonType("No");
-    private final ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+    private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
+                                                      ButtonBar.ButtonData.CANCEL_CLOSE);
 
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
-    public static final String[] DEFAULT_KEY_BINDINGS = {
-            SHORTCUT + "-N",               // new text file
-            SHORTCUT + "-O",               // open text file
-            SHORTCUT + "-W",               // close file
-            SHORTCUT + "-S",               // save file
-            SHORTCUT + "-Shift-S",         // save file as
-            SHORTCUT + "-Shift-N",         // save machine
-            SHORTCUT + "-Shift-O",         // open machine  
-            SHORTCUT + "-B",               // save machine 
-            SHORTCUT + "-Shift-B",         // save machine as
-            SHORTCUT + "-Alt-B",           // save machine as html
-            SHORTCUT + "-Alt-P",           // print preview
-            SHORTCUT + "-Shift-P",         // print setup
-            SHORTCUT + "-P",               // print 
-            /* quit, undo, redo, cut, 
-            copy, paste, delete, and 
-            select all are not editable */
-            SHORTCUT + "-Slash",           // toggle comment
-            SHORTCUT + "-F",               // find
-            SHORTCUT + "-Comma",           // preferences
-            SHORTCUT + "-M",               // edit machine instructions
-            SHORTCUT + "-Shift-M",         // edit microinstructions
-            SHORTCUT + "-K",               // edit hardware modules
-            SHORTCUT + "-E",               // edit EQUs 
-            SHORTCUT + "-Y",               // edit fetch sequence
-            SHORTCUT + "-D",               // toggle debug mode
-            SHORTCUT + "-1",               // assemble
-            SHORTCUT + "-2",               // assemble and load
-            SHORTCUT + "-3",               // assemble, load and run
-            SHORTCUT + "-G",               // clear, assemble, load, and run
-            SHORTCUT + "-R",               // run   
-            SHORTCUT + "-Period",          // stop
-            SHORTCUT + "-Shift-R",         // reset everything
-            SHORTCUT + "-L",               // clear console 
-            SHORTCUT + "-I",               // edit options
-            SHORTCUT + "-Shift-H",         // open general cpusim help
-            SHORTCUT + "-Shift-A"          // open about cpusim
+    public static final String[][] DEFAULT_KEY_BINDINGS = {
+            /* quit, undo, redo, cut, copy, paste, delete, select all are not editable */
+            { "New text",           SHORTCUT + "-N"},
+            { "Open text...",       SHORTCUT + "-O"},
+            { "Close text",         SHORTCUT + "-W"},
+            { "Save text",          SHORTCUT + "-S"},
+            { "Save text as...",    SHORTCUT + "-Shift-S"},
+            { "New machine",        SHORTCUT + "-Shift-N"},
+            { "Open machine...",       SHORTCUT + "-Shift-O"},
+            { "Save machine",       SHORTCUT + "-B"},
+            { "Save machine as...", SHORTCUT + "-Shift-B"},
+            { "Save machine in HTML...", SHORTCUT + "-Alt-B"},
+            { "Print setup...",     SHORTCUT + "-Shift-P"},
+            { "Print...",           SHORTCUT + "-P"},
+            { "Toggle Comment",     SHORTCUT + "-Slash"},
+            { "Find...",            SHORTCUT + "-F"},
+            { "Preferences...",     SHORTCUT + "-Comma"},
+            { "Machine instructions...", SHORTCUT + "-M"},
+            { "Microinstructions...", SHORTCUT + "-Shift-M"},
+            { "Hardware Modules...", SHORTCUT + "-K"},
+            { "EQUs...",            SHORTCUT + "-E"},
+            { "Fetch Sequence...",  SHORTCUT + "-Y"},
+            { "Debug Mode",         SHORTCUT + "-D"},
+            { "Assemble",           SHORTCUT + "-1"},
+            { "Assemble & load",    SHORTCUT + "-2"},
+            { "Assemble, load & run", SHORTCUT + "-3"},
+            { "Clear, assemble, load & run", SHORTCUT + "-G"},
+            { "Run",                SHORTCUT + "-R"},
+            { "Stop",               SHORTCUT + "-Period"},
+            { "Reset everything",   SHORTCUT + "-Shift-R"},
+            { "Clear console",      SHORTCUT + "-L"},
+            { "Options...",         SHORTCUT + "-I"},
+            { "General CPUSim Help", SHORTCUT + "-Shift-H"},
+            { "About CPUSim",       SHORTCUT + "-Shift-A"}
     };
-    private PrinterJob currentPrinterJob;
 
     /**
      * constructor method that takes in a mediator and a stage
@@ -334,48 +329,32 @@ public class DesktopController implements Initializable {
         reopenTextFiles = new ArrayDeque<String>();
         reopenMachineFiles = new ArrayDeque<String>();
 
-        //initialize table data
+        //initialize preferences data
         registerTableFontData = new FontData();
         ramTableFontData = new FontData();
         assmFontData = new FontData();
-
-//        backgroundSetting = new HashMap<String, String>() {{
-//            put("WHITE", "cpusim/gui/css/DefaultBackground.css");
-//            put("BLACK", "cpusim/gui/css/CustomerBackground1.css");
-//            put("AZURE", "cpusim/gui/css/CustomerBackground2.css");
-//            put("PURPLE", "cpusim/gui/css/CustomerBackground3.css");
-//            put("ORANGE", "cpusim/gui/css/CustomerBackground4.css");
-//            put("GREEN", "cpusim/gui/css/CustomerBackground5.css");
-//            put("MAGENTA", "cpusim/gui/css/CustomerBackground6.css");
-//        }};
-
         otherSettings = new OtherSettings();
 
         //init key bindings
-        keyBindings = FXCollections.observableArrayList();
-        keyCodeCombinations = FXCollections.observableArrayList();
-        for (int i = 0; i < DEFAULT_KEY_BINDINGS.length; i++) {
-            keyCodeCombinations.add(new SimpleObjectProperty<KeyCodeCombination>(null));
-        }
+        keyBindings = new LinkedHashMap<>(); //to preserve iteration order
 
         //find the screen width
-        double screenwidth = Screen.getPrimary().getBounds().getWidth();
-        double screenheight = Screen.getPrimary().getBounds().getHeight();
+        double screenWidth = Screen.getPrimary().getBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getBounds().getHeight();
 
         //fit main pane to the screen (roughly)
-        if (mainPane.getPrefWidth() > screenwidth) {
-            mainPane.setPrefWidth(screenwidth - 75);
+        if (mainPane.getPrefWidth() > screenWidth) {
+            mainPane.setPrefWidth(screenWidth - 75);
         }
 
-        if (mainPane.getPrefHeight() > screenheight) {
-            mainPane.setPrefHeight(screenheight - 40);
+        if (mainPane.getPrefHeight() > screenHeight) {
+            mainPane.setPrefHeight(screenHeight - 40);
         }
 
         //load preferences
         loadPreferences();
 
-        //initialize key bindings
-        createKeyCodes();
+        //initialize key bindings between the menu item accelerators and the key codes
         bindKeys();
 
         //initialize the values of the choice boxes
@@ -764,6 +743,7 @@ public class DesktopController implements Initializable {
                 // start a new page to be filled with lines of text
                 page = new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
                 assmFontData.setFontAndBackground(page);
+                page.setWrapText(false); // can't print wrapped text
                 page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
                         numLinesPerPage * pageCount, totalNumLines,
                         otherSettings.showLineNumbers.get() ?
@@ -907,12 +887,12 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleToggleComment(ActionEvent event) {
         Tab currTab = textTabPane.getSelectionModel().getSelectedItem();
-        InlineStyleTextArea ta = (InlineStyleTextArea) currTab.getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) currTab.getContent();
 
-        int lower = Math.min(ta.getCaretPosition(), ta.getAnchor());
-        int upper = Math.max(ta.getCaretPosition(), ta.getAnchor());
+        int lower = Math.min(codeArea.getCaretPosition(), codeArea.getAnchor());
+        int upper = Math.max(codeArea.getCaretPosition(), codeArea.getAnchor());
 
-        String text = ta.getText();
+        String text = codeArea.getText();
 
         //handle the case if there is a line at the end with nothing in it
         //give it something so that it will have its own line in the array
@@ -1014,9 +994,7 @@ public class DesktopController implements Initializable {
         // contents in to replace, then return the Clipboard to
         // its original state. This way the actions can be un-done
         // and re-done.
-        ta.selectAll();
-        TextInputControlBehavior<?> ticb = (TextInputControlBehavior<?>)
-                (((TextInputControlSkin<?, ?>) ta.getSkin()).getBehavior());
+        codeArea.selectAll();
         Clipboard clipboard = Clipboard.getSystemClipboard();
 
         boolean setBack = true;
@@ -1032,7 +1010,7 @@ public class DesktopController implements Initializable {
         ClipboardContent content = new ClipboardContent();
         content.putString(newText);
         clipboard.setContent(content);
-        ticb.callAction("Paste");
+        codeArea.paste();
 
         if (setBack) {
             ClipboardContent oldContent = new ClipboardContent();
@@ -1041,9 +1019,9 @@ public class DesktopController implements Initializable {
         }
 
         if (commenting) {
-            ta.selectRange(lower + 1, upper + numIncreasedChars);
+            codeArea.selectRange(lower + 1, upper + numIncreasedChars);
         } else {
-            ta.selectRange(lower - 1, upper + numIncreasedChars);
+            codeArea.selectRange(lower - 1, upper + numIncreasedChars);
         }
     }
 
@@ -1761,10 +1739,8 @@ public class DesktopController implements Initializable {
         fileMenu.getItems().get(11).disableProperty().bind(inRunningMode);
         // Reopen Machine
         fileMenu.getItems().get(12).disableProperty().bind(inRunningMode);
-        // Print Preview
-        fileMenu.getItems().get(18).disableProperty().bind(noTabSelected);
         // Print
-        fileMenu.getItems().get(20).disableProperty().bind(noTabSelected);
+        fileMenu.getItems().get(19).disableProperty().bind(noTabSelected);
 
 
         // Edit Menu
@@ -2947,10 +2923,8 @@ public class DesktopController implements Initializable {
         prefs.put("ramTableFont", ramTableFontData.font);
         prefs.put("ramTableBackground", ramTableFontData.background);
 
-        i = 0;
-        for (String binding : keyBindings) {
-            prefs.put("keyBinding" + i, binding);
-            i++;
+        for (Map.Entry<String,KeyCodeInfo> binding : keyBindings.entrySet()) {
+            prefs.put(binding.getKey(), binding.getValue().getKeyCode());
         }
 
         prefs.putBoolean("autoSave", otherSettings.autoSave);
@@ -3002,9 +2976,10 @@ public class DesktopController implements Initializable {
         ramTableFontData.font = prefs.get("ramTableFont", "Courier New");
         ramTableFontData.background = prefs.get("ramTableBackground", "#fff");
 
-        for (int i = 0; i < DEFAULT_KEY_BINDINGS.length; i++) {
-            String keyString = prefs.get("keyBinding" + i, DEFAULT_KEY_BINDINGS[i]);
-            keyBindings.add(keyString);
+        for (String[] defaultBinding : DEFAULT_KEY_BINDINGS) {
+            String menuName = defaultBinding[0];
+            String keyCode = prefs.get(menuName, defaultBinding[1]);
+            keyBindings.put(menuName, new KeyCodeInfo(keyCode));
         }
 
         otherSettings.autoSave = prefs.getBoolean("autoSave", false);
@@ -3068,64 +3043,64 @@ public class DesktopController implements Initializable {
      * Binds the proper menu items to the correct key combinations based on the strings
      * in the keyBindings data structure.
      */
-    private void createKeyCodes() {
-
-        KeyCode key = null;
-
-        int i = 0;
-        for (String keyBinding : keyBindings) {
-            KeyCodeCombination.ModifierValue shift = KeyCodeCombination.ModifierValue.UP;
-            KeyCodeCombination.ModifierValue ctrl = KeyCodeCombination.ModifierValue.UP;
-            KeyCodeCombination.ModifierValue alt = KeyCodeCombination.ModifierValue.UP;
-            KeyCodeCombination.ModifierValue meta = KeyCodeCombination.ModifierValue.UP;
-            KeyCodeCombination.ModifierValue shortcut = KeyCodeCombination
-                    .ModifierValue.UP;
-            String[] keys = keyBinding.split("-");
-            key = KeyCode.getKeyCode(keys[keys.length - 1]);
-            if (key == null) {
-                key = Convert.charToKeyCode(keys[keys.length - 1]);
-            }
-            keys[keys.length - 1] = null;
-            if (keys.length > 1) {
-                for (String mod : keys) {
-                    if (mod != null) {
-                        switch (mod) {
-                            case "Shift":
-                                shift = KeyCodeCombination.ModifierValue.DOWN;
-                                break;
-                            case "Ctrl":
-                                if (!System.getProperty("os.name").startsWith
-                                        ("Windows")) {
-                                    ctrl = KeyCodeCombination.ModifierValue.DOWN;
-                                } else {
-                                    shortcut = KeyCodeCombination.ModifierValue.DOWN;
-                                }
-                                break;
-                            case "Alt":
-                                alt = KeyCodeCombination.ModifierValue.DOWN;
-                                break;
-                            case "Meta":
-                                meta = KeyCodeCombination.ModifierValue.DOWN;
-                                break;
-                            case "Cmd":
-                                shortcut = KeyCodeCombination.ModifierValue.DOWN;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-            keyCodeCombinations.get(i).set(null);
-            if (key != null) {
-                keyCodeCombinations.get(i).set(new KeyCodeCombination(key, shift, ctrl,
-                        alt,
-                        meta, shortcut));
-            }
-            i++;
-        }
-
-    }
+//    private void createKeyCodes() {
+//
+//        KeyCode key = null;
+//
+//        int i = 0;
+//        for (String keycode : keyBindings) {
+//            KeyCodeCombination.ModifierValue shift = KeyCodeCombination.ModifierValue.UP;
+//            KeyCodeCombination.ModifierValue ctrl = KeyCodeCombination.ModifierValue.UP;
+//            KeyCodeCombination.ModifierValue alt = KeyCodeCombination.ModifierValue.UP;
+//            KeyCodeCombination.ModifierValue meta = KeyCodeCombination.ModifierValue.UP;
+//            KeyCodeCombination.ModifierValue shortcut = KeyCodeCombination
+//                    .ModifierValue.UP;
+//            String[] keys = keycode.split("-");
+//            key = KeyCode.getKeyCode(keys[keys.length - 1]);
+//            if (key == null) {
+//                key = Convert.charToKeyCode(keys[keys.length - 1]);
+//            }
+//            keys[keys.length - 1] = null;
+//            if (keys.length > 1) {
+//                for (String mod : keys) {
+//                    if (mod != null) {
+//                        switch (mod) {
+//                            case "Shift":
+//                                shift = KeyCodeCombination.ModifierValue.DOWN;
+//                                break;
+//                            case "Ctrl":
+//                                if (!System.getProperty("os.name").startsWith
+//                                        ("Windows")) {
+//                                    ctrl = KeyCodeCombination.ModifierValue.DOWN;
+//                                } else {
+//                                    shortcut = KeyCodeCombination.ModifierValue.DOWN;
+//                                }
+//                                break;
+//                            case "Alt":
+//                                alt = KeyCodeCombination.ModifierValue.DOWN;
+//                                break;
+//                            case "Meta":
+//                                meta = KeyCodeCombination.ModifierValue.DOWN;
+//                                break;
+//                            case "Cmd":
+//                                shortcut = KeyCodeCombination.ModifierValue.DOWN;
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    }
+//                }
+//            }
+//            keyCodeCombinations.get(i).set(null);
+//            if (key != null) {
+//                keyCodeCombinations.get(i).set(new KeyCodeCombination(key, shift, ctrl,
+//                        alt,
+//                        meta, shortcut));
+//            }
+//            i++;
+//        }
+//
+//    }
 
     /**
      * Uses the key code combinations in the keyCodeCombinations list to bind the proper
@@ -3133,32 +3108,36 @@ public class DesktopController implements Initializable {
      */
     private void bindKeys() {
 
-        //List of menu items to give keycodes
-        ArrayList<MenuItem> menuItems = new ArrayList<>();
+        //List of menu items to give key codes
+        Set<MenuItem> menuItems = new HashSet<>();
 
-        //put appropriate menu items from the filemenu into the array
+        //put appropriate menu items from the file menu into the array
         for (MenuItem menuItem : fileMenu.getItems()) {
             if (menuItem.getText() == null) {
-                continue;
+                // it's just a separator line
             }
-            if (menuItem.getText().equals("Reopen text") ||
-                    menuItem.getText().equals("Reopen machine") ||
-                    menuItem.getText().equals("Open RAM...") ||
-                    menuItem.getText().equals("Save RAM...") ||
-                    menuItem.getText().equals("Quit")) {
-                continue;
+            else if(menuItem.getText().equals("Quit")) {
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q,
+                        KeyCodeCombination.
+                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                                ModifierValue.DOWN));
+
             }
-            menuItems.add(menuItem);
+            else
+                menuItems.add(menuItem);
         }
 
-        //put appropriate menu items from the filemenu into the array and
+        //put appropriate menu items from the edit menu into the array and
         //give appropriate menu items their default (final) value
         for (MenuItem menuItem : editMenu.getItems()) {
             if (menuItem.getText() == null) {
-                continue;
+                // it's just a separator line
             }
             // Delete: DELETE
-            if (menuItem.getText().equals("Delete")) {
+            else if (menuItem.getText().equals("Delete")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3166,10 +3145,9 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.UP));
-                continue;
             }
             // Undo: SHORTCUT-Z
-            if (menuItem.getText().equals("Undo")) {
+            else if (menuItem.getText().equals("Undo")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3177,10 +3155,9 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
             // Redo: SHORTCUT-Shift-Z
-            if (menuItem.getText().equals("Redo")) {
+            else if (menuItem.getText().equals("Redo")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
                         KeyCodeCombination.
                                 ModifierValue.DOWN, KeyCodeCombination.ModifierValue.UP,
@@ -3188,10 +3165,9 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
             // Cut: SHORTCUT-X
-            if (menuItem.getText().equals("Cut")) {
+            else if (menuItem.getText().equals("Cut")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.X,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3199,10 +3175,9 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
             // Copy: SHORTCUT-C
-            if (menuItem.getText().equals("Copy")) {
+            else if (menuItem.getText().equals("Copy")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.C,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3210,10 +3185,9 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
             // Paste: SHORTCUT-Y
-            if (menuItem.getText().equals("Paste")) {
+            else if (menuItem.getText().equals("Paste")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.V,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3221,9 +3195,8 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
-            if (menuItem.getText().equals("Select All")) {
+            else if (menuItem.getText().equals("Select All")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.A,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3231,24 +3204,20 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-                continue;
             }
-            menuItems.add(menuItem);
+            else
+                menuItems.add(menuItem);
         }
 
         //get appropriate menu items (all fo them) from the rest of the menu items
         for (MenuItem menuItem : modifyMenu.getItems()) {
-            if (menuItem.getText() == null) {
-                continue;
-            }
-            menuItems.add(menuItem);
+            if (menuItem.getText() != null)
+                menuItems.add(menuItem);
         }
 
         for (MenuItem menuItem : executeMenu.getItems()) {
-            if (menuItem.getText() == null) {
-                continue;
-            }
-            menuItems.add(menuItem);
+            if (menuItem.getText() != null)
+                menuItems.add(menuItem);
         }
 
         for (MenuItem menuItem : helpMenu.getItems()) {
@@ -3256,10 +3225,9 @@ public class DesktopController implements Initializable {
         }
 
         //bind the key proper keycode to the every menu item
-        int i = 0;
         for (MenuItem menuItem : menuItems) {
-            menuItem.acceleratorProperty().bind(keyCodeCombinations.get(i));
-            i++;
+            if(keyBindings.containsKey(menuItem.getText()))
+                keyBindings.get(menuItem.getText()).bindToMenuItem(menuItem);
         }
     }
 
@@ -3269,7 +3237,7 @@ public class DesktopController implements Initializable {
      *
      * @returns the current key bindings for the menu items
      */
-    public ObservableList<String> getKeyBindings() {
+    public Map<String,KeyCodeInfo> getKeyBindings() {
         return keyBindings;
     }
 
@@ -3279,9 +3247,8 @@ public class DesktopController implements Initializable {
      *
      * @param keyBindings The new key bindings for the menu items
      */
-    public void setKeyBindings(ObservableList<String> keyBindings) {
+    public void setKeyBindings(Map<String,KeyCodeInfo> keyBindings) {
         this.keyBindings = keyBindings;
-        createKeyCodes();
     }
 
     /**
