@@ -14,11 +14,8 @@
             <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
                     onAction="#handleHelp" prefHeight="25.0" prefWidth="25.0"
                     styleClass="helpButton" text="?"/>
-            <Pane fx:id="easter" onMouseClicked="#holidaySeason" prefHeight="42.0"
-                  prefWidth="260.0">
-                <Label fx:id="christmas"
-                       text="Did you know: There is no button in this space..."
-                       visible="false"/>
+            <Pane prefHeight="42.0" prefWidth="260.0">
+                <Label text=" " visible="false"/>
             </Pane>
             <Button defaultButton="true" minHeight="-Infinity" minWidth="100.0"
                     mnemonicParsing="false" onAction="#handleOkay" prefHeight="22.0"

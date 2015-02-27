@@ -82,9 +82,7 @@ import cpusim.module.RegisterArray;
 import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -102,12 +100,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.stage.*;
+import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-
+import javafx.stage.Modality;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 import org.fxmisc.richtext.*;
 
 import java.io.*;
@@ -306,28 +309,25 @@ public class DesktopController implements Initializable {
         htmlWriter = new MachineHTMLWriter();
 
         //add listener for the stage for closing
-        stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent t) {
-                boolean close = confirmClosing();
-                if (close) {
-                    if (helpController != null) {
-                        helpController.getStage().close();
-                    }
-                    if (findReplaceController != null) {
-                        findReplaceController.getStage().close();
-                    }
-                    storePreferences();
-                } else {
-                    t.consume();
+        stage.setOnCloseRequest(t -> {
+            boolean close = confirmClosing();
+            if (close) {
+                if (helpController != null) {
+                    helpController.getStage().close();
                 }
-
+                if (findReplaceController != null) {
+                    findReplaceController.getStage().close();
+                }
+                storePreferences();
+            } else {
+                t.consume();
             }
+
         });
 
         //set up reopen queues
-        reopenTextFiles = new ArrayDeque<String>();
-        reopenMachineFiles = new ArrayDeque<String>();
+        reopenTextFiles = new ArrayDeque<>();
+        reopenMachineFiles = new ArrayDeque<>();
 
         //initialize preferences data
         registerTableFontData = new FontData();
@@ -377,12 +377,7 @@ public class DesktopController implements Initializable {
                         noTabSelected.set(newTab == null);
                         if (newTab != null) {
                             final Node node = newTab.getContent();
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    node.requestFocus();
-                                }
-                            });
+                            Platform.runLater(() -> node.requestFocus());
                         }
                     }
                 });
@@ -642,7 +637,7 @@ public class DesktopController implements Initializable {
     /**
      * TODO: implement this or remove it
      *
-     * @param event
+     * @param event unused
      */
     @FXML
     protected void handlePrintPreview(ActionEvent event) {
@@ -652,7 +647,7 @@ public class DesktopController implements Initializable {
     /**
      * TODO:  implement this
      *
-     * @param event
+     * @param event unused
      */
     @FXML
     protected void handlePrintSetup(ActionEvent event) {
@@ -948,7 +943,7 @@ public class DesktopController implements Initializable {
             return;
         }
 
-        //determine whether we will be commenting or uncommenting by checking
+        //determine whether we will be commenting or un-commenting by checking
         //the first character of the place where highlighting begins
         boolean commenting = false;
         for (int i = 0; i < splitArray.length; i++) {
@@ -959,8 +954,8 @@ public class DesktopController implements Initializable {
 
         int numIncreasedChars = 0;
 
-        //the line with comment approriately added or removed
-        String editedLine = "";
+        //the line with comment appropriately added or removed
+        String editedLine;
 
 
         for (int i = 0; i < splitArray.length; i++) {
@@ -2095,7 +2090,7 @@ public class DesktopController implements Initializable {
         Pane dialogRoot = null;
 
         try {
-            dialogRoot = (Pane) fxmlLoader.load();
+            dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
             //TODO: something better...
             System.out.println(e.getMessage());
@@ -2109,6 +2104,7 @@ public class DesktopController implements Initializable {
             dialogStage.setX(stage.getX() + x);
             dialogStage.setY(stage.getY() + y);
         }
+        // pressing escape key causes the dialog to close without saving changes
         dialogScene.addEventFilter(
                 KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
                     @Override
