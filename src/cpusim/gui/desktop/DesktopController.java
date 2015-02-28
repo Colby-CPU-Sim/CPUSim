@@ -65,6 +65,7 @@ package cpusim.gui.desktop;
 
 import cpusim.*;
 import cpusim.assembler.Token;
+import cpusim.gui.about.AboutController;
 import cpusim.gui.desktop.editorpane.*;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
@@ -1260,13 +1261,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleAboutCPUSim(ActionEvent event) {
-//        openModalDialog("About CPU Sim", "gui/about/AboutFXML.fxml",
-//                new AboutController());
-        Tab tab = textTabPane.getSelectionModel().getSelectedItem();
-        StyledTextArea codeArea = (StyledTextArea) tab.getContent();
-        System.out.println(((LineNumAndBreakpointFactory) codeArea
-                .getParagraphGraphicFactory()).getBreakPointLines());
-
+        openModalDialog("About CPU Sim", "gui/about/AboutFXML.fxml",
+                new AboutController());
     }
 
     //======================= auxiliary methods ================================

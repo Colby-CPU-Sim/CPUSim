@@ -130,10 +130,10 @@ public class BufferedChannel implements IOChannel {
 			// Output directions if the user asks for "help"
 			if(inputFromChannel.toLowerCase().equals("help")) {
 				state.writeString("Type in a decimal, binary, or hexadecimal " +
-						"integer. " +
+						"integer and then press Enter. " +
 						"For binary, use a prefix of \"0b\" or \"-0b\"." +
-						"For hexadecimal, use " +
-						"\"0x\" or \"-0x\". and then press Enter" + this.LINE_SEPARATOR +
+						" For hexadecimal, use " +
+						"\"0x\" or \"-0x\"." + this.LINE_SEPARATOR +
 						"To halt execution, use the Stop menu item from the Execute menu." +
 						this.LINE_SEPARATOR);
 			} else { //not help

@@ -21,8 +21,8 @@
 			consuming.</FONT>
 	</P>
 	<P class="p2">
-		<FONT FACE="Arial" size=+1 COLOR="#0000ff">Overview of the
-			Wombat1 architecture</font>
+		<span FACE="Arial" COLOR="#0000ff" style="font-size: larger; ">Overview of the
+			Wombat1 architecture</span>
 	</P>
 	<P class="p3">
 		<FONT FACE="Palatino">The machine we will now construct, the
@@ -39,7 +39,7 @@
 		</FONT>
 	</P>
 	<P class="p3">
-		<FONT FACE="Palatino">In the Wombat1, t</FONT><FONT FACE="Palatino">he
+		<FONT FACE="Palatino">In the Wombat1, the
 			<I>pc</I> stores the address of the main memory location that
 			contains the next instruction to be executed. In the fetch sequence
 			(the first part of every machine cycle), the next instruction to be
@@ -63,7 +63,7 @@
 	<P class="p3">
 		<FONT FACE="Palatino">There are 12 machine instructions for the
 			Wombat1, each associated with a 4-bit opcode. These instructions are:
-			HALT (stop), READ (get input from the user), WRITE (send output to
+			STOP, READ (get input from the user), WRITE (send output to
 			the user), LOAD (transfer data from the main memory to the acc),
 			STORE (transfer data from the acc to the main memory), ADD (add a
 			value from the main memory to the value in the <I>acc</I>, putting
@@ -117,8 +117,8 @@
 			&quot;status&quot; register, the bit to 0, and check the "halt" box.</FONT>
 	</P>
 	<P class="p3" ALIGN="CENTER">
-		<FONT FACE="Palatino"><IMG SRC="EditModules.jpg" HEIGHT="303"
-			WIDTH="480"><BR>Figure 5. The dialog for editing the
+		<FONT FACE="Palatino"><IMG SRC="EditModules.png" HEIGHT="336"
+			WIDTH="484"><BR>Figure 5. The dialog for editing the
 			hardware modules.</FONT>
 	</P>
 	<P class="p3">
@@ -199,46 +199,43 @@
 			sequence is a list of microinstructions that are executed at the
 			beginning of every machine cycle. The default sequence is empty. The
 			current fetch sequence list is displayed in the left scroll box
-			entitled "Implementation". To add microinstructions to it, first
-			display the microinstructions of the type you want in the tree of
+			entitled "Fetch Sequence Implementation". To add microinstructions to it, first
+			display the microinstructions of the type you want to add in the tree of
 			microinstructions in the right side of the dialog by clicking on the
-			dial to the right of the folder corresponding to the desired type.
-			Then highlight the microinstruction you want by clicking on it.
+			triangle to the right of the folder corresponding to the desired type.
 			(Note: If you realize you need to create or modify a microinstruction
 			before inserting it in the fetch sequence, you don't need to close
 			this dialog; instead you can just double-click on the tree of
 			microinstructions on the right and the dialog for editing and
-			creating microinstructions will appear.) Next, to specify where the
-			new microinstruction is to be inserted into the fetch sequence, click
-			on the microinstruction in the left (Implementation) scroll box
-			before which you want to insert the new microinstruction. Finally,
-			click "&lt;&lt;insert&lt;&lt;". You can reorder the microinstructions
+			creating microinstructions will appear.) To insert the
+			new microinstruction into the fetch sequence, just drag it from the tree on
+            right into the list on the left. You can reorder the microinstructions
 			in the implementation list on the left by dragging them up or down to
 			a new position.
 		</FONT>
 	</P>
 	<P class="p3" ALIGN="CENTER">
-		<FONT FACE="Palatino"><IMG SRC="EditFetchSequ.jpg" HEIGHT="409"
-			WIDTH="540"><BR>Figure 7. The dialog for editing the fetch
+		<FONT FACE="Palatino"><IMG SRC="EditFetchSequ.png" HEIGHT="470"
+			WIDTH="618"><BR>Figure 7. The dialog for editing the fetch
 			sequence.</FONT>
 	</P>
 	<P class="p3">
 		<FONT FACE="Palatino"> To remove a microinstruction from the
-			fetch sequence, click on it in the left scroll box to highlight it,
-			and then click ">>delete". </FONT>
+			fetch sequence, just drag it out of the list on the left. </FONT>
 	</P>
 	<P class="p3">
-		<FONT FACE="Palatino">At the bottom of the list of all
-			microinstructions on the right (not shown in Figure 7), there is a
-			microinstruction named &quot;Comment&quot; shown in italics. When
-			executed, this microinstruction does nothing. Instead, this
+		<FONT FACE="Palatino">There is a
+			microinstruction named &quot;Comment&quot; that, when
+			executed, does nothing. Instead, this
 			microinstruction can be used to insert comments into the fetch
-			sequence implementation. To add it, first select it and then press
-			&quot;&lt;&lt;insert&lt;&lt;&quot;. A new Comment microinstruction is
-			added to the implementation. You can now edit the comment in the
+			sequence implementation. Once a Comment microinstruction has been
+			added to the implementation, you can now edit it in the
 			implementation list by double-clicking it (or pressing F2). Comments
-			are colored gray and use an italics font to distinguish them from
-			regular microinstructions.</font>
+			are colored gray to distinguish them from
+			regular microinstructions.  It is also a good idea to start the comment
+            with a special comment symbol to distinguish them from other
+            microinstructions.
+        </font>
 	</P>
 	<P class="p3">
 		<FONT FACE="Palatino">When you are done, click "OK".</FONT>
@@ -257,11 +254,11 @@
 			specify for a machine instruction is used in assembly language
 			programs to execute that instruction. You specify the opcode in
 			hexadecimal notation. The execution sequence of each instruction is
-			edited using the right side of the dialog box (in the same way the
-			fetch sequence is edited, as described above). First select the
+			edited using the Implementation tab. After clicking on this tab, select the
 			instruction you wish to edit on the left and then insert, delete, or
-			move the microinstructions implementing the machine instruction on
-			the right. Figure 8 shows the 12 machine instructions for the Wombat1
+			move the microinstructions implementing the machine instruction just as you
+            did for the fetch sequence.
+            Figure 8 shows the 12 machine instructions for the Wombat1
 			CPU.
 		</FONT>
 	</P>
@@ -272,10 +269,18 @@
 	</P>
 	<P class="p3">
 		<FONT FACE="Palatino">The format of each instruction is
-			specified by a list of fields. For example, the &quot;add&quot;
+			specified using the Format tab. As shown in Figure 8, the &quot;stop&quot;
 			instruction uses two fields: a 4-bit &quot;op&quot; field and a
-			12-bit &quot;addr&quot; field. The &quot;stop&quot; instruction uses
-			a 4-bit &quot;op&quot; field and a 12-bit &quot;unused&quot; field.</FONT>
+			12-bit &quot;unused&quot; field.  To rearrange the fields of an instruction,
+            drag the colored bars to the desired order.  To delete a field, just drag it
+            away from the other fields.  To add a new field, drag a field in from the
+            list of all fields on the right.  The bottom colored bar indicates which of
+            the fields must be included in assembly language instructions and what order
+            they must be in.  The order need not match the order in the instruction bar
+            above it.  The assembler will convert an instruction of the form at the
+            bottom and assemble it into an instruction of the form at the top.
+
+        </FONT>
 	</P>
 	<P class="p3">
 		<FONT FACE="Palatino">To edit the fields, click on the
@@ -284,8 +289,8 @@
 			the figure.</FONT>
 	</P>
 	<P class="p3" ALIGN="CENTER">
-		<FONT FACE="Palatino"><IMG SRC="EditMachineFields.jpg"
-			HEIGHT="475" WIDTH="475"><BR>Figure 9. The dialog for
+		<FONT FACE="Palatino"><IMG SRC="EditMachineFields.png"
+			HEIGHT="282" WIDTH="432"><BR>Figure 9. The dialog for
 			editing the fields of machine instructions.</FONT>
 	</P>
 	<P class="p3">
@@ -324,10 +329,14 @@
 			Sim in a file named "Wombat1.html".
 		</FONT>
 	</P>
+    <P class="p2">
+        <FONT FACE="Arial" size=+1 COLOR="#0000ff">Creating
+            assembly programs for the Wombat1</font>
+    </P>
 	<P class="p3">
 		<FONT FACE="Palatino">Now let's see how you would create an
 			assembly language program for the Wombat1. Select "New text" from the
-			Windows menu. The window that appears is a simple text editor window
+			File menu. The window that appears is a simple text editor window
 			that allows you to type in, save, and print an assembly language
 			program. For example, you could type in the following short program,
 			which reads in two integers and writes out the difference. </FONT>
@@ -344,7 +353,11 @@ x: .data 2 0&#9;;the storage location for x
 y: .data 2 0&#9;;the storage location for y
 </PRE>
 	<P class="p3">
-		<FONT FACE="Palatino">The assembly language names for the
+		<FONT FACE="Palatino">As you type in the program, you will see syntax highlighting
+            in the form of different colors and styles of characters for the various
+            parts of an assembly program.  You can choose the colors and styles you
+            want by using the &quot;Edit|Preferences...&quot; menu item.
+            The assembly language names for the
 			machine instructions are just the names you gave to the machine
 			instructions when you created them. The ".data" statements are
 			pseudoinstructions that tell the assembler to allocate memory for the

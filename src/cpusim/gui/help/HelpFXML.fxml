@@ -14,7 +14,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
 <?import java.lang.*?>
 <?import java.net.URL?>
 
-<BorderPane fx:id="helpPane" prefHeight="750.0" prefWidth="850.0" styleClass="root"
+<BorderPane fx:id="helpPane" prefHeight="750.0" prefWidth="950.0" styleClass="root"
             xmlns:fx="http://javafx.com/fxml">
     <center>
         <SplitPane dividerPositions="0.3" focusTraversable="true" prefHeight="160.0"

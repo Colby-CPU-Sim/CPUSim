@@ -16,22 +16,18 @@
 				ALIGN="CENTER">Running Programs in CPU Sim</P> <I><P
 					ALIGN="CENTER">A Tour using the Wombat1</P></I></font></B>
 	<FONT FACE="Palatino">
-		<P class="p3">
-			This section demonstrates how to use CPU Sim to run a program on a
-			hypothetical machine. In this tour, we will (a) load into CPU Sim a
-			hypothetical machine "Wombat1" that has already been defined and
-			saved in a file, (b) open an assembly language program for the
-			Wombat1, (c) assemble the program, (d) load it into the Wombat1's
-			memory, and (e) run it.<BR>
-		</P>
-		<P class="p3">You have presumably already successfully started CPU
-			Sim if you are reading this help window. The window that appeared
-			when you started CPU Sim is the main "desktop" window. Except for
-			some dialog boxes, all windows used by CPU Sim are windows internal
-			to the desktop window. Such windows include text windows for writing
-			and editing assembly programs and display windows for viewing and
-			editing the contents of registers and memory.</P>
-		<P class="p3">If you do not specify a machine on the command line
+        <P class="p3">
+            This section demonstrates how to use CPU Sim to run a program on a
+            hypothetical machine. In this tour, we will (a) load into CPU Sim a
+            hypothetical machine "Wombat1" that has already been defined and
+            saved in a file, (b) open an assembly language program for the
+            Wombat1, (c) assemble the program, (d) load it into the Wombat1's
+            memory, and (e) run it.<BR>
+            You have presumably already successfully started CPU
+            Sim if you are reading this help window. The window that appears
+            when you start CPU Sim is the main "desktop" window.</P>
+
+        <P class="p3">If you do not specify a machine on the command line
 			when starting CPU Sim, then the title of the main display window is
 			"New" since, if no machine is specified, a new virtual machine is
 			created that has no registers and no memory.</P>
@@ -47,69 +43,86 @@
 			in the SampleAssignments folder included with CPU Sim. (Note: The
 			Wombat1.cpu file is a text file in XML format that contains the
 			information for the Wombat1 machine.) If the machine loads without
-			error, then the title of the main display should become "Wombat1" and
-			two windows should appear inside the desktop (see Figure 1).
+			error, then the title of the main display should become "Wombat1", indicating
+            the machine that is currently being simulated (see Figure 1).
 		</P>
 		<P class="p3" ALIGN="CENTER">
-			<IMG SRC="WombatDesktopPC.jpg" HEIGHT="347" WIDTH="540"><BR>
-			Figure 1. The main display after the Wombat1 has been loaded.
+			<IMG SRC="WombatDesktop.png" HEIGHT="587" WIDTH="1105"><BR>
+			Figure 1. The main display after the Wombat1 has been loaded and the
+            W1-0.a assembly language program has been opened.
 		</P>
-		<P class="p3">The window labeled "Registers" displays all the
+		<P class="p3">The window is divided into four sections.  The left section,
+            labeled "Registers", displays all the
 			registers of the Wombat1 including their widths and current values.
 			To see the values in every register displayed in binary (base 2),
 			signed 2's complement decimal (base 10), unsigned decimal (base 10),
-			or as hexadecimal (base 16), select the appropriate item from the
-			popup menu labeled &quot;Base&quot; at the top of the window. Values
+			hexadecimal (base 16), or ASCII, select the appropriate item from the
+			popup menu labeled &quot;Data&quot; at the top of the window. Values
 			in binary and hexadecimal format are displayed in four-digit groups
 			for readability. The values in the registers can be edited in any of
 			these display formats by double-clicking in the appropriate cell of
 			the table, typing in a new value, and then pressing the enter or
 			return key. The edited values will be automatically reformatted into
 			groups of four characters if the user is working in binary or
-			hexadecimal.</P>
-		<P class="p3">The window labeled "Main" shows the contents of the
+			hexadecimal.  (The number of registers and the names and widths of
+            the registers can also be edited using the
+            dialog that appears when you selected the
+            &quot;Modify|Hardware Modules...&quot; menu item.)
+        </P>
+		<P class="p3">The right section of the window, labeled "Main", shows the contents of the
 			RAM named "Main". As with the registers, you can display the values
-			in base 2, 10 (signed or unsigned), or 16, and, as with the
+			in base 2, 10 (signed or unsigned), 16, or ASCII, and, as with the
 			registers, values in binary and hexadecimal format are grouped in
 			four digit units. You can also view the addresses as positive
 			integers in base 2, 10, or 16. Each cell (with its own address) of
-			this RAM consists of 1 byte. Since each instruction is 16-bits in the
-			Wombat1, it requires 2 cells of RAM to store a single instruction.
-			The values of all cells are editable except the cells in the address
-			column.</P>
+			this RAM consists of 1 byte.
+			The data values of all cells are editable. (You can also edit the number of
+            cells in RAM and the number of bits per cell using the
+            &quot;Modify|Hardware Modules...&quot; menu item.)
+        </P>
 		<P class="p3">Note: The columns in the tables in any of these
 			windows can be reordered by dragging the column headers left or right
 			to a new position. The column widths can also be adjusted by dragging
-			the line dividing the columns. In all windows except the RAM windows,
+			the line dividing the columns. In all tables except the RAM tables,
 			the rows can be resorted by column by clicking in any column header.</P>
-		<P class="p3">The bottom panel of the main display is the Console
-			and is used for console input and output. That is, the user can type
-			data into the Console panel when prompted for input and CPU Sim can
-			print data to the panel for output.</P>
-		<P class="p3">
+        <P class="p3">The center section of the window displays, in separate tabs,
+            the assembly language programs that are currently open.  Each program
+            is displayed in a text editor with the usual editing features such as
+            cut/copy/paste, as well as syntax highlighting and line numbers. (The line
+            numbers and the colors used in the editors are configurable using the
+            &quot;Edit|Preferences...&quot; menu item.)
+        </P>
+        <P class="p3">The bottom panel of the main display is a console
+            that is used for input and output. That is, the user can type
+            data into the console when prompted for input and CPU Sim can
+            print data to the panel for output.</P>
+        <P class="p3">
 			<FONT FACE="Arial" SIZE=+1 COLOR="#0000ff">Opening an assembly
 				language program</FONT>
 		</P>
 		<P class="p3">
-			Now let's open a Wombat1 assembly language program. To do so, choose
-			"Open text..." from the <b>File </b> menu and choose the file
+			Now, if an assembly language program is not already open,
+            let's open a Wombat1 assembly language program. To do so, choose
+			"Open text..." from the <b>File</b> menu and choose the file
 			"W1-0.a". This file may be found in the same folder as the
-			Wombat1.cpu file. After you have selected it, a window will appear
-			containing the text of the file (see Figure 2). The first three lines
-			are comments (comments begin with a semicolon). The remaining lines
+			Wombat1.cpu file. After you have selected it, a tab will appear
+			in the center section of the desktop window
+            containing the text of the file (see Figure 2). The first three lines
+			are comments (comments begin with a semicolon in the Wombat1).
+            The remaining lines
 			consist of instructions followed by comments. The instructions
 			consist of the name of a Wombat1 machine instruction (<FONT
 				FACE="Courier New"> "load", "store" </FONT>, etc.). Some of the
 			instructions are followed by an argument and some of them have a
 			label in front (labels end with a colon). The ".data" instruction is
-			actually a pseudoinstruction used by the assembler to allocate memory
+			actually a pseudo-instruction used by the assembler to allocate memory
 			for the variable "sum". The assembly language syntax is described in
 			more detail in the <a
 				href="../../specifications/assemblyLanguage/syntax.html">Assembly
 				Language Syntax</a> section of this manual.
 		</P>
 		<P class="p3" ALIGN="CENTER">
-			<IMG SRC="Wombat1.jpg" HEIGHT="267" WIDTH="500"> <BR>Figure
+			<IMG SRC="Wombat1.png" HEIGHT="313" WIDTH="473"> <BR>Figure
 			2. A Wombat1 assembly language program.
 		</P>
 		<P class="p3">
@@ -117,14 +130,20 @@
 			language instructions that the Wombat1 can understand and then load
 			those instructions into the Wombat1's memory. To do so, choose
 			"Assemble & Load" from the <b>Execute</b> menu. (Note: If this menu
-			item is disabled, it means there either isn't a RAM available to
-			store instructions within, or there is no tab currently open.) You
-			should see numbers appear in the first few rows of the table in the
-			RAM window. If you hover your mouse over a RAM location, there will
-			also be a Tooltip to show which instruction or pseudoinstruction this
-			RAM location is being used by (if any). The numbers in the data
-			column of the RAM window are the machine language instructions
-			generated by the assembler from the assembly language program.
+			item is disabled, it means either there isn't a RAM available to
+			store instructions within or there is no assembly language program
+            currently open.) You
+			should see numbers appear in the first few rows of the Main RAM table
+			on the right. The numbers in the data
+            column of the Main RAM window are the machine language instructions
+            generated by the assembler from the assembly language program.
+        </P><P class="p3">
+            If you hover your mouse over a RAM location, there will
+			be a tooltip to show which instruction or pseudo-instruction this
+			RAM location corresponds to (if any).  In this example, tooltips appear only
+            on even-address rows because Wombat1 instructions occupy 16 bits, or 2 cells of
+            memory.  Therefore half of an instruction appears in one row and the other
+            half in the next row.
 		</P>
 		<P class="p3">
 			<FONT FACE="Arial" SIZE=+1 COLOR="#0000ff">Running the program
@@ -133,9 +152,9 @@
 		<P class="p3">
 			Now the program in main memory is ready to run. Make sure all the
 			registers have been cleared (set to 0). If some of them are not 0,
-			then either edit the values to make them 0 or choose "Reset
+			then either edit the values directly to make them 0 or choose "Reset
 			everything" from the <b> Execute </b> menu and then choose
-			&quot;Assemble &amp; Load&quot; to reload your program. Then choose
+			&quot;Assemble &amp; load&quot; to reload your program. Then choose
 			"Run" from the <b>Execute</b> menu. The program will begin execution
 			with the instruction whose address is stored in the <em>pc</em>
 			register (the program counter). The machine runs by repeatedly
@@ -160,10 +179,11 @@
 			registers and RAM windows.</P>
 		<P class="p3">
 			If you wish to rerun the program with different input, you can
-			proceed in two ways. You can either perform the two-step process of
-			selecting "Clear everything" from the <b>Execute </b>menu, and then
-			choose "Assemble, load, & run" from the <b> Execute </b>menu, or you
-			can select "Clear, assemble, load & run" from the <b>Execute </b>menu.
+			proceed in two ways. One way is to perform the two-step process of
+			selecting "Reset everything" from the <b>Execute </b>menu, and then
+			choosing "Assemble, load, & run" from the <b> Execute </b>menu.
+            The other way is to
+			select "Clear, assemble, load & run" from the <b>Execute </b>menu.
 			While both of these approaches perform the same function, the "Clear
 			everything" and "Assemble, load, & run" menu items are provided in
 			case you want to debug your programs, as explained below.
@@ -176,15 +196,13 @@
 			When you are debugging assembly code, it is useful to be able to step
 			through the execution, one instruction or microinstruction at a time,
 			and to set break points in the code. To practice debugging using the
-			Wombat1 and the program W1-0.a, first select "Clear everything" from
+			Wombat1 and the program W1-0.a, first select "Reset everything" from
 			the <b> Execute </b> menu, and then choose "Assemble & load" from the
 			<b> Execute </b> menu. Next select "Debug Mode" from the <b>
 				Execute </b> menu. You will see a toolbar appear at the top of the
-			display (see Figure 3). You will also see check boxes for setting
-			break points appear in a new column on the left side in the window
-			where the assembly language text is displayed. When you are in debug
-			mode, you cannot edit the machine's parameters and so the <B>
-				Modify </B>menu is disabled. However, you can still edit the contents of
+			display (see Figure 3). When you are in debug
+			mode, you cannot modify most of the features of the current machine and so the
+             <B>Modify</B> menu is disabled. However, you can still edit the contents of
 			registers or RAMs.
 		</P>
 		<P class="p3" ALIGN="CENTER">
@@ -206,7 +224,7 @@
 			"Step by Instr" causes a full machine cycle to be executed,
 			consisting of the fetch sequence followed by the execute sequence of
 			the instruction that was fetched. As you step through the execution,
-			note that the next machine instruction to be executed is highlighted
+			note that the next instruction to be executed is highlighted
 			in the assembly language code and in the corresponding row in the RAM
 			window. If you wish, you can edit the contents of any of the
 			registers or RAM between steps.</P>
@@ -214,7 +232,12 @@
 			the instructions that are fetched are comprised of a series of
 			smaller, more basic steps called "microinstructions". The list on
 			right side of the debug toolbar displays the microinstructions making
-			up the current fetch sequence or instruction.</P>
+			up the current fetch sequence or execute sequence.  You can edit
+            the microinstructions used in these sequences through the &quot;
+            Modify|Microinstructions...&quot; menu item.  You can edit the fetch and
+            execute sequences through two other menu items in the &quot;Modify&quot;
+            menu.
+        </P>
 		<P class="p3">If you click "Step by Micro" from the toolbar, then
 			only one microinstruction will execute, namely the microinstruction
 			highlighted in the scrolling list on the right end of the debug
@@ -228,7 +251,7 @@
 		<P class="p3">If the microinstruction that you execute is the
 			final "end" microinstruction of a particular machine instruction,
 			then the current machine cycle is ended. A new machine cycle will
-			begin execution next with the fetch sequence. The scrolling list of
+			begin execution with the fetch sequence. The scrolling list of
 			microinstructions will be updated to display the microinstructions in
 			the fetch sequence. The first microinstruction in the fetch sequence
 			will be highlighted and the next machine instruction will be
@@ -239,11 +262,12 @@
 			matter what microinstruction you are currently executing, if you
 			click "Backup one Instr", the state of the CPU will revert back to
 			the state at the beginning of the machine cycle. The &quot;Start
-			over&quot; button backs you up all the way back to the state of the
+			over&quot; button backs you up all the way to the state of the
 			machine when debug mode was first entered.</P>
-		<P class="p3">To set break points in your code, check the box on
-			the left of any line of code in the Assembly language program window.
-			When the CPU accesses that line of code (for example, when that line
+		<P class="p3">To set break points in your code, click on
+			the left grey margin of any line of code in the Assembly language program window.
+			A red dot should appear.
+            When the CPU accesses that line of code (for example, when that line
 			is loaded into the CPU for execution), the program will halt. At that
 			point you can inspect or change any of the values in the register or
 			RAM windows and resume execution or step forward or backward.</P>
