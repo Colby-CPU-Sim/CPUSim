@@ -45,8 +45,9 @@
 				highlighted row of RAM, as you step through the code.
 		</FONT></LI>
 		<LI><FONT FACE="Palatino">You can specify break points at
-				any line of code by checking the box on the left side of that line
-				in its text tab. When that line of code is used (via a <A
+				any line of code by clicking on the left side of the line
+				which will cause a red circle to appear there.
+                When that line of code is accessed (via a <A
 				HREF="../specifications/micros/memoryAccess.html">MemoryAccess</A>
 				microinstruction) for either reading or writing, the MemoryAccess
 				microinstruction is executed and then execution halts. When the
@@ -57,10 +58,9 @@
 	</OL>
 	<P>
 		<FONT FACE="Palatino">To enter debug mode, select the "Debug
-			mode" menu item in the <strong>Execute</strong> menu. This action
-			will cause (a) a debug toolbar to appear below the main menu (see
-			Figure 28) and (b) a new column of checkboxes to appear on the left
-			side of all RAM windows.
+			Mode" menu item in the <strong>Execute</strong> menu. This action
+			will cause a debug toolbar to appear below the main menu (see
+			Figure 28).
 		</FONT>
 	</P>
 	<P class="p3" ALIGN="CENTER">
@@ -93,8 +93,8 @@
 		<LI><FONT FACE="Palatino">the user stops the current
 				execution by choosing "Stop" from the <b> Execute </b>menu
 		</FONT></LI>
-		<LI><FONT FACE="Palatino">the user chooses Cancel when an
-				input dialog appears</FONT></LI>
+        <LI><FONT FACE="Palatino">the user chooses Cancel when an
+            input dialog appears</FONT></LI>
 		<LI><FONT FACE="Palatino">an error occurs.</FONT></LI>
 	</OL>
 	<P>
@@ -144,9 +144,7 @@
 			microinstruction at a time all the way to the initial state of the
 			machine. If you have been backing up by microinstruction and then use
 			the "Backup one Instr" button, the machine will back up to the state
-			it was in at the beginning of the last machine cycle. From there you
-			can back up by machine instruction or microinstruction, or you can
-			step forward by machine instruction or microinstruction.</FONT>
+			it was in at the beginning of the last machine cycle.</FONT>
 	</P>
 	<P>
 		<B><I><FONT FACE="Arial" COLOR="#0000ff">Start over</FONT></I></B>
@@ -154,10 +152,10 @@
 	<P>
 		<FONT FACE="Palatino">The "Start over" button causes the
 			machine to back up all at once to the initial state it was in when
-			the user started executing the current program in debug mode using
-			the current machine. This action also causes the IO to be flushed and
-			reset and the control unit to be reset (to begin execution at the
-			start of the fetch sequence). This buttons functions similarly to
+			the user started executing the current program in debug mode.
+            This action also causes the IO to be flushed and
+			reset and the control unit to be reset to begin execution again at the
+			start of the fetch sequence. This button functions similarly to
 			"Reset everything" in the <B>Execute </B>menu except that this button
 			does not clear the registers and RAMs (unless they were clear when
 			debug mode was entered).
@@ -169,27 +167,28 @@
 					Break points in RAM windows</FONT></B></FONT>
 	</P>
 	<P>
-		<FONT FACE="Palatino"><FONT FACE="Palatino">The column
-				of checkboxes in the text editor that appears when CPU Sim is in
-				debug mode is used for setting break points. CPU Sim will halt
-				execution whenever a MemoryAccess microinstruction reads or writes
-				to the address of RAM associated with the line of code that is
-				checked. More precisely, the MemoryAccess microinstruction will be
-				executed, the row of the RAM window with the associated checked box
-				will be highlighted, and then execution will halt. At that point,
+		<FONT FACE="Palatino"><FONT FACE="Palatino">The grey column
+				that appears along the left edge in the text editor is used
+                for setting break points. To set a break point, click in the grey
+                column and a red dot will appear there.  To clear a break point, just
+                click on the red circle.  CPU Sim will halt
+				execution whenever a MemoryAccess microinstruction reads from or writes
+				to the address of RAM associated with a line of code that
+				has a breakpoint set. More precisely, the MemoryAccess microinstruction will be
+				executed and then execution will halt. At that point,
 				you can inspect and/or change the contents of any register or RAM
 				and continue execution or back up. </FONT></FONT>
 	</P>
 	<P>
-		<FONT FACE="Palatino"><FONT FACE="Palatino">By checking
-				the box in front of a line of code containing a machine instruction,
+		<FONT FACE="Palatino"><FONT FACE="Palatino">By adding a breakpoint in front of
+                a line of code containing a machine instruction,
 				you can halt execution when that instruction is reached (since that
 				instruction needs to be loaded into a register via a MemoryAccess
 				microinstruction before it can be executed).</FONT></FONT>
 	</P>
 	<P>
-		<FONT FACE="Palatino"><FONT FACE="Palatino">For example,
-				by checking the box in front of a .data pseudoinstruction you can
+		<FONT FACE="Palatino"><FONT FACE="Palatino">
+				By adding a breakpoint in front of a .data pseudo-instruction you can
 				halt execution when that data is read from or written to.</FONT></FONT>
 	</P>
 	<P>

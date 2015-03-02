@@ -36,8 +36,8 @@
 			instruction or one microinstruction at a time by using debug mode. </FONT>
 	</P>
 	<P class="p3" ALIGN="CENTER">
-		<FONT FACE="Palatino"><IMG border="1px" SRC="ExecuteMenu.jpg"
-			HEIGHT="235" WIDTH="253"><BR>Figure 13. The Execute menu.</FONT>
+		<FONT FACE="Palatino"><IMG border="1px" SRC="ExecuteMenu.png"
+			HEIGHT="254" WIDTH="275"><BR>Figure 13. The Execute menu.</FONT>
 	</P>
 	<P>
 		<FONT FACE="Palatino"><B><I>Debug Mode</I></B></FONT>
@@ -102,7 +102,7 @@
 			is a convenience item that is equivalent to choosing the "Assemble &
 			load" menu item followed by the "Run" menu item. Similarly, the
 			"Clear, assemble, load & run" menu item is a convenience item that is
-			equivalent to choosing the "Clear everything" menu item followed by
+			equivalent to choosing the "Reset everything" menu item followed by
 			"Assemble, load & run".</FONT>
 	</P>
 	<P>
@@ -142,16 +142,19 @@
 			edit the contents of RAM to get the program to execute a halt
 			instruction or to crash. If the program is repeatedly asking for
 			input from a dialog box, you can select the Cancel button in the
-			dialog. </FONT>
+			dialog. If the program is repeatedly asking for input from the console,
+            you can just press enter instead of entering data.
+        </FONT>
 	</P>
 	<P>
 		<FONT FACE="Palatino"><B><I>Reset Everything</I></B></FONT>
 	</P>
 	<P>
 		<FONT FACE="Palatino">The "Reset everything" menu item causes
-			all registers, register arrays, and RAMs to be cleared. It also
-			resets the control unit (to begin execution at the start of the fetch
-			sequence), and resets all the IO channels. If the IO channel is a
+			all registers, register arrays, and RAMs to be cleared (that is, set
+            to their default values). It also
+			resets execution so that it will start with the fetch
+			sequence, and resets all the IO channels. If the IO channel is a
 			file, the file is closed. Note that you can also clear any individual
 			register or cell of RAM manually by editing its contents in the
 			register or RAM windows.</FONT>
@@ -161,8 +164,9 @@
 	</P>
 	<FONT FACE="Palatino"><P>
 			The &quot;Options&quot; menu item brings up a dialog box where the
-			user can edit the IO Connections, Highlighting, Loading, and
-			Punctuation settings. To learn more about this dialog box, go to <A
+			user can edit the IO Connections, Highlighting, Loading,
+			Punctuation, and the indexing of bits in a register.
+            To learn more about this dialog box, go to <A
 				HREF="../windows/OptionsDialog.html">The Options Dialog.</A>
 		</P>
 </BODY>

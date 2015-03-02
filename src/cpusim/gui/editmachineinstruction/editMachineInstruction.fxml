@@ -97,7 +97,7 @@
                 <BorderPane padding="$x2">
                     <left>
                         <VBox id="VBox" alignment="TOP_CENTER" spacing="5.0">
-                            <Label id="lengthLabel" text="Length"/>
+                            <Label id="lengthLabel" text="Execute sequence"/>
                             <ScrollPane id="ScrollPane" prefHeight="353.9998779296875"
                                         prefViewportHeight="16.0"
                                         prefViewportWidth="47.0" prefWidth="248.0">

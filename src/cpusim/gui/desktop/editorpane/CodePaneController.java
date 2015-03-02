@@ -92,7 +92,7 @@ public class CodePaneController
         String labelRegExpr = symbolsRegExpr + "\\" + labelChar;
         char commentChar = mediator.getMachine().getCommentChar();
         String commentRegExpr = "\\" + commentChar + "[^\n]*\n?";
-        String stringRegExpr = "\".*?\"";
+        String stringRegExpr = "\"[^\n\"]*?\"";
         String decimalLiteralRegExpr = "(\\+|\\-)?[0-9]+";
         String charLiteralRegExpr = "\\'.\\'";
         String binaryIntLiteralRegExpr = "(\\+|\\-)?0b[0-1]+";
