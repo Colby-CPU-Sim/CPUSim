@@ -22,6 +22,7 @@ import cpusim.FieldValue;
 import cpusim.assembler.EQU;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
@@ -261,21 +262,16 @@ public class EditFieldValuesController implements Initializable {
         ArrayList<String> fieldNames = new ArrayList<>();
         for (FieldValue fieldValue : allFieldValues){
             if (fieldValue.getName().indexOf(" ") != -1){
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Field Name Error").
-                        message("Field name '"+fieldValue.getName()+"' is not "
-                        + "valid.").
-                        showError();
+                Dialogs.createErrorDialog(stage, "Field Name Error",
+                        "Field name '"+fieldValue.getName()+"' is not valid.").showAndWait();
+
                 return false;
             }
             if (fieldNames.contains(fieldValue.getName())){
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Field Name Error").
-                        message("You cannot have two fields with the "
-                        + "same name ("+fieldValue.getName()+")").
-                        showError();
+                Dialogs.createErrorDialog(stage, "Field Name Error",
+                        "You cannot have two fields with the "
+                                + "same name ("+fieldValue.getName()+")").showAndWait();
+
                 return false;
             }
             fieldNames.add(fieldValue.getName());

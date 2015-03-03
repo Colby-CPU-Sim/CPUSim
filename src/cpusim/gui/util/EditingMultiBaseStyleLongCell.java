@@ -18,6 +18,7 @@ import cpusim.module.RAMLocation;
 import cpusim.module.Register;
 import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
+import cpusim.util.Dialogs;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -132,11 +133,8 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                     }
                     else {
                         if (textField.getScene() != null) {
-                            CPUSimConstants.dialog.
-                                    owner(textField.getScene().getWindow()).
-                                    masthead("Number Format Error").
-                                    message(errorMessage).
-                                    showError();
+                            Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                    "Number Format Error", errorMessage).showAndWait();
                             cancelEdit();
                         }
                     }

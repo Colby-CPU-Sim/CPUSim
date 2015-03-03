@@ -28,6 +28,7 @@ import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.help.HelpController;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -50,10 +51,7 @@ import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * The controller for the Preferences Dialog.
@@ -552,17 +550,17 @@ public class PreferencesController implements Initializable {
                                 .get(
                                         keyBindingsPane.getChildren().indexOf(label)))
                                 .getText();
-                        Action response = CPUSimConstants.dialog.
-                                owner(keyBindingsPane.getScene().getWindow()).
-                                masthead("Key Binding Conflict").
-                                message("The key binding of the menu item '" +
+                        Optional<ButtonType> result = Dialogs.createConfirmationDialog(
+                                keyBindingsPane.getScene().getWindow(),
+                                "Key Binding Conflict",
+                                "The key binding of the menu item '" +
                                         conflictMenuItem
                                         + "' already has the key binding '" + kbString
                                         + "'.  Would you"
                                         + "like to reassign the key binding of '" +
-                                        conflictMenuItem + "'?").
-                                showConfirm();
-                        if (response == Dialog.ACTION_YES) {
+                                        conflictMenuItem + "'?").showAndWait();
+
+                        if (result.get() == ButtonType.OK) {
                             keyBindings.set(keyBindingsPane.getChildren().indexOf
                                     (label), "          ");
                             currBinding = ((Label) label).getText();
@@ -579,7 +577,7 @@ public class PreferencesController implements Initializable {
                             listenForKeyEvents();
 
                         }
-                        else if (response == Dialog.ACTION_CANCEL) {
+                        else if (result.get() == ButtonType.CANCEL) {
                             return;
                         }
                         else /* response == Actions.NO */ {
@@ -707,25 +705,24 @@ public class PreferencesController implements Initializable {
                         String conflictMenuItem = ((Label) menuItemsPane.getChildren()
                                 .get(
                                         keyBindingsPane.getChildren().indexOf(label))).getText();
-                        Action response = CPUSimConstants.dialog.
-                                owner(((Stage) keyBindingsPane.getScene().getWindow())).
-                                masthead("Key Binding Conflict").
-                                message("The key binding of the menu item '" +
+                        Optional<ButtonType> result = Dialogs.createConfirmationDialog(
+                                keyBindingsPane.getScene().getWindow(),
+                                "Key Binding Conflict",
+                                "The key binding of the menu item '" +
                                         conflictMenuItem
                                         + "' already has the key binding '" + kbString
                                         + "'.  Would you"
                                         + "like to reassign the key binding of '" +
-                                        conflictMenuItem + "'?").
-                                showConfirm();
+                                        conflictMenuItem + "'?").showAndWait();
 
-                        if (response == Dialog.ACTION_YES) {
+                        if (result.get() == ButtonType.OK) {
                             keyBindings.set(keyBindingsPane.getChildren().indexOf
                                     (label), "          ");
                             currBinding = ((Label) label).getText();
                             stillListening = true;
 
                         }
-                        else if (response == Dialog.ACTION_CANCEL) {
+                        else if (result.get() == ButtonType.CANCEL) {
                             return;
                         }
                         else {
@@ -748,12 +745,9 @@ public class PreferencesController implements Initializable {
                         || kbString.equals("Cmd-C") || kbString.equals("Cmd-Z") ||
                         kbString.equals("Cmd-X")
                         || kbString.equals("Cmd-Shift-Z")) {
-                    CPUSimConstants.dialog.
-                            owner((Stage) keyBindingsPane.getScene().getWindow()).
-                            masthead("Reserved Key Binding").
-                            message("The key binding " + kbString + " cannot be assigned"
-                                    + " to a menu item").
-                            showError();
+                    Dialogs.createErrorDialog(keyBindingsPane.getScene().getWindow(),
+                            "Reserved Key Binding", "The key binding " + kbString + " cannot be assigned"
+                                    + " to a menu item").showAndWait();
                     return;
 
                 }

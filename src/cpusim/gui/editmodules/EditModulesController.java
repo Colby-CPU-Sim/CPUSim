@@ -17,6 +17,7 @@ import cpusim.module.RAM;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -29,6 +30,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
 import javafx.scene.input.InputEvent;
@@ -182,11 +184,7 @@ public class EditModulesController implements Initializable {
                     ((ModuleController)activeTable).checkValidity();
 
                 } catch (ValidationException ex){
-                    CPUSimConstants.dialog.
-                            owner((Stage)okButton.getScene().getWindow()).
-                            masthead("Modules Error").
-                            message(ex.getMessage()).
-                            showError();
+                    Dialogs.createErrorDialog(tables.getScene().getWindow(), "Modules Error", ex.getMessage()).showAndWait();
                     event.consume();
                 }
             }
@@ -243,11 +241,7 @@ public class EditModulesController implements Initializable {
                     message += cBitsThatUseIt.elementAt(i) +
                             (i == cBitsThatUseIt.size() - 1 ? "" : ",  ");
                 message += ".\nYou need to delete those condition bits first.";
-                CPUSimConstants.dialog.
-                        owner((Stage) tables.getScene().getWindow()).
-                        masthead("Deletion Error").
-                        message(message).
-                        showError();
+                Dialogs.createErrorDialog(tables.getScene().getWindow(), "Deletion Error", message).showAndWait();
                 return; //don't delete anything
             }
         }
@@ -273,14 +267,10 @@ public class EditModulesController implements Initializable {
                 message += ".\n  If you delete it, all these " +
                         "microinstructions will also be deleted.  " +
                         "Really delete it?";
-                Action response = CPUSimConstants.dialog.
-                        owner((Stage) tables.getScene().getWindow()).
-                        masthead("Confirm Deletion").
-                        message(message).
-                        showConfirm();
-                if(response == Dialog.ACTION_CANCEL ||
-                        response == Dialog.ACTION_NO ||
-                        response == Dialog.ACTION_CLOSE)
+                Optional<ButtonType> result = Dialogs.createConfirmationDialog(tables.getScene().getWindow(), "Confirm Deletion", message).showAndWait();
+                if(result.get() == ButtonType.CANCEL ||
+                        result.get() == ButtonType.NO ||
+                        result.get() == ButtonType.CLOSE)
                     return; //don't delete anything
             }
         }
@@ -397,11 +387,7 @@ public class EditModulesController implements Initializable {
             desktop.getHighlightManager().updatePairsForNewRegistersAndRAMs();
         }
         catch (ValidationException ex) {
-            CPUSimConstants.dialog.
-                    owner((Stage)okButton.getScene().getWindow()).
-                    masthead("Modules Error").
-                    message(ex.getMessage()).
-                    showError();
+            Dialogs.createErrorDialog(tables.getScene().getWindow(), "Modules Error", ex.getMessage()).showAndWait();
         }
 
     }

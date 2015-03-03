@@ -27,6 +27,7 @@ import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.microinstruction.Comment;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.FXCollections;
@@ -165,11 +166,8 @@ public class EditFetchSequenceController implements Initializable {
             ((Stage)implementationFormatPane.getScene().getWindow()).close();
         }
         catch(ValidationException ex){
-            CPUSimConstants.dialog.
-                            owner((Stage)microInstrTreeView.getScene().getWindow()).
-                            masthead("Fetch Sequence Error").
-                            message(ex.getMessage()).
-                            showError();
+            Dialogs.createErrorDialog(microInstrTreeView.getScene().getWindow(),
+                    "Fetch Sequence Error", ex.getMessage()).showAndWait();
         }
     }
 

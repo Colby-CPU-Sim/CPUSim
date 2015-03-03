@@ -16,6 +16,7 @@ import cpusim.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -25,9 +26,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -35,10 +34,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
+
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
@@ -188,11 +185,9 @@ public class EditMicroinstructionsController implements Initializable {
                     ((MicroController)activeTable).checkValidity(activeTable.getItems());
 
                 } catch (ValidationException ex){
-                    CPUSimConstants.dialog.
-                            owner((Stage)okButton.getScene().getWindow()).
-                            masthead("Microinstruction Error").
-                            message(ex.getMessage()).
-                            showError();
+                    Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                            "Microinstruction Error", ex.getMessage()).showAndWait();
+
                     event.consume();
                 }
             }
@@ -249,14 +244,13 @@ public class EditMicroinstructionsController implements Initializable {
                 for (int i = 0; i < instrsThatUseIt.size(); i++)
                     message += instrsThatUseIt.elementAt(i) + " ";
                 message += ".\nReally delete it?";
-                Action response = CPUSimConstants.dialog.
-                        owner((Stage) tables.getScene().getWindow()).
-                        masthead("Confirm Deletion").
-                        message(message).
-                        showConfirm();
-                if(response == Dialog.ACTION_CANCEL ||
-                        response == Dialog.ACTION_NO ||
-                        response == Dialog.ACTION_CLOSE)
+
+                Alert dialog = Dialogs.createConfirmationDialog(tables.getScene().getWindow(),
+                        "Confirm Deletion", message);
+                Optional<ButtonType> result = dialog.showAndWait();
+                if(result.get() == ButtonType.CANCEL ||
+                        result.get() == ButtonType.NO ||
+                        result.get() == ButtonType.CLOSE)
                     return; //don't delete anything
             }
         }
@@ -311,11 +305,8 @@ public class EditMicroinstructionsController implements Initializable {
             if (parent != null)
                 parent.updateDisplay();
         } catch (ValidationException ex){
-            CPUSimConstants.dialog.
-                    owner((Stage)okButton.getScene().getWindow()).
-                    masthead("Microinstruction Error").
-                    message(ex.getMessage()).
-                    showError();
+            Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                    "Microinstruction Error", ex.getMessage()).showAndWait();
         }
 
 

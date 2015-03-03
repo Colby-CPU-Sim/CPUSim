@@ -32,10 +32,7 @@ import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.microinstruction.Comment;
-import cpusim.util.CPUSimConstants;
-import cpusim.util.Convert;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+import cpusim.util.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -556,8 +553,7 @@ public class EditMachineInstructionController implements Initializable {
                             if (currentInstr.getOpcode() != 0) {
                                 numOpcodeBits = 64 - Long.numberOfLeadingZeros
                                         (currentInstr.getOpcode());
-                            }
-                            else {
+                            } else {
                                 numOpcodeBits = 1;
                             }
                             opcodeTextField.setText("0x" + Convert
@@ -689,14 +685,12 @@ public class EditMachineInstructionController implements Initializable {
         instrNames.remove(currentInstr.getName());
         if (indx != 0) {
             instructionList.getSelectionModel().select(indx - 1);
-        }
-        else {
+        } else {
             instructionList.getSelectionModel().select(indx + 1);
             instructionList.getSelectionModel().select(indx);
             if (instructions.size() != 0) {
                 currentInstr = instructions.get(indx);
-            }
-            else {
+            } else {
                 currentInstr = null;
                 dupButton.setDisable(true);
                 deleteButton.setDisable(true);
@@ -739,11 +733,8 @@ public class EditMachineInstructionController implements Initializable {
             mediator.setMachineDirty(true);
             ((Stage) newButton.getScene().getWindow()).close();
         } catch (ValidationException ex) {
-            CPUSimConstants.dialog.
-                    owner((Stage) newButton.getScene().getWindow()).
-                    masthead("Machine Instruction Error").
-                    message(ex.getMessage()).
-                    showError();
+            Dialogs.createErrorDialog(newButton.getScene().getWindow(),
+                    "Machine Instruction Error", ex.getMessage()).showAndWait();
         }
     }
 
@@ -759,8 +750,7 @@ public class EditMachineInstructionController implements Initializable {
             HelpController helpController = HelpController.openHelpDialog(
                     mediator.getDesktopController(), startString);
             mediator.getDesktopController().setHelpController(helpController);
-        }
-        else {
+        } else {
             HelpController hc = mediator.getDesktopController().getHelpController();
             hc.getStage().toFront();
             hc.selectTreeItem(startString);
@@ -1205,16 +1195,14 @@ public class EditMachineInstructionController implements Initializable {
                                                             + 2);
                                         }
                                     }
-                                }
-                                else {
+                                } else {
                                     t.setExpanded(false);
                                 }
                             }
                         }
                     }
                 });
-            }
-            else {
+            } else {
                 microLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent mouseEvent) {

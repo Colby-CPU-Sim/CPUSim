@@ -1,5 +1,3 @@
-package cpusim.gui.options;
-
 /**
  * Controller for the Options Dialog.
  *
@@ -9,31 +7,34 @@ package cpusim.gui.options;
 /*
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
  * with the following changes:
- * 
+ *
  * 1.) changed saveLoadingTab and saveHighlightingOptions methods so that they work
  * with the Validate class to validate their data before saving said data
  * 2.) removed one try catch and allOkay variable and replaced it with a try catch for a validation exception
- * 
- *  on 11/6/13 
+ *
+ *  on 11/6/13
  * 1.) fixed the problem in the savePunctChars() method where it was returning true instead
  * of false and vice-versa
  * 2.) fixed the problem with saving the punctuation characters.  It was adding all the punctChar
- * values on the right side to those on the left side, so it had all the two copies of half the 
+ * values on the right side to those on the left side, so it had all the two copies of half the
  * punctChars, which was causing problems because there were two comments, labels, and pseudos, when
  * there were really only one.  We fixed it so it doesn't do that anymore.
- * 
+ *
  *  on 12/2
  * 1.) fixed a bug where there was a classcastexception when the filechooser dialog was closed
  */
 
+package cpusim.gui.options;
+
 import cpusim.BufferedChannel;
 import cpusim.ConsoleChannel;
+
 import java.io.File;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+import cpusim.util.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -42,15 +43,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -71,58 +64,86 @@ import cpusim.gui.util.EditingStrCell;
 import cpusim.microinstruction.IO;
 import cpusim.module.RAM;
 import cpusim.module.Register;
-import cpusim.util.CPUSimConstants;
-import cpusim.util.Convert;
-import cpusim.util.RegisterRAMPair;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.ComboBox;
 import org.controlsfx.control.action.Action;
 import org.controlsfx.dialog.Dialog;
 
 public class OptionsController implements Initializable {
 
-    @FXML private BorderPane mainBorderPane;
+    @FXML
+    private BorderPane mainBorderPane;
 
-    @FXML private Button helpButton;
-    @FXML private Button OKButton;
-    @FXML private Button cancelButton;
-    @FXML private Button newButton;
-    @FXML private Button deleteButton;
-    @FXML private Button duplicateButton;
-    @FXML private Button applyButton;
+    @FXML
+    private Button helpButton;
+    @FXML
+    private Button OKButton;
+    @FXML
+    private Button cancelButton;
+    @FXML
+    private Button newButton;
+    @FXML
+    private Button deleteButton;
+    @FXML
+    private Button duplicateButton;
+    @FXML
+    private Button applyButton;
 
-    @FXML private TabPane tabPane;
-    @FXML private Tab IOOptionsTab;
-    @FXML private Tab highlightingTab;
-    @FXML private Tab loadingTab;
-    @FXML private Tab punctuationTab;
-    @FXML private Tab indexingTab;
-    
-    @FXML private AnchorPane ioOptionsAnchorPane;
-    @FXML private TableView<IOOptionsData> IOOptionsTable;
-    @FXML private TableColumn<IOOptionsData, IO> nameColumn;
-    @FXML private TableColumn<IOOptionsData, IOChannel> connectionColumn;
+    @FXML
+    private TabPane tabPane;
+    @FXML
+    private Tab IOOptionsTab;
+    @FXML
+    private Tab highlightingTab;
+    @FXML
+    private Tab loadingTab;
+    @FXML
+    private Tab punctuationTab;
+    @FXML
+    private Tab indexingTab;
+
+    @FXML
+    private AnchorPane ioOptionsAnchorPane;
+    @FXML
+    private TableView<IOOptionsData> IOOptionsTable;
+    @FXML
+    private TableColumn<IOOptionsData, IO> nameColumn;
+    @FXML
+    private TableColumn<IOOptionsData, IOChannel> connectionColumn;
     private ObservableList<IOChannel> allChannels;
 
-    @FXML private TableView<RegisterRAMPair> highlightingTable;
-    @FXML private TableColumn<RegisterRAMPair, Register> registerColumn;
-    @FXML private TableColumn<RegisterRAMPair, RAM> RAMColumn;
-    @FXML private TableColumn<RegisterRAMPair, Boolean> dynamicColumn;
+    @FXML
+    private TableView<RegisterRAMPair> highlightingTable;
+    @FXML
+    private TableColumn<RegisterRAMPair, Register> registerColumn;
+    @FXML
+    private TableColumn<RegisterRAMPair, RAM> RAMColumn;
+    @FXML
+    private TableColumn<RegisterRAMPair, Boolean> dynamicColumn;
 
-    @FXML private ChoiceBox<RAM> codeStore;
-    @FXML private TextField startingAddress;
-    
-    @FXML private ChoiceBox<String> indexChoice;
-    
-    @FXML private TableView<PunctChar> leftPunctuationTable;
-    @FXML private TableColumn<PunctChar, String> leftASCIIColumn;
-    @FXML private TableColumn<PunctChar, Use> leftTypeColumn;
-    @FXML private TableView<PunctChar> rightPunctuationTable;
-    @FXML private TableColumn<PunctChar, String> rightASCIIColumn;
-    @FXML private TableColumn<PunctChar, Use> rightTypeColumn;
-    
-    @FXML private ComboBox<ComboBoxChannel> changeAllCombo;
+    @FXML
+    private ChoiceBox<RAM> codeStore;
+    @FXML
+    private TextField startingAddress;
+
+    @FXML
+    private ChoiceBox<String> indexChoice;
+
+    @FXML
+    private TableView<PunctChar> leftPunctuationTable;
+    @FXML
+    private TableColumn<PunctChar, String> leftASCIIColumn;
+    @FXML
+    private TableColumn<PunctChar, Use> leftTypeColumn;
+    @FXML
+    private TableView<PunctChar> rightPunctuationTable;
+    @FXML
+    private TableColumn<PunctChar, String> rightASCIIColumn;
+    @FXML
+    private TableColumn<PunctChar, Use> rightTypeColumn;
+
+    @FXML
+    private ComboBox<ComboBoxChannel> changeAllCombo;
 
 
     private RegisterRAMPair highlightingSelectedSet;
@@ -131,7 +152,7 @@ public class OptionsController implements Initializable {
     private ObservableList<Register> registers;
     private ObservableList<RAM> RAMs;
     private boolean changeStartBits;
-    
+
     /**
      * Constructor with mediator passed
      * from the desktop controller.
@@ -166,28 +187,27 @@ public class OptionsController implements Initializable {
      * is clicked.
      */
     public void onHelpButtonClicked() {
-    	String startString = "Options Dialog";
-    	String appendString = "";
-    	if (IOOptionsTab.isSelected())
-    		appendString = "#IOConnections";
-    	else if (highlightingTab.isSelected())
-    		appendString = "#Highlighting";
-    	else if (loadingTab.isSelected())
-    		appendString = "#Loading";
-    	else if (punctuationTab.isSelected())
-    		appendString = "#Punctuation";
-    	
-    	if (mediator.getDesktopController().getHelpController() == null) {
-			HelpController helpController = HelpController.openHelpDialog(
-					mediator.getDesktopController(), startString, appendString);
-			mediator.getDesktopController().setHelpController(helpController);
-			return;
-		}
-		else {
-			HelpController hc = mediator.getDesktopController().getHelpController();
-			hc.getStage().toFront();
-			hc.selectTreeItem(startString, appendString);
-		}
+        String startString = "Options Dialog";
+        String appendString = "";
+        if (IOOptionsTab.isSelected())
+            appendString = "#IOConnections";
+        else if (highlightingTab.isSelected())
+            appendString = "#Highlighting";
+        else if (loadingTab.isSelected())
+            appendString = "#Loading";
+        else if (punctuationTab.isSelected())
+            appendString = "#Punctuation";
+
+        if (mediator.getDesktopController().getHelpController() == null) {
+            HelpController helpController = HelpController.openHelpDialog(
+                    mediator.getDesktopController(), startString, appendString);
+            mediator.getDesktopController().setHelpController(helpController);
+            return;
+        } else {
+            HelpController hc = mediator.getDesktopController().getHelpController();
+            hc.getStage().toFront();
+            hc.selectTreeItem(startString, appendString);
+        }
     }
 
     /**
@@ -197,14 +217,11 @@ public class OptionsController implements Initializable {
     public void onApplyButtonClicked() {
         if (highlightingTab.isSelected()) {
             saveHighlightingTab();
-        }
-        else if (IOOptionsTab.isSelected()) {
+        } else if (IOOptionsTab.isSelected()) {
             saveIOOptionsTab();
-        }
-        else if (loadingTab.isSelected()) {
+        } else if (loadingTab.isSelected()) {
             saveLoadingTab();
-        }
-        else if (punctuationTab.isSelected()) {
+        } else if (punctuationTab.isSelected()) {
             savePunctuationTab();
         }
     }
@@ -214,25 +231,25 @@ public class OptionsController implements Initializable {
      * is clicked.
      */
     public void onOKButtonClicked() {
-    	// Save individual tabs
-        
-            boolean canClose = true;
-            
-            canClose &= saveIndexingTab();
-            saveHighlightingTab();
-            saveIOOptionsTab();
-            canClose &= saveLoadingTab();
-            canClose &= savePunctuationTab();
+        // Save individual tabs
 
-            if (canClose){
-                // Machine changed & close window.
-        //changed to avoid reference to DesktopController object
-        //previously mediator.getDesktopController.changedMachine()
-                mediator.setMachineDirty(true);
-                Stage stage = (Stage) OKButton.getScene().getWindow();
-                //close window.
-                stage.close();
-            }
+        boolean canClose = true;
+
+        canClose &= saveIndexingTab();
+        saveHighlightingTab();
+        saveIOOptionsTab();
+        canClose &= saveLoadingTab();
+        canClose &= savePunctuationTab();
+
+        if (canClose) {
+            // Machine changed & close window.
+            //changed to avoid reference to DesktopController object
+            //previously mediator.getDesktopController.changedMachine()
+            mediator.setMachineDirty(true);
+            Stage stage = (Stage) OKButton.getScene().getWindow();
+            //close window.
+            stage.close();
+        }
 
     }
 
@@ -241,7 +258,7 @@ public class OptionsController implements Initializable {
      * is clicked.
      */
     public void onCancelButtonClicked() {
-    	cancelButton.setDisable(true);
+        cancelButton.setDisable(true);
         //close window.
         ((Stage) (helpButton.getScene().getWindow())).close();
     }
@@ -251,17 +268,17 @@ public class OptionsController implements Initializable {
      * Button is only within the highlighting tab.
      */
     public void onNewButtonClicked() {
-    	// Add newSet
+        // Add newSet
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
         RegisterRAMPair newSet = new RegisterRAMPair(
-        		registers.get(0), RAMs.get(0), false);
+                registers.get(0), RAMs.get(0), false);
         data.add(0, newSet);
-        
+
         // Select first and scroll to top
         highlightingTable.getSelectionModel().clearSelection();
         highlightingTable.getSelectionModel().selectFirst();
         highlightingTable.scrollTo(0);
-        
+
         updateHighlightingClickables();
     }
 
@@ -278,10 +295,10 @@ public class OptionsController implements Initializable {
         }
 
         // Select Correctly 
-        int indexToSelect = index-1 < 0 ? index : index-1;
+        int indexToSelect = index - 1 < 0 ? index : index - 1;
         if (highlightingTable.getItems().size() > 0) {
-        	highlightingTable.getSelectionModel().clearSelection();
-        	highlightingTable.getSelectionModel().select(indexToSelect);
+            highlightingTable.getSelectionModel().clearSelection();
+            highlightingTable.getSelectionModel().select(indexToSelect);
         }
 
         updateHighlightingClickables();
@@ -295,13 +312,13 @@ public class OptionsController implements Initializable {
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
         int index = data.indexOf(highlightingSelectedSet);
         if (index >= 0) {
-        	// Make newSet and add to table
-        	RegisterRAMPair newSet = highlightingSelectedSet.clone();
-        	data.add(0, newSet);
+            // Make newSet and add to table
+            RegisterRAMPair newSet = highlightingSelectedSet.clone();
+            data.add(0, newSet);
 
-        	// Select first and scroll to top
-        	highlightingTable.getSelectionModel().clearSelection();
-        	highlightingTable.getSelectionModel().selectFirst();
+            // Select first and scroll to top
+            highlightingTable.getSelectionModel().clearSelection();
+            highlightingTable.getSelectionModel().selectFirst();
             highlightingTable.scrollTo(0);
         }
         updateHighlightingClickables();
@@ -311,109 +328,97 @@ public class OptionsController implements Initializable {
 
     public void saveHighlightingTab() {
         if (!highlightingTab.isDisabled()) {
-        	ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
+            ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
             Validate.allRegisterRAMPairAreUnique(data);
-        	mediator.setRegisterRamPairs(data);
+            mediator.setRegisterRamPairs(data);
         }
     }
 
     public void saveIOOptionsTab() {
-    	if (!IOOptionsTab.isDisabled()) {
-    		ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
+        if (!IOOptionsTab.isDisabled()) {
+            ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
             ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
             for (IOOptionsData d : data) {
                 IO micro = (IO) ios.get(ios.indexOf(d.getIo()));
                 micro.setConnection(d.getChannel());
             }
             mediator.getMachine().setMicros("io", ios);
-    	}
+        }
     }
 
     public boolean saveLoadingTab() {
-    	if (!loadingTab.isDisabled()) {
-	        // save the ram used for storing instructions
-	        mediator.getMachine().setCodeStore(codeStore.getValue());
-	
-	        // Save starting address
-	        int ramLength = codeStore.getValue().getLength();
-	        String startString = startingAddress.getText();
-	        int startInt;
-                
-                try{
-                    Validate.startingAddressIsValid(startString, ramLength);
-                    mediator.getMachine().setStartingAddressForLoading(
-                            (int)Convert.fromAnyBaseStringToLong(startString));
-                    return true;
+        if (!loadingTab.isDisabled()) {
+            // save the ram used for storing instructions
+            mediator.getMachine().setCodeStore(codeStore.getValue());
+
+            // Save starting address
+            int ramLength = codeStore.getValue().getLength();
+            String startString = startingAddress.getText();
+            int startInt;
+
+            try {
+                Validate.startingAddressIsValid(startString, ramLength);
+                mediator.getMachine().setStartingAddressForLoading(
+                        (int) Convert.fromAnyBaseStringToLong(startString));
+                return true;
+            } catch (ValidationException ex) {
+                if (tabPane.getSelectionModel().getSelectedItem() != loadingTab) {
+                    tabPane.getSelectionModel().select(loadingTab);
                 }
-                catch(ValidationException ex){
-                    if (tabPane.getSelectionModel().getSelectedItem() != loadingTab) {
-                            tabPane.getSelectionModel().select(loadingTab);
-                    }
-                    CPUSimConstants.dialog.
-                            owner((Stage)OKButton.getScene().getWindow()).
-                            masthead("Starting Address Error").
-                            message(ex.getMessage()).
-                            showError();
-                    return false;
-                }
+                Dialogs.createErrorDialog(OKButton.getScene().getWindow(),
+                        "Starting Address Error", ex.getMessage()).showAndWait();
+                return false;
+            }
         }
         return true;
     }
 
     public boolean savePunctuationTab() {
-    	if (!punctuationTab.isDisabled()) {
+        if (!punctuationTab.isDisabled()) {
             ObservableList<PunctChar> punctChars = FXCollections.observableArrayList();
             punctChars.addAll(leftPunctuationTable.getItems());
             punctChars.addAll(rightPunctuationTable.getItems());
-            try{
+            try {
                 Validate.punctChars(punctChars);
                 PunctChar[] pca = new PunctChar[punctChars.size()];
-                for (int i=0; i<punctChars.size(); i++){
+                for (int i = 0; i < punctChars.size(); i++) {
                     pca[i] = punctChars.get(i);
                 }
                 mediator.getMachine().setPunctChars(pca);
                 return true;
-            }
-            catch(ValidationException ex){
+            } catch (ValidationException ex) {
                 if (tabPane.getSelectionModel().getSelectedItem() != punctuationTab) {
-                        tabPane.getSelectionModel().select(punctuationTab);
+                    tabPane.getSelectionModel().select(punctuationTab);
                 }
-                CPUSimConstants.dialog.
-                            owner(OKButton.getScene().getWindow()).
-                            masthead("Punctuation Character Error").
-                            message(ex.getMessage()).
-                            showError();
+                Dialogs.createErrorDialog(OKButton.getScene().getWindow(),
+                        "Punctuation Character Error", ex.getMessage()).showAndWait();
                 return false;
             }
-    	}
+        }
         return false;
     }
-    
-    public boolean saveIndexingTab(){
-        if (!indexingTab.isDisabled()){
-            if(changeStartBits){
-                Action response = CPUSimConstants.dialog.
-                        owner((Stage)OKButton.getScene().getWindow()).
-                        actions(Dialog.ACTION_OK, Dialog.ACTION_CANCEL).
-                        masthead("Confirm Index Change?").
-                        message("Changing the indexing system may change the functionality of"
-                                    + " some of your microinstructions.  Would you like to"
-                                    + " automatically change the start bits of these microinstructions"
-                                    + " and modules so that you machine will have the same behavior it"
-                                    + " had before you changed the indexing system?").
-                        showConfirm();
-                    if (response == Dialog.ACTION_OK){
-                        mediator.getMachine().changeStartBits();
-                    }
-                    else if (response == Dialog.ACTION_CANCEL){
-                        return false;
-                    }
-                    //else do nothing
+
+    public boolean saveIndexingTab() {
+        if (!indexingTab.isDisabled()) {
+            if (changeStartBits) {
+                Optional<ButtonType> result = Dialogs.createConfirmationDialog(OKButton.getScene().getWindow(),
+                        "Confirm Index Change?",
+                        "Changing the indexing system may change the functionality of"
+                                + " some of your microinstructions.  Would you like to"
+                                + " automatically change the start bits of these microinstructions"
+                                + " and modules so that you machine will have the same behavior it"
+                                + " had before you changed the indexing system?").showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    mediator.getMachine().changeStartBits();
+                } else if (result.get() == ButtonType.CANCEL) {
+                    return false;
+                }
+                //else do nothing
             }
-            
-            
+
+
             mediator.getMachine().setIndexFromRight(indexChoice.getValue().equals("right"));
-            
+
         }
         return true;
     }
@@ -431,18 +436,15 @@ public class OptionsController implements Initializable {
         if (highlightingTable.getItems().isEmpty()) {
             deleteButton.setDisable(true);
             duplicateButton.setDisable(true);
-        }
-        else {
+        } else {
             if (highlightingSelectedSet == null) {
                 deleteButton.setDisable(true);
                 duplicateButton.setDisable(true);
-            }
-            else {
+            } else {
                 if (highlightingTable.getItems().indexOf(highlightingSelectedSet) >= 0) {
                     deleteButton.setDisable(false);
                     duplicateButton.setDisable(false);
-                }
-                else {
+                } else {
                     deleteButton.setDisable(true);
                     duplicateButton.setDisable(true);
                 }
@@ -469,18 +471,15 @@ public class OptionsController implements Initializable {
     public void onSelectionChanged() {
         if (IOOptionsTab.isSelected()) {
             updateGlobalClickables();
-        }
-        else if (highlightingTab.isSelected()) {
+        } else if (highlightingTab.isSelected()) {
             updateHighlightingClickables();
             updateGlobalClickables();
-        }
-        else if (loadingTab.isSelected()) {
+        } else if (loadingTab.isSelected()) {
+            updateGlobalClickables();
+        } else if (punctuationTab.isSelected()) {
             updateGlobalClickables();
         }
-        else if (punctuationTab.isSelected()) {
-            updateGlobalClickables();
-        }
-        
+
     }
 
     ///////////// Setting Up Tables //////////////
@@ -519,7 +518,7 @@ public class OptionsController implements Initializable {
                         Double sum = registerColumn.getWidth()
                                 + RAMColumn.getWidth()
                                 + dynamicColumn.getWidth();
-                        Double perc = sum/oldValue.doubleValue()*.94;
+                        Double perc = sum / oldValue.doubleValue() * .94;
 
                         registerColumn.setPrefWidth(newWidth * perc *
                                 registerColumn.getWidth() / sum);
@@ -529,7 +528,7 @@ public class OptionsController implements Initializable {
                                 dynamicColumn.getWidth() / sum);
                     }
                 });
-        
+
         // Callbacks
         Callback<TableColumn<RegisterRAMPair, Register>, TableCell<RegisterRAMPair, Register>>
                 cellComboRegisterFactory =
@@ -557,10 +556,10 @@ public class OptionsController implements Initializable {
                     @Override
                     public TableCell<RegisterRAMPair, Boolean> call(
                             TableColumn<RegisterRAMPair, Boolean> setStringTableColumn) {
-                    	CheckBoxTableCell<RegisterRAMPair, Boolean> cbtc = 
-                    			new CheckBoxTableCell<RegisterRAMPair, Boolean>();
-                    	cbtc.setAlignment(Pos.CENTER);
-                    	return cbtc;
+                        CheckBoxTableCell<RegisterRAMPair, Boolean> cbtc =
+                                new CheckBoxTableCell<RegisterRAMPair, Boolean>();
+                        cbtc.setAlignment(Pos.CENTER);
+                        return cbtc;
                     }
                 };
 
@@ -616,8 +615,7 @@ public class OptionsController implements Initializable {
         if (RAMs.size() < 1) {
             loadingTab.setDisable(true);
             return;
-        }
-        else {
+        } else {
             codeStore.setItems(RAMs);
             codeStore.setValue(mediator.getMachine().getCodeStore());
             startingAddress.setText(String.valueOf(
@@ -629,16 +627,16 @@ public class OptionsController implements Initializable {
      * Initializes the Punctuation tab.
      */
     private void initializePunctuationTab() {
-    	
-    	// Accounts for width changes.
-    	leftASCIIColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-    	leftTypeColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-    	rightASCIIColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
-    	rightTypeColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
 
-    	// Making column widths adjust properly
-    	leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-    	rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        // Accounts for width changes.
+        leftASCIIColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
+        leftTypeColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
+        rightASCIIColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
+        rightTypeColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
+
+        // Making column widths adjust properly
+        leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Callbacks
         Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>> cellStrFactory =
@@ -646,30 +644,30 @@ public class OptionsController implements Initializable {
                     @Override
                     public TableCell<PunctChar, String> call(
                             TableColumn<PunctChar, String> setStringTableColumn) {
-                    	EditingStrCell<PunctChar> esc = new EditingStrCell<PunctChar>();
-                    	esc.setAlignment(Pos.CENTER);
-                    	esc.setFont(new Font("Courier",18));
-                    	return esc;
+                        EditingStrCell<PunctChar> esc = new EditingStrCell<PunctChar>();
+                        esc.setAlignment(Pos.CENTER);
+                        esc.setFont(new Font("Courier", 18));
+                        return esc;
                     }
-        };
+                };
 
         Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory1 =
-        		new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
-        	@Override
-        	public TableCell<PunctChar, Use> call(
-        			TableColumn<PunctChar, Use> setStringTableColumn) {
-        		return new ComboBoxTableCell<PunctChar, Use>(Use.values());
-        	}
-        };
-        
+                new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
+                    @Override
+                    public TableCell<PunctChar, Use> call(
+                            TableColumn<PunctChar, Use> setStringTableColumn) {
+                        return new ComboBoxTableCell<PunctChar, Use>(Use.values());
+                    }
+                };
+
         Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory2 =
-        		new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
-        	@Override
-        	public TableCell<PunctChar, Use> call(
-        			TableColumn<PunctChar, Use> setStringTableColumn) {
-        		return new ComboBoxTableCell<PunctChar, Use>(Use.values());
-        	}
-        };
+                new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
+                    @Override
+                    public TableCell<PunctChar, Use> call(
+                            TableColumn<PunctChar, Use> setStringTableColumn) {
+                        return new ComboBoxTableCell<PunctChar, Use>(Use.values());
+                    }
+                };
 
         // Set cellValue Factory
         leftASCIIColumn.setCellValueFactory(new PropertyValueFactory<PunctChar, String>("Char"));
@@ -705,14 +703,13 @@ public class OptionsController implements Initializable {
         ObservableList<PunctChar> leftData = leftPunctuationTable.getItems();
         ObservableList<PunctChar> rightData = rightPunctuationTable.getItems();
         PunctChar[] originalPunctChars = mediator.getMachine().getPunctChars();
-        int leftSize = (originalPunctChars.length)/2;
-        int rightSize = originalPunctChars.length-leftSize;
-        for (int i = 0; i < leftSize+rightSize; i++) {
-            if (i<leftSize) {
-            	leftData.add(originalPunctChars[i].copy());
-            }
-            else {
-            	rightData.add(originalPunctChars[i].copy());
+        int leftSize = (originalPunctChars.length) / 2;
+        int rightSize = originalPunctChars.length - leftSize;
+        for (int i = 0; i < leftSize + rightSize; i++) {
+            if (i < leftSize) {
+                leftData.add(originalPunctChars[i].copy());
+            } else {
+                rightData.add(originalPunctChars[i].copy());
             }
         }
         leftPunctuationTable.setItems(leftData);
@@ -732,7 +729,7 @@ public class OptionsController implements Initializable {
                 CPUSimConstants.CONSOLE_CHANNEL,
                 CPUSimConstants.DIALOG_CHANNEL,
                 CPUSimConstants.FILE_CHANNEL);
-        
+
         ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
         for (int i = 0; i < ios.size(); i++) {
             IOChannel channel = ((IO) ios.get(i)).getConnection();
@@ -767,7 +764,7 @@ public class OptionsController implements Initializable {
                     @Override
                     public TableCell<IOOptionsData, IOChannel> call(
                             TableColumn<IOOptionsData, IOChannel> setStringTableColumn) {
-                    	return new IOComboBoxTableCell<IOOptionsData, IOChannel>(
+                        return new IOComboBoxTableCell<IOOptionsData, IOChannel>(
                                 allChannels);
                     }
                 };
@@ -781,18 +778,17 @@ public class OptionsController implements Initializable {
         // IO column is not editable.
         connectionColumn.setCellFactory(cellComboIOChannelFactory);
         connectionColumn.setOnEditCommit(
-            new EventHandler<TableColumn.CellEditEvent<IOOptionsData, IOChannel>>() {
-                @Override
-                public void handle(TableColumn.CellEditEvent<IOOptionsData, IOChannel> text) {
-                    if (!text.getNewValue().equals(CPUSimConstants.FILE_CHANNEL)) {
-                        text.getRowValue().setChannel(text.getNewValue());
+                new EventHandler<TableColumn.CellEditEvent<IOOptionsData, IOChannel>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<IOOptionsData, IOChannel> text) {
+                        if (!text.getNewValue().equals(CPUSimConstants.FILE_CHANNEL)) {
+                            text.getRowValue().setChannel(text.getNewValue());
+                        } else {
+                            IOChannel newChannel = getFileChannelFromChooser(text.getOldValue());
+                            IOOptionsSelectedSet.setChannel(newChannel);
+                        }
                     }
-                    else {
-                        IOChannel newChannel = getFileChannelFromChooser(text.getOldValue());
-                        IOOptionsSelectedSet.setChannel(newChannel);
-                    }
-                }
-            });
+                });
 
         // Load in rows
         ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
@@ -801,120 +797,117 @@ public class OptionsController implements Initializable {
             data.add(new IOOptionsData(channel, channel.getConnection()));
         }
         IOOptionsTable.setItems(data);
-        
+
         // for disabling appropriately
         IOOptionsTab.disableProperty().bind(mediator.getDesktopController().inDebugOrRunningModeProperty());
         if (IOOptionsTab.isDisabled()) {
-        	for (Tab tab : tabPane.getTabs()) {
-        		if (!tab.isDisabled()) {
-        			tabPane.getSelectionModel().select(tab);
-        			break;
-        		}
-        	}
+            for (Tab tab : tabPane.getTabs()) {
+                if (!tab.isDisabled()) {
+                    tabPane.getSelectionModel().select(tab);
+                    break;
+                }
+            }
         }
-        
+
         // Set up change all combo box
 
-		// This uses the Null Object Pattern to ensure that 
-		// the change listener is called appropriately.
-		final ComboBoxChannel nullChannel = new NullComboBoxChannel("individually");
-		ComboBoxChannel dialogCBChannel = new ComboBoxChannel(
-				"to "+CPUSimConstants.DIALOG_CHANNEL.toString(), 
-				(BufferedChannel) CPUSimConstants.DIALOG_CHANNEL);
-		ComboBoxChannel consoleCBChannel = new ComboBoxChannel(
-				"to "+CPUSimConstants.CONSOLE_CHANNEL.toString(), 
-				(BufferedChannel) CPUSimConstants.CONSOLE_CHANNEL);
-		this.changeAllCombo.getItems().addAll(
-				nullChannel, dialogCBChannel, consoleCBChannel);
-		this.changeAllCombo.setValue(nullChannel);
+        // This uses the Null Object Pattern to ensure that
+        // the change listener is called appropriately.
+        final ComboBoxChannel nullChannel = new NullComboBoxChannel("individually");
+        ComboBoxChannel dialogCBChannel = new ComboBoxChannel(
+                "to " + CPUSimConstants.DIALOG_CHANNEL.toString(),
+                (BufferedChannel) CPUSimConstants.DIALOG_CHANNEL);
+        ComboBoxChannel consoleCBChannel = new ComboBoxChannel(
+                "to " + CPUSimConstants.CONSOLE_CHANNEL.toString(),
+                (BufferedChannel) CPUSimConstants.CONSOLE_CHANNEL);
+        this.changeAllCombo.getItems().addAll(
+                nullChannel, dialogCBChannel, consoleCBChannel);
+        this.changeAllCombo.setValue(nullChannel);
 
-		changeAllCombo.valueProperty().addListener(new ChangeListener<ComboBoxChannel>() {
-			@Override
-			public void changed(ObservableValue<? extends ComboBoxChannel> arg0,
-					ComboBoxChannel oldChannel, ComboBoxChannel newChannel) {
-				// Change all data in table
-				// If new channel is null channel then this does nothing,
-				// as it should.
-				for(IOOptionsData ioData : OptionsController.this.IOOptionsTable.getItems()) {
-					newChannel.setChannelInIOOptionsData(ioData);
-				}
+        changeAllCombo.valueProperty().addListener(new ChangeListener<ComboBoxChannel>() {
+            @Override
+            public void changed(ObservableValue<? extends ComboBoxChannel> arg0,
+                                ComboBoxChannel oldChannel, ComboBoxChannel newChannel) {
+                // Change all data in table
+                // If new channel is null channel then this does nothing,
+                // as it should.
+                for (IOOptionsData ioData : OptionsController.this.IOOptionsTable.getItems()) {
+                    newChannel.setChannelInIOOptionsData(ioData);
+                }
 
-				// For some reason, need to run later so that table
-				// and other gui components have time to update
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						changeAllCombo.setValue(nullChannel);
-					}
-				});
+                // For some reason, need to run later so that table
+                // and other gui components have time to update
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        changeAllCombo.setValue(nullChannel);
+                    }
+                });
 
-			}
-		});
+            }
+        });
     }
-    
-    
+
+
     ////////////// OTHER METHODS ///////////////////
-    
-    
+
+
     /**
      * Gets a file channel from the user.
-     * 
+     *
      * @param oldChannel - The default return if the file chooser
-     * fails for some reason to give a valid file.
+     *                   fails for some reason to give a valid file.
      * @return IOChannel - The new channel if successful, oldValue
-     * if not. 
+     * if not.
      */
     private IOChannel getFileChannelFromChooser(IOChannel oldChannel) {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Choose Data File");
-            fileChooser.setInitialDirectory(null);
-            File file = fileChooser.showOpenDialog(
-                            helpButton.getScene().getWindow());
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Data File");
+        fileChooser.setInitialDirectory(null);
+        File file = fileChooser.showOpenDialog(
+                helpButton.getScene().getWindow());
 
-            try {
-                    if (file != null) {
-                            FileChannel newFileChannel = new FileChannel(file);
+        try {
+            if (file != null) {
+                FileChannel newFileChannel = new FileChannel(file);
 
-                            // add it to the ComboBox if not already there
-                            boolean alreadyIn = false;
-                            for (IOChannel ioc : allChannels) {
-                                    if (newFileChannel.toString().equals(ioc.toString())) {
-                                            alreadyIn = true;
-                                            newFileChannel = (FileChannel) ioc;
-                                    }
-                            }
-                            if (!alreadyIn) {
-                                    allChannels.add(newFileChannel);
-                            }
-
-                            return newFileChannel;
+                // add it to the ComboBox if not already there
+                boolean alreadyIn = false;
+                for (IOChannel ioc : allChannels) {
+                    if (newFileChannel.toString().equals(ioc.toString())) {
+                        alreadyIn = true;
+                        newFileChannel = (FileChannel) ioc;
                     }
-            } catch (Exception e) {
-                    CPUSimConstants.dialog.
-                            owner(helpButton.getScene().getWindow()).
-                            masthead("File Load Error").
-                            message("Something went wrong while trying to " +
-                                    "load the file. Please make " +
-                                    "sure the file is valid and try again.").
-                            showError();
+                }
+                if (!alreadyIn) {
+                    allChannels.add(newFileChannel);
+                }
+
+                return newFileChannel;
             }
-            return oldChannel;
+        } catch (Exception e) {
+            Dialogs.createErrorDialog(helpButton.getScene().getWindow(), "File Load Error",
+                    "Something went wrong while trying to " +
+                            "load the file. Please make " +
+                            "sure the file is valid and try again.").showAndWait();
+        }
+        return oldChannel;
     }
-    
+
     /**
      * Initializes the indexing tab
      */
-    private void initializeIndexingTab(){
-        
+    private void initializeIndexingTab() {
+
         changeStartBits = false;
-        
-        ChangeListener indexChangeListener = new ChangeListener(){
+
+        ChangeListener indexChangeListener = new ChangeListener() {
             @Override
             public void changed(ObservableValue ov, Object t, Object t1) {
                 changeStartBits = changeStartBits ? false : true;
             }
         };
-        
+
         indexChoice.setValue(mediator.getMachine().getIndexFromRight() ? "right" : "left");
         indexChoice.getSelectionModel().selectedIndexProperty().addListener(indexChangeListener);
     }
@@ -939,7 +932,7 @@ public class OptionsController implements Initializable {
         }
 
         @SuppressWarnings("unchecked")
-		@Override
+        @Override
         public void updateItem(T item, boolean empty) {
             if (item != CPUSimConstants.FILE_CHANNEL ||
                     IOOptionsSelectedSet == null) {
@@ -948,19 +941,17 @@ public class OptionsController implements Initializable {
                     File file = ((FileChannel) item).getFile();
                     setText(file.getName());
                     setTooltip(new Tooltip(file.toString()));
+                } else {
+                    if (item != null) {
+                        setTooltip(new Tooltip(item.toString()));
+                    }
                 }
-                else {
-                	if (item != null) { 
-                		setTooltip(new Tooltip(item.toString()));
-                	}
-                }
-            }
-            else if (IOOptionsSelectedSet.getChannel() instanceof FileChannel) {
+            } else if (IOOptionsSelectedSet.getChannel() instanceof FileChannel) {
                 //if item is FILE_CHANNEL & a row is selected,
                 // just display that selected channel -- this is
                 // to fix a bug in ComboBoxTableCell
                 // also set a tooltip to the full path name
-            	super.updateItem((T) IOOptionsSelectedSet.getChannel(), empty);
+                super.updateItem((T) IOOptionsSelectedSet.getChannel(), empty);
                 File file = ((FileChannel)
                         IOOptionsSelectedSet.getChannel()).getFile();
                 setText(file.getName());
@@ -969,76 +960,76 @@ public class OptionsController implements Initializable {
             //added on 12/3/13 to make sure that when the hits cancel on the filechooser
             //dialog, an error will not be thrown and the values in the table will update
             //properly
-            else{
+            else {
                 updateIOTableDisplay();
             }
         }
     }
-    
+
     ////////////////////// Other Methods //////////////////////
-    
+
     public void selectTab(int index) {
-    	if (0 <= index && index <= 3) {
-    		if (!tabPane.getTabs().get(index).isDisabled()) {
-    			tabPane.getSelectionModel().select(index);
-    		}
-    	}
+        if (0 <= index && index <= 3) {
+            if (!tabPane.getTabs().get(index).isDisabled()) {
+                tabPane.getSelectionModel().select(index);
+            }
+        }
     }
-    
+
     /**
      * This is a private inner class for the
      * set all connections combo box.
      */
     private class ComboBoxChannel {
-            private String name;
-            private BufferedChannel buffChannel;
+        private String name;
+        private BufferedChannel buffChannel;
 
-            public ComboBoxChannel(String name, BufferedChannel ioChan) {
-                    setName(name);
-                    setChannel(ioChan);
-            }
+        public ComboBoxChannel(String name, BufferedChannel ioChan) {
+            setName(name);
+            setChannel(ioChan);
+        }
 
-            public String getName() {
-                    return this.name;
-            }
+        public String getName() {
+            return this.name;
+        }
 
-            public void setName(String name) {
-                    this.name = name;
-            }
+        public void setName(String name) {
+            this.name = name;
+        }
 
-            public BufferedChannel getChannel() {
-                    return this.buffChannel;
-            }
+        public BufferedChannel getChannel() {
+            return this.buffChannel;
+        }
 
-            public void setChannel(BufferedChannel buffChannel) {
-                    this.buffChannel = buffChannel;
-            }
+        public void setChannel(BufferedChannel buffChannel) {
+            this.buffChannel = buffChannel;
+        }
 
-            public String toString() {
-                    return getName();
-            }
+        public String toString() {
+            return getName();
+        }
 
-            public void setChannelInIOOptionsData(IOOptionsData ioOpsData) {
-                    ioOpsData.setChannel(getChannel());
-            }
+        public void setChannelInIOOptionsData(IOOptionsData ioOpsData) {
+            ioOpsData.setChannel(getChannel());
+        }
     }
 
     /**
      * A null combo box to use Null object pattern.
      * Overrides setChannelInIOOptionsData to do nothing
-     * so that dynamic method invocation can be used 
+     * so that dynamic method invocation can be used
      * in change listener correctly.
      */
     private class NullComboBoxChannel extends ComboBoxChannel {
 
-            public NullComboBoxChannel(String name) {
-                    super(name, null);
-            }
+        public NullComboBoxChannel(String name) {
+            super(name, null);
+        }
 
-            @Override
-            public void setChannelInIOOptionsData(IOOptionsData ioOpsData) {
-                    // Do nothing, Null Object pattern used here
-            }
+        @Override
+        public void setChannelInIOOptionsData(IOOptionsData ioOpsData) {
+            // Do nothing, Null Object pattern used here
+        }
 
     }
 }

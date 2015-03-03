@@ -18,6 +18,7 @@ import cpusim.gui.help.HelpController;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
@@ -174,11 +175,8 @@ public class EditRegistersController implements Initializable {
                     ((ModuleController)activeTable).checkValidity();
                     event.consume();
                 } catch (ValidationException ex){
-                    CPUSimConstants.dialog.
-                            owner((Stage)okButton.getScene().getWindow()).
-                            masthead("Registers Error").
-                            message(ex.getMessage()).
-                            showError();
+                    Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                            "Registers Error", ex.getMessage()).showAndWait();
                 }
             }
         };
@@ -210,11 +208,8 @@ public class EditRegistersController implements Initializable {
             stage.close();
         }
         catch (Exception ex) {
-            CPUSimConstants.dialog.
-                    owner((Stage)okButton.getScene().getWindow()).
-                    masthead("Registers Error").
-                    message(ex.getMessage()).
-                    showError();
+            Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                    "Registers Error", ex.getMessage()).showAndWait();
         }
     }
 
