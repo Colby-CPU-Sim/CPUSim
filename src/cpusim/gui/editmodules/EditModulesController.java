@@ -45,8 +45,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 
 /**
  * This class is the controller for the dialog box that is used for

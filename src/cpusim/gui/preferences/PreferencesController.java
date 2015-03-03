@@ -47,8 +47,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 
 import java.net.URL;
 import java.util.*;

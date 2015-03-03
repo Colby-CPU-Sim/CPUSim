@@ -66,8 +66,6 @@ import cpusim.module.RAM;
 import cpusim.module.Register;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
 
 public class OptionsController implements Initializable {
 

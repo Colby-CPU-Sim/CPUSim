@@ -55,9 +55,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
-
 /**
  * @author Ben Borchard
  */
