@@ -8,6 +8,7 @@ package cpusim.gui.util;
 import cpusim.gui.desktop.FontData;
 import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
+import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -112,24 +113,17 @@ public class EditingIntStyleCell<T> extends TableCell<T, Integer> {
                                         Integer.toHexString(newInt)));
                             } catch (AssertionError e) {
                                 if (textField.getScene() != null) {
-                                    CPUSimConstants.dialog.
-                                            owner(textField.getScene()
-                                                    .getWindow()).
-                                            masthead("Integer Error").
-                                            message("Entered value out of range").
-                                            showError();
+                                    Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                            "Integer Error", "Entered value out of range").showAndWait();
                                     cancelEdit();
                                 }
                             }
                         }
                         else {
                             if (textField.getScene() != null) {
-                                CPUSimConstants.dialog.
-                                        owner(textField.getScene().getWindow()).
-                                        masthead("Integer Error").
-                                        message("This column requires "
-                                                + "positive integer values").
-                                        showError();
+                                Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                        "Integer Error", "This column requires "
+                                                + "positive integer values").showAndWait();
                                 cancelEdit();
                             }
                         }
@@ -140,12 +134,9 @@ public class EditingIntStyleCell<T> extends TableCell<T, Integer> {
                         //textField.setTooltip(new Tooltip("You need to enter an
                         // integer"));
                         if (textField.getScene() != null) {
-                            CPUSimConstants.dialog.
-                                    owner(textField.getScene().getWindow()).
-                                    masthead("Integer Error").
-                                    message("This column requires "
-                                            + "positive integer values").
-                                    showError();
+                            Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                    "Integer Error", "This column requires "
+                                            + "positive integer values").showAndWait();
                             cancelEdit();
                         }
                     }

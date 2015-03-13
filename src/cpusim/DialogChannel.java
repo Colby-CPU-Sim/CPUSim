@@ -19,6 +19,7 @@
 package cpusim;
 
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.FXUtilities;
 import javafx.stage.Stage;
 
@@ -67,12 +68,7 @@ public class DialogChannel implements StringChannel {
         try {
             FXUtilities.runAndWait(new Runnable() {
                 public void run() {
-                    CPUSimConstants.dialog.
-                            owner(stage).
-                            //actions(Dialog.ACTION_OK).
-                            masthead("Output").
-                            message(s).
-                            showConfirm();
+                    Dialogs.createConfirmationDialog(stage, "Output", s).showAndWait();
                 }
             });
         } catch (Exception e) {
@@ -92,12 +88,7 @@ public class DialogChannel implements StringChannel {
         try {
             FXUtilities.runAndWait(new Runnable() {
                 public void run() {
-                    input = CPUSimConstants.dialog.
-                            owner(stage).
-                            //actions(Dialog.ACTION_OK).
-                            masthead("Input Dialog").
-                            message(prompt).
-                            showTextInput();
+                    input = Dialogs.createTextInputDialog(stage,"Input Dialog",prompt).showAndWait();
                 }
             });
         } catch (Exception e) {

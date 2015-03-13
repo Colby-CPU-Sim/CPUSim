@@ -10,15 +10,16 @@ import java.util.List;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.util.CPUSimConstants;
 import java.net.URL;
+
+import cpusim.util.Dialogs;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-
-import org.controlsfx.dialog.Dialogs;
 
 /**
  * A class to start the GUI. This is used every time 
@@ -50,11 +51,9 @@ public class GUIMain extends Application {
         try {
             mainPane = fxmlLoader.load();
         } catch (Exception e) {
-            CPUSimConstants.dialog.
-                owner(stage).
-                masthead("Error finding Resource").
-                message("The FXML resource for the Desktop could not be found.").
-                showError();
+            Dialogs.createErrorDialog(null, "Error finding Resource",
+                    "The FXML resource for the Desktop could not be found.").showAndWait();
+
             System.exit(1);
         }
         Scene mainScene = new Scene(mainPane);

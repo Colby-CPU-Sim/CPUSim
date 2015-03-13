@@ -24,7 +24,7 @@
                         prefHeight="22.0" styleClass="roundButton"
                         text="   Duplicate   "/>
                 <Button fx:id="propertiesButton" disable="true" minHeight="-Infinity"
-                        mnemonicParsing="false" prefHeight="22.0"
+                        mnemonicParsing="false" prefHeight="22.0" visible="false"
                         onAction="#onPropertiesButtonClick" styleClass="roundButton"
                         text="  Properties...  "/>
             </HBox>

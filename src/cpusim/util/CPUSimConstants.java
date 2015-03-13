@@ -32,10 +32,6 @@ import cpusim.DialogChannel;
 import cpusim.IOChannel;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
-import java.awt.Dialog;
-import java.net.URL;
-import javafx.scene.image.Image;
-import org.controlsfx.dialog.Dialogs;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the CPUSimConstants class
@@ -43,9 +39,6 @@ import org.controlsfx.dialog.Dialogs;
 public interface CPUSimConstants {
     // constant for the current version number of CPU Sim
     public static final String VERSION_NUMBER = "4.0b41";
-    
-    // standard baseline for a dialog (lightweight dialog with 'CPU Sim' as the title)
-    public static final Dialogs dialog = Dialogs.create().title("CPU Sim").lightweight();
 
     //is this a Macintosh?  This constant is used to set up the menus
     //differently for Macs and for other OS's.

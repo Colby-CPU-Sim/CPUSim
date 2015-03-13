@@ -7,6 +7,7 @@ package cpusim.gui.util;
 
 import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
+import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -107,11 +108,8 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
                                 //textField.setStyle("-fx-background-color:red;");
                                 //textField.setTooltip(new Tooltip("You need to enter an integer"));
                                 if (textField.getScene() != null){
-                                    CPUSimConstants.dialog.
-                                            owner((Stage)textField.getScene().getWindow()).
-                                            masthead("Integer Error").
-                                            message("This column requires integer values").
-                                            showError();
+                                    Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                            "Integer Error", "This column requires integer values").showAndWait();
                                 }
                             }
                         }

@@ -27,6 +27,7 @@ import cpusim.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.util.EditingIntCell;
 import cpusim.util.CPUSimConstants;
+import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
@@ -52,12 +53,7 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ResourceBundle;
-import org.controlsfx.control.action.Action;
-import org.controlsfx.dialog.Dialog;
+import java.util.*;
 
 /**
  * @author Ben Borchard
@@ -427,16 +423,16 @@ public class EditFieldsController implements Initializable {
         //check if the selected field is contained in any instructions.  If so, inform the
         //user and ask him/her to confirm the delete
         if (containingInstructions.containsKey(selectedField)){
-            Action response = CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Delete Field In Use?").
-                    message("The following instructions contain this field:"+
-                    System.lineSeparator()+containingInstructions.get(selectedField)
-                    +"If you delete this field all instances of "
-                    + "this field will be removed.  Are you sure you want to delete this "
-                    + "instruction?").
-                    showConfirm();
-            if (response == Dialog.ACTION_YES){
+            Alert dialog = Dialogs.createConfirmationDialog(stage,
+                    "Delete Field In Use?", "The following instructions contain this field:"+
+                            System.lineSeparator()+containingInstructions.get(selectedField)
+                            +"If you delete this field all instances of "
+                            + "this field will be removed.  Are you sure you want to delete this "
+                            + "instruction?");
+
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.get() == ButtonType.OK){
                 for (MachineInstruction instr : instructions){
                     instr.getInstructionFields().remove(selectedField);
                     instr.getAssemblyFields().remove(selectedField);
@@ -535,21 +531,15 @@ public class EditFieldsController implements Initializable {
         ArrayList<String> fieldNames = new ArrayList<>();
         for (Field field : allFields){
             if (field.getName().indexOf(" ") != -1){
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Field Name Error").
-                        message("Field name '"+field.getName()+"' is not "
-                        + "valid.").
-                        showError();
+                Dialogs.createErrorDialog(stage,
+                        "Field Name Error", "Field name '"+field.getName()+"' is not valid.").showAndWait();
+
                 return false;
             } 
             if (fieldNames.contains(field.getName())){
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Field Name Error").
-                        message("You cannot have two fields with the "
-                        + "same name ("+field.getName()+")").
-                        showError();
+                Dialogs.createErrorDialog(stage, "Field Name Error",
+                        "You cannot have two fields with the same name ("+field.getName()+")").showAndWait();
+
                 return false;
             }
             fieldNames.add(field.getName());

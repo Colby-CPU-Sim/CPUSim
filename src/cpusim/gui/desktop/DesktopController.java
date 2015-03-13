@@ -203,7 +203,7 @@ public class DesktopController implements Initializable {
 
     private Stage stage;
 
-    private Map<String,KeyCodeInfo> keyBindings; //key=menu name, value=keyboard shortcut
+    private Map<String, KeyCodeInfo> keyBindings; //key=menu name, value=keyboard shortcut
 
     private Mediator mediator;
 
@@ -228,44 +228,44 @@ public class DesktopController implements Initializable {
     private final ButtonType buttonTypeYes = new ButtonType("Yes");
     private final ButtonType buttonTypeNo = new ButtonType("No");
     private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
-                                                      ButtonBar.ButtonData.CANCEL_CLOSE);
+            ButtonBar.ButtonData.CANCEL_CLOSE);
 
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
     public static final String[][] DEFAULT_KEY_BINDINGS = {
             /* quit, undo, redo, cut, copy, paste, delete, select all are not editable */
-            { "New text",           SHORTCUT + "-N"},
-            { "Open text...",       SHORTCUT + "-O"},
-            { "Close text",         SHORTCUT + "-W"},
-            { "Save text",          SHORTCUT + "-S"},
-            { "Save text as...",    SHORTCUT + "-Shift-S"},
-            { "New machine",        SHORTCUT + "-Shift-N"},
-            { "Open machine...",       SHORTCUT + "-Shift-O"},
-            { "Save machine",       SHORTCUT + "-B"},
-            { "Save machine as...", SHORTCUT + "-Shift-B"},
-            { "Save machine in HTML...", SHORTCUT + "-Alt-B"},
-            { "Print setup...",     SHORTCUT + "-Shift-P"},
-            { "Print...",           SHORTCUT + "-P"},
-            { "Toggle Comment",     SHORTCUT + "-Slash"},
-            { "Find...",            SHORTCUT + "-F"},
-            { "Preferences...",     SHORTCUT + "-Comma"},
-            { "Machine instructions...", SHORTCUT + "-M"},
-            { "Microinstructions...", SHORTCUT + "-Shift-M"},
-            { "Hardware Modules...", SHORTCUT + "-K"},
-            { "EQUs...",            SHORTCUT + "-E"},
-            { "Fetch Sequence...",  SHORTCUT + "-Y"},
-            { "Debug Mode",         SHORTCUT + "-D"},
-            { "Assemble",           SHORTCUT + "-1"},
-            { "Assemble & load",    SHORTCUT + "-2"},
-            { "Assemble, load & run", SHORTCUT + "-3"},
-            { "Clear, assemble, load & run", SHORTCUT + "-G"},
-            { "Run",                SHORTCUT + "-R"},
-            { "Stop",               SHORTCUT + "-Period"},
-            { "Reset everything",   SHORTCUT + "-Shift-R"},
-            { "Clear console",      SHORTCUT + "-L"},
-            { "Options...",         SHORTCUT + "-I"},
-            { "General CPUSim Help", SHORTCUT + "-Shift-H"},
-            { "About CPUSim",       SHORTCUT + "-Shift-A"}
+            {"New text", SHORTCUT + "-N"},
+            {"Open text...", SHORTCUT + "-O"},
+            {"Close text", SHORTCUT + "-W"},
+            {"Save text", SHORTCUT + "-S"},
+            {"Save text as...", SHORTCUT + "-Shift-S"},
+            {"New machine", SHORTCUT + "-Shift-N"},
+            {"Open machine...", SHORTCUT + "-Shift-O"},
+            {"Save machine", SHORTCUT + "-B"},
+            {"Save machine as...", SHORTCUT + "-Shift-B"},
+            {"Save machine in HTML...", SHORTCUT + "-Alt-B"},
+            {"Print setup...", SHORTCUT + "-Shift-P"},
+            {"Print...", SHORTCUT + "-P"},
+            {"Toggle Comment", SHORTCUT + "-Slash"},
+            {"Find...", SHORTCUT + "-F"},
+            {"Preferences...", SHORTCUT + "-Comma"},
+            {"Machine instructions...", SHORTCUT + "-M"},
+            {"Microinstructions...", SHORTCUT + "-Shift-M"},
+            {"Hardware Modules...", SHORTCUT + "-K"},
+            {"EQUs...", SHORTCUT + "-E"},
+            {"Fetch Sequence...", SHORTCUT + "-Y"},
+            {"Debug Mode", SHORTCUT + "-D"},
+            {"Assemble", SHORTCUT + "-1"},
+            {"Assemble & load", SHORTCUT + "-2"},
+            {"Assemble, load & run", SHORTCUT + "-3"},
+            {"Clear, assemble, load & run", SHORTCUT + "-G"},
+            {"Run", SHORTCUT + "-R"},
+            {"Stop", SHORTCUT + "-Period"},
+            {"Reset everything", SHORTCUT + "-Shift-R"},
+            {"Clear console", SHORTCUT + "-L"},
+            {"Options...", SHORTCUT + "-I"},
+            {"General CPUSim Help", SHORTCUT + "-Shift-H"},
+            {"About CPUSim", SHORTCUT + "-Shift-A"}
     };
 
     /**
@@ -513,10 +513,10 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
                     "The machine you are currently working on is unsaved.  " +
                             "Would you like to save it before you open a new machine?");
-
+            dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
@@ -545,10 +545,10 @@ public class DesktopController implements Initializable {
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
 
-            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
                     "The machine you are currently working on is unsaved.  " +
                             "Would you like to save it before you open a new machine?");
-
+            dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
@@ -664,7 +664,7 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePrint(ActionEvent event) {
-        if(currentPrinterJob == null)
+        if (currentPrinterJob == null)
             currentPrinterJob = PrinterJob.createPrinterJob();
         Printer printer = Printer.getDefaultPrinter();
         PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
@@ -718,8 +718,9 @@ public class DesktopController implements Initializable {
 
     /**
      * constructs a list of pages to be printed
+     *
      * @param nodeToBePrinted the StyledTextArea that has all the data to be printed
-     * @param layout the PageLayout to use when constructing the pages
+     * @param layout          the PageLayout to use when constructing the pages
      * @return a List of the StyledTextAreas each constituting one page to be printed.
      */
     private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted,
@@ -727,11 +728,11 @@ public class DesktopController implements Initializable {
         LinkedList<Node> result = new LinkedList<>();
         double lineHeight = computeParagraphHeight();
         double printableHeight = layout.getPrintableHeight();
-        final int numLinesPerPage = (int) Math.floor(printableHeight/lineHeight);
+        final int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight);
         int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
         int pageCount = 0; // the number of pages so far
         int totalNumLines = nodeToBePrinted.getParagraphs().size();
-        int numPages = totalNumLines/numLinesPerPage +
+        int numPages = totalNumLines / numLinesPerPage +
                 (totalNumLines % numLinesPerPage == 0 ? 0 : 1); // last partial page
         InlineStyleTextArea<StyleInfo> page = null;
         for (Paragraph<StyleInfo> p : nodeToBePrinted.getParagraphs()) {
@@ -754,13 +755,13 @@ public class DesktopController implements Initializable {
                 page.setPrefWidth(layout.getPrintableWidth());
                 page.setPrefHeight(
                         pageCount != numPages ? lineHeight * numLinesPerPage :
-                        totalNumLines % numLinesPerPage == 0 ? lineHeight * numLinesPerPage :
-                        (totalNumLines % numLinesPerPage) * lineHeight);
+                                totalNumLines % numLinesPerPage == 0 ? lineHeight * numLinesPerPage :
+                                        (totalNumLines % numLinesPerPage) * lineHeight);
                 result.add(page);
             }
             lineCount++;
-            if(page != null) // added to stop a compiler warning: possibly uninitialized
-                if(lineCount == numLinesPerPage)
+            if (page != null) // added to stop a compiler warning: possibly uninitialized
+                if (lineCount == numLinesPerPage)
                     page.appendText(p.toString()); // skip newline char for the last line
                 else
                     page.appendText(p.fullText()); // text plus newline
@@ -772,6 +773,7 @@ public class DesktopController implements Initializable {
     /**
      * computes the number of pixels in the text's height, based on the current font
      * and font size for assembly language panes
+     *
      * @return the number of pixels in height of each line
      */
     private double computeParagraphHeight() {
@@ -1293,10 +1295,10 @@ public class DesktopController implements Initializable {
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Alert dialog = createCustomizedConfirmationDialog("Save File",
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save File",
                     "Would you like to save your work before you close this " +
                             "tab?");
-
+            dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 if (save(tab) && close) {
@@ -1340,7 +1342,7 @@ public class DesktopController implements Initializable {
                 return currTab.getFile();
             }
         } else {  //there is no file or there is a file but the tab is dirty.
-            Alert dialog = createConfirmationDialog("Save File?",
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save File?",
                     "Current Tab is not saved. It needs to be saved"
                             + " before assembly. Save and continue?");
             Optional<ButtonType> result = dialog.showAndWait();
@@ -2183,11 +2185,7 @@ public class DesktopController implements Initializable {
             bwriter.close();
             return true;
         } catch (IOException ioe) {
-            CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Error").
-                    message("Unable to save the text to a file.").
-                    showError();
+            Dialogs.createErrorDialog(stage, "Error", "Unable to save the text to a file.").showAndWait();
             return false;
         }
     }
@@ -2282,12 +2280,9 @@ public class DesktopController implements Initializable {
         currentTextDirectory = fileToOpen.getParent();
         String content = extractTextFromFile(fileToOpen);
         if (content == null) {
-            CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("Nonexistant File").
-                    message("There is no longer a file at the path " +
-                            fileToOpen.getAbsolutePath()).
-                    showError();
+            Dialogs.createErrorDialog(stage, "Nonexistant File", "There is no longer a file at the path " +
+                    fileToOpen.getAbsolutePath()).showAndWait();
+
             if (reopenTextFiles.contains(fileToOpen.getAbsolutePath())) {
                 reopenTextFiles.remove(fileToOpen.getAbsolutePath());
             }
@@ -2375,10 +2370,10 @@ public class DesktopController implements Initializable {
             MenuItem menuItem = new MenuItem(filePath);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
-                    Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+                    Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
                             "The machine you are currently working on is unsaved.  " +
                                     "Would you like to save it before you open a new machine?");
-
+                    dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
                     Optional<ButtonType> result = dialog.showAndWait();
                     if (result.get() == buttonTypeYes) {
                         handleSaveMachine(e);
@@ -2453,11 +2448,7 @@ public class DesktopController implements Initializable {
                 mediator.parseMIFFile(extractTextFromFile(fileToOpen), ram,
                         fileToOpen.getAbsolutePath());
             } catch (MIFReaderException e) {
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("MIF Parse Error").
-                        message(e.getMessage()).
-                        showError();
+                Dialogs.createErrorDialog(stage, "MIF Parse Error", e.getMessage()).showAndWait();
             }
         } else {
             mediator.parseIntelHexFile(extractTextFromFile(fileToOpen), ram,
@@ -2490,11 +2481,10 @@ public class DesktopController implements Initializable {
         // choosing something else the fileFormat string that will be returned
         // will be null.  This would be fine except that we can tell that the
         // user canceled the dialog only by checking if the string is null
-        Optional<String> fileFormat = CPUSimConstants.dialog.
-                owner(stage).
-                masthead("File Format Choice").
-                message("In what file format should your ram information be saved?").
-                showChoices(choices);
+        ChoiceDialog<String> dialog = Dialogs.createChoiceDialog(stage, "File Format Choice",
+                "In what file format should your ram information be saved?",
+                "Machine Instruction File (.mif)", choices);
+        Optional<String> fileFormat = dialog.showAndWait();
 
         if (!fileFormat.isPresent()) {
             return;
@@ -2542,11 +2532,7 @@ public class DesktopController implements Initializable {
                 fwriter.close();
                 bwriter.close();
             } catch (IOException ioe) {
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Error").
-                        message("Unable to save the ram to a file.").
-                        showError();
+                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a file.").showAndWait();
             }
 
         } else {
@@ -2564,11 +2550,7 @@ public class DesktopController implements Initializable {
                 fwriter.close();
                 bwriter.close();
             } catch (IOException ioe) {
-                CPUSimConstants.dialog.
-                        owner(stage).
-                        masthead("Error").
-                        message("Unable to save the ram to a file.").
-                        showError();
+                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a file.").showAndWait();
             }
         }
 
@@ -2833,21 +2815,21 @@ public class DesktopController implements Initializable {
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Alert dialog = createCustomizedConfirmationDialog("Running Program",
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Running Program",
                     "There is a program running. " +
                             "Closing the application will also quit the program. " +
                             "Do you want to quit the running program?");
-
+            dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeNo || result.get() == buttonTypeCancel) {
                 return false;
             }
         }
         if (mediator.isMachineDirty()) {
-            Alert dialog = createCustomizedConfirmationDialog("Save Machine",
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
                     "The machine you are currently working on is unsaved.  " +
                             "Would you like to save it before you close?");
-
+            dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 mediator.saveMachine();
@@ -2857,10 +2839,10 @@ public class DesktopController implements Initializable {
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Alert dialog = createCustomizedConfirmationDialog("Save Text",
+                Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Text",
                         "Would you like to save your work before you "
                                 + "close " + tab.getText().substring(1) + "?");
-
+                dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
                 Optional<ButtonType> result = dialog.showAndWait();
                 if (result.get() == buttonTypeYes) {
                     save(tab);
@@ -2915,7 +2897,7 @@ public class DesktopController implements Initializable {
         prefs.put("ramTableFont", ramTableFontData.font);
         prefs.put("ramTableBackground", ramTableFontData.background);
 
-        for (Map.Entry<String,KeyCodeInfo> binding : keyBindings.entrySet()) {
+        for (Map.Entry<String, KeyCodeInfo> binding : keyBindings.entrySet()) {
             prefs.put(binding.getKey(), binding.getValue().getKeyCode());
         }
 
@@ -3107,8 +3089,7 @@ public class DesktopController implements Initializable {
         for (MenuItem menuItem : fileMenu.getItems()) {
             if (menuItem.getText() == null) {
                 // it's just a separator line
-            }
-            else if(menuItem.getText().equals("Quit")) {
+            } else if (menuItem.getText().equals("Quit")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3117,8 +3098,7 @@ public class DesktopController implements Initializable {
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
 
-            }
-            else
+            } else
                 menuItems.add(menuItem);
         }
 
@@ -3187,8 +3167,7 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-            }
-            else if (menuItem.getText().equals("Select All")) {
+            } else if (menuItem.getText().equals("Select All")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.A,
                         KeyCodeCombination.
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
@@ -3196,8 +3175,7 @@ public class DesktopController implements Initializable {
                                 ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
                                 ModifierValue.DOWN));
-            }
-            else
+            } else
                 menuItems.add(menuItem);
         }
 
@@ -3218,7 +3196,7 @@ public class DesktopController implements Initializable {
 
         //bind the key proper keycode to the every menu item
         for (MenuItem menuItem : menuItems) {
-            if(keyBindings.containsKey(menuItem.getText()))
+            if (keyBindings.containsKey(menuItem.getText()))
                 keyBindings.get(menuItem.getText()).bindToMenuItem(menuItem);
         }
     }
@@ -3229,7 +3207,7 @@ public class DesktopController implements Initializable {
      *
      * @returns the current key bindings for the menu items
      */
-    public Map<String,KeyCodeInfo> getKeyBindings() {
+    public Map<String, KeyCodeInfo> getKeyBindings() {
         return keyBindings;
     }
 
@@ -3239,7 +3217,7 @@ public class DesktopController implements Initializable {
      *
      * @param keyBindings The new key bindings for the menu items
      */
-    public void setKeyBindings(Map<String,KeyCodeInfo> keyBindings) {
+    public void setKeyBindings(Map<String, KeyCodeInfo> keyBindings) {
         this.keyBindings = keyBindings;
     }
 
@@ -3248,11 +3226,8 @@ public class DesktopController implements Initializable {
      * be implemented
      */
     private void tempPrintDialog() {
-        CPUSimConstants.dialog.
-                owner(stage).
-                masthead("Not Implemented").
-                message("Not yet implemented (waiting for JavaFX 8)").
-                showInformation();
+        Alert dialog = Dialogs.createInformationDialog(stage, "Not Implemented", "Not yet implemented (waiting for JavaFX 8)");
+        dialog.showAndWait();
     }
 
     /**
@@ -3264,12 +3239,8 @@ public class DesktopController implements Initializable {
     public void highlightToken(Token token) {
         File file = new File(token.filename);
         if (!file.canRead()) {
-            CPUSimConstants.dialog.
-                    owner(stage).
-                    masthead("IO Error").
-                    message("CPU Sim could not find the file to open and "
-                            + "highlight: " + file.getAbsolutePath()).
-                    showInformation();
+            Dialogs.createErrorDialog(stage, "IO Error", "CPU Sim could not find the file to open and "
+                    + "highlight: " + file.getAbsolutePath()).showAndWait();
             return;
         }
         InlineStyleTextArea textArea = (InlineStyleTextArea) getTabForFile(file).getContent();
@@ -3323,42 +3294,6 @@ public class DesktopController implements Initializable {
                 codeArea.setWrapText(newVal);
             });
         }
-    }
-
-    /**
-     * Creates confirmation dialog.
-     *
-     * @param header  head text of the confirmation dialog
-     * @param content content of the confirmation dialog
-     * @return an dialog object
-     */
-    public Alert createConfirmationDialog(String header, String content) {
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-        dialog.initOwner(stage);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
-
-        return dialog;
-    }
-
-    /**
-     * Creates customized confirmation dialog for saving, closing, new actions.
-     *
-     * @param header  head text of the confirmation dialog
-     * @param content content of the confirmation dialog
-     * @return an dialog object
-     */
-    public Alert createCustomizedConfirmationDialog(String header, String content) {
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-        dialog.initOwner(stage);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
-
-        dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
-
-        return dialog;
     }
 
 }
