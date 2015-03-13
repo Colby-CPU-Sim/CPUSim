@@ -25,29 +25,29 @@
     determine which instruction it is.
     The remaining fields include the operands of the instruction.</FONT></P>
 
-<P><FONT FACE="Palatino">For a very simple example, consider a 16-bit instruction named
-    "load" with format &quot;op reg
-    addr&quot;, where &quot;op&quot; is a 4-bit field, &quot;reg&quot; is a 2-bit operand
-    field, and &quot;addr&quot; is
-    a 10-bit operand field. When the user wants to include this instruction in an assembly
-    language program, the user
-    must type in the program the name of the instruction and 2 operands, each consisting
-    of a symbol or number. For this
-    example, a legal assembly language instruction is "load 1 96".</FONT></P>
+<P><FONT FACE="Palatino">For example, a 16-bit instruction might have
+    a 4-bit opcode, a 2-bit field, and a 10-bit field.</FONT></P>
 
-<P><FONT FACE="Palatino">There are many options regarding the format of the instruction.
-    For example, you can include
+<P><FONT FACE="Palatino">To specify the format of a machine instruction, you use the
+    <a href="../windows/machineInstructions.html"> machine instruction dialog</a>.  In that
+    dialog, you can choose which fields to include and the order in which to include them.
+    The only restriction is that the opcode field must come first.
+    </FONT></P>
+
+<P><FONT FACE="Palatino">
+    To provide flexibility in the assembly language, you have several options that allow
+    you to format the assembly instruction corresponding to the
+    machine instruction differently than the format of the actual instruction.
+    For example, you can list the fields in a different order in assembly language than
+    their order in the machine instruction.  The assembler will
+    rearrange the fields when constructing the machine instruction.
+    Also, you can include
     0-bit fields, which are just used as punctuation in the assembly language instruction.
-    For example, a &quot;loadr&quot;
-    instruction might have a format &quot;op reg delta[reg]&quot;, which contains six
-    fields. Here &quot;op&quot; might
-    be a 4-bit field as before, &quot;reg&quot; is a 2-bit field, &quot;delta&quot; is an
-    8-bit field, and &quot;[&quot;
-    and &quot;]&quot; are 0-bit fields. To include this instruction in an assembly
-    language program, you could write
-    &quot;loadr 1 -3[2]&quot;. Note that you don't supply values for the 0-bit fields and
-    instead the names of those
-    fields are used as punctuation.</FONT></P>
+    For example, an
+    instruction might have a format &quot;loadr A0 -3[A1]&quot;, which contains six
+    fields. Here &quot;loadr&quot; is the name of the instruction, which is assembled
+    into the opcode, A0 and A1 are symbols representing registers, and the brackets are
+    just punctuation, represented as 0-bit fields.</FONT></P>
 
 <P><FONT FACE="Palatino">You can also specify some fields as optional, which means that
     you need not include a value for
@@ -57,9 +57,9 @@
     field in assembly language
     programs and instead a default value is always used.</FONT></P>
 
-<P><FONT FACE="Palatino">Furthermore, you can specify whether the address of the
-    instruction or its successor should be
-    subtracted from the value of the field before it is assembled into machine language.
+<P><FONT FACE="Palatino">Furthermore, you can specify whether you want the address of the
+    instruction or its successor to be
+    subtracted from the value of the field when it is assembled into machine language.
     Such subtractions are useful
     for pc-relative addressing.</FONT></P>
 
@@ -87,15 +87,15 @@
     so cause the start of a new
     machine cycle.</FONT></P>
 
-<P><FONT FACE="Palatino"><B><I>Parameters:</I></B></FONT>
-<DIR><B>opcode:</B> a non-negative integer that fits in the
-    first field of the instruction.
-    <P><FONT FACE="Palatino"><B>format:</B> a list of 1 or more field names. The sum of
+<P><FONT FACE="Palatino"><B><I>Parameters:</I></B></FONT></P>
+<UL><LI><FONT FACE="Palatino"><B>opcode:</B> <br />a non-negative integer that fits in the
+    first field of the instruction.</FONT></li>
+    <li><FONT FACE="Palatino"><B>format:</B><br />a list of 1 or more field names. The sum of
         the number of bits corresponding
-        to the fields must be at most 64.</FONT></P>
+        to the fields must be at most 64.</FONT></li>
 
-    <P><FONT FACE="Palatino"><B>implementation:</B> a list of microinstructions that form
-        the execute sequence of the
-        instruction.</FONT></P></DIR>
+    <li><FONT FACE="Palatino"><B>implementation:</B><br /> a list of microinstructions that form
+        the execute sequence of the instruction.</FONT></li>
+</UL>
 </BODY>
 </HTML>
