@@ -21,7 +21,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                    prefWidth="200.0">
             <!-- SRW -->
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" tabMinWidth="100">
-                <Tab fx:id="treeTab" style="CENTER" text="Files">
+                <Tab fx:id="treeTab"  text="Files">
                     <!-- Start Tree View -->
                     <TreeView fx:id="treeView" prefHeight="702.0"
                               prefWidth="300.0">

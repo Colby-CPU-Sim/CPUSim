@@ -1,0 +1,3 @@
+load A0 A1
+store A0 A1
+exit

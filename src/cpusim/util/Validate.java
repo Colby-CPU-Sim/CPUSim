@@ -993,11 +993,14 @@ public class Validate
             width = nextRegister.getWidth();
             BigInteger max = BigInteger.valueOf(2).pow(width - 1);
             BigInteger initial = BigInteger.valueOf(nextRegister.getInitialValue());
+            BigInteger unsignedMax = max.shiftLeft(1).subtract(BigInteger.ONE);
             if (!(max.negate().compareTo(initial) <= 0 &&
-                    initial.compareTo(max.shiftLeft(1).subtract(BigInteger.ONE)) <= 0)) {
-                throw new ValidationException("The initial value of register " + nextRegister.getName() +
+                    initial.compareTo(unsignedMax) <= 0)) {
+                throw new ValidationException("The initial value of register " +
+                        nextRegister.getName() +
                         " is out of range. It must be set to a value greater than " +
-                        max.negate() + " and smaller than " + max + ".");
+                        "or equal to " + max.negate() + " and smaller than or equal to " +
+                        unsignedMax + ".");
             }
         }
     }

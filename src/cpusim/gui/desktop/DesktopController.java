@@ -124,112 +124,6 @@ import java.util.prefs.Preferences;
  */
 public class DesktopController implements Initializable {
 
-    @FXML
-    private VBox mainPane;
-
-    @FXML
-    private TabPane textTabPane;
-
-    @FXML
-    private ChoiceBox<String> registerDataDisplayCB;
-    @FXML
-    private ChoiceBox<String> ramAddressDisplayCB;
-    @FXML
-    private ChoiceBox<String> ramDataDisplayCB;
-
-    @FXML
-    protected Menu fileMenu;
-    @FXML
-    protected Menu editMenu;
-    @FXML
-    protected Menu modifyMenu;
-    @FXML
-    protected Menu executeMenu;
-    @FXML
-    protected Menu helpMenu;
-
-    @FXML
-    private Menu reopenMachineMenu;
-    @FXML
-    private Menu reopenTextMenu;
-    @FXML
-    private Menu openRamMenu;
-    @FXML
-    private Menu saveRamMenu;
-
-    @FXML
-    private Label noRAMLabel;
-
-    @FXML
-    private VBox ramVbox;
-    @FXML
-    private VBox regVbox;
-
-    @FXML
-    private SplitPane regSplitPane;
-    @FXML
-    private SplitPane ramSplitPane;
-
-    @FXML
-    private ToolBar ramToolBar;
-
-    @FXML
-    private StackPane ioConsolePane;
-
-    private StyledTextArea ioConsole;
-
-    // System.getProperty("line.separator") doesn't work
-    // on PCs. TextArea class may just use "\n".
-    static final String NEWLINE = "\n";
-
-    private String currentTextDirectory;
-
-    private PrinterJob currentPrinterJob;
-
-    private FontData assmFontData;
-    private FontData registerTableFontData;
-    private FontData ramTableFontData;
-    private OtherSettings otherSettings;
-
-    private ArrayDeque<String> reopenTextFiles;
-    private ArrayDeque<String> reopenMachineFiles;
-
-    private ObservableList<RamTableController> ramControllers;
-    private ObservableList<RegisterTableController> registerControllers;
-    private DebugToolBarController debugToolBarController;
-    private CodePaneController codePaneController;
-
-    private MachineHTMLWriter htmlWriter; //HTML descriptions of the machine
-
-    private Stage stage;
-
-    private Map<String, KeyCodeInfo> keyBindings; //key=menu name, value=keyboard shortcut
-
-    private Mediator mediator;
-
-    private String regDataBase;
-    private String ramAddressBase;
-    private String ramDataBase;
-
-    private HighlightManager highlightManager;
-    private UpdateDisplayManager updateDisplayManager;
-    private ConsoleManager consoleManager;
-
-    private SimpleBooleanProperty inDebugMode;
-    private SimpleBooleanProperty inRunningMode;
-    private SimpleBooleanProperty inDebugOrRunningMode;
-    private SimpleBooleanProperty noTabSelected;
-    private SimpleBooleanProperty anchorEqualsCarret;
-    private SimpleBooleanProperty codeStoreIsNull;
-
-    private HelpController helpController;
-    private FindReplaceController findReplaceController;
-
-    private final ButtonType buttonTypeYes = new ButtonType("Yes");
-    private final ButtonType buttonTypeNo = new ButtonType("No");
-    private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
-            ButtonBar.ButtonData.CANCEL_CLOSE);
-
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
     public static final String[][] DEFAULT_KEY_BINDINGS = {
@@ -267,6 +161,86 @@ public class DesktopController implements Initializable {
             {"General CPUSim Help", SHORTCUT + "-Shift-H"},
             {"About CPUSim", SHORTCUT + "-Shift-A"}
     };
+    // System.getProperty("line.separator") doesn't work
+    // on PCs. TextArea class may just use "\n".
+    static final String NEWLINE = "\n";
+    private final ButtonType buttonTypeYes = new ButtonType("Yes");
+    private final ButtonType buttonTypeNo = new ButtonType("No");
+    private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
+            ButtonBar.ButtonData.CANCEL_CLOSE);
+    @FXML
+    protected Menu fileMenu;
+    @FXML
+    protected Menu editMenu;
+    @FXML
+    protected Menu modifyMenu;
+    @FXML
+    protected Menu executeMenu;
+    @FXML
+    protected Menu helpMenu;
+    @FXML
+    private VBox mainPane;
+    @FXML
+    private TabPane textTabPane;
+    @FXML
+    private ChoiceBox<String> registerDataDisplayCB;
+    @FXML
+    private ChoiceBox<String> ramAddressDisplayCB;
+    @FXML
+    private ChoiceBox<String> ramDataDisplayCB;
+    @FXML
+    private Menu reopenMachineMenu;
+    @FXML
+    private Menu reopenTextMenu;
+    @FXML
+    private Menu openRamMenu;
+    @FXML
+    private Menu saveRamMenu;
+    @FXML
+    private Label noRAMLabel;
+    @FXML
+    private VBox ramVbox;
+    @FXML
+    private VBox regVbox;
+    @FXML
+    private SplitPane regSplitPane;
+    @FXML
+    private SplitPane ramSplitPane;
+    @FXML
+    private ToolBar ramToolBar;
+    @FXML
+    private StackPane ioConsolePane;
+    private StyledTextArea ioConsole;
+    private String currentTextDirectory;
+    private PrinterJob currentPrinterJob;
+    private FontData assmFontData;
+    private FontData registerTableFontData;
+    private FontData ramTableFontData;
+    private OtherSettings otherSettings;
+    private ArrayDeque<String> reopenTextFiles;
+    private ArrayDeque<String> reopenMachineFiles;
+    private ObservableList<RamTableController> ramControllers;
+    private ObservableList<RegisterTableController> registerControllers;
+    private DebugToolBarController debugToolBarController;
+    private CodePaneController codePaneController;
+    private MachineHTMLWriter htmlWriter; //HTML descriptions of the machine
+    private Stage stage;
+    private Map<String, KeyCodeInfo> keyBindings; //key=menu name, value=keyboard shortcut
+    private Mediator mediator;
+    private String regDataBase;
+    private String ramAddressBase;
+    private String ramDataBase;
+    private HighlightManager highlightManager;
+    private UpdateDisplayManager updateDisplayManager;
+    private ConsoleManager consoleManager;
+    private SimpleBooleanProperty inDebugMode;
+    private SimpleBooleanProperty inRunningMode;
+    private SimpleBooleanProperty inDebugOrRunningMode;
+    private SimpleBooleanProperty noTabSelected;
+    private SimpleBooleanProperty anchorEqualsCarret;
+    private SimpleBooleanProperty codeStoreIsNull;
+    private HelpController helpController;
+    private FindReplaceController findReplaceController;
 
     /**
      * constructor method that takes in a mediator and a stage
@@ -666,14 +640,14 @@ public class DesktopController implements Initializable {
     protected void handlePrint(ActionEvent event) {
         if (currentPrinterJob == null)
             currentPrinterJob = PrinterJob.createPrinterJob();
-        Printer printer = Printer.getDefaultPrinter();
-        PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
-                PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
-        Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem().getContent();
-        final List<Node> pages =
-                getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted, pageLayout);
         final boolean print = currentPrinterJob.showPrintDialog(stage);
         if (print) {
+            Printer printer = Printer.getDefaultPrinter();
+            PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
+                    PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
+            Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem().getContent();
+            final List<Node> pages =
+                    getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted, pageLayout);
             pages.forEach(currentPrinterJob::printPage);
             currentPrinterJob.endJob();
             currentPrinterJob = null;
@@ -1619,6 +1593,17 @@ public class DesktopController implements Initializable {
 //------------------------------------------------------------------------------
 
     /**
+     * Returns the boolean describing whether or not
+     * the desktop is currently in debug mode.
+     *
+     * @return boolean describing whether or not
+     * the desktop is currently in debug mode.
+     */
+    public boolean getInDebugMode() {
+        return inDebugMode.get();
+    }
+
+    /**
      * Sets the desktop into debug mode
      * if b is true, into regular mode if false.
      *
@@ -1650,17 +1635,6 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * Returns the boolean describing whether or not
-     * the desktop is currently in debug mode.
-     *
-     * @return boolean describing whether or not
-     * the desktop is currently in debug mode.
-     */
-    public boolean getInDebugMode() {
-        return inDebugMode.get();
-    }
-
-    /**
      * Gives the SimpleBooleanProperty describing
      * whether or not we are in debug mode.
      *
@@ -1672,19 +1646,19 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * Notifies the desktop that the machine is in
-     * running mode.
-     */
-    public void setInRunningMode(boolean irm) {
-        inRunningMode.set(irm);
-    }
-
-    /**
      * Returns a boolean describing whether
      * or not we are currently in running mode.
      */
     public boolean getInRunningMode() {
         return inRunningMode.get();
+    }
+
+    /**
+     * Notifies the desktop that the machine is in
+     * running mode.
+     */
+    public void setInRunningMode(boolean irm) {
+        inRunningMode.set(irm);
     }
 
     /**
@@ -2904,6 +2878,7 @@ public class DesktopController implements Initializable {
         prefs.putBoolean("autoSave", otherSettings.autoSave);
         prefs.putBoolean("showLineNumbers", otherSettings.showLineNumbers.get());
         prefs.putBoolean("clearConsoleOnRun", otherSettings.clearConsoleOnRun);
+        prefs.putBoolean("lineWrap", otherSettings.lineWrap.get());
     }
 
     /**
@@ -2959,6 +2934,7 @@ public class DesktopController implements Initializable {
         otherSettings.autoSave = prefs.getBoolean("autoSave", false);
         otherSettings.showLineNumbers.set(prefs.getBoolean("showLineNumbers", true));
         otherSettings.clearConsoleOnRun = prefs.getBoolean("clearConsoleOnRun", true);
+        otherSettings.lineWrap.set(prefs.getBoolean("lineWrap", false));
     }
 
     /**

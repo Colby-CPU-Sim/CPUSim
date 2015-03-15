@@ -15,6 +15,7 @@ public class FontData {
     public String background;
 
     public FontData() {
+        //default values
         font = "Courier New";
         fontSize = "12";
         background = "#fff";

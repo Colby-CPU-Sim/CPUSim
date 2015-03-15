@@ -210,7 +210,7 @@ public class Parser
 
 
     //-------------------------------
-    //Program -> [Comments-and-EOLs] Equ-and-include-and-macro-part Instr-part EOF
+    //Program -> [Comments-and-EOLs] Equ-and-include-and-macro-and-global-part Instr-part EOF
     private void Program() throws AssemblyException
     {
         //Comments-and-EOLs
@@ -220,7 +220,7 @@ public class Parser
             Comments_and_EOLs();
         }
 
-        //Equ-and-macro-part
+        //Equ-and-include-and-macro-and-global-part
         Equ_and_Include_and_macro_and_global_part();
 
         //Instr-part
@@ -383,8 +383,8 @@ public class Parser
     }
 
     //-------------------------------
-    //Equ-and-Include-and-macro-part ->
-    //					((Equ-decl | Include | Macro-decl) Comments-and-EOLs)*
+    //Equ-and-Include-and-macro-and-global-part ->
+    //					((Equ-decl | Include | Macro-decl | global) Comments-and-EOLs)*
     private void Equ_and_Include_and_macro_and_global_part() throws AssemblyException
     {
         //(Equ-decl Comments-and-EOLs)*

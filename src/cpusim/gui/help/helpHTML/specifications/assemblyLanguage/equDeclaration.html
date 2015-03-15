@@ -7,7 +7,8 @@
 </HEAD>
 <BODY LINK="#0000ff" VLINK="#800080">
 
-<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">EQU Declarations</P></font></B><FONT FACE="Palatino"><P>
+<B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">EQU Declarations</P></font></B><FONT
+        FACE="Palatino"><P>
     EQU declarations define names for integer
     constants. Those names can be used anywhere in the program where a number is
     expected. It is legal to declare an EQU name whose value is a previously-defined
@@ -16,25 +17,28 @@
 	A EQU 4
 	B EQU A
 </PRE>
-<FONT FACE="Palatino"><P>In this example, both A and B are now names for the constant 4.</P>
+<FONT FACE="Palatino"><P>In this example, both A and B are now names for the constant
+    4.</P>
 
-    <P>Note that the names of all EQUs must be valid symbols and the values of all EQUs must be previously-defined EQU
+    <P>Note that the names of all EQUs must be valid symbols and the values of all EQUs
+        must be previously-defined EQU
         names or valid literals in the
         <A HREF="syntax.html">
             assembly language syntax</A>.</P>
 
-    <P>The value associated with the name must be in the
-        range -2<sup>31</sup> to 2<sup>31</sup>-1
-        <br>(-2147483648 to 2147483647).</P>
+    <P>The value associated with the name must be an unsigned or signed (2's complement)
+        64-bit integer.</P>
 
-    <P>Note that EQU declarations in an assembly language program are always local, which means that the declared
+    <P>Note that EQU declarations in an assembly language program are always local, which
+        means that the declared
         names can only be used in the file in which they are declared. Therefore, it
         is often useful to put the EQU declarations in files that are then included
         (using <A HREF="includeDirectives.html">.include directives</A>) in all files
         in which you wish to use the declared names. You can also make
         <A HREF="../../other/globalEqus.html">global EQU declarations</A>.</P>
 
-    <P>If a global EQU declaration and a local EQU declaration both use the same symbol (which is legal), the local EQU
+    <P>If a global EQU declaration and a local EQU declaration both use the same symbol
+        (which is legal), the local EQU
         declaration has precedence.</P></FONT>
 </BODY>
 </HTML>

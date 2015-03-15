@@ -19,9 +19,13 @@
 				box</A>. A register array is an indexed list of any number of registers.
 			If the array has name "A" and if the array contains 4 registers, then
 			those registers are denoted by "A[0]", "A[1]", "A[2]", and "A[3]".
-			You cannot edit the contents of the registers in an array using this
-			dialog box.
+			You cannot edit the contents of the registers in an array, other than their
+            default initial values, using this dialog box.
 		</P>
+        <P>Each register in the array can also be given a new name different from the default
+        name (such as "A[0]"), an initial default value, and can be designated as read
+        only.  However, all registers must have the same width.  To set these properties,
+        click the "Properties..." button in the Edit Modules dialog box.</P>
 		<P>
 			<B><I>Parameters:</I></B></FONT>
 	<DIR>
@@ -32,7 +36,8 @@
 			<P>
 				<B>Length:</B> a positive base-10 integer specifying the number of
 				registers in the register array.
-			</P></FONT>
+			</P>
+</FONT>
 	</DIR>
 </BODY>
 </HTML>
