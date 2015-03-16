@@ -22,6 +22,7 @@ import java.math.BigInteger;
 public class Increment extends Microinstruction{
     private SimpleObjectProperty<Register> register;
     private SimpleObjectProperty<ConditionBit> overflowBit;
+    private SimpleObjectProperty<ConditionBit> carryBit;
     private SimpleLongProperty delta;
 
     /**
@@ -37,10 +38,12 @@ public class Increment extends Microinstruction{
     public Increment(String name, Machine machine,
                      Register register,
                      ConditionBit overflowBit,
+                     ConditionBit carryBit,
                      Long delta){
         super(name, machine);
         this.register = new SimpleObjectProperty<>(register);
         this.overflowBit = new SimpleObjectProperty<>(overflowBit);
+        this.carryBit = new SimpleObjectProperty<>(carryBit);
         this.delta = new SimpleLongProperty(delta);
     }
 
@@ -79,6 +82,20 @@ public class Increment extends Microinstruction{
     }
 
     /**
+     * returns the status of recording carryBit.
+     *
+     * @return the status of recording carryBit as a string.
+     */
+    public ConditionBit getCarryBit() { return carryBit.get(); }
+
+    /**
+     * updates the status of the carryBit.
+     *
+     * @param newCarryBit the new string for the status.
+     */
+    public void setCarryBit(ConditionBit newCarryBit) { carryBit.set(newCarryBit);}
+
+    /**
      * returns the fixed value stored in the set microinstruction.
      * @return the integer value of the field.
      */
@@ -108,7 +125,7 @@ public class Increment extends Microinstruction{
      * @return a copy of the Set class
      */
     public Object clone(){
-        return new Increment(getName(),machine,getRegister(),getOverflowBit(),getDelta());
+        return new Increment(getName(),machine,getRegister(),getOverflowBit(),getCarryBit(),getDelta());
     }
 
     /**
@@ -123,6 +140,7 @@ public class Increment extends Microinstruction{
         newIncr.setName(getName());
         newIncr.setRegister(getRegister());
         newIncr.setOverflowBit(getOverflowBit());
+        newIncr.setCarryBit(getCarryBit());
         newIncr.setDelta(getDelta());
     }
 
@@ -144,6 +162,11 @@ public class Increment extends Microinstruction{
                 bigResult.compareTo(twoToWidthMinusOne.negate()) < 0)
             overflowBit.get().set(1);
 
+        if ((bigValue.intValue() < 0 && bigDelta.intValue() < 0) ||
+                        (bigValue.intValue() < 0 && bigDelta.intValue() > bigValue.intValue()) ||
+                        (bigDelta.intValue() < 0 && bigValue.intValue() > bigDelta.intValue()))
+            carryBit.get().set(1);
+
         //set destination's value to the result
         long result = bigResult.longValue();
         register.get().setValue((result << (64 - width)) >> (64 - width));
@@ -158,6 +181,8 @@ public class Increment extends Microinstruction{
                 "\" register=\"" + getRegister().getID() +
                 (overflowBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
                         "\" overflowBit=\"" + getOverflowBit().getID() : "") +
+                (carryBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
+                "\" carryBit=\"" + getCarryBit().getID() : "") +
                 "\" delta=\"" + getDelta() +
                 "\" id=\"" + getID() + "\" />";
     }
@@ -169,6 +194,7 @@ public class Increment extends Microinstruction{
     public String getHTMLDescription(){
         return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getOverflowBit().getHTMLName() +
+                "</TD><TD>" + getCarryBit().getHTMLName() +
                 "</TD><TD>" + getDelta() + "</TD></TR>";
     }
 

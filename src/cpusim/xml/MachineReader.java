@@ -588,7 +588,22 @@ public class MachineReader
             overflowBit = (ConditionBit) object;
         }
 
-        Increment c = new Increment(name, machine, register, overflowBit, Long.valueOf(delta));
+        ConditionBit carryBit;
+        String carryBitID = attrs.getValue("carryBit");
+        if (carryBitID == null)
+            carryBit = CPUSimConstants.NO_CONDITIONBIT;
+        else {
+            object = components.get(carryBitID);
+            if (object == null || !(object instanceof ConditionBit)) {
+                throw new MachineReaderException(
+                        getCurrentLine() + "The carryBit attribute "
+                                + "of Increment microinstruction \"" + name +
+                                "\" is not valid.");
+            }
+            carryBit = (ConditionBit) object;
+        }
+
+        Increment c = new Increment(name, machine, register, overflowBit, carryBit, Long.valueOf(delta));
         String id = attrs.getValue("id");
         components.put(id, c);
         machine.getMicros("increment").add(c);

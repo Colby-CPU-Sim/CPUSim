@@ -51,6 +51,7 @@ public class IncrementTableController
     @FXML TableColumn<Increment,String> name;
     @FXML TableColumn<Increment,Register> register;
     @FXML TableColumn<Increment,ConditionBit> overflowBit;
+    @FXML TableColumn<Increment,ConditionBit> carryBit;
     @FXML TableColumn<Increment,Long> delta;
 
     private ObservableList currentMicros;
@@ -67,7 +68,7 @@ public class IncrementTableController
         this.currentMicros = machine.getMicros("increment");
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
-        this.prototype = new Increment("???", machine, r, NO_CONDITIONBIT, Long.valueOf(1));
+        this.prototype = new Increment("???", machine, r, NO_CONDITIONBIT, NO_CONDITIONBIT, Long.valueOf(1));
         clones = (Microinstruction[]) createClones();
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
@@ -99,10 +100,11 @@ public class IncrementTableController
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.widthProperty().divide(100/25.0));
-        register.prefWidthProperty().bind(table.widthProperty().divide(100/25.0));
-        overflowBit.prefWidthProperty().bind(table.widthProperty().divide(100/25.0));
-        delta.prefWidthProperty().bind(table.widthProperty().divide(100 / 25.0));
+        name.prefWidthProperty().bind(table.widthProperty().divide(100 / 20.0));
+        register.prefWidthProperty().bind(table.widthProperty().divide(100/20.0));
+        overflowBit.prefWidthProperty().bind(table.widthProperty().divide(100/20.0));
+        carryBit.prefWidthProperty().bind(table.widthProperty().divide(100/20.0));
+        delta.prefWidthProperty().bind(table.widthProperty().divide(100 / 20.0));
 
         Callback<TableColumn<Increment,String>,TableCell<Increment,String>> cellStrFactory =
                 new Callback<TableColumn<Increment, String>, TableCell<Increment, String>>() {
@@ -146,6 +148,7 @@ public class IncrementTableController
         name.setCellValueFactory(new PropertyValueFactory<Increment, String>("name"));
         register.setCellValueFactory(new PropertyValueFactory<Increment, Register>("register"));
         overflowBit.setCellValueFactory(new PropertyValueFactory<Increment, ConditionBit>("overflowBit"));
+        carryBit.setCellValueFactory(new PropertyValueFactory<Increment, ConditionBit>("carryBit"));
         delta.setCellValueFactory(new PropertyValueFactory<Increment, Long>("delta"));
 
         //Add for Editable Cell of each field, in String or in Integer
@@ -185,6 +188,18 @@ public class IncrementTableController
                     @Override
                     public void handle(TableColumn.CellEditEvent<Increment, ConditionBit> text) {
                         ((Increment)text.getRowValue()).setOverflowBit(
+                                text.getNewValue()
+                        );
+                    }
+                }
+        );
+
+        carryBit.setCellFactory(cellCondFactory);
+        carryBit.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Increment, ConditionBit>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Increment, ConditionBit> text) {
+                        ((Increment)text.getRowValue()).setCarryBit(
                                 text.getNewValue()
                         );
                     }

@@ -8,6 +8,7 @@
     <TableColumn text="name" fx:id="name"/>
     <TableColumn text="register" fx:id="register"/>
     <TableColumn text="overflowBit" fx:id="overflowBit"/>
+    <TableColumn text="carryBit" fx:id="carryBit" />
     <TableColumn text="delta" fx:id="delta"/>
   </columns>
 </fx:root>
