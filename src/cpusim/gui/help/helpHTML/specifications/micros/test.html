@@ -19,17 +19,23 @@
 
 <P><FONT FACE="Palatino"><B><I>Parameters:</I></B></FONT>
 <DIR>
-    <font face="Palatino"><B>Register: </B>the register whose value is to be tested.
+    <font face="Palatino"><B>Register: </B>the register containing the range of bits
+        to be tested.
     </FONT>
 
-    <P><font face="Palatino"><B>Start: </B>an integer indicating the leftmost bit to be
+    <P><font face="Palatino"><B>Start: </B>an integer indicating the index of the
+        first bit in the range of bits to be
         tested in the register. The
         value must be an integer between 0 and one less than the width of the
-        register.  The value 0 indicates the leftmost bit in the register.</FONT></P>
+        register.  Bit 0 is the
+        left-most bit of the register if indexing is done from the left and is the
+        right-most bit if indexing is done from the right.
+        Use the <A href="../../windows/OptionsDialog.html">Options Dialog</A>
+        to specify the indexing direction.</FONT></P>
 
     <P><font face="Palatino"><B>Number of bits:</B> a non-negative integer indicating the
-        number of bits to be tested.
-        The sum of the start and the number of bits must be at most the width of the
+        number of bits in the range to be tested.
+        The sum of the start index and the number of bits must be at most the width of the
         register.</FONT></P>
     <P><FONT FACE="Palatino"><B>Comparison: </B> the type of comparison be done:
         <DIR>LT means "less than"
@@ -42,7 +48,7 @@
     </font></P>
 
     <P><FONT FACE="Palatino"><B>Comparison value: </B> the integer to be compared with the
-        part of the register. </FONT></P>
+        range of bits of the register. </FONT></P>
 
     <P><FONT FACE="Palatino"><B>Omission:</B> an integer (positive, negative or zero)
         indicating the size of the

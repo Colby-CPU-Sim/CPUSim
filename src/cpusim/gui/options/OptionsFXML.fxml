@@ -202,7 +202,7 @@
                     <VBox id="VBox" alignment="CENTER" spacing="5.0">
                         <Label alignment="CENTER_RIGHT"
                                contentDisplay="CENTER"
-                               text="Index Bits in Register From:">
+                               text="Index bits in registers from the">
                             <VBox.margin>
                                 <Insets bottom="15.0"/>
                             </VBox.margin>

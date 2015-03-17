@@ -31,9 +31,9 @@ public class ConditionBit extends Module
 {
 
     private SimpleObjectProperty<Register> register;  //the register containing the bit
-    private SimpleIntegerProperty bit;    //the bit in the register, bit = 0 means the
-    //left-most or rightmost bit depending on the indexFromRight field in the machine.
-    private SimpleBooleanProperty halt;  //should machine halt when it is set?
+    private SimpleIntegerProperty bit;    //the index of the bit in the register, bit = 0
+    //means the left-most or rightmost bit depending on the indexFromRight field in the machine.
+    private SimpleBooleanProperty halt;  //should machine halt when this bit is set to 1?
 
     /**
      * Constructor
@@ -150,11 +150,11 @@ public class ConditionBit extends Module
         assert bitValue == 0 || bitValue == 1 : "Illegal argument: " + bitValue +
                 " to ConditionBit.set().";
         int leftShift;
-        if(!machine.getIndexFromRight()){
-            leftShift = register.get().getWidth() - bit.get() - 1;
-        }
-        else{
+        if (machine.getIndexFromRight()) {
             leftShift = bit.get();
+        }
+        else {
+            leftShift = register.get().getWidth() - bit.get() - 1;
         }
         long mask = 1L << (leftShift);
         long value = register.get().getValue();
@@ -176,14 +176,14 @@ public class ConditionBit extends Module
         long registerValue = register.get().getValue();
         
         int leftShift;
-        if(!machine.getIndexFromRight()){
+        if (machine.getIndexFromRight()) {
+            leftShift = 64 - bit.get() - 1;
+        }
+        else {
             leftShift = 64 - register.get().getWidth() + bit.get();
         }
-        else{
-            leftShift = 64 - bit.get();
-        }
-        
-        registerValue = registerValue << (64 - register.get().getWidth() + bit.get());
+
+        registerValue = registerValue << leftShift;
         return registerValue < 0;
     }
 

@@ -228,6 +228,16 @@ public class MachineHTMLWriter
             out.println("</TABLE><P></P>");
         }
 
+        //print the register indexing direction (from the left or from the right)
+        out.println();
+        out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
+                " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
+        out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Indexing Order of Bits in Registers"
+                + HEADER_SUFFIX);
+        out.println("<TR><TD>From " + (machine.getIndexFromRight() ? " right to left" :
+                " left to right") + "</TD></TR>");
+        out.println("</TABLE><P></P>");
+
         //print the micros except for End
         for (int i = 0; i < microVectors.length; i++) {
             out.println();

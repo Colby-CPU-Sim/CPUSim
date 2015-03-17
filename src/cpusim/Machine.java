@@ -125,23 +125,23 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
         startingAddressForLoading = 0;
         codeStore = new SimpleObjectProperty<>(null);
-        indexFromRight = new SimpleBooleanProperty(true);
+        indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
         initializeModuleMap();
         initializeMicroMap();
 
     }
     
     /**
-     * This constructor exists for backwards compatability. The default
-     * on old machines was to index from the left, where the default on new machines
+     * This constructor exists for backwards compatibility. The default
+     * on old existing machines was to index from the left, where the default on new machines
      * is to index from the right
      * @param name machines name
-     * @param indexFromLeft indicates that the default should be to index from 
-     * the left rather than the right side of the registers
+     * @param indexFromLeft if true then index from
+     *                       the left rather than the right side of the registers
      */
     public Machine(String name, boolean indexFromLeft){
         this(name);
-        indexFromRight.set(false);
+        indexFromRight.set(! indexFromLeft);
     }
 
     /**
@@ -789,6 +789,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      * RUN, STEP_BY_MICRO, STEP_BY_INSTR, STOP, ABORT, COMMAND_LINE
      * The machine uses the current contents of memory and its registers
      * and the control store as it executes.
+     * If the GUI is used, the machine is executed in a new Thread so that
+     * the GUI remains responsive.
      * @param mode the run mode for execution.
      */
     public void execute(final RunModes mode) {
@@ -929,17 +931,20 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     }
     
     /**
-     * adjusts the start bits for the following the ConditionBit module and the following micros:
-     * TransferRtoR
-     * TransferAtoR
-     * TransferRtoA
-     * CpusimSet (Set)
-     * Test
+     * changes indexing of bits in registers to the opposite direction while preserving
+     * the behavior of the components.
+     * The following components need to be modified:
+     *    ConditionBit module
+     *    TransferRtoR micros
+     *    TransferAtoR micros
+     *    TransferRtoA micros
+     *    CpusimSet (Set) micros
+     *    Test micros
      */
     public void changeStartBits() {
         for (Module m : this.getModule("conditionBits")){
             ConditionBit cb = (ConditionBit) m;
-            cb.setBit(cb.getRegister().getWidth() - cb.getBit());
+            cb.setBit(cb.getRegister().getWidth() - cb.getBit() - 1);
         }
         
         for (Microinstruction micro : this.getMicros("transferRtoR")){
@@ -952,12 +957,14 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
             TransferRtoA tRtoA = (TransferRtoA) micro;
             tRtoA.setDestStartBit(tRtoA.getDest().getWidth()-tRtoA.getNumBits()-tRtoA.getDestStartBit());
             tRtoA.setSrcStartBit(tRtoA.getSource().getWidth()-tRtoA.getNumBits()-tRtoA.getSrcStartBit());
+            tRtoA.setIndexStart(tRtoA.getIndex().getWidth()-tRtoA.getIndexNumBits()-tRtoA.getIndexStart());
         }
     
         for (Microinstruction micro : this.getMicros("transferAtoR")){
             TransferAtoR tAtoR = (TransferAtoR) micro;
             tAtoR.setDestStartBit(tAtoR.getDest().getWidth()-tAtoR.getNumBits()-tAtoR.getDestStartBit());
             tAtoR.setSrcStartBit(tAtoR.getSource().getWidth()-tAtoR.getNumBits()-tAtoR.getSrcStartBit());
+            tAtoR.setIndexStart(tAtoR.getIndex().getWidth()-tAtoR.getIndexNumBits()-tAtoR.getIndexStart());
         }
         
         for (Microinstruction micro : this.getMicros("test")){

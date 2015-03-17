@@ -9,7 +9,7 @@
 
 <B><FONT FACE="Arial" SIZE=4 COLOR="#0000ff"><P ALIGN="CENTER">Condition Bit</P>
 </font></B><FONT FACE="Palatino"><P>By choosing "Condition Bit" from the popup menu at the
-    top of the <A HREF="conditionBit.html">Edit Modules dialog box</A>, you can edit the
+    top of the <A HREF="../../windows/hardwareModules.html">Edit Modules dialog box</A>, you can edit the
     condition bits of the current machine. A condition bit is a specific bit of a
     register. The bit can be set to 0 or 1 by a <A HREF="../micros/setCondBit.html">SetCondBit</A>
     microinstruction or it can be set to 1 if an overflow or carry out occurs in an <A
@@ -19,9 +19,12 @@
     Parameters:</i></B></FONT>
 <DIR><FONT FACE="Palatino">
     <B>Register:</B> the register that contains the condition bit.
-    <P><B>Bit:</B> the bit of the register that is the condition bit. This is a number
-        from 0 to one less than the width of the specified register. Bit 0 is on the
-        left-most bit of the register.</P>
+    <P><B>Bit:</B> the index of the bit of the register that is the condition bit. This is a number
+        from 0 to one less than the width of the specified register. Bit 0 is the
+        left-most bit of the register if indexing is done from the left and is the
+        right-most bit if indexing is done from the right.
+        Use the <A href="../../windows/OptionsDialog.html">Options Dialog</A>
+        to specify the indexing direction.</P>
 
     <P><B>Halt:</B> a boolean value. If this value is true, then the machine will halt and
         display a message after the execution of any microinstruction that causes the

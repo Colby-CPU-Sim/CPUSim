@@ -20,9 +20,9 @@
         bits of a register. The old
         data in the part of the register receiving the new data is lost and is replaced
         with the new data. The rest of
-        the receiving register is unchanged. That is, if you transfer 4 bits into the
-        first 4 bits of a 16-bit register,
-        then the last 12 bits of the register are unchanged by the transfer.</P>
+        the receiving register is unchanged. That is, if you transfer 4 bits from one
+        register into 4 bits of a 16-bit register,
+        then the other 12 bits of the destination register are unchanged by the transfer.</P>
 
     <P>When transferring to or from a register array, the user must specify an index
         register and a sequence of
@@ -41,25 +41,29 @@
 </FONT>
 <DIR><FONT FACE="Palatino">
     <B>Source:</B> a register or register array from which data is to be transferred
-    <P><B>Source start bit:</B> this number designates the leftmost bit that is to be
+
+    <P><B>Source start bit:</B> this number designates the index of the first bit that is to be
         transferred. It must be a number
-        from 0 to one less than the width of the source register or register array. The
-        value 0 indicates the leftmost bit in the register.</P>
+        from 0 to one less than the width of the source register or register array.
+        The value 0 refers to the left-most bit in the register
+        if indexing is done from the left and refers to the
+        right-most bit if indexing is done from the right.
+        Use the <A href="../../windows/OptionsDialog.html">Options Dialog</A>
+        to specify the indexing direction.</P>
 
     <P><B>Destination:</B> a register or register array to which data is to be transferred
     </P>
 
-    <P><B>Destination start bit:</B> this number designates where the leftmost transferred
-        bit is to be placed in the
-        destination register.</P>
+    <P><B>Destination start bit:</B> this is the index of the first bit in the
+        destination register that is to receive the transferred bits.</P>
 
     <P><B>Number of bits:</B> this specifies how many bits are to be transferred. The
-        source start bit added to the
-        number of bits must yield a sum that is at most the width of the source register
+        index of the source start bit plus the
+        number of bits must be at most the width of the source register
         or register array. Similarly
         for the destination register or register array. </P>
 
-    <P><B>Index:</B> a register which contains the index of the source or destination
+    <P><B>Index:</B> a register that contains the index of the source or destination
         register in the array to or from
         which data is to be transferred. This parameter is only used in transfers of type
         TransferRtoA or TransferAtoR.
@@ -67,7 +71,7 @@
         treated as an unsigned
         integer. </P>
 
-    <P><B>Index start bit:</B> this number designates the position of the leftmost bit of
+    <P><B>Index start bit:</B>  this number designates the index of the first bit of
         the index register used to
         compute the index into the array.</P>
 
@@ -77,7 +81,8 @@
 <FONT FACE="Palatino">
     <BR>
 
-    <P>For example, if you specify 16-bit registers <I>r1</I> and <I>r2</I> as the source
+    <P>For example, suppose you are indexing bits in registers from the left.
+        If you specify 16-bit registers <I>r1</I> and <I>r2</I> as the source
         and destination registers, and
         if you specify a source start bit of 0, a destination start bit of 12, and the
         number of bits as 4, then the
@@ -85,7 +90,8 @@
         the right-most 4 bits of
         <I>r2</I>.</P>
 
-    <P>For another example, suppose you specify a TransferRtoA
+    <P>For another example using the same indexing direction,
+        suppose you specify a TransferRtoA
         microinstruction with source register <I>r</I> and destination
         register array <I>A</I> containing 8 registers. If you specify
         an index register <I>i</I> and index start bit = 0 and index number

@@ -27,7 +27,6 @@
 package cpusim.gui.options;
 
 import cpusim.BufferedChannel;
-import cpusim.ConsoleChannel;
 
 import java.io.File;
 import java.net.URL;
@@ -65,7 +64,6 @@ import cpusim.microinstruction.IO;
 import cpusim.module.RAM;
 import cpusim.module.Register;
 import javafx.application.Platform;
-import javafx.beans.property.SimpleObjectProperty;
 
 public class OptionsController implements Initializable {
 
@@ -149,7 +147,7 @@ public class OptionsController implements Initializable {
     private Mediator mediator;
     private ObservableList<Register> registers;
     private ObservableList<RAM> RAMs;
-    private boolean changeStartBits;
+    private boolean changeIndexingDirection;  // true if changing to the opposite indexing direction
 
     /**
      * Constructor with mediator passed
@@ -398,14 +396,15 @@ public class OptionsController implements Initializable {
 
     public boolean saveIndexingTab() {
         if (!indexingTab.isDisabled()) {
-            if (changeStartBits) {
-                Optional<ButtonType> result = Dialogs.createConfirmationDialog(OKButton.getScene().getWindow(),
-                        "Confirm Index Change?",
-                        "Changing the indexing system may change the functionality of"
-                                + " some of your microinstructions.  Would you like to"
-                                + " automatically change the start bits of these microinstructions"
-                                + " and modules so that you machine will have the same behavior it"
-                                + " had before you changed the indexing system?").showAndWait();
+            if (changeIndexingDirection) {
+                Optional<ButtonType> result =
+                    Dialogs.createConfirmationDialog(OKButton.getScene().getWindow(),
+                        "Confirm Index Change",
+                        "Changing the indexing direction may change the behavior of"
+                            + " some of your microinstructions.  Would you like to"
+                            + " automatically change these microinstructions"
+                            + " so that you machine will have the same behavior it"
+                            + " had before you changed the indexing direction?").showAndWait();
                 if (result.get() == ButtonType.OK) {
                     mediator.getMachine().changeStartBits();
                 } else if (result.get() == ButtonType.CANCEL) {
@@ -897,12 +896,12 @@ public class OptionsController implements Initializable {
      */
     private void initializeIndexingTab() {
 
-        changeStartBits = false;
+        changeIndexingDirection = false;
 
         ChangeListener indexChangeListener = new ChangeListener() {
             @Override
             public void changed(ObservableValue ov, Object t, Object t1) {
-                changeStartBits = changeStartBits ? false : true;
+                changeIndexingDirection = !changeIndexingDirection;
             }
         };
 

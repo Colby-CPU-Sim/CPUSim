@@ -14,11 +14,17 @@
 </i></B></FONT>
 <DIR><FONT FACE="Palatino">
     <B>Register:</B> the register whose bits are to be set.
-    <P><B>Start:</B> the leftmost bit of the register that is to be set. This must be an
-        integer from 0 to one less than
-        the width of the register.  The value 0 refers to the leftmost bit in the register.</P>
+    <P><B>Start:</B> the starting index of the range of bits of the register that is to
+        be set. This must be an integer from 0 to one less than
+        the width of the register.  The value 0 refers to the left-most bit in the register
+        if indexing is done from the left and refers to the
+        right-most bit if indexing is done from the right.
+        Use the <A href="../../windows/OptionsDialog.html">Options Dialog</A>
+        to specify the indexing direction.</P>
 
-    <P><B>NumBits:</B> the number of consecutive bits in the register to be set</P>
+    <P><B>NumBits:</B> the number of consecutive bits in the register to be set.  The
+        sum of the start index and the number of bits must be at most the width of the
+        register.</P>
 
     <P><B>Value:</B> the value to which the bits are to be set. This value must
         fit in the designated bits as
