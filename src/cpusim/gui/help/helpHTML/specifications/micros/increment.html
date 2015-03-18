@@ -23,19 +23,24 @@
     condition bit is left unchanged. In the case of overflow, the register will contain
     the rightmost <I>n </I>bits of
     the result in two's complement notation, where <I> n </I> is the width of the
-    register.</P>
+    register. If there is a carry
+    in/out, i.e., an unsigned integer overflow, in an addition or subtraction microinstruction, then the carry condition
+    bit is set, if a condition bit is used.</P>
 
 
     <P>Typical uses of the increment microinstruction include incrementing the program
         counter during the fetch sequence
         or incrementing or decrementing the stack top pointer during pushes and pops.</P>
     <B><I><P>Parameters:
-    </i></B>
+    </i></B> </FONT>
     <DIR>
         <B>Register:</B> the register whose contents are to be incremented.
         <BR><br>
         <B>OverflowBit:</B> a condition bit. If not needed then &quot;(none)&quot; should
         be specified.
+        <bR><br>
+        <B>Carry:</B> a carry condition bit. Used only in addition and subtraction microinstructions and ignored by the
+            others. If not needed then "(none)" should be specified.
         <bR><br>
         <B>Delta:</B> the integer value that will be added to the register's
         contents.
