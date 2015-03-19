@@ -895,17 +895,17 @@ public class Scanner
                             top.columnNumber, top.offset, "" + c, false));
         }
         if (c == (char) EOF) {
-//            //add an EOL before the EOF if there isn't one there:
-//            //if top.currentChar != EOL then put an EOF token on the tokenstack
-//            //and return EOL instead.  Otherwise do the stuff below
-//            //Note: char 'c' is not the same char as 'top.currentChar' because
-//            //top.currentChar is set to c only after this method returns
-//
-//            if (charType[top.currentChar] != C_NEWLINE) {
-//                c = '\n';   //the scanner will finish returning this token before
-//                //using the stack's EOF token
-//            }
-//            else {
+            // add an EOL before the EOF if there isn't one there:
+            // if top.currentChar != EOL then put an EOF token on the tokenstack
+            // and return EOL instead.  Otherwise do the stuff below
+            // Note: char 'c' is not the same char as 'top.currentChar' because
+            // top.currentChar is set to c only after this method returns
+
+            if (charType[top.currentChar] != C_NEWLINE) {
+                c = '\n';   //the scanner will finish returning this token before
+                //using the stack's EOF token
+            }
+            else {
 
                 //use the same method to get the filename as used in
                 //startScanning() when the filename was added, and remove that
@@ -919,7 +919,7 @@ public class Scanner
                     top = streamStack.peek();
                     return top.currentChar;
                 }
-//            }
+            }
         }
 
         //keep track of line and column numbers
@@ -1119,9 +1119,9 @@ public class Scanner
         }
 
         if (isFinalState(currentState)) {
-            if (buffer.toString().equals(".global")){
-                System.out.println();
-            }
+//            if (buffer.toString().equals(".global")){
+//                System.out.println();
+//            }
             Token.Type ttype = getTokenType(buffer.toString(), currentState);
             return new Token(top.filename, ttype, startingLineNumber,
                     startingColumnNumber, startingOffset,

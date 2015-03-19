@@ -25,7 +25,13 @@
 				scroll box. If you step by microinstruction, then any register and
 				RAM cells that are changed during execution are outlined in green.
 				After each step you can inspect and change the values stored in any
-				register or RAM.</FONT></LI>
+				register or RAM. Note: At the beginning of each machine cycle the
+                fetch sequence is listed as the current instruction in the debug toolbar
+            and its microinstruction sequence is listed, because it is what is executed
+            next.  However, after executing the Decode
+            microinstruction in the fetch sequence, the toolbar will display the name
+            of the decoded instruction and its microinstruction sequence.
+        </FONT></LI>
 		<LI><FONT FACE="Palatino">You can back up one machine
 				instruction at a time, which resets the values of the registers and
 				RAMs to their state at the start of the last machine cycle.</FONT></LI>

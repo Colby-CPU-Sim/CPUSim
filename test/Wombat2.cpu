@@ -105,120 +105,120 @@
 	<PunctChar char=";" use="comment" />
 
 	<!--......... machine instruction fields ............-->
-	<Field name="sgn5" type="required" numBits="8" relativity="absolute" signed="true" defaultValue="0" id="Field3374430">
+	<Field name="sgn5" type="required" numBits="8" relativity="absolute" signed="true" defaultValue="0" id="Field575bf79f">
 	</Field>
-	<Field name="reg" type="required" numBits="3" relativity="absolute" signed="false" defaultValue="0" id="Field4c81e6da">
+	<Field name="reg" type="required" numBits="3" relativity="absolute" signed="false" defaultValue="0" id="Field69c22709">
 	</Field>
-	<Field name="un3" type="ignored" numBits="3" relativity="absolute" signed="true" defaultValue="0" id="Field32e42382">
+	<Field name="un3" type="ignored" numBits="3" relativity="absolute" signed="true" defaultValue="0" id="Field2688bee">
 	</Field>
-	<Field name="op" type="required" numBits="5" relativity="absolute" signed="false" defaultValue="0" id="Field73485ab6">
+	<Field name="op" type="required" numBits="5" relativity="absolute" signed="false" defaultValue="0" id="Field204b4031">
 	</Field>
-	<Field name="un5" type="ignored" numBits="5" relativity="absolute" signed="true" defaultValue="0" id="Field4ae7962b">
+	<Field name="un5" type="ignored" numBits="5" relativity="absolute" signed="true" defaultValue="0" id="Field2824aca8">
 	</Field>
-	<Field name="addr" type="required" numBits="8" relativity="absolute" signed="false" defaultValue="0" id="Field9931e9b">
+	<Field name="addr" type="required" numBits="8" relativity="absolute" signed="false" defaultValue="0" id="Field50a62cca">
 	</Field>
-	<Field name="un8" type="ignored" numBits="8" relativity="absolute" signed="true" defaultValue="0" id="Field1a78c418">
+	<Field name="un8" type="ignored" numBits="8" relativity="absolute" signed="true" defaultValue="0" id="Field16d7facb">
 	</Field>
-	<Field name="un11" type="ignored" numBits="11" relativity="absolute" signed="true" defaultValue="0" id="Field2b54a00b">
+	<Field name="un11" type="ignored" numBits="11" relativity="absolute" signed="true" defaultValue="0" id="Field6ce76ae8">
 	</Field>
 
 	<!--............. FileChannels .................-->
 	<!-- none -->
 
 	<!--............. registers .....................-->
-	<Register name="buffer1" width="16" initialValue="0" readOnly="false" id="module.Register78f73b5b" />
-	<Register name="buffer2" width="16" initialValue="0" readOnly="false" id="module.Register3eedafd" />
-	<Register name="ir" width="16" initialValue="0" readOnly="false" id="module.Register30270e02" />
-	<Register name="mar" width="12" initialValue="0" readOnly="false" id="module.Register74338112" />
-	<Register name="mdr" width="16" initialValue="0" readOnly="false" id="module.Register35df512c" />
-	<Register name="pc" width="12" initialValue="0" readOnly="false" id="module.Register40935c58" />
-	<Register name="status" width="3" initialValue="0" readOnly="false" id="module.Register484c1d56" />
+	<Register name="buffer1" width="16" initialValue="0" readOnly="false" id="module.Register612bda30" />
+	<Register name="buffer2" width="16" initialValue="0" readOnly="false" id="module.Registera6aa3" />
+	<Register name="ir" width="16" initialValue="0" readOnly="false" id="module.Register2922d9cb" />
+	<Register name="mar" width="12" initialValue="0" readOnly="false" id="module.Register7e45562d" />
+	<Register name="mdr" width="16" initialValue="0" readOnly="false" id="module.Register4180f98f" />
+	<Register name="pc" width="12" initialValue="0" readOnly="false" id="module.Register120cdc6e" />
+	<Register name="status" width="3" initialValue="0" readOnly="false" id="module.Register2d5fa365" />
 
 	<!--............. register arrays ...............-->
-	<RegisterArray name="A" length="8" width="16" id="module.RegisterArray201f2e5c" >
-		<Register name="A[0]" width="16" initialValue="0" readOnly="false" id="module.Register6f865d42" />
-		<Register name="A[1]" width="16" initialValue="0" readOnly="false" id="module.Register352dbd76" />
-		<Register name="A[2]" width="16" initialValue="0" readOnly="false" id="module.Register1d23a028" />
-		<Register name="A[3]" width="16" initialValue="0" readOnly="false" id="module.Register4417001e" />
-		<Register name="A[4]" width="16" initialValue="0" readOnly="false" id="module.Register19262993" />
-		<Register name="A[5]" width="16" initialValue="0" readOnly="false" id="module.Register4138e1cc" />
-		<Register name="A[6]" width="16" initialValue="0" readOnly="false" id="module.Register411a3b23" />
-		<Register name="A[7]" width="16" initialValue="0" readOnly="false" id="module.Register3df1c4ee" />
+	<RegisterArray name="A" length="8" width="16" id="module.RegisterArray79ff6cdd" >
+		<Register name="A[0]" width="16" initialValue="0" readOnly="false" id="module.Register3ff5aeec" />
+		<Register name="A[1]" width="16" initialValue="0" readOnly="false" id="module.Register4beeead0" />
+		<Register name="A[2]" width="16" initialValue="0" readOnly="false" id="module.Register1b7a3c43" />
+		<Register name="A[3]" width="16" initialValue="0" readOnly="false" id="module.Register19612275" />
+		<Register name="A[4]" width="16" initialValue="0" readOnly="false" id="module.Registerb717d7b" />
+		<Register name="A[5]" width="16" initialValue="0" readOnly="false" id="module.Register3775aeaf" />
+		<Register name="A[6]" width="16" initialValue="0" readOnly="false" id="module.Register7d270426" />
+		<Register name="A[7]" width="16" initialValue="0" readOnly="false" id="module.Register6dc5f37d" />
 	</RegisterArray>
 
 	<!--............. condition bits ................-->
-	<ConditionBit name="halt" bit="0" register="module.Register484c1d56" halt="true" id="module.ConditionBit15b31872" />
+	<ConditionBit name="halt" bit="0" register="module.Register2d5fa365" halt="true" id="module.ConditionBit6ddfd11b" />
 
 	<!--............. rams ..........................-->
-	<RAM name="Main" length="256" cellSize="8" id="module.RAM1383ad89" />
+	<RAM name="Main" length="256" cellSize="8" id="module.RAM77c50ad9" />
 
 	<!--............. set ...........................-->
-	<Set name="clear-buf1" register="module.Register78f73b5b" start="0" numBits="16" value="0" id="microinstruction.CpusimSet627fc766" />
-	<Set name="clear-mar" register="module.Register74338112" start="0" numBits="12" value="0" id="microinstruction.CpusimSet28ee04cc" />
-	<Set name="clear-pc" register="module.Register40935c58" start="0" numBits="12" value="0" id="microinstruction.CpusimSet7ec8ed04" />
+	<Set name="clear-buf1" register="module.Register612bda30" start="0" numBits="16" value="0" id="microinstruction.CpusimSet5d4f941e" />
+	<Set name="clear-mar" register="module.Register7e45562d" start="0" numBits="12" value="0" id="microinstruction.CpusimSet4eb1bb6b" />
+	<Set name="clear-pc" register="module.Register120cdc6e" start="0" numBits="12" value="0" id="microinstruction.CpusimSet1ae96b0" />
 
 	<!--............. test ..........................-->
-	<Test name="if(buf1!=0)skip-2" register="module.Register78f73b5b" start="0" numBits="16" comparison="NE" value="0" omission="2" id="microinstruction.Test441ddb20" />
-	<Test name="if(buf1&gt;=0)skip-2" register="module.Register78f73b5b" start="0" numBits="16" comparison="GE" value="0" omission="2" id="microinstruction.Test58c57032" />
-	<Test name="if(mar=IO)skip3" register="module.Register74338112" start="0" numBits="12" comparison="EQ" value="254" omission="3" id="microinstruction.Testd5d782" />
-	<Test name="if(mar=IO)skip4" register="module.Register74338112" start="0" numBits="12" comparison="EQ" value="254" omission="4" id="microinstruction.Test39ccaa51" />
+	<Test name="if(buf1!=0)skip-2" register="module.Register612bda30" start="0" numBits="16" comparison="NE" value="0" omission="2" id="microinstruction.Test6d8c7da0" />
+	<Test name="if(buf1&gt;=0)skip-2" register="module.Register612bda30" start="0" numBits="16" comparison="GE" value="0" omission="2" id="microinstruction.Test4c42eb6b" />
+	<Test name="if(mar=IO)skip3" register="module.Register7e45562d" start="0" numBits="12" comparison="EQ" value="254" omission="3" id="microinstruction.Testf6b7b6b" />
+	<Test name="if(mar=IO)skip4" register="module.Register7e45562d" start="0" numBits="12" comparison="EQ" value="254" omission="4" id="microinstruction.Test7a856720" />
 
 	<!--............. increment .....................-->
-	<Increment name="Inc2-pc" register="module.Register40935c58" overflowBit="module.ConditionBit15b31872" delta="2" id="microinstruction.Increment1322b293" />
+	<Increment name="Inc2-pc" register="module.Register120cdc6e" overflowBit="module.ConditionBit6ddfd11b" delta="2" id="microinstruction.Increment746a74ad" />
 
 	<!--............. shift .........................-->
-	<Shift name="rsa8buf1" type="arithmetic" source="module.Register78f73b5b" destination="module.Register78f73b5b" direction="right" distance="8" id="microinstruction.Shift60151425" />
+	<Shift name="rsa8buf1" type="arithmetic" source="module.Register612bda30" destination="module.Register612bda30" direction="right" distance="8" id="microinstruction.Shift2fa8c0f8" />
 
 	<!--............. logical .......................-->
 	<!-- none -->
 
 	<!--............. arithmetic ....................-->
-	<Arithmetic name="buf1*buf2-&gt;buf1" type="MULTIPLY" source1="module.Register78f73b5b" source2="module.Register3eedafd" destination="module.Register78f73b5b" overflowBit="module.ConditionBit15b31872" id="microinstruction.Arithmetic4e52b662" />
-	<Arithmetic name="buf1+buf2-&gt;buf1" type="ADD" source1="module.Register78f73b5b" source2="module.Register3eedafd" destination="module.Register78f73b5b" overflowBit="module.ConditionBit15b31872" id="microinstruction.Arithmetic129003db" />
-	<Arithmetic name="buf1-buf2-&gt;buf1" type="SUBTRACT" source1="module.Register78f73b5b" source2="module.Register3eedafd" destination="module.Register78f73b5b" overflowBit="module.ConditionBit15b31872" id="microinstruction.Arithmetic14209d30" />
-	<Arithmetic name="buf1/buf2-&gt;buf1" type="DIVIDE" source1="module.Register78f73b5b" source2="module.Register3eedafd" destination="module.Register78f73b5b" overflowBit="module.ConditionBit15b31872" id="microinstruction.Arithmetic5c5c17ad" />
+	<Arithmetic name="buf1*buf2-&gt;buf1" type="MULTIPLY" source1="module.Register612bda30" source2="module.Registera6aa3" destination="module.Register612bda30" overflowBit="module.ConditionBit6ddfd11b" id="microinstruction.Arithmetic7bcc5645" />
+	<Arithmetic name="buf1+buf2-&gt;buf1" type="ADD" source1="module.Register612bda30" source2="module.Registera6aa3" destination="module.Register612bda30" overflowBit="module.ConditionBit6ddfd11b" id="microinstruction.Arithmetic2a21927b" />
+	<Arithmetic name="buf1-buf2-&gt;buf1" type="SUBTRACT" source1="module.Register612bda30" source2="module.Registera6aa3" destination="module.Register612bda30" overflowBit="module.ConditionBit6ddfd11b" id="microinstruction.Arithmeticd49548e" />
+	<Arithmetic name="buf1/buf2-&gt;buf1" type="DIVIDE" source1="module.Register612bda30" source2="module.Registera6aa3" destination="module.Register612bda30" overflowBit="module.ConditionBit6ddfd11b" id="microinstruction.Arithmetic648ffadf" />
 
 	<!--............. branch ........................-->
 	<!-- none -->
 
 	<!--............. transferRtoR ..................-->
-	<TransferRtoR name="buffer1-&gt;mar" source="module.Register78f73b5b" srcStartBit="4" dest="module.Register74338112" destStartBit="0" numBits="12" id="microinstruction.TransferRtoR7664be2" />
-	<TransferRtoR name="buffer1-&gt;mdr" source="module.Register78f73b5b" srcStartBit="0" dest="module.Register35df512c" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR157a1e0e" />
-	<TransferRtoR name="ir(8-15)-&gt;buf1(0-7)" source="module.Register30270e02" srcStartBit="8" dest="module.Register78f73b5b" destStartBit="0" numBits="8" id="microinstruction.TransferRtoR5a3d88c" />
-	<TransferRtoR name="ir(8-15)-&gt;mar" source="module.Register30270e02" srcStartBit="8" dest="module.Register74338112" destStartBit="4" numBits="8" id="microinstruction.TransferRtoR397e56ea" />
-	<TransferRtoR name="ir(8-15)-&gt;pc" source="module.Register30270e02" srcStartBit="8" dest="module.Register40935c58" destStartBit="4" numBits="8" id="microinstruction.TransferRtoRc72237c" />
-	<TransferRtoR name="mdr-&gt;buffer1" source="module.Register35df512c" srcStartBit="0" dest="module.Register78f73b5b" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR49bdd692" />
-	<TransferRtoR name="mdr-&gt;ir" source="module.Register35df512c" srcStartBit="0" dest="module.Register30270e02" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR52411091" />
-	<TransferRtoR name="pc-&gt;mar" source="module.Register40935c58" srcStartBit="0" dest="module.Register74338112" destStartBit="0" numBits="12" id="microinstruction.TransferRtoR19c3d535" />
+	<TransferRtoR name="buffer1-&gt;mar" source="module.Register612bda30" srcStartBit="4" dest="module.Register7e45562d" destStartBit="0" numBits="12" id="microinstruction.TransferRtoR7d68f675" />
+	<TransferRtoR name="buffer1-&gt;mdr" source="module.Register612bda30" srcStartBit="0" dest="module.Register4180f98f" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR5b7c11e9" />
+	<TransferRtoR name="ir(8-15)-&gt;buf1(0-7)" source="module.Register2922d9cb" srcStartBit="8" dest="module.Register612bda30" destStartBit="0" numBits="8" id="microinstruction.TransferRtoR1cd6d32c" />
+	<TransferRtoR name="ir(8-15)-&gt;mar" source="module.Register2922d9cb" srcStartBit="8" dest="module.Register7e45562d" destStartBit="4" numBits="8" id="microinstruction.TransferRtoR7948b6b" />
+	<TransferRtoR name="ir(8-15)-&gt;pc" source="module.Register2922d9cb" srcStartBit="8" dest="module.Register120cdc6e" destStartBit="4" numBits="8" id="microinstruction.TransferRtoR3df50eb2" />
+	<TransferRtoR name="mdr-&gt;buffer1" source="module.Register4180f98f" srcStartBit="0" dest="module.Register612bda30" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR6bdb3bc" />
+	<TransferRtoR name="mdr-&gt;ir" source="module.Register4180f98f" srcStartBit="0" dest="module.Register2922d9cb" destStartBit="0" numBits="16" id="microinstruction.TransferRtoR2c584ff4" />
+	<TransferRtoR name="pc-&gt;mar" source="module.Register120cdc6e" srcStartBit="0" dest="module.Register7e45562d" destStartBit="0" numBits="12" id="microinstruction.TransferRtoRf3446c7" />
 
 	<!--............. transferRtoA ..................-->
-	<TransferRtoA name="buf1-&gt;A[ir(5-7)]" source="module.Register78f73b5b" srcStartBit="0" dest="module.RegisterArray201f2e5c" destStartBit="0" numBits="16" index="module.Register30270e02" indexStart="5" indexNumBits="3" id="microinstruction.TransferRtoA4b77cb2" />
-	<TransferRtoA name="buf1-&gt;A[ir(8-10)]" source="module.Register78f73b5b" srcStartBit="0" dest="module.RegisterArray201f2e5c" destStartBit="0" numBits="16" index="module.Register30270e02" indexStart="8" indexNumBits="3" id="microinstruction.TransferRtoA239933f0" />
+	<TransferRtoA name="buf1-&gt;A[ir(5-7)]" source="module.Register612bda30" srcStartBit="0" dest="module.RegisterArray79ff6cdd" destStartBit="0" numBits="16" index="module.Register2922d9cb" indexStart="5" indexNumBits="3" id="microinstruction.TransferRtoA1aa1590d" />
+	<TransferRtoA name="buf1-&gt;A[ir(8-10)]" source="module.Register612bda30" srcStartBit="0" dest="module.RegisterArray79ff6cdd" destStartBit="0" numBits="16" index="module.Register2922d9cb" indexStart="8" indexNumBits="3" id="microinstruction.TransferRtoA716a29b6" />
 
 	<!--............. transferAtoR ..................-->
-	<TransferAtoR name="A[ir(5-7)]-&gt;buf1" source="module.RegisterArray201f2e5c" srcStartBit="0" dest="module.Register78f73b5b" destStartBit="0" numBits="16" index="module.Register30270e02" indexStart="5" indexNumBits="3" id="microinstruction.TransferAtoR79066a8a" />
-	<TransferAtoR name="A[ir(8-10)]-&gt;buf1" source="module.RegisterArray201f2e5c" srcStartBit="0" dest="module.Register78f73b5b" destStartBit="0" numBits="16" index="module.Register30270e02" indexStart="8" indexNumBits="3" id="microinstruction.TransferAtoR7e6b72e2" />
-	<TransferAtoR name="A[ir(8-10)]-&gt;buf2" source="module.RegisterArray201f2e5c" srcStartBit="0" dest="module.Register3eedafd" destStartBit="0" numBits="16" index="module.Register30270e02" indexStart="8" indexNumBits="3" id="microinstruction.TransferAtoR4186c371" />
+	<TransferAtoR name="A[ir(5-7)]-&gt;buf1" source="module.RegisterArray79ff6cdd" srcStartBit="0" dest="module.Register612bda30" destStartBit="0" numBits="16" index="module.Register2922d9cb" indexStart="5" indexNumBits="3" id="microinstruction.TransferAtoR1f23ff80" />
+	<TransferAtoR name="A[ir(8-10)]-&gt;buf1" source="module.RegisterArray79ff6cdd" srcStartBit="0" dest="module.Register612bda30" destStartBit="0" numBits="16" index="module.Register2922d9cb" indexStart="8" indexNumBits="3" id="microinstruction.TransferAtoR328c90dd" />
+	<TransferAtoR name="A[ir(8-10)]-&gt;buf2" source="module.RegisterArray79ff6cdd" srcStartBit="0" dest="module.Registera6aa3" destStartBit="0" numBits="16" index="module.Register2922d9cb" indexStart="8" indexNumBits="3" id="microinstruction.TransferAtoR22f5ceb0" />
 
 	<!--............. decode ........................-->
-	<Decode name="Decode-ir" ir="module.Register30270e02" id="microinstruction.Decode2b6a6e02" />
+	<Decode name="Decode-ir" ir="module.Register2922d9cb" id="microinstruction.Decode27274c1" />
 
 	<!--............. set condition bit .............-->
-	<SetCondBit name="set-halt-bit" bit="module.ConditionBit15b31872" value="1" id="microinstruction.SetCondBit617203df" />
+	<SetCondBit name="set-halt-bit" bit="module.ConditionBit6ddfd11b" value="1" id="microinstruction.SetCondBit22d44f0" />
 
 	<!--............. io ............................-->
-	<IO name="input-int-&gt;buf1" direction="input" type="integer" buffer="module.Register78f73b5b" connection="[Console]" id="microinstruction.IO44ab9171" />
-	<IO name="output-buf1-&gt;int" direction="output" type="integer" buffer="module.Register78f73b5b" connection="[Console]" id="microinstruction.IO33c14fde" />
+	<IO name="input-int-&gt;buf1" direction="input" type="integer" buffer="module.Register612bda30" connection="[Console]" id="microinstruction.IO54713610" />
+	<IO name="output-buf1-&gt;int" direction="output" type="integer" buffer="module.Register612bda30" connection="[Console]" id="microinstruction.IO587df260" />
 
 	<!--............. memory access .................-->
-	<MemoryAccess name="Main[mar]-&gt;mdr" direction="read" memory="module.RAM1383ad89" data="module.Register35df512c" address="module.Register74338112" id="microinstruction.MemoryAccess4ba33dda" />
-	<MemoryAccess name="mdr-&gt;Main[mar]" direction="write" memory="module.RAM1383ad89" data="module.Register35df512c" address="module.Register74338112" id="microinstruction.MemoryAccess3a3eb38a" />
+	<MemoryAccess name="Main[mar]-&gt;mdr" direction="read" memory="module.RAM77c50ad9" data="module.Register4180f98f" address="module.Register7e45562d" id="microinstruction.MemoryAccess49b841d2" />
+	<MemoryAccess name="mdr-&gt;Main[mar]" direction="write" memory="module.RAM77c50ad9" data="module.Register4180f98f" address="module.Register7e45562d" id="microinstruction.MemoryAccess21da96d1" />
 
 	<!--............. end ...........................-->
-	<End id="microinstruction.End22068da5" />
+	<End id="microinstruction.End7cc6f54c" />
 
 	<!--............. comment ...........................-->
-	<Comment name="; a useless test comment" id="microinstruction.Commentd3d68d5" />
+	<Comment name="; a useless test comment" id="microinstruction.Comment4b1fe646" />
 
 	<!--............. global equs ..................-->
 	<EQU name="IO" value="254" />
@@ -233,157 +233,153 @@
 
 	<!--............. fetch sequence ................-->
 	<FetchSequence>
-		<Microinstruction microRef="microinstruction.TransferRtoR19c3d535" />
-		<Microinstruction microRef="microinstruction.MemoryAccess4ba33dda" />
-		<Microinstruction microRef="microinstruction.TransferRtoR52411091" />
-		<Microinstruction microRef="microinstruction.Increment1322b293" />
-		<Microinstruction microRef="microinstruction.Decode2b6a6e02" />
+		<Microinstruction microRef="microinstruction.TransferRtoRf3446c7" />
+		<Microinstruction microRef="microinstruction.MemoryAccess49b841d2" />
+		<Microinstruction microRef="microinstruction.TransferRtoR2c584ff4" />
+		<Microinstruction microRef="microinstruction.Increment746a74ad" />
+		<Microinstruction microRef="microinstruction.Decode27274c1" />
 	</FetchSequence>
 
 	<!--............. machine instructions ..........-->
 
 	<MachineInstruction name="clear" opcode="e" instructionFormat="op reg un8" assemblyFormat="op reg" instructionColors="#b5eca0 #d8b39e #b6c089" assemblyColors="#b5eca0 #d8b39e" >
-		<Microinstruction microRef="microinstruction.Commentd3d68d5" />
-		<Microinstruction microRef="microinstruction.CpusimSet627fc766" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.Comment4b1fe646" />
+		<Microinstruction microRef="microinstruction.CpusimSet5d4f941e" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="loadc" opcode="d" instructionFormat="op reg sgn5" assemblyFormat="op reg sgn5" instructionColors="#908fc9 #d1add1 #b7bfbe" assemblyColors="#908fc9 #d1add1 #b7bfbe" >
-		<Microinstruction microRef="microinstruction.TransferRtoR5a3d88c" />
-		<Microinstruction microRef="microinstruction.Shift60151425" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferRtoR1cd6d32c" />
+		<Microinstruction microRef="microinstruction.Shift2fa8c0f8" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="storei" opcode="c" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#9bd5f9 #8d86c7 #89edac #91f1a0" assemblyColors="#9bd5f9 #8d86c7 #89edac" >
-		<Microinstruction microRef="microinstruction.TransferAtoR7e6b72e2" />
-		<Microinstruction microRef="microinstruction.TransferRtoR7664be2" />
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.Testd5d782" />
-		<Microinstruction microRef="microinstruction.TransferRtoR157a1e0e" />
-		<Microinstruction microRef="microinstruction.MemoryAccess3a3eb38a" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
-		<Microinstruction microRef="microinstruction.IO33c14fde" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR328c90dd" />
+		<Microinstruction microRef="microinstruction.TransferRtoR7d68f675" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.Testf6b7b6b" />
+		<Microinstruction microRef="microinstruction.TransferRtoR5b7c11e9" />
+		<Microinstruction microRef="microinstruction.MemoryAccess21da96d1" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
+		<Microinstruction microRef="microinstruction.IO587df260" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="loadi" opcode="b" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#f7e2c8 #cdf3d3 #aac18f #d6cac9" assemblyColors="#f7e2c8 #cdf3d3 #aac18f" >
-		<Microinstruction microRef="microinstruction.TransferAtoR7e6b72e2" />
-		<Microinstruction microRef="microinstruction.TransferRtoR7664be2" />
-		<Microinstruction microRef="microinstruction.Test39ccaa51" />
-		<Microinstruction microRef="microinstruction.MemoryAccess4ba33dda" />
-		<Microinstruction microRef="microinstruction.TransferRtoR49bdd692" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
-		<Microinstruction microRef="microinstruction.IO44ab9171" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR328c90dd" />
+		<Microinstruction microRef="microinstruction.TransferRtoR7d68f675" />
+		<Microinstruction microRef="microinstruction.Test7a856720" />
+		<Microinstruction microRef="microinstruction.MemoryAccess49b841d2" />
+		<Microinstruction microRef="microinstruction.TransferRtoR6bdb3bc" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
+		<Microinstruction microRef="microinstruction.IO54713610" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="move" opcode="a" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#c7f785 #c0c1ca #c5f1af #84ca8c" assemblyColors="#c7f785 #c0c1ca #c5f1af" >
-		<Microinstruction microRef="microinstruction.TransferAtoR7e6b72e2" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR328c90dd" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="divide" opcode="6" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#d5c7e4 #8ec485 #b0dbe3 #9b9cbe" assemblyColors="#d5c7e4 #8ec485 #b0dbe3" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.TransferAtoR4186c371" />
-		<Microinstruction microRef="microinstruction.Arithmetic5c5c17ad" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.TransferAtoR22f5ceb0" />
+		<Microinstruction microRef="microinstruction.Arithmetic648ffadf" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="multiply" opcode="5" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#c7f4b8 #f8ebec #bca4a4 #b6b0a7" assemblyColors="#c7f4b8 #f8ebec #bca4a4" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.TransferAtoR4186c371" />
-		<Microinstruction microRef="microinstruction.Arithmetic4e52b662" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.TransferAtoR22f5ceb0" />
+		<Microinstruction microRef="microinstruction.Arithmetic7bcc5645" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="subtract" opcode="4" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#9eaf90 #95ae9b #cce4fe #c0a2e1" assemblyColors="#9eaf90 #95ae9b #cce4fe" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.TransferAtoR4186c371" />
-		<Microinstruction microRef="microinstruction.Arithmetic14209d30" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.TransferAtoR22f5ceb0" />
+		<Microinstruction microRef="microinstruction.Arithmeticd49548e" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="exit" opcode="0" instructionFormat="op un11" assemblyFormat="op" instructionColors="#fa9686 #c9d7ee" assemblyColors="#fa9686" >
-		<Microinstruction microRef="microinstruction.SetCondBit617203df" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.SetCondBit22d44f0" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="load" opcode="1" instructionFormat="op reg addr" assemblyFormat="op reg addr" instructionColors="#a0ad84 #e2c093 #adc0d1" assemblyColors="#a0ad84 #e2c093 #adc0d1" >
-		<Microinstruction microRef="microinstruction.CpusimSet28ee04cc" />
-		<Microinstruction microRef="microinstruction.TransferRtoR397e56ea" />
-		<Microinstruction microRef="microinstruction.Test39ccaa51" />
-		<Microinstruction microRef="microinstruction.MemoryAccess4ba33dda" />
-		<Microinstruction microRef="microinstruction.TransferRtoR49bdd692" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
-		<Microinstruction microRef="microinstruction.IO44ab9171" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.CpusimSet4eb1bb6b" />
+		<Microinstruction microRef="microinstruction.TransferRtoR7948b6b" />
+		<Microinstruction microRef="microinstruction.Test7a856720" />
+		<Microinstruction microRef="microinstruction.MemoryAccess49b841d2" />
+		<Microinstruction microRef="microinstruction.TransferRtoR6bdb3bc" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
+		<Microinstruction microRef="microinstruction.IO54713610" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="store" opcode="2" instructionFormat="op reg addr" assemblyFormat="op reg addr" instructionColors="#c5ebc4 #c58dc2 #83b4e4" assemblyColors="#c5ebc4 #c58dc2 #83b4e4" >
-		<Microinstruction microRef="microinstruction.CpusimSet28ee04cc" />
-		<Microinstruction microRef="microinstruction.TransferRtoR397e56ea" />
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.Testd5d782" />
-		<Microinstruction microRef="microinstruction.TransferRtoR157a1e0e" />
-		<Microinstruction microRef="microinstruction.MemoryAccess3a3eb38a" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
-		<Microinstruction microRef="microinstruction.IO33c14fde" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.CpusimSet4eb1bb6b" />
+		<Microinstruction microRef="microinstruction.TransferRtoR7948b6b" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.Testf6b7b6b" />
+		<Microinstruction microRef="microinstruction.TransferRtoR5b7c11e9" />
+		<Microinstruction microRef="microinstruction.MemoryAccess21da96d1" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
+		<Microinstruction microRef="microinstruction.IO587df260" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="add" opcode="3" instructionFormat="op reg reg un5" assemblyFormat="op reg reg" instructionColors="#a7d4b3 #9180cf #f0d3b4 #e8d990" assemblyColors="#a7d4b3 #9180cf #f0d3b4" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.TransferAtoR4186c371" />
-		<Microinstruction microRef="microinstruction.Arithmetic129003db" />
-		<Microinstruction microRef="microinstruction.TransferRtoA4b77cb2" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.TransferAtoR22f5ceb0" />
+		<Microinstruction microRef="microinstruction.Arithmetic2a21927b" />
+		<Microinstruction microRef="microinstruction.TransferRtoA1aa1590d" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="jump" opcode="7" instructionFormat="op un3 addr" assemblyFormat="op addr" instructionColors="#83d3cd #95efbf #e4f8eb" assemblyColors="#83d3cd #e4f8eb" >
-		<Microinstruction microRef="microinstruction.CpusimSet7ec8ed04" />
-		<Microinstruction microRef="microinstruction.TransferRtoRc72237c" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.CpusimSet1ae96b0" />
+		<Microinstruction microRef="microinstruction.TransferRtoR3df50eb2" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="jmpz" opcode="8" instructionFormat="op reg addr" assemblyFormat="op reg addr" instructionColors="#dbcfdd #f4d5fb #a7cc82" assemblyColors="#dbcfdd #f4d5fb #a7cc82" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.Test441ddb20" />
-		<Microinstruction microRef="microinstruction.CpusimSet7ec8ed04" />
-		<Microinstruction microRef="microinstruction.TransferRtoRc72237c" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.Test6d8c7da0" />
+		<Microinstruction microRef="microinstruction.CpusimSet1ae96b0" />
+		<Microinstruction microRef="microinstruction.TransferRtoR3df50eb2" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<MachineInstruction name="jmpn" opcode="9" instructionFormat="op reg addr" assemblyFormat="op reg addr" instructionColors="#acecf7 #f8aff6 #e5ce9e" assemblyColors="#acecf7 #f8aff6 #e5ce9e" >
-		<Microinstruction microRef="microinstruction.TransferAtoR79066a8a" />
-		<Microinstruction microRef="microinstruction.Test58c57032" />
-		<Microinstruction microRef="microinstruction.CpusimSet7ec8ed04" />
-		<Microinstruction microRef="microinstruction.TransferRtoRc72237c" />
-		<Microinstruction microRef="microinstruction.End22068da5" />
+		<Microinstruction microRef="microinstruction.TransferAtoR1f23ff80" />
+		<Microinstruction microRef="microinstruction.Test4c42eb6b" />
+		<Microinstruction microRef="microinstruction.CpusimSet1ae96b0" />
+		<Microinstruction microRef="microinstruction.TransferRtoR3df50eb2" />
+		<Microinstruction microRef="microinstruction.End7cc6f54c" />
 	</MachineInstruction>
 
 	<!--............. highlighting info .............-->
 	<HighlightingInfo>
-		<RegisterRAMPair register="module.Register40935c58" ram="module.RAM1383ad89" dynamic="false" />
+		<RegisterRAMPair register="module.Register120cdc6e" ram="module.RAM77c50ad9" dynamic="false" />
 	</HighlightingInfo>
 
 	<!--............. loading info ..................-->
-	<LoadingInfo ram="module.RAM1383ad89" startingAddress="0" />
+	<LoadingInfo ram="module.RAM77c50ad9" startingAddress="0" />
 
 	<!--............. indexing info ............-->
 	<IndexingInfo indexFromRight="false" />
-
-	<!--............. module window info ............-->
-	<ModuleWindowsInfo>
-	</ModuleWindowsInfo>
 
 </Machine>

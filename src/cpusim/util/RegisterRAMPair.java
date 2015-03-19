@@ -15,33 +15,36 @@
 
 package cpusim.util;
 
-
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
-
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import cpusim.module.RAM;
 import cpusim.module.Register;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// the RegisterRAMPair class
-
+/**
+ * Holds a Register and a RAM for the purpose of highlighting.
+ * The RAM cell whose address is in the register is highlighted when in Debug mode.
+ */
 public class RegisterRAMPair implements Cloneable {
 	
 	private SimpleObjectProperty<Register> register;
 	private SimpleObjectProperty<RAM> ram;
 	
-	//if true, always use the current value
-	public SimpleBooleanProperty dynamic;    
-	//otherwise use the value at start of cycle
-    private int addressAtStart; 
+	/**
+     * if true, always highlight with the current value, not just at the start of a cycle
+     *         otherwise, update highlighting only at the start of a cycle
+     */
+	public SimpleBooleanProperty dynamic;
+    /**
+     * the value in the register at the start of the current cycle.  It is preserved
+     * here as the cycle is executed.
+     */
+    private int addressAtStart;
 
     //constructor
     public RegisterRAMPair(Register theRegister, RAM theRAM, boolean dyn) {
-        register = new SimpleObjectProperty<Register>(theRegister);
-        ram = new SimpleObjectProperty<RAM>(theRAM);
+        register = new SimpleObjectProperty<>(theRegister);
+        ram = new SimpleObjectProperty<>(theRAM);
         dynamic = new SimpleBooleanProperty(dyn);
         addressAtStart = 0;
     }
@@ -110,5 +113,5 @@ public class RegisterRAMPair implements Cloneable {
                 (dynamic.get() ? "true" : "false") + "\" />";
     }
 
-}  //end of class RegisterRAMPair
+}
 

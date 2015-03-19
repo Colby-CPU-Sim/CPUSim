@@ -1,19 +1,16 @@
-///////////////////////////////////////////////////////////////////////////////
-// File:    	HighlightManager.java
-// Author:		Dale Skrien
-// Project: 	CPU Sim
-// Date:    	June, 2001
-//
-// Description:
-//   This file contains the class that manages the highlighting
-//   of the rows of RAM during stepping.  It is only active when the
-//   debug toolbar is visible.  It stores Register/RAM pairs and
-//   is a PropertyChangeListener to the machine, which tells it when
-//   to highlight the rows of RAMs.
+/**
+ * File:    	HighlightManager.java
+ * Author:		Dale Skrien
+ * Project: 	CPU Sim
+ * Date:    	June, 2001
 
-
-///////////////////////////////////////////////////////////////////////////////
-// the package in which our file resides
+ * Description:
+ *  This file contains the class that manages the highlighting
+ *  of the rows of RAM and assembly code during stepping.  It is only active when the
+ *  debug toolbar is visible.  It stores Register/RAM pairs and
+ *  is a ChangeListener to the machine, which tells it when
+ *  to highlight the rows of RAMs and the corresponding row of the assembly program.
+*/
 
 package cpusim.util;
 
@@ -28,21 +25,18 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Tab;
-import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.InlineStyleTextArea;
 
 import java.io.File;
 import java.util.*;
 
 /**
- * class to highlight rows in the table when in debug mode
+ * class to handle highlighting of rows in the table when in debug mode
  */
 public class HighlightManager
         implements ChangeListener<Machine.StateWrapper> {
 
-    //instance variables
     private DesktopController desktop;
     private Mediator mediator;
     private int breakAddress;  //the address to be highlighted in red
@@ -74,7 +68,7 @@ public class HighlightManager
         ObservableList rams = mediator.getMachine().getModule("rams");
         for (Object ram : rams) {
             highlightingPairs.put((RAM) ram,
-                    new Vector<RegisterRAMPair>());
+                    new Vector<>());
         }
         for (RegisterRAMPair pair : newPairs) {
             highlightingPairs.get(pair.getRam()).addElement(pair);
@@ -106,7 +100,7 @@ public class HighlightManager
         //update pairs for new RAMs
         for (Object ram : rams) {
             if (!highlightingPairs.containsKey(ram))
-                highlightingPairs.put((RAM) ram, new Vector<RegisterRAMPair>());
+                highlightingPairs.put((RAM) ram, new Vector<>());
         }
         //update pairs for deleted RAMs
         //the keySet is created to avoid ConcurrentModificationExceptions
@@ -134,18 +128,17 @@ public class HighlightManager
      * and highlighted.
      */
     public void highlightCellsAndText() {
-        ObservableList ramTables = desktop.getRAMController();
+        ObservableList<RamTableController> ramTableControllers = desktop.getRAMControllers();
 
-        for (Object key : ramTables) {
-            RamTableController table = (RamTableController) key;
-            RAM ram = table.getRam();
+        for (RamTableController controller : ramTableControllers) {
+            RAM ram = controller.getRam();
             int[] addresses = getAddressesToHighlight(ram);
-
             //now have the window highlight the cells
-            table.highlightRows(addresses);
+            controller.highlightRows(addresses);
             highlightText(ram, addresses);
+
             if (ram == breakRAM) {
-                table.highlightBreak(breakAddress);
+                controller.highlightBreak(breakAddress);
                 breakRAM = null; //turn off highlight when execution resumes
             }
         }
@@ -235,16 +228,15 @@ public class HighlightManager
     //--------------------------------
     // returns an array of addresses to be highlighted for the given RAM
     public int[] getAddressesToHighlight(RAM ram) {
-        Vector registerRAMPairs = highlightingPairs.get(ram);
+        Vector<RegisterRAMPair> registerRAMPairs = highlightingPairs.get(ram);
         int[] addresses = new int[registerRAMPairs.size()];
         for (int i = 0; i < addresses.length; i++) {
-            RegisterRAMPair info = (RegisterRAMPair)
-                    registerRAMPairs.elementAt(i);
-            Register register = info.getRegister();
-            if (info.isDynamic())
+            RegisterRAMPair pair = registerRAMPairs.elementAt(i);
+            Register register = pair.getRegister();
+            if (pair.isDynamic())
                 addresses[i] = (int) register.getValue();
             else
-                addresses[i] = info.getAddressAtStart();
+                addresses[i] = pair.getAddressAtStart();
             //if address register has 1 in the leftmost bit, its value is stored
             //as a 2's complement negative, but we want to treat it as an
             //unsigned decimal
@@ -256,38 +248,27 @@ public class HighlightManager
     }
 
     /**
-     * save the new value of registers at the start of a cycle.
+     * save in each RegisterRAMPair the value of register at the start of a cycle.
      */
     public void saveStartOfCycleValues() {
-        Collection c = highlightingPairs.values();
-        for (Object aC : c) {
-            Vector infos = (Vector) aC;
-            for (int i = 0; i < infos.size(); i++) {
-                RegisterRAMPair info = (RegisterRAMPair) infos.elementAt(i);
+        Collection<Vector<RegisterRAMPair>> c = highlightingPairs.values();
+        for (Vector<RegisterRAMPair> pairs : c) {
+            for (int i = 0; i < pairs.size(); i++) {
+                RegisterRAMPair info = pairs.elementAt(i);
                 info.setAddressAtStart((int) info.getRegister().getValue());
             }
         }
     }
 
-    public void clearHighlights() {
-        ObservableList ramTables = desktop.getRAMController();
-        for (Object key : ramTables) {
-            RamTableController table = (RamTableController) key;
-            table.getTable().getSelectionModel().clearSelection();
-        }
-
-    }
-
-    //--------------------------------------
-    // --- PropertyChangeListener Methods---
-    //--------------------------------------
-
-    //------------------------------------------
-    //
-    // Receive notifications that a module
-    // has modified a property.  This method is called in the
-    // SwingWorker's thread in Machine.execute() and so no GUI stuff is
-    // allowed here.
+    // never used
+//    public void clearHighlights() {
+//        ObservableList ramTables = desktop.getRAMControllers();
+//        for (Object key : ramTables) {
+//            RamTableController table = (RamTableController) key;
+//            table.getTable().getSelectionModel().clearSelection();
+//        }
+//
+//    }
 
     /**
      * Receive notifications that a module
@@ -312,4 +293,4 @@ public class HighlightManager
         //else it was a something that we don't care about
     }
 
-} //end of class HighlightManager
+}

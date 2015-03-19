@@ -271,7 +271,7 @@ public class RamTableController implements Initializable {
         for (int address : addresses)
             if (address >= 0 && address < length) {
                 table.getSelectionModel().select(address);
-                table.scrollTo(address);
+                table.scrollTo(address-4>=0? address-4 : 0);
 
             }
     }

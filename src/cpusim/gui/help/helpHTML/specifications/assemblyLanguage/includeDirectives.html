@@ -49,6 +49,13 @@
     then CPU Sim will search for the file W1-0.h relative to the directory containing the
     current machine (that is, the
     .cpu file containing the current machine) instead of relative to the directory
-    containing <I>F</I>.<P></P></FONT>
+    containing <I>F</I>.<P>
+        Note that Include directives can be nested and can be included in arbitrary
+        locations in the program.  However, after the text
+        from the included files has been inserted into the program, all EQU, macro,
+        and global declarations must precede all regular instructions and data or
+        ascii pseudoinstructions.  Otherwise, you will get an error when you attempt
+        to assemble your program.
+    </P></FONT>
 </BODY>
 </HTML>

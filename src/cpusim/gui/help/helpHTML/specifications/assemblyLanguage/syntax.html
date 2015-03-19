@@ -57,7 +57,7 @@ Michael Goldenberg, Jinghui Yu, and Ben Borchard chaged this file on 11/25/13 in
     <B>Global</B> -&gt; ".global" Symbol<BR>
 
     <B>InstructionPart</B> -&gt; ((RegularInstructionCall | DataPseudoinstructionCall |
-    AsciiPseudoinstructionCall)
+    AsciiPseudoinstructionCall | Include)
     CommentsAndEOLs)*<BR> <B>RegularInstructionCall</B> -&gt; (Label CommentsAndEOLs)*
     [Label] Symbol [Operand ([","]
     Operand)*]<BR>
@@ -137,7 +137,8 @@ Michael Goldenberg, Jinghui Yu, and Ben Borchard chaged this file on 11/25/13 in
         contains any number of EQU
         declarations, include directives, macro definitions, and global declarations
         in any order. The second part contains any number of
-        regular instructions and data pseudoinstructions, one per line.</font></P>
+        regular instructions, ascii pseudoinstructions, data pseudoinstructions, and
+        include directives, one per line.</font></P>
 
     <P><font face="Palatino"> Note: To separate tokens in assembly language programs that
         the assembler would otherwise

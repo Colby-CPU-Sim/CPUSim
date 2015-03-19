@@ -397,45 +397,6 @@ public class MachineWriter
                     machine.getIndexFromRight() +
                     "\" />");
 
-        //print the module window information
-        out.println();
-        out.println("\t<!--............. module window info ............-->");
-        out.println("\t<ModuleWindowsInfo>");
-        
-        //This will be added back in when the GUI has been set
-
-//        for (Object key : moduleWindows.keySet()) {
-//            BaseInternalFrame frame = (BaseInternalFrame) moduleWindows.get(key);
-//            Rectangle r = frame.getNormalBounds();
-//            if (key instanceof RAM) {
-//                out.println("\t\t<RAMWindowInfo ram=\"" +
-//                        ((RAM) key).getID() + "\" cellSize=\"" +
-//                        ((RAMWindow) frame).getNumMemCellsPerTableCell() +
-//                        "\" contentsbase=\"" +
-//                        ((RAMWindow) frame).getContentBaseString().replace(" ","") +
-//                        "\" addressbase=\"" +
-//                        ((RAMWindow) frame).getAddressBaseString() + "\" ");
-//            }
-//            else if (key instanceof RegisterArray) {
-//                out.println("\t\t<RegisterArrayWindowInfo array=\"" +
-//                        ((RegisterArray) key).getID() + "\" base=\"" +
-//                        ((RegistersWindow) frame).getBaseString().replace(" ","") + "\" ");
-//            }
-//            else if (key instanceof String) {
-//                out.println("\t\t<RegisterWindowInfo base=\"" +
-//                        ((RegistersWindow) frame).getBaseString().replace(" ","") + "\" ");
-//            }
-//            else {
-//                assert false, "Illegal key: " + key + " in " +
-//                        "desktop.moduleWindows.");
-//            }
-//            out.println("\t\t\ttop=\"" + (r.y < 0 ? 0 : r.y) +
-//                    "\" left=\"" + (r.x < 0 ? 0 : r.x) +
-//                    "\" width=\"" + r.width + "\" height=\"" + r.height
-//                    + "\" />");
-//        }
-        out.println("\t</ModuleWindowsInfo>");
-
         out.println();
         out.println("</Machine>");
         out.close();

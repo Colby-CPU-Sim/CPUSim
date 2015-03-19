@@ -129,7 +129,7 @@ public class RegisterTableController implements Initializable {
         MenuItem edit = new MenuItem("Edit Hardware");
         edit.setOnAction(e -> {
             ObservableList<RegisterTableController> RTCs =
-                    desktop.getRegisterController();
+                    desktop.getRegisterControllers();
             for (RegisterTableController RTC : RTCs) {
                 if (RTC == RegisterTableController.this) {
                     if (RTC.title.equals("Registers")) {

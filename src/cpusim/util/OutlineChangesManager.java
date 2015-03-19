@@ -86,12 +86,12 @@ public class OutlineChangesManager {
      */
     private void updateRamAndRegOutlines()
     {
-        for (Object c : desktop.getRegisterController()){
+        for (Object c : desktop.getRegisterControllers()){
             RegisterTableController controller = (RegisterTableController) c;
             controller.outlineRows(registerSet);
         }
 
-        for (Object c : desktop.getRAMController()){
+        for (Object c : desktop.getRAMControllers()){
             RamTableController controller = (RamTableController) c;
             RAM ram = controller.getRam();
             HashMap<Integer,Long> tempRam = ramMap.get(ram);

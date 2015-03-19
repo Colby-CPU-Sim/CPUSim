@@ -589,20 +589,14 @@ public class DesktopController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         initFileChooser(fileChooser, "Save Machine", false);
         fileChooser.getExtensionFilters().add(new ExtensionFilter("Hyper Text Markup " +
-                "File file (.html)",
+                "Language file (.html)",
                 "*.html"));
+        fileChooser.setInitialFileName(mediator.getMachine().getName());
 
         File fileToSave = fileChooser.showSaveDialog(stage);
         if (fileToSave == null) {
             return;
         }
-
-        if (fileToSave.getAbsolutePath().lastIndexOf(".html") !=
-                fileToSave.getAbsolutePath().length() - 5) {
-            fileToSave = new File(fileToSave.getAbsolutePath() + ".html");
-        }
-
-        fileToSave = new File(fileToSave.getAbsolutePath() + ".html");
 
         PrintWriter printWriter = new PrintWriter(fileToSave);
 
@@ -1884,18 +1878,18 @@ public class DesktopController implements Initializable {
     /**
      * gets the register controllers in an observable list.
      *
-     * @return the observable list of registercontrollers
+     * @return the observable list of RegisterTableControllers
      */
-    public ObservableList<RegisterTableController> getRegisterController() {
+    public ObservableList<RegisterTableController> getRegisterControllers() {
         return registerControllers;
     }
 
     /**
      * gets the ram controller in an observable list.
      *
-     * @return the observable list of ramcontrollers.
+     * @return the observable list of RamTableControllers.
      */
-    public ObservableList<RamTableController> getRAMController() {
+    public ObservableList<RamTableController> getRAMControllers() {
         return ramControllers;
     }
 
@@ -2096,6 +2090,7 @@ public class DesktopController implements Initializable {
      *
      * @param fileChooser fileChooser to be modified
      * @param title       title of fileChooser window
+     * @param text        true for saving an assembly language program, false for a machine
      */
     public void initFileChooser(FileChooser fileChooser, String title, boolean text) {
         fileChooser.setTitle(title);
