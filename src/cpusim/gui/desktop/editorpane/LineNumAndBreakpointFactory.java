@@ -6,10 +6,10 @@
 package cpusim.gui.desktop.editorpane;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.Node;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -32,7 +32,7 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
     private final String stylesheet;
     private SimpleObjectProperty<IntFunction<String>> format;
     private StyledTextArea<?> area;
-    private Set<Paragraph> breakPoints;
+    private ObservableSet<Paragraph> breakPoints;
 
     private static final String STYLESHEET = LineNumAndBreakpointFactory.class.getResource
             ("../../css/LineNumbers.css").toExternalForm();
@@ -64,7 +64,7 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         this.area = area;
         this.format = new SimpleObjectProperty<>(format);
         this.stylesheet = stylesheet;
-        this.breakPoints = new HashSet<>();
+        this.breakPoints = FXCollections.observableSet();
     }
 
     public void setFormat(IntFunction<String> format) {
@@ -75,7 +75,19 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         return this.format;
     }
 
-    public Set<Integer> getBreakPointLines() {
+    /**
+     * @return the set of Paragraphs with breakpoints set so that changes to the set can
+     * be observed.
+     */
+    public ObservableSet<Paragraph> getBreakPoints() {
+        return breakPoints;
+    }
+
+    /**
+     * @return the Set of line numbers with break points so that corresponding RAM breakpoints
+     * can be set when the code is loaded.
+     */
+    public Set<Integer> getAllBreakPointLineNumbers() {
         Set<Integer> breakPointLineNumbers = new HashSet<>();
         for(Paragraph p : breakPoints)
             breakPointLineNumbers.add(area.getParagraphs().indexOf(p));
@@ -119,6 +131,7 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
                 breakPoints.remove(paragraph);
         });
 
+        // reformat the line numbers when the number of lines changes.
         // When removed from the scene, stay subscribed to never(), which is
         // a fake subscription that consumes no resources, instead of staying
         // subscribed to area's paragraphs.

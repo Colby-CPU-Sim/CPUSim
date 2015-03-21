@@ -33,4 +33,11 @@ public class SourceLine
     {
         return fileName;
     }
+
+    public boolean equals(Object obj) {
+        if(! (obj instanceof SourceLine))
+            return false;
+        SourceLine other = (SourceLine) obj;
+        return other.line == this.line && other.fileName.equals(this.fileName);
+    }
 }

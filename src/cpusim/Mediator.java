@@ -83,7 +83,6 @@ import cpusim.assembler.AssembledInstructionCall;
 import cpusim.assembler.Assembler;
 import cpusim.assembler.AssemblyException;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.mif.MIFScanner;
 import cpusim.module.RAM;
@@ -115,7 +114,6 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.stage.FileChooser;
 import org.fxmisc.richtext.InlineStyleTextArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -674,13 +672,13 @@ public class Mediator {
             if (clearing) {
                 machine.get().clearAllRAMs();
             }
-            machine.get().getCodeStore().loadAssembledInstructions(instrs,
+            RAM codeStore = machine.get().getCodeStore();
+            codeStore.loadAssembledInstructions(instrs,
                     machine.get().getStartingAddressForLoading());
 
             // remove the old breakpoints and add the new ones
-            clearAllBreakPointsInRam(machine.get().getCodeStore());
-            RAM r = machine.get().getCodeStore();
-            setBreakPointsInRam(r);
+            codeStore.clearAllBreakpoints();
+            setBreakPointsInRam();
             return true;
         } catch (LoadException ex) {
             Dialogs.createErrorDialog(stage, "RAM Load Error", ex.getMessage()).showAndWait();
@@ -1136,34 +1134,31 @@ public class Mediator {
                 "The file is missing an end-of-line record.").showAndWait();
     }
 
-
-    public void setBreakPointsInRam(RAM ram) {
-        if (ram == null) {
-            return;
-        }
+    /**
+     * sets or clears a break point in the given ram at the line corresponding
+     * to the given SourceLine.
+     * @param sourceLine the file and line number where the break is to be set/cleared
+     * @param set true if setting the breakpoint, false if clearing the breakpoint
+     */
+    public void setBreakPointInRAM(SourceLine sourceLine, boolean set) {
+        RAM ram = machine.get().getCodeStore();
         for (RAMLocation rLoc : ram.data()) {
-            if (rLoc.getSourceLine() != null) {
-                SourceLine sourceLine = rLoc.getSourceLine();
-                Set<Integer> breakPoints = getBreakPointsForFile(sourceLine.getFileName());
-                rLoc.setBreak(breakPoints.contains(sourceLine.getLine()));
+            if (sourceLine.equals(rLoc.getSourceLine())) {
+                rLoc.setBreak(set);
             }
         }
     }
 
-    private Set<Integer> getBreakPointsForFile(String fileName) {
-        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) desktopController
-                .getTabForFile(new File(fileName))
-                .getContent()).getParagraphGraphicFactory()).getBreakPointLines();
-    }
-
-    public void clearAllBreakPointsInRam(RAM ram) {
-        if (ram == null) {
-            return;
-        }
+    public void setBreakPointsInRam() {
+        RAM ram = machine.get().getCodeStore();
         for (RAMLocation rLoc : ram.data()) {
-            rLoc.setBreak(false);
+            if (rLoc.getSourceLine() != null) {
+                SourceLine sourceLine = rLoc.getSourceLine();
+                Set<Integer> breakPoints = desktopController.getAllBreakPointsForFile(
+                        sourceLine.getFileName());
+                rLoc.setBreak(breakPoints.contains(sourceLine.getLine()));
+            }
         }
     }
-
 
 }

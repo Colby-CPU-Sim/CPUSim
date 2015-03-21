@@ -466,5 +466,13 @@ public class RAM extends Module
     public int getNumAddrBits() {
         return 31-Integer.numberOfLeadingZeros(data.size());
     }
-    
-} 
+
+    /**
+     * clear all the breakpoints for ram locations.
+     */
+    public void clearAllBreakpoints() {
+        for (RAMLocation rLoc : this.data()) {
+            rLoc.setBreak(false);
+        }
+    }
+}

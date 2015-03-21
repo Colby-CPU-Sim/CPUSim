@@ -83,11 +83,14 @@ import cpusim.module.RegisterArray;
 import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
+import javafx.beans.*;
+import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -1105,7 +1108,7 @@ public class DesktopController implements Initializable {
     protected void handleAssemble(ActionEvent event) {
         File currFile = getFileToAssemble();
         if (currFile != null) {
-            mediator.Assemble(currFile.getPath());
+            mediator.Assemble(currFile.getAbsolutePath());
         }
     }
 
@@ -1119,7 +1122,7 @@ public class DesktopController implements Initializable {
     protected void handleAssembleLoad(ActionEvent event) {
         File currFile = getFileToAssemble();
         if (currFile != null) {
-            mediator.AssembleLoad(currFile.getPath());
+            mediator.AssembleLoad(currFile.getAbsolutePath());
         }
     }
 
@@ -1133,7 +1136,7 @@ public class DesktopController implements Initializable {
     protected void handleAssembleLoadRun(ActionEvent event) {
         File currFile = getFileToAssemble();
         if (currFile != null) {
-            mediator.AssembleLoadRun(currFile.getPath());
+            mediator.AssembleLoadRun(currFile.getAbsolutePath());
         }
     }
 
@@ -1147,7 +1150,7 @@ public class DesktopController implements Initializable {
     protected void handleClearAssembleLoadRun(ActionEvent event) {
         File currFile = getFileToAssemble();
         if (currFile != null) {
-            mediator.ClearAssembleLoadRun(currFile.getPath());
+            mediator.ClearAssembleLoadRun(currFile.getAbsolutePath());
         }
     }
 
@@ -1350,8 +1353,7 @@ public class DesktopController implements Initializable {
      */
     public void addTab(String content, String title, File file) {
         // create the new tab and text area
-        final CodePaneTab newTab = new CodePaneTab();
-        final File f = file;
+        CodePaneTab newTab = new CodePaneTab();
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
         codeArea.setWrapText(otherSettings.lineWrap.get());
@@ -1382,9 +1384,33 @@ public class DesktopController implements Initializable {
         newTab.setText(title);
         addContextMenu(newTab);
 
+        // add a listener to the codeArea's set of breakpoints
+        // so that breakpoints can be added dynamically as the code is being stepped through
+        // when in debug mode
+        ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory()).getBreakPoints().
+                addListener((SetChangeListener<Paragraph>) change -> {
+                    if (newTab.getFile() != null) {
+                        boolean set = change.wasAdded();
+                        String fileName = newTab.getFile().getAbsolutePath();
+                        Paragraph paragraph = set ? change
+                                .getElementAdded() : change.getElementRemoved();
+                        int line = codeArea.getParagraphs().indexOf(paragraph);
+                        SourceLine sourceLine = new SourceLine(line, fileName);
+                        mediator.setBreakPointInRAM(sourceLine, set);
+                    }
+                });
+
         textTabPane.getTabs().add(newTab);
         textTabPane.getSelectionModel().selectLast();
     }
+
+
+    public Set<Integer> getAllBreakPointsForFile(String fileName) {
+        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea)
+                getTabForFile(new File(fileName)).getContent())
+                .getParagraphGraphicFactory()).getAllBreakPointLineNumbers();
+    }
+
 
     /**
      * creates and adds a context menu for the new Tab
@@ -3266,5 +3292,4 @@ public class DesktopController implements Initializable {
             });
         }
     }
-
 }
