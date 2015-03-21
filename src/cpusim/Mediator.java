@@ -578,7 +578,8 @@ public class Mediator {
         }
 
         // Try clearing
-        success = clearRegistersAndRegisterArrays();
+        clearRegisters();
+        clearRegisterArrays();
         if (!success) {
             return;
         }
@@ -620,7 +621,8 @@ public class Mediator {
      * Called from the Execute menu.
      */
     public void ResetEverything() {
-        clearRegistersAndRegisterArrays();
+        clearRegisters();
+        clearRegisterArrays();
         clearRAMs();
         ClearConsole();
     }
@@ -642,13 +644,15 @@ public class Mediator {
      * machine, and updates the displays to show that
      * everything has been cleared.
      */
-    private boolean clearRegistersAndRegisterArrays() {
+    public void clearRegisters() {
         machine.get().clearAllRegisters();
-        machine.get().clearAllRegisterArrays();
-        return true;
     }
 
-    private void clearRAMs() {
+    public void clearRegisterArrays() {
+        machine.get().clearAllRegisterArrays();
+    }
+
+    public void clearRAMs() {
         machine.get().clearAllRAMs();
     }
 
@@ -673,7 +677,8 @@ public class Mediator {
 
         try {
             if (clearing) {
-                clearRegistersAndRegisterArrays();
+                clearRegisters();
+                clearRegisterArrays();
                 clearRAMs();
             }
             RAM codeStore = machine.get().getCodeStore();

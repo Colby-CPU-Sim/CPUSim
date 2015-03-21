@@ -23,9 +23,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -119,7 +122,15 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         else {
             setTooltipsAndCellSize();
             setText(formatString(convertLong(Long.parseLong(getString()))));
-            setGraphic(null);
+            if(isReadOnlyRegisterValue()) {
+                ImageView graphic = new ImageView(new Image("cpusim/gui/desktop/Lock.png"));
+                graphic.setFitHeight(12);
+                graphic.setSmooth(true);
+                graphic.setPreserveRatio(true);
+                graphic.setCache(true);
+                setContentDisplay(ContentDisplay.RIGHT);
+                setGraphic(graphic);
+            }
         }
 
     }

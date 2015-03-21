@@ -521,7 +521,9 @@ public class EditModulesController implements Initializable {
         }
         desktop.adjustTablesForNewModules();
         mediator.setMachineDirty(true);
-
+        mediator.clearRAMs();
+        mediator.clearRegisterArrays();
+        mediator.clearRegisters();
     }
 
     //sorts the given Vector of Modules in place by name
