@@ -1,10 +1,4 @@
 /**
- * Created with IntelliJ IDEA.
- * User: jyu
- * Date: 8/12/13
- * Time: 9:54 AM
- * To change this template use File | Settings | File Templates.
- *
  * Jinghui Yu, Ben Borchard and Michael Goldenberg made the following modifications to
  * this class on 11/11/13:
  *

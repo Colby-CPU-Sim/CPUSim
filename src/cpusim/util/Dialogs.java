@@ -1,8 +1,6 @@
 /**
  * Jinghui Yu
  * Created on 3/3/2015
- *
- * Dialogs class is used to create different kinds dialogs including error, information, confirmation and choices.
  */
 
 package cpusim.util;
@@ -14,6 +12,9 @@ import javafx.stage.Window;
 
 import java.util.List;
 
+/**
+ * A factory class for generating standard dialogs, such as error dialogs.
+ */
 public class Dialogs {
 
     /**

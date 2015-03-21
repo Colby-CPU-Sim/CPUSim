@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class EditRegistersController implements Initializable {
+public class EditArrayRegistersController implements Initializable {
     @FXML
     BorderPane scene;
     @FXML
@@ -59,10 +59,10 @@ public class EditRegistersController implements Initializable {
     private ChangeTable tableMap;
     private String selection;
 
-    public EditRegistersController(Mediator mediator,
-                                   RegistersTableController registerTableController,
-                                   RegisterArrayTableController controller,
-                                   String selected) {
+    public EditArrayRegistersController(Mediator mediator,
+                                        RegistersTableController registerTableController,
+                                        RegisterArrayTableController controller,
+                                        String selected) {
         this.mediator = mediator;
         this.registerController = registerTableController;
         this.registerArrays = controller.getItems();
@@ -71,9 +71,9 @@ public class EditRegistersController implements Initializable {
         selection = selected;
     }
 
-    public EditRegistersController(Mediator mediator,
-                                   RegistersTableController registerTableController,
-                                   RegisterArrayTableController controller) {
+    public EditArrayRegistersController(Mediator mediator,
+                                        RegistersTableController registerTableController,
+                                        RegisterArrayTableController controller) {
         this.mediator = mediator;
         this.registerController = registerTableController;
         this.registerArrays = controller.getItems();

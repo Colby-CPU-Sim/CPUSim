@@ -59,12 +59,7 @@ public class Register extends Module
      */
     public Register(String name, int width)
     {
-        super(name);
-        this.value = new SimpleLongProperty(this, "register value", 0);
-        setWidth(width);
-        this.initialValue = new SimpleLongProperty(0);
-        this.readOnly = new SimpleBooleanProperty(false);
-        nameDirty = false;
+        this(name, width, 0, false);
     }
 
     /**
@@ -74,12 +69,7 @@ public class Register extends Module
      */
     public Register(String name, int width, long initialValue, boolean readOnly)
     {
-        super(name);
-        this.value = new SimpleLongProperty(this, "register value", 0);
-        setWidth(width);
-        this.initialValue = new SimpleLongProperty(initialValue);
-        this.readOnly = new SimpleBooleanProperty(readOnly);
-        nameDirty = false;
+        this(name, width, initialValue, readOnly, false);
     }
 
     /**
@@ -95,6 +85,7 @@ public class Register extends Module
         this.initialValue = new SimpleLongProperty(initialValue);
         this.readOnly = new SimpleBooleanProperty(readOnly);
         nameDirty = dirty;
+        setValue(initialValue);
     }
 
     /**

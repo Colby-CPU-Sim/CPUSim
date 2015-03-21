@@ -413,6 +413,7 @@ public class MachineReader
             r = currentRegisterArray.registers().get(currentRegisterArrayIndex);
             r.setName(name);
             r.setInitialValue(initialValue);
+            r.setValue(initialValue);
             r.setReadOnly(readOnly);
             currentRegisterArrayIndex++;
         } else {

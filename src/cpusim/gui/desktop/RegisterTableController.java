@@ -7,7 +7,9 @@ package cpusim.gui.desktop;
 
 import cpusim.gui.util.*;
 import cpusim.module.Register;
+import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -22,16 +24,9 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
- * FXML Controller class
- *
- * @author Ben Borchard
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/6/13
- * with the following changes:
- * 
- * 1.) got rid of an unused ArrayList of EditingMultiBaseStyleCells called datas
+ * This class is the controller for a pane in the Desktop that contains registers.
+ * There is one such controller for the default registers pane and one controller for
+ * each of the register array panes.
  */
 public class RegisterTableController implements Initializable {
 
@@ -85,26 +80,14 @@ public class RegisterTableController implements Initializable {
         });
         
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellMultiBaseLongFactory =
-                setStringTableColumn -> {
-                    final EditingMultiBaseStyleLongCell<Register> a =
-                            new EditingMultiBaseStyleLongCell<>(base, styleInfo);
-                    // Tooltip
-                    a.setTooltip(new Tooltip());
-                    a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
-                    return a;
-                };
+                column -> new EditingMultiBaseStyleLongCell<>(base, styleInfo);
         
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStringFactory =
-                setStringTableColumn -> {
-                    final EditingStrStyleCell<Register> a = new EditingStrStyleCell<>(styleInfo);
-                    return a;
-                };
+                column -> new EditingStrStyleCell<>(styleInfo);
         
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntegerFactory =
-                setStringTableColumn -> {
-                    final EditingIntStyleCell<Register> a = new EditingIntStyleCell<>(styleInfo);
-                    return a;
-                };
+                column -> new EditingIntStyleCell<>(styleInfo);
+
         data.setCellFactory(cellMultiBaseLongFactory);
         name.setCellFactory(cellStringFactory);
         width.setCellFactory(cellIntegerFactory);
@@ -114,12 +97,19 @@ public class RegisterTableController implements Initializable {
         width.prefWidthProperty().bind(table.widthProperty().divide(100 / 15.0));
         data.prefWidthProperty().bind(table.widthProperty().divide(100 / 60.0));
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
-        width.setCellValueFactory(new PropertyValueFactory<>("width"));
-        data.setCellValueFactory(new PropertyValueFactory<>("value"));
+        name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
+        width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
+        data.setCellValueFactory(new PropertyValueFactory<Register, Long>("value"));
 
         data.setOnEditCommit(
-                text -> text.getRowValue().setValue(text.getNewValue())
+                new EventHandler<TableColumn.CellEditEvent<Register, Long>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Register, Long> text) {
+                        Register register = text.getRowValue();
+                        if(! register.getReadOnly())
+                            register.setValue(text.getNewValue());
+                    }
+                }
         );
 
         table.setItems(registers);

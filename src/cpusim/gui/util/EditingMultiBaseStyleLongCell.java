@@ -46,6 +46,9 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         this.base = base;
         tooltipStringProperty = new SimpleStringProperty("");
         this.styleInfo = style;
+        setTooltip(new Tooltip());
+        tooltipProperty().get().textProperty().bind(tooltipStringProperty);
+
     }
 
     public Base getBase(){
@@ -58,12 +61,22 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
      */
     @Override
     public void startEdit() {
-        if (!isEmpty()) {
+        if (!isEmpty() && ! isReadOnlyRegisterValue()) {
             super.startEdit();
             createTextField();
             setText(null);
             setGraphic(textField);
             textField.selectAll();
+        }
+    }
+
+    private boolean isReadOnlyRegisterValue() {
+        if ((getTableRow().getItem() instanceof Register)) {
+            Register register = (Register) getTableRow().getItem();
+            return register.getReadOnly();
+        }
+        else {
+            return false;
         }
     }
 
@@ -87,29 +100,28 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     @Override
     public void updateItem(Long item, boolean empty) {
         super.updateItem(item, empty);
-        
+
         styleInfo.setFontAndBackground(this);
 
-        
+
         if (empty) {
             setText(null);
             setGraphic(null);
             setTooltip(null);
         }
-        else {
-            if (isEditing()) {
-                if (textField != null) {
-                    textField.setText(formatString(prepareString(getString())));
-                }
-                setText(null);
-                setGraphic(textField);
+        else if (isEditing()) {
+            if (textField != null) {
+                textField.setText(formatString(prepareString(getString())));
             }
-            else {
-                setTooltipsAndCellSize();
-                setText(formatString(convertLong(Long.parseLong(getString()))));
-                setGraphic(null);
-            }
+            setText(null);
+            setGraphic(textField);
         }
+        else {
+            setTooltipsAndCellSize();
+            setText(formatString(convertLong(Long.parseLong(getString()))));
+            setGraphic(null);
+        }
+
     }
 
     /**

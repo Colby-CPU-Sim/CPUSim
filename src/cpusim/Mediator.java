@@ -83,7 +83,6 @@ import cpusim.assembler.AssembledInstructionCall;
 import cpusim.assembler.Assembler;
 import cpusim.assembler.AssemblyException;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.mif.MIFScanner;
 import cpusim.module.RAM;
 import cpusim.module.RAMLocation;
@@ -113,7 +112,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.stage.FileChooser;
-import org.fxmisc.richtext.InlineStyleTextArea;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -580,7 +578,7 @@ public class Mediator {
         }
 
         // Try clearing
-        success = clear();
+        success = clearRegistersAndRegisterArrays();
         if (!success) {
             return;
         }
@@ -618,11 +616,12 @@ public class Mediator {
     }
 
     /**
-     * Clears all registers and Arrays and Console.
+     * Clears all registers and Arrays and Rams and Console.
      * Called from the Execute menu.
      */
     public void ResetEverything() {
-        clear();
+        clearRegistersAndRegisterArrays();
+        clearRAMs();
         ClearConsole();
     }
 
@@ -643,10 +642,14 @@ public class Mediator {
      * machine, and updates the displays to show that
      * everything has been cleared.
      */
-    private boolean clear() {
+    private boolean clearRegistersAndRegisterArrays() {
         machine.get().clearAllRegisters();
         machine.get().clearAllRegisterArrays();
         return true;
+    }
+
+    private void clearRAMs() {
+        machine.get().clearAllRAMs();
     }
 
     /**
@@ -654,7 +657,7 @@ public class Mediator {
      * is implemented here. It loads the binary decoded
      * instructions into RAM.
      *
-     * @param clearing if the clearing all RAMs should be done
+     * @param clearing if the clearing all Registers and RAMs should be done
      * @return boolean true if everything went smoothly,
      * false if there was an error
      */
@@ -670,7 +673,8 @@ public class Mediator {
 
         try {
             if (clearing) {
-                machine.get().clearAllRAMs();
+                clearRegistersAndRegisterArrays();
+                clearRAMs();
             }
             RAM codeStore = machine.get().getCodeStore();
             codeStore.loadAssembledInstructions(instrs,
@@ -685,6 +689,7 @@ public class Mediator {
             return false;
         }
     }
+
     //--------------------------------------------------------------------------
 
     /////////////////////// Other Getters, Setters and Parsers ///////////////////////

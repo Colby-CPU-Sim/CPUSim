@@ -53,7 +53,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
- * The controller for editing the Branch command in the EditMicroDialog.
+ * The controller for editing the Registers in the EditModules dialog.
  */
 public class RegistersTableController
         extends ModuleController implements Initializable {

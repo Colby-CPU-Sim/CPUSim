@@ -10,7 +10,7 @@ import cpusim.Machine;
 import cpusim.Mediator;
 import cpusim.Module;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.gui.editmodules.editRegisters.EditRegistersController;
+import cpusim.gui.editmodules.editRegisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
 import cpusim.module.RAM;
 import cpusim.module.Register;
@@ -46,7 +46,7 @@ import java.util.*;
 
 /**
  * This class is the controller for the dialog box that is used for
- * editing modules.
+ * editing the properties of each register in a register array.
  */
 public class EditModulesController implements Initializable {
     @FXML
@@ -320,13 +320,13 @@ public class EditModulesController implements Initializable {
     public void onPropertiesButtonClick(ActionEvent e) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 mediator.getClass().getResource("gui/editmodules/editRegisters/EditRegisters.fxml"));
-        EditRegistersController controller;
+        EditArrayRegistersController controller;
         if (activeTable.getSelectionModel().getSelectedIndex() == -1) {
-            controller = new EditRegistersController(mediator,
+            controller = new EditArrayRegistersController(mediator,
                     (RegistersTableController) tableMap.getMap().get("Register"),
                     (RegisterArrayTableController) tableMap.getMap().get("RegisterArray"));
         } else {
-            controller = new EditRegistersController(mediator,
+            controller = new EditArrayRegistersController(mediator,
                     (RegistersTableController) tableMap.getMap().get("Register"),
                     (RegisterArrayTableController) tableMap.getMap().get("RegisterArray"),
                     ((RegisterArray) activeTable.getItems().get(

@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 /**
- * The controller for editing the Branch command in the EditMicroDialog.
+ * The controller for editing the Register arrays in the EditModules dialog.
  */
 public class RegisterArrayTableController
         extends ModuleController implements Initializable {
