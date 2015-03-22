@@ -5,7 +5,7 @@
  * 
  * 1.) Removed one try catch and allOkay variable and replaced it with a try catch for a validation exception
  */
-package cpusim.gui.editmodules.editRegisters;
+package cpusim.gui.editmodules.arrayregisters;
 
 import cpusim.Mediator;
 import cpusim.Module;
@@ -27,14 +27,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 

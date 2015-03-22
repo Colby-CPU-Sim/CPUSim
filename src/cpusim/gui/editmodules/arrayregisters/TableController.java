@@ -6,7 +6,7 @@
  * 2.) Changed initialize method so that it initializes cell factory of readOnly property
  */
 
-package cpusim.gui.editmodules.editRegisters;
+package cpusim.gui.editmodules.arrayregisters;
 
 import cpusim.Module;
 import cpusim.gui.util.EditingIntCell;
@@ -33,13 +33,15 @@ import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.*;
 
-
+/**
+ * This class is the TableView for one of the register arrays.  One of these
+ * TableViews is created for each register array.
+ */
 public class TableController extends TableView implements Initializable {
     @FXML
     TableView<Register> table;
     @FXML
     TableColumn<Register,String> name;
-    @FXML TableColumn<Register,Integer> width;
     @FXML TableColumn<Register,Long> initialValue;
     @FXML TableColumn<Register,Boolean> readOnly;
 
@@ -92,9 +94,8 @@ public class TableController extends TableView implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        initialValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
+        initialValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
         readOnly.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
 
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStrFactory =
@@ -131,7 +132,6 @@ public class TableController extends TableView implements Initializable {
                 };
 
         name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
-        width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
         initialValue.setCellValueFactory(new PropertyValueFactory<Register, Long>("initialValue"));
         readOnly.setCellValueFactory(new PropertyValueFactory<Register, Boolean>("readOnly"));
 
@@ -150,16 +150,6 @@ public class TableController extends TableView implements Initializable {
                             (text.getRowValue()).setName(oldName);
                             updateTable();
                         }
-                    }
-                }
-        );
-
-        width.setCellFactory(cellIntFactory);
-        width.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Integer> text) {
-                        text.getRowValue().setWidth(text.getNewValue());
                     }
                 }
         );
@@ -282,24 +272,12 @@ public class TableController extends TableView implements Initializable {
     {
         // convert the array to an array of Registers
         Register[] registers = new Register[modules.size()];
-
         for (int i = 0; i < modules.size(); i++) {
             registers[i] = (Register) modules.get(i);
         }
 
-        //build up a HashMap of old registers and new widths
-        HashMap table = new HashMap();
-        for (int i = 0; i < registers.length; i++) {
-            Register oldRegister =
-                    (Register) getCurrentFromClone(registers[i]);
-            if (oldRegister != null && oldRegister.getWidth() !=
-                    registers[i].getWidth())
-                table.put(oldRegister,
-                        new Integer(registers[i].getWidth()));
-        }
-
         // check that all names are unique and nonempty
-        Validate.initialValueAreInbound(registers);
+        Validate.initialValuesAreInbound(registers);
 
     }
 

@@ -196,6 +196,7 @@
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
+                                                    <String fx:value="Courier"/>
                                                     <String fx:value="Lucida Console"/>
                                                     <String fx:value="Monaco"/>
                                                 </FXCollections>
@@ -213,6 +214,7 @@
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
+                                                    <String fx:value="Courier"/>
                                                     <String fx:value="Lucida Console"/>
                                                     <String fx:value="Monaco"/>
                                                 </FXCollections>
@@ -230,6 +232,7 @@
                                                 <FXCollections
                                                         fx:factory="observableArrayList">
                                                     <String fx:value="Courier New"/>
+                                                    <String fx:value="Courier"/>
                                                     <String fx:value="Lucida Console"/>
                                                     <String fx:value="Monaco"/>
                                                 </FXCollections>

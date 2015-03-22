@@ -133,9 +133,9 @@ public class DebugToolBarController extends ToolBar
      */
     @FXML
     public void onBackupMachineInstrClick(ActionEvent e){
+        // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMachineInstruction();
         machine.getControlUnit().reset();
-        // !!!! need to back up the channels, but how???
         updateDisplay();
         enableForwardButtons();
     }
@@ -146,10 +146,10 @@ public class DebugToolBarController extends ToolBar
      */
     @FXML
     public void onBackupMicroInstrClick(ActionEvent e){
+        // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMicroInstruction();
         updateDisplay();
         outlineChangesManager.updateOutlines();
-        //Should back up the channels, but how?
         enableForwardButtons();
     }
 
@@ -159,7 +159,6 @@ public class DebugToolBarController extends ToolBar
      */
     @FXML
     public void onStartOverClick(ActionEvent e){
-        //C.T. modified method
         backupManager.backupAllTheWay();
         machine.getControlUnit().reset();
         machine.resetAllChannels();

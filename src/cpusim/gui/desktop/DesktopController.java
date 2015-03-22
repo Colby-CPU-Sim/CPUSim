@@ -116,11 +116,16 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.fxmisc.richtext.*;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.prefs.Preferences;
+
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
+import static javafx.scene.input.KeyCode.TAB;
 
 /**
  * @author Ben Borchard
@@ -1361,6 +1366,21 @@ public class DesktopController implements Initializable {
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
                         (digits -> "")));
+        // replace tabs with 4 or fewer spaces
+        EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper
+                .on(keyPressed(TAB)).act(new Consumer<KeyEvent>() {
+                    @Override
+                    public void accept(KeyEvent event) {
+                        String spaces = "";
+                        int numSpaces = 4 - codeArea.getCaretColumn() % 4;
+                        for (int i = 0; i < numSpaces; i++) {
+                            spaces += " ";
+                        }
+                        codeArea.replaceSelection(spaces);
+                    }
+                })
+                .create();
+        EventHandlerHelper.install(codeArea.onKeyPressedProperty(), tabHandler);
         newTab.setContent(codeArea);
 
         // whenever the text is changed, recompute the highlighting and set it dirty

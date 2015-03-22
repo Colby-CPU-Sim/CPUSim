@@ -45,7 +45,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -328,7 +327,7 @@ public class RegistersTableController
 
         // check that all names are unique and nonempty
         Validate.widthsAreInBound(registers);
-        Validate.initialValueAreInbound(registers);
+        Validate.initialValuesAreInbound(registers);
         
         //Validate.registersNotReadOnly();
 

@@ -561,31 +561,25 @@ public class Mediator {
      */
     public void ClearAssembleLoadRun(String programFileName) {
 
-        //Modification : added the line to clear the console
-        this.desktopController.getIOConsole().clear();
-
         // Try assembling
-        //CHANGE: Assemble called rather than assemble
         boolean success = Assemble(programFileName);
         if (!success) {
             return;
         }
 
-        // Try Loading
+        // clear the registers and arrays and RAMs
+        // note:  Run() resets the control unit and io channels
+        clearRAMs();
+        clearRegisters();
+        clearRegisterArrays();
+
+        // Try loading
         success = load(true);
         if (!success) {
             return;
         }
 
-        // Try clearing
-        clearRegisters();
-        clearRegisterArrays();
-        if (!success) {
-            return;
-        }
-
         // Try running
-        //CHANGE: Run called rather than run
         Run();
     }
 

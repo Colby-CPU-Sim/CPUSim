@@ -41,7 +41,7 @@
  * -  lengthsArePositive (RAMsTableController)
  * -  cellSizesAreValid (RAMsTableController)
  * -  widthsAreInBound (RegistersTableController)
- * -  initialValueAreInbound (RegistersTableController)
+ * -  initialValuesAreInbound (RegistersTableController)
  * 5.) Created the EQUNames method that checks the validity of the EQU names (we cannot
  * use the nameableObjects method because the EQU names need to be valid assembly language
  * as well)
@@ -358,7 +358,7 @@ public class Validate
 
     /**
      * checks if the opcode is non-negative
-     * @param instr instruction whose opcode needs to be validated
+     * @param opcode instruction whose opcode needs to be validated
      */
     private static void opcodeIsNonnegative(long opcode)
     {
@@ -373,9 +373,7 @@ public class Validate
 
     /**
      * determines if the opcode fits given the number of bits
-     * @param opcode opcode of the machine instruction
-     * @param numBits number of bits in the machine instruction
-     * @param instrName name of the machine instruction (needed for the error message)
+     * @param instr the machine instruction (needed for the error message)
      */
     public static void opcodeFits(MachineInstruction instr)
     {
@@ -984,7 +982,7 @@ public class Validate
      * Check of the initialValue of some registers are in the proper bound 
      * @param registers registers to be checked
      */
-    public static void initialValueAreInbound(Register[] registers){
+    public static void initialValuesAreInbound(Register[] registers){
         int width;
         Register nextRegister;
 
@@ -1483,7 +1481,7 @@ public class Validate
      * Checks that the character is a valid ASCII
      * character, in the range of 0 to 255.
      * 
-     * @param c - long value of char to check
+     * @param longValOfChar - long value of char to check
      * @throws ValidationException - When not a valid ASCII char. 
      */
     public static void isAsciiChar(long longValOfChar) throws ValidationException {
@@ -1494,7 +1492,7 @@ public class Validate
      * Checks that the character is a valid UNICODE
      * character, in the range of 0 to 65535.
      * 
-     * @param c - long value of char to check
+     * @param longValOfChar - long value of char to check
      * @throws ValidationException - When not a valid UNICODE char. 
      */
     public static void isUnicodeChar(long longValOfChar) throws ValidationException {
@@ -1505,7 +1503,7 @@ public class Validate
 	 * Checks that the character is a valid ASCII/UNICODE
 	 * character, in the range of 0 to 255 or 65535, respectively.
 	 * 
-	 * @param c - long value of char to check
+	 * @param longValOfChar - long value of char to check
 	 * @param asciiNotUnicode - To tell whether we are testing
 	 * for ASCII or UNICODE. 
 	 * @throws ValidationException - When not a valid ASCII/UNICODE char. 

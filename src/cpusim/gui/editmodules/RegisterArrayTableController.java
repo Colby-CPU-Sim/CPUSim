@@ -151,8 +151,7 @@ public class RegisterArrayTableController
                 new EventHandler<TableColumn.CellEditEvent<RegisterArray, Integer>>() {
                     @Override
                     public void handle(TableColumn.CellEditEvent<RegisterArray, Integer> text) {
-                        ((RegisterArray)text.getRowValue()).setWidth(
-                                text.getNewValue());
+                        text.getRowValue().setWidth(text.getNewValue());
                     }
                 }
         );
@@ -245,11 +244,11 @@ public class RegisterArrayTableController
         RegisterArray[] registerArrays = new RegisterArray[table.getItems().size()];
 
         for (int i = 0; i < table.getItems().size(); i++) {
-            registerArrays[i] = (RegisterArray) table.getItems().get(i);
+            registerArrays[i] = table.getItems().get(i);
         }
 
         //build up a HashMap of old registers and new widths
-        HashMap h = new HashMap();
+        HashMap<Register,Integer> h = new HashMap<>();
         for (int i = 0; i < registerArrays.length; i++) {
             RegisterArray oldArray =
                     (RegisterArray) getCurrentFromClone(registerArrays[i]);
@@ -257,13 +256,16 @@ public class RegisterArrayTableController
                     registerArrays[i].getWidth() != oldArray.getWidth()) {
                 for (int j = 0; j < Math.min(registerArrays[i].getLength(),
                         oldArray.getLength()); j++) {
-                    h.put(oldArray.registers().get(j),
-                            new Integer(registerArrays[i].getWidth()));
+                    h.put(oldArray.registers().get(j), registerArrays[i].getWidth());
                 }
             }
         }
 
         //now do all the tests
+        for (RegisterArray registerArray : registerArrays) {
+            Validate.initialValuesAreInbound(registerArray.registers()
+                    .toArray(new Register[registerArray.getLength()]));
+        }
         Validate.rangesAreInBound(registerArrays);
         Validate.registerArrayWidthsAreOkay(bitController,registerArrays);
         Validate.registerWidthsAreOkayForMicros(machine,h);

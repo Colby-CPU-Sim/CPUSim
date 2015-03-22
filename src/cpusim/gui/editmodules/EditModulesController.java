@@ -10,7 +10,7 @@ import cpusim.Machine;
 import cpusim.Mediator;
 import cpusim.Module;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.gui.editmodules.editRegisters.EditArrayRegistersController;
+import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
 import cpusim.module.RAM;
 import cpusim.module.Register;
@@ -167,9 +167,12 @@ public class EditModulesController implements Initializable {
                         if (oldType.equals("Register") || oldType.equals("RegisterArray"))
                             ((ConditionBitTableController) tableMap.getMap().get("ConditionBit")).updateRegisters();
 
-                        if (newType.equals("RegisterArray") && machine.getModule("registerArrays").size() > 0) {
+                        if (newType.equals("RegisterArray") && activeTable.getItems().size() > 0) {
                             propertiesButton.setVisible(true);
                             propertiesButton.setDisable(false);
+                        } else if (newType.equals("RegisterArray")) {
+                            propertiesButton.setVisible(true);
+                            propertiesButton.setDisable(true);
                         } else
                             propertiesButton.setVisible(false);
 
@@ -319,7 +322,7 @@ public class EditModulesController implements Initializable {
     @FXML
     public void onPropertiesButtonClick(ActionEvent e) {
         FXMLLoader fxmlLoader = new FXMLLoader(
-                mediator.getClass().getResource("gui/editmodules/editRegisters/EditRegisters.fxml"));
+                mediator.getClass().getResource("gui/editmodules/arrayregisters/EditRegisters.fxml"));
         EditArrayRegistersController controller;
         if (activeTable.getSelectionModel().getSelectedIndex() == -1) {
             controller = new EditArrayRegistersController(mediator,

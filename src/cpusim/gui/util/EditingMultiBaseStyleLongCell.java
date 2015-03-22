@@ -16,7 +16,6 @@ import cpusim.assembler.EQU;
 import cpusim.gui.desktop.FontData;
 import cpusim.module.RAMLocation;
 import cpusim.module.Register;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
 import cpusim.util.Dialogs;
 import javafx.beans.property.SimpleStringProperty;
@@ -124,7 +123,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             setText(formatString(convertLong(Long.parseLong(getString()))));
             if(isReadOnlyRegisterValue()) {
                 ImageView graphic = new ImageView(new Image("cpusim/gui/desktop/Lock.png"));
-                graphic.setFitHeight(12);
+                graphic.setFitHeight(Integer.parseInt(styleInfo.fontSize));
                 graphic.setSmooth(true);
                 graphic.setPreserveRatio(true);
                 graphic.setCache(true);

@@ -10,7 +10,6 @@
            fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
   <columns>
     <TableColumn text="name" fx:id="name" />
-    <TableColumn text="width" fx:id="width" editable="false"/>
     <TableColumn text="initial value" fx:id="initialValue" />
     <TableColumn text="read-only" fx:id="readOnly" />
   </columns>

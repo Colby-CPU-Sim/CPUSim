@@ -536,7 +536,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     public void setRegisterArrays(Vector<RegisterArray> newRegisterArrays) {
         for (RegisterArray oldArray : registerArrays) {
             if (!newRegisterArrays.contains(oldArray)) {
-                HashMap microsThatUseIt = getMicrosThatUse(oldArray);
+                HashMap<Microinstruction,ObservableList<Microinstruction>> microsThatUseIt
+                        = getMicrosThatUse(oldArray);
                 Set e = microsThatUseIt.keySet();
                 for (Object anE : e) {
                     //get next micro; should be transferRtoA or transferAtoR
@@ -544,8 +545,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                             (Microinstruction) anE;
                     //remove it from all machine instructions
                     removeAllOccurencesOf(micro);
-                    //also remove the microinstruction from its list.
-                    ((Vector) microsThatUseIt.get(micro)).removeElement(micro);
+                    //also remove the micro from the list of micros of that type.
+                    microsThatUseIt.get(micro).remove(micro);
                 }
             }
         }
@@ -557,11 +558,11 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     //--------------------------------
     // returns a HashMap whose keys consist of all microinstructions that
-    // use m and such that the value associated with each key is the vector
+    // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
-    public HashMap getMicrosThatUse(Module m) {
-        HashMap<Microinstruction, ObservableList> result =
-                new HashMap<Microinstruction, ObservableList>();
+    public HashMap<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module m) {
+        HashMap<Microinstruction, ObservableList<Microinstruction>> result =
+                new HashMap<>();
 
         for (String aMicroClass : MICRO_CLASSES) {
             ObservableList<Microinstruction> v = microMap.get(aMicroClass);
