@@ -7,6 +7,7 @@ package cpusim.util;
 
 import cpusim.Machine;
 import cpusim.Microinstruction;
+import cpusim.gui.desktop.DesktopController;
 import cpusim.microinstruction.IO;
 import cpusim.module.ControlUnit;
 import javafx.application.Platform;
@@ -41,7 +42,7 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
                         Machine.StateWrapper oldStateWrapper, Machine.StateWrapper newStateWrapper) {
 
         if (newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
-            if (((Boolean) newStateWrapper.getValue()) == true)  // machine is in RUN mode
+            if (((Boolean) newStateWrapper.getValue()))  // machine is in RUN mode
                 printlnToConsole("EXECUTING...");
         }
         else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN) {
@@ -60,24 +61,16 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
                 if(micro.getDirection().equals("input") &&
                         micro.getConnection().equals(CONSOLE_CHANNEL)) {
                     printToConsole("","yellow");
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            ioConsole.requestFocus();
-                        }
-                    });
+                    Platform.runLater(() -> ioConsole.requestFocus());
                 }
             }
         }
         else if (newStateWrapper.getState() == Machine.State.EXECUTION_HALTED) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    ioConsole.setStyle("-fx-background-color: white");
-                }});
+            Platform.runLater(() -> ioConsole.setStyle("-fx-background-color: white"));
             if (((boolean) newStateWrapper.getValue())) {
                 // halt bits are set so the halt is normal
-                printlnToConsole("EXECUTION HALTED NORMALLY\n");
+                printlnToConsole("EXECUTION HALTED NORMALLY due to the setting of the bit(s): " +
+                        newStateWrapper.getMachine().haltBitsThatAreSet());
             }
         }
         // ignore all other possible states:
@@ -89,12 +82,9 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
 
 
     public void printToConsole(final String message, final String backgroundColor) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                ioConsole.appendText(message);
-                ioConsole.setStyle("-fx-background-color: " + backgroundColor);
-            }
+        Platform.runLater(() -> {
+            ioConsole.appendText(message);
+            ioConsole.setStyle("-fx-background-color: " + backgroundColor);
         });
     }
 

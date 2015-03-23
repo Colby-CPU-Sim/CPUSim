@@ -80,14 +80,20 @@ public class RegisterTableController implements Initializable {
         });
         
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellMultiBaseLongFactory =
-                column -> new EditingMultiBaseStyleLongCell<>(base, styleInfo);
+                column -> {
+                    final EditingMultiBaseStyleLongCell<Register> a =
+                            new EditingMultiBaseStyleLongCell<>(base, styleInfo);
+                    // Tooltip
+                    a.setTooltip(new Tooltip());
+                    a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
+                    return a;
+                };
         
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStringFactory =
                 column -> new EditingStrStyleCell<>(styleInfo);
         
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntegerFactory =
                 column -> new EditingIntStyleCell<>(styleInfo);
-
         data.setCellFactory(cellMultiBaseLongFactory);
         name.setCellFactory(cellStringFactory);
         width.setCellFactory(cellIntegerFactory);
@@ -101,10 +107,13 @@ public class RegisterTableController implements Initializable {
         width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
         data.setCellValueFactory(new PropertyValueFactory<Register, Long>("value"));
 
-        data.setOnEditCommit(text -> {
-                    Register register = text.getRowValue();
-                    if (!register.getReadOnly()) {
-                        register.setValue(text.getNewValue());
+        data.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Register, Long>>() {
+                    @Override
+                    public void handle(TableColumn.CellEditEvent<Register, Long> text) {
+                        Register register = text.getRowValue();
+                        if(! register.getReadOnly())
+                            register.setValue(text.getNewValue());
                     }
                 }
         );

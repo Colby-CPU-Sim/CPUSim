@@ -7,7 +7,8 @@
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 12/5/13
  * with the following changes:
  *
- * 1.) Changed execute so it write to the output file when the state reaches the end of a program
+ * 1.) Changed execute so it write to the output file when the state reaches the end of
+  * a program
  */
 package cpusim;
 
@@ -16,6 +17,7 @@ import cpusim.assembler.PunctChar;
 import cpusim.microinstruction.*;
 import cpusim.module.*;
 import cpusim.util.CPUSimConstants;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,15 +25,14 @@ import javafx.concurrent.Task;
 
 import java.io.Serializable;
 import java.util.*;
-import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  * This file contains the class for Machines created using CPU Sim
- * <p/>
+ * <p>
  * Class Modifications:
  * Generics added to setRegisterArrays, getMicrosThatUse, setEnd, setRAMs,
  * haltBitsThatAreSet and getInstructionsThatUse methods.
- * <p/>
+ * <p>
  * In the execute method we added "fire property change" to indicate the start
  * of a microinstruction. This property change is used to indicate when to put
  * a new microInstructionStack of HashMaps as an element in the
@@ -41,10 +42,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private static final long serialVersionUID = 1L;
 
-    
 
     // constants for different running modes
-    public static enum RunModes{
+    public static enum RunModes {
         RUN,
         STEP_BY_MICRO,
         STEP_BY_INSTR,
@@ -54,20 +54,25 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         COMMAND_LINE
     }
 
-    /** the names of all the microinstruction classes */
+    /**
+     * the names of all the microinstruction classes
+     */
     public static final String[] MICRO_CLASSES =
             {"arithmetic", "branch", "decode", "end", "comment",
                     "increment", "io", "logical", "memoryAccess",
                     "set", "setCondBit", "shift", "test",
                     "transferRtoR", "transferRtoA", "transferAtoR"};
 
-    /** the hardware modules making up the machine */
+    /**
+     * the hardware modules making up the machine
+     */
     private ObservableList<Register> registers;
     private ObservableList<RegisterArray> registerArrays;
     private ObservableList<ConditionBit> conditionBits;
     private ObservableList<RAM> rams;
 
-    /** the current state of the machine, defined by enum state
+    /**
+     * the current state of the machine, defined by enum state
      * and associated Object value
      */
     private SimpleObjectProperty<StateWrapper> wrappedState;
@@ -97,7 +102,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     private SimpleObjectProperty<RAM> codeStore;
     // True if bit indexing starts of the right side, false if on the left
     private SimpleBooleanProperty indexFromRight;
-    
+
     /**
      * Creates a new machine.
      *
@@ -109,7 +114,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         registerArrays = FXCollections.observableArrayList();
         conditionBits = FXCollections.observableArrayList();
         rams = FXCollections.observableArrayList();
-        wrappedState = new SimpleObjectProperty<>(this, "machine state", new StateWrapper(State.NEVER_RUN, ""));
+        wrappedState = new SimpleObjectProperty<>(this, "machine state", new
+                StateWrapper(State.NEVER_RUN, ""));
 
         moduleMap = new HashMap<>();
         microMap = new HashMap<>();
@@ -130,18 +136,20 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         initializeMicroMap();
 
     }
-    
+
     /**
      * This constructor exists for backwards compatibility. The default
-     * on old existing machines was to index from the left, where the default on new machines
+     * on old existing machines was to index from the left, where the default on new
+     * machines
      * is to index from the right
-     * @param name machines name
+     *
+     * @param name          machines name
      * @param indexFromLeft if true then index from
-     *                       the left rather than the right side of the registers
+     *                      the left rather than the right side of the registers
      */
-    public Machine(String name, boolean indexFromLeft){
+    public Machine(String name, boolean indexFromLeft) {
         this(name);
-        indexFromRight.set(! indexFromLeft);
+        indexFromRight.set(!indexFromLeft);
     }
 
     /**
@@ -160,49 +168,59 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     }
 
     /**
-     * StateWrapper class wraps a State enum and an Object value so that listeners will register
-     * a change when the state is set, even if the enum is the same so that changed method is
+     * StateWrapper class wraps a State enum and an Object value so that listeners will
+     * register
+     * a change when the state is set, even if the enum is the same so that changed
+     * method is
      * always called by listeners
      */
-    public class StateWrapper{
+    public class StateWrapper {
 
-    	/**
-    	 * state is the enum State of the Machine
-    	 */
-    	State state;
+        /**
+         * state is the enum State of the Machine
+         */
+        State state;
 
-        /** value is any additional information needed by listeners who are
-         *  listening to state changes. */
+        /**
+         * value is any additional information needed by listeners who are
+         * listening to state changes.
+         */
         Object value;
 
-		/**
-		 * constructor initializes field state and value to parameter newState and newValue
-		 * @param newState new enum State of Machine
-		 * @param newValue any additional information needed by listeners who are listening to state changes.
-		 */
-    	public StateWrapper(State newState, Object newValue){
-    		this.state = newState;
-    		this.value = newValue;
+        /**
+         * constructor initializes field state and value to parameter newState and
+         * newValue
+         *
+         * @param newState new enum State of Machine
+         * @param newValue any additional information needed by listeners who are
+         *                 listening to state changes.
+         */
+        public StateWrapper(State newState, Object newValue) {
+            this.state = newState;
+            this.value = newValue;
         }
 
         /**
          * returns the Machine of this State
+         *
          * @return the Machine of this State
          */
         public Machine getMachine() {
             return Machine.this;
         }
 
-    	/**
-    	 * getter for the state field
-    	 * @return the State of the Machine
-    	 */
+        /**
+         * getter for the state field
+         *
+         * @return the State of the Machine
+         */
         public State getState() {
             return this.state;
         }
 
         /**
          * getter for the value field
+         *
          * @return the value of the state
          */
         public Object getValue() {
@@ -211,6 +229,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
         /**
          * setter for the state field
+         *
          * @param newState the new State of the Machine
          */
         public void setState(State newState) {
@@ -219,6 +238,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
         /**
          * setter for the value field
+         *
          * @param newValue the new value of the state
          */
         public void setValue(Object newValue) {
@@ -261,7 +281,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      * Uses.
      *
      * @return - an Array of the default PunctChars and their
-     *         Uses.
+     * Uses.
      */
     public PunctChar[] getDefaultPunctChars() {
         //for the punctuation characters:  !@$%^&*()_={}[]|\:;,.?/~#-+`
@@ -324,9 +344,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         assert false : "No label char found in the machine's punctChars";
         return ':';  //to satisfy the compiler
     }
-    
+
     public char getCommentChar() {
-    	for (PunctChar c : punctChars) {
+        for (PunctChar c : punctChars) {
             if (c.getUse() == PunctChar.Use.comment) {
                 return c.getChar();
             }
@@ -380,16 +400,16 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     public int getStartingAddressForLoading() {
         return startingAddressForLoading;
     }
-    
+
     public SimpleObjectProperty<RAM> getCodeStoreProperty() {
-    	return codeStore;
+        return codeStore;
     }
-    
-    public boolean getIndexFromRight(){
+
+    public boolean getIndexFromRight() {
         return indexFromRight.get();
     }
-    
-    public void setIndexFromRight(boolean b){
+
+    public void setIndexFromRight(boolean b) {
         indexFromRight.set(b);
     }
 
@@ -536,7 +556,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     public void setRegisterArrays(Vector<RegisterArray> newRegisterArrays) {
         for (RegisterArray oldArray : registerArrays) {
             if (!newRegisterArrays.contains(oldArray)) {
-                HashMap<Microinstruction,ObservableList<Microinstruction>> microsThatUseIt
+                HashMap<Microinstruction, ObservableList<Microinstruction>>
+                        microsThatUseIt
                         = getMicrosThatUse(oldArray);
                 Set e = microsThatUseIt.keySet();
                 for (Object anE : e) {
@@ -560,7 +581,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     // returns a HashMap whose keys consist of all microinstructions that
     // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
-    public HashMap<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module m) {
+    public HashMap<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse
+    (Module m) {
         HashMap<Microinstruction, ObservableList<Microinstruction>> result =
                 new HashMap<>();
 
@@ -792,14 +814,14 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      * and the control store as it executes.
      * If the GUI is used, the machine is executed in a new Thread so that
      * the GUI remains responsive.
+     *
      * @param mode the run mode for execution.
      */
     public void execute(final RunModes mode) {
         setRunMode(mode);
-        
 
-        if (mode == RunModes.COMMAND_LINE)
-        {
+
+        if (mode == RunModes.COMMAND_LINE) {
             // do not use the GUI at all--purely command line execution
             // There is no stepping or backing up.  It executes in the
             // main (and only) thread until it finishes or the user
@@ -809,9 +831,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                     haltBitsThatAreSet().size() == 0) {
 
                 MachineInstruction currentInstruction =
-                                          controlUnit.getCurrentInstruction();
+                        controlUnit.getCurrentInstruction();
                 List<Microinstruction> microInstructions =
-                                               currentInstruction.getMicros();
+                        currentInstruction.getMicros();
                 int currentIndex = controlUnit.getMicroIndex();
 
                 if (currentIndex < 0 || currentIndex >= microInstructions.size()) {
@@ -837,21 +859,22 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
             Task<Void> executionTask = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
-                        while (runMode != RunModes.STOP &&
+                    while (runMode != RunModes.STOP &&
                             runMode != RunModes.ABORT &&
                             !isCancelled() &&
                             haltBitsThatAreSet().size() == 0) {
 
                         MachineInstruction currentInstruction =
-                                            controlUnit.getCurrentInstruction();
+                                controlUnit.getCurrentInstruction();
                         List<Microinstruction> microInstructions =
-                                                 currentInstruction.getMicros();
+                                currentInstruction.getMicros();
                         int currentIndex = controlUnit.getMicroIndex();
 
                         if (currentIndex < 0 ||
                                 currentIndex >= microInstructions.size()) {
                             //change the state indicating an exception and quit
-                            setState(Machine.State.EXCEPTION_THROWN, "The step is out of range\n" +
+                            setState(Machine.State.EXCEPTION_THROWN, "The step is out " +
+                                    "of range\n" +
                                     "at step " + currentIndex + " of " +
                                     currentInstruction + ".\n");
                             break;
@@ -860,14 +883,16 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                                 currentIndex == 0 &&
                                 currentInstruction == getFetchSequence()) {
                             //fire property change for start of a machine cycle
-                            setState(Machine.State.START_OF_MACHINE_CYCLE, false); //false is unused
+                            setState(Machine.State.START_OF_MACHINE_CYCLE, false);
+                            //false is unused
                         }
-                        Microinstruction currentMicro = microInstructions.get(currentIndex);
+                        Microinstruction currentMicro = microInstructions.get
+                                (currentIndex);
                         // Fire property change indicating the start of a
                         // microinstruction
                         if (currentIndex < microInstructions.size()) {
-                                 setState(Machine.State.START_OF_MICROINSTRUCTION,
-                                          controlUnit.getCurrentState());
+                            setState(Machine.State.START_OF_MICROINSTRUCTION,
+                                    controlUnit.getCurrentState());
                         }
                         controlUnit.incrementMicroIndex(1);
 
@@ -887,95 +912,98 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                         if (runMode == RunModes.STEP_BY_MICRO) {
                             runMode = RunModes.STOP;
                         }
-                        if (runMode == RunModes.STEP_BY_INSTR && currentMicro == getEnd()) {
+                        if (runMode == RunModes.STEP_BY_INSTR && currentMicro == getEnd
+                                ()) {
                             runMode = RunModes.STOP;
                         }
                     }
-                        /*
-                    if (runMode == RunModes.ABORT){
-                        setState(Machine.State.EXECUTION_ABORTED, haltBitsThatAreSet().size() > 0);
-                    }
-                    else if (runMode == RunModes.STEP_BY_MICRO && haltBitsThatAreSet().isEmpty()){
-                        setState(Machine.State.HALTED_STEP_BY_MICRO, haltBitsThatAreSet().size() > 0);
-                    }
-                    else{
-                        setState(Machine.State.EXECUTION_HALTED, haltBitsThatAreSet().size() > 0);
-                    }*/
-                        
-                    //Now fire a property change that execution halted or aborted
-                    setState(
-                        runMode == RunModes.ABORT ? Machine.State.EXECUTION_ABORTED :
-                        mode == RunModes.STEP_BY_MICRO ? Machine.State.HALTED_STEP_BY_MICRO :
-                         /* else */ Machine.State.EXECUTION_HALTED, haltBitsThatAreSet().size() > 0);
-                    
 
-                    //write buf to output file channel
+                    // fire a property change that execution halted or aborted
+                    setState(
+                            runMode == RunModes.ABORT ? Machine.State.EXECUTION_ABORTED :
+                                    mode == RunModes.STEP_BY_MICRO ? Machine.State
+                                            .HALTED_STEP_BY_MICRO :
+                         /* else */ Machine.State.EXECUTION_HALTED, haltBitsThatAreSet
+                                    ().size() > 0);
+
+                    // write buf to output file channel
                     if ((getStateWrapper().getState() == Machine.State.EXECUTION_HALTED &&
-                            ((boolean)getStateWrapper().getValue()) == true)||
-                            getStateWrapper().getState() == Machine.State.EXCEPTION_THROWN) {
+                            ((boolean) getStateWrapper().getValue()) == true) ||
+                            getStateWrapper().getState() == Machine.State
+                                    .EXCEPTION_THROWN) {
                         //added by Ben Borchard on 2/23
                         ObservableList<Microinstruction> ios = getMicros("io");
                         for (int i = 0; i < ios.size(); i++) {
                             IOChannel channel = ((IO) ios.get(i)).getConnection();
                             if ((channel instanceof FileChannel) &&
                                     ((IO) ios.get(i)).getDirection().equals("output")) {
-                                ((FileChannel)channel).writeToFile();
+                                ((FileChannel) channel).writeToFile();
                             }
                         }
                     }
                     return null;
                 }
             };
-            new Thread(executionTask,"Machine execution thread").start();
-            
+            new Thread(executionTask, "Machine execution thread").start();
+
         }
     }
-    
+
     /**
      * changes indexing of bits in registers to the opposite direction while preserving
      * the behavior of the components.
      * The following components need to be modified:
-     *    ConditionBit module
-     *    TransferRtoR micros
-     *    TransferAtoR micros
-     *    TransferRtoA micros
-     *    CpusimSet (Set) micros
-     *    Test micros
+     * ConditionBit module
+     * TransferRtoR micros
+     * TransferAtoR micros
+     * TransferRtoA micros
+     * CpusimSet (Set) micros
+     * Test micros
      */
     public void changeStartBits() {
-        for (Module m : this.getModule("conditionBits")){
+        for (Module m : this.getModule("conditionBits")) {
             ConditionBit cb = (ConditionBit) m;
             cb.setBit(cb.getRegister().getWidth() - cb.getBit() - 1);
         }
-        
-        for (Microinstruction micro : this.getMicros("transferRtoR")){
+
+        for (Microinstruction micro : this.getMicros("transferRtoR")) {
             TransferRtoR tRtoR = (TransferRtoR) micro;
-            tRtoR.setDestStartBit(tRtoR.getDest().getWidth()-tRtoR.getNumBits()-tRtoR.getDestStartBit());
-            tRtoR.setSrcStartBit(tRtoR.getSource().getWidth()-tRtoR.getNumBits()-tRtoR.getSrcStartBit());
+            tRtoR.setDestStartBit(tRtoR.getDest().getWidth() - tRtoR.getNumBits() -
+                    tRtoR.getDestStartBit());
+            tRtoR.setSrcStartBit(tRtoR.getSource().getWidth() - tRtoR.getNumBits() -
+                    tRtoR.getSrcStartBit());
         }
-        
-        for (Microinstruction micro : this.getMicros("transferRtoA")){
+
+        for (Microinstruction micro : this.getMicros("transferRtoA")) {
             TransferRtoA tRtoA = (TransferRtoA) micro;
-            tRtoA.setDestStartBit(tRtoA.getDest().getWidth()-tRtoA.getNumBits()-tRtoA.getDestStartBit());
-            tRtoA.setSrcStartBit(tRtoA.getSource().getWidth()-tRtoA.getNumBits()-tRtoA.getSrcStartBit());
-            tRtoA.setIndexStart(tRtoA.getIndex().getWidth()-tRtoA.getIndexNumBits()-tRtoA.getIndexStart());
+            tRtoA.setDestStartBit(tRtoA.getDest().getWidth() - tRtoA.getNumBits() -
+                    tRtoA.getDestStartBit());
+            tRtoA.setSrcStartBit(tRtoA.getSource().getWidth() - tRtoA.getNumBits() -
+                    tRtoA.getSrcStartBit());
+            tRtoA.setIndexStart(tRtoA.getIndex().getWidth() - tRtoA.getIndexNumBits() -
+                    tRtoA.getIndexStart());
         }
-    
-        for (Microinstruction micro : this.getMicros("transferAtoR")){
+
+        for (Microinstruction micro : this.getMicros("transferAtoR")) {
             TransferAtoR tAtoR = (TransferAtoR) micro;
-            tAtoR.setDestStartBit(tAtoR.getDest().getWidth()-tAtoR.getNumBits()-tAtoR.getDestStartBit());
-            tAtoR.setSrcStartBit(tAtoR.getSource().getWidth()-tAtoR.getNumBits()-tAtoR.getSrcStartBit());
-            tAtoR.setIndexStart(tAtoR.getIndex().getWidth()-tAtoR.getIndexNumBits()-tAtoR.getIndexStart());
+            tAtoR.setDestStartBit(tAtoR.getDest().getWidth() - tAtoR.getNumBits() -
+                    tAtoR.getDestStartBit());
+            tAtoR.setSrcStartBit(tAtoR.getSource().getWidth() - tAtoR.getNumBits() -
+                    tAtoR.getSrcStartBit());
+            tAtoR.setIndexStart(tAtoR.getIndex().getWidth() - tAtoR.getIndexNumBits() -
+                    tAtoR.getIndexStart());
         }
-        
-        for (Microinstruction micro : this.getMicros("test")){
+
+        for (Microinstruction micro : this.getMicros("test")) {
             Test test = (Test) micro;
-            test.setStart(test.getRegister().getWidth() - test.getNumBits() - test.getStart());
+            test.setStart(test.getRegister().getWidth() - test.getNumBits() - test
+                    .getStart());
         }
-        
-        for (Microinstruction micro : this.getMicros("set")){
+
+        for (Microinstruction micro : this.getMicros("set")) {
             CpusimSet set = (CpusimSet) micro;
-            set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart());
+            set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart
+                    ());
         }
     }
 
@@ -1026,7 +1054,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     }
 
     public void copyDataTo(Module newModule) {
-        assert newModule instanceof Machine : "Passed non-Machine to Machine.copyDataTo()";
+        assert newModule instanceof Machine : "Passed non-Machine to Machine.copyDataTo" +
+                "()";
         // DJS Do more here?
     }
 

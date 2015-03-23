@@ -27,6 +27,9 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 
 /**
  * A tool bar used for debug mode.
@@ -41,6 +44,25 @@ public class DebugToolBarController extends ToolBar
     @FXML Button startOverButton;
     @FXML Label currentInstrLabel;
     @FXML ListView<Microinstruction> currentMicrosList;
+
+    private static final KeyCodeCombination GO_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.G, KeyCombination.ALT_DOWN, KeyCombination
+                    .SHORTCUT_DOWN);
+    private static final KeyCodeCombination STEP_BY_INSTR_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.I, KeyCombination.ALT_DOWN, KeyCombination
+                    .SHORTCUT_DOWN);
+    private static final KeyCodeCombination STEP_BY_MICRO_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.M, KeyCombination.ALT_DOWN, KeyCombination
+                    .SHORTCUT_DOWN);
+    private static final KeyCodeCombination BACKUP_BY_INSTR_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.B, KeyCombination.ALT_DOWN, KeyCombination
+                    .SHORTCUT_DOWN);
+    private static final KeyCodeCombination BACKUP_BY_MICRO_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN, KeyCombination
+                    .SHORTCUT_DOWN);
+    private static final KeyCodeCombination START_OVER_ACCELERATOR =
+            new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN);
+
 
     private Machine machine;
     private BackupManager backupManager;
@@ -79,7 +101,6 @@ public class DebugToolBarController extends ToolBar
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //updateDisplay(true, false);
     }
 
     /**
@@ -327,5 +348,33 @@ public class DebugToolBarController extends ToolBar
         }
     }
 
+    /**
+     * add keyboard accelerators to the buttons in the debug toolbar
+     */
+    public void addButtonAccelerators() {
+        getScene().getAccelerators().put(GO_ACCELERATOR, () -> goButton.fire());
+        getScene().getAccelerators().put(STEP_BY_INSTR_ACCELERATOR, () ->
+                stepByInstrButton.fire());
+        getScene().getAccelerators().put(STEP_BY_MICRO_ACCELERATOR, () ->
+                stepByMicroButton.fire());
+        getScene().getAccelerators().put(BACKUP_BY_INSTR_ACCELERATOR, () ->
+                backupMachineInstrButton.fire());
+        getScene().getAccelerators().put(BACKUP_BY_MICRO_ACCELERATOR, () ->
+                backupMicroInstrButton.fire());
+        getScene().getAccelerators().put(START_OVER_ACCELERATOR, () -> startOverButton
+                .fire());
+    }
+
+    /**
+     * add keyboard accelerators to the buttons in the debug toolbar
+     */
+    public void removeButtonAccelerators() {
+        getScene().getAccelerators().remove(GO_ACCELERATOR);
+        getScene().getAccelerators().remove(STEP_BY_INSTR_ACCELERATOR);
+        getScene().getAccelerators().remove(STEP_BY_MICRO_ACCELERATOR);
+        getScene().getAccelerators().remove(BACKUP_BY_INSTR_ACCELERATOR);
+        getScene().getAccelerators().remove(BACKUP_BY_MICRO_ACCELERATOR);
+        getScene().getAccelerators().remove(START_OVER_ACCELERATOR);
+    }
 
 }

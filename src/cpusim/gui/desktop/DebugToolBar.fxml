@@ -8,23 +8,23 @@
          styleClass="debugToolBar" xmlns:fx="http://javafx.com/fxml/1"
          xmlns="http://javafx.com/javafx/8">
     <items>
-        <Button fx:id="goButton" mnemonicParsing="false" onAction="#onGoButtonClick"
-                text="Go"/>
+        <Button fx:id="goButton" mnemonicParsing="true" onAction="#onGoButtonClick"
+                text="_Go"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
-        <Button fx:id="stepByInstrButton" mnemonicParsing="false"
-                onAction="#onStepByInstrClick" text="Step by Instr"/>
+        <Button fx:id="stepByInstrButton" mnemonicParsing="true"
+                onAction="#onStepByInstrClick" text="_Step by Instr"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
-        <Button fx:id="stepByMicroButton" mnemonicParsing="false"
-                onAction="#onStepByMicroClick" text="Step by Micro"/>
+        <Button fx:id="stepByMicroButton" mnemonicParsing="true"
+                onAction="#onStepByMicroClick" text="Ste_p by Micro"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
-        <Button fx:id="backupMachineInstrButton" mnemonicParsing="false"
-                onAction="#onBackupMachineInstrClick" text="Backup one Instr"/>
+        <Button fx:id="backupMachineInstrButton" mnemonicParsing="true"
+                onAction="#onBackupMachineInstrClick" text="_Backup one Instr"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
-        <Button fx:id="backupMicroInstrButton" mnemonicParsing="false"
-                onAction="#onBackupMicroInstrClick" text="Backup one Micro"/>
+        <Button fx:id="backupMicroInstrButton" mnemonicParsing="true"
+                onAction="#onBackupMicroInstrClick" text="Bac_kup one Micro"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
-        <Button fx:id="startOverButton" mnemonicParsing="false"
-                onAction="#onStartOverClick" text="Start Over"/>
+        <Button fx:id="startOverButton" mnemonicParsing="true"
+                onAction="#onStartOverClick" text="Start Ove_r"/>
         <Separator orientation="VERTICAL" prefHeight="80.0"/>
         <Label fx:id="currentInstrLabel" text="Fetch squence:"/>
         <ListView fx:id="currentMicrosList" editable="true" prefWidth="200.0"/>

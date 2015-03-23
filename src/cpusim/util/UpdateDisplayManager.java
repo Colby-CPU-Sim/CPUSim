@@ -38,46 +38,31 @@ public class UpdateDisplayManager
         //The cases are
         //identical except for the error message that is displayed.
         if (newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    desktop.setInRunningMode(true);
-                }
-            });
+            Platform.runLater(() -> desktop.setInRunningMode(true));
             if (desktop.getInDebugMode()) {
                 //The Modify menu is already disabled in Debug mode,
                 // as are the run menu items in the Execute menu.
                 //So just disable the buttons on the tool bar
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        desktop.getDebugToolBarController().setDisableAllButtons(true);
-                    }
-                });
+                Platform.runLater(() -> desktop.getDebugToolBarController().setDisableAllButtons(true));
             }
         }
         else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateDesktop(false);
-                    desktop.setInRunningMode(false);
-                    if (desktop.getInDebugMode()) {
-                        desktop.getDebugToolBarController().setDisableAllButtons(false);
-                    }
+            Platform.runLater(() -> {
+                updateDesktop(false);
+                desktop.setInRunningMode(false);
+                if (desktop.getInDebugMode()) {
+                    desktop.getDebugToolBarController().setDisableAllButtons(false);
                 }
             });
         }
         else if (newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
-            Platform.runLater(new Runnable() {
-                public void run() {
-                    updateDesktop(true);
-                    desktop.setInRunningMode(false);
-                    if (desktop.getInDebugMode()) {
-                        desktop.getDebugToolBarController().setDisableAllButtons(false);
-                    }
+            Platform.runLater(() -> {
+                updateDesktop(true);
+                desktop.setInRunningMode(false);
+                if (desktop.getInDebugMode()) {
+                    desktop.getDebugToolBarController().setDisableAllButtons(false);
                 }
             });
         }
@@ -90,6 +75,7 @@ public class UpdateDisplayManager
      * @param outlineChanges state if the outline has changed
      */
     private void updateDesktop(boolean outlineChanges) {
+        desktop.updateRegisterAndRAMDisplays();
         if (desktop.getInDebugMode()) {
             desktop.getDebugToolBarController().updateDisplay(false, outlineChanges);
         }

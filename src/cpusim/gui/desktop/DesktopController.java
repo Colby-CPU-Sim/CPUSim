@@ -1660,7 +1660,9 @@ public class DesktopController implements Initializable {
             //debugToolBarController = new DebugToolBarController(mediator, this);
             mainPane.getChildren().add(1, debugToolBarController);
             debugToolBarController.prefWidthProperty().bind(mainPane.widthProperty());
+            debugToolBarController.addButtonAccelerators();
         } else {
+            debugToolBarController.removeButtonAccelerators();
             mainPane.getChildren().remove(1);
             debugToolBarController.clearAllOutlines();
             mediator.getBackupManager().flushBackups();
@@ -1673,6 +1675,7 @@ public class DesktopController implements Initializable {
         mediator.getBackupManager().setListening(inDebug);
         ((CheckMenuItem) (executeMenu.getItems().get(0))).setSelected(inDebug);
     }
+
 
     /**
      * Gives the SimpleBooleanProperty describing
@@ -1831,6 +1834,8 @@ public class DesktopController implements Initializable {
             }
         });
 
+        // if using the console for IO, then set the console's background to yellow
+        // during input and set it to white during output and at the end.
         inRunningMode.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0,
@@ -2813,13 +2818,17 @@ public class DesktopController implements Initializable {
             ramSplitPane.setDividerPosition(i, ramdpos);
         }
 
+        updateRegisterAndRAMDisplays();
+
+    }
+
+    public void updateRegisterAndRAMDisplays() {
         for (RamTableController rtc : ramControllers) {
             rtc.updateTable();
         }
         for (RegisterTableController rtc : registerControllers) {
             rtc.updateTable();
         }
-
     }
 
     /**

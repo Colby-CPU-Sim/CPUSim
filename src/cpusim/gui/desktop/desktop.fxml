@@ -14,7 +14,7 @@
         <URL value="@../css/Desktop.css"/>
     </stylesheets>
     <MenuBar>
-        <Menu mnemonicParsing="true" text="_File" fx:id="fileMenu">
+        <Menu mnemonicParsing="false" text="File" fx:id="fileMenu">
             <MenuItem mnemonicParsing="false" onAction="#handleNewText"
                       text="New text"/>
             <MenuItem mnemonicParsing="false" onAction="#handleOpenText"
@@ -56,7 +56,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handleQuit"
                       text="Quit"/>
         </Menu>
-        <Menu mnemonicParsing="true" text="_Edit" fx:id="editMenu">
+        <Menu mnemonicParsing="false" text="Edit" fx:id="editMenu">
             <MenuItem mnemonicParsing="false" onAction="#handleUndo"
                       text="Undo"/>
             <MenuItem mnemonicParsing="false" onAction="#handleRedo"
@@ -79,7 +79,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handlePreferences"
                       text="Preferences..."/>
         </Menu>
-        <Menu mnemonicParsing="true" text="_Modify" fx:id="modifyMenu">
+        <Menu mnemonicParsing="false" text="Modify" fx:id="modifyMenu">
             <MenuItem mnemonicParsing="false"
                       onAction="#handleMachineInstructions"
                       text="Machine instructions..."/>
@@ -94,7 +94,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handleFetchSequence"
                       text="Fetch Sequence..."/>
         </Menu>
-        <Menu mnemonicParsing="true" text="E_xecute" fx:id="executeMenu">
+        <Menu mnemonicParsing="false" text="Execute" fx:id="executeMenu">
             <CheckMenuItem mnemonicParsing="false" onAction="#handleDebug"
                            text="Debug Mode" fx:id="debugMode"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
@@ -123,7 +123,7 @@
             <MenuItem mnemonicParsing="false" onAction="#handleOptions"
                       text="Options..."/>
         </Menu>
-        <Menu mnemonicParsing="true" text="_Help" fx:id="helpMenu">
+        <Menu mnemonicParsing="false" text="Help" fx:id="helpMenu">
             <MenuItem mnemonicParsing="false" onAction="#handleGeneralCPUSimHelp"
                       text="General CPUSim Help"/>
             <MenuItem mnemonicParsing="false" onAction="#handleAboutCPUSim"

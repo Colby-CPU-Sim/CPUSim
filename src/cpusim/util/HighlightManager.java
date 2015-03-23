@@ -187,6 +187,8 @@ public class HighlightManager
      * @return the offset
      */
     private int getLineStartOffset(String content, int line) {
+        if(line == 0)
+            return 0;
         int count = 0;
         int lineNum = 0;
         while (count < content.length()) {
