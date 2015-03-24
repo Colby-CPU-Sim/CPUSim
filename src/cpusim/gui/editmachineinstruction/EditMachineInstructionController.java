@@ -204,15 +204,19 @@ public class EditMachineInstructionController implements Initializable {
 
                 try {
                     Validate.stringIsLegalBinHexOrDecNumber(newValue);
-                    currentInstr.setOpcode(Convert.fromAnyBaseStringToLong(newValue));
+                    long newOpcode = Convert.fromAnyBaseStringToLong(newValue);
+                    currentInstr.setOpcode(newOpcode);
                     Validate.instructionsOpcodeIsValid(instructions, currentInstr);
                     opcodeTextField.setStyle("-fx-background-color:white;");
-                    opcodeTextField.setTooltip(null);
+                    opcodeTextField.setTooltip(new Tooltip("Binary: " +
+                            Long.toBinaryString(newOpcode) +
+                            System.getProperty("line.separator") + "Decimal: " + newOpcode +
+                            System.getProperty("line.separator") + "Hex: " +
+                            Long.toHexString(newOpcode)));
                 } catch (ValidationException ex) {
                     opcodeTextField.setStyle("-fx-background-color:red;");
-                    opcodeTextField.setTooltip(new Tooltip(ex.getMessage()));
+                    opcodeTextField.setTooltip(new Tooltip("Illegal value"));
                 }
-
             }
 
         });

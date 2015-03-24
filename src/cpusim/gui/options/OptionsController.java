@@ -611,12 +611,27 @@ public class OptionsController implements Initializable {
     private void initializeLoadingTab() {
         if (RAMs.size() < 1) {
             loadingTab.setDisable(true);
-            return;
         } else {
             codeStore.setItems(RAMs);
             codeStore.setValue(mediator.getMachine().getCodeStore());
+            startingAddress.textProperty().addListener((observable, oldValue, newValue) ->
+                setStartingAddressTooltip());
             startingAddress.setText(String.valueOf(
                     mediator.getMachine().getStartingAddressForLoading()));
+        }
+    }
+
+    private void setStartingAddressTooltip() {
+        try{
+            long startAddress = Convert.fromAnyBaseStringToLong(startingAddress.getText());
+            startingAddress.setTooltip(new Tooltip("Binary: " +
+                    Long.toBinaryString(startAddress) +
+                    System.getProperty("line.separator") + "Decimal: " + startAddress +
+                    System.getProperty("line.separator") + "Hex: " +
+                    Long.toHexString(startAddress)));
+        }
+        catch(NumberFormatException ex) {
+            startingAddress.setTooltip(new Tooltip("Illegal value"));
         }
     }
 

@@ -5,11 +5,9 @@
 
 package cpusim.gui.util;
 
- ;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
- import cpusim.util.Dialogs;
- import javafx.beans.value.ChangeListener;
+import cpusim.util.Dialogs;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.TableCell;
@@ -17,7 +15,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 
 /**
  * An editable cell class that allows the user to modify the integer in the cell.

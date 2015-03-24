@@ -457,19 +457,14 @@ public class Convert
      * @return the long value of the string
      * @throws NumberFormatException if the string cannot be parsed as a long
      */
-    
-    //TODO use Long.decode() to simplify this
     public static long fromAnyBaseStringToLong(String string)
             throws NumberFormatException
     {
-        while(string.startsWith(" ")) { //get rid of leading spaces
-            string = string.substring(1);
-        }
+        string = string.trim();
         if (string.startsWith("'")) { //single Unicode character
             char c = string.charAt(1);
             return (long) c;
         }
-
         if (string.startsWith("+")) {
             string = string.substring(1); //start just after the + sign
         }

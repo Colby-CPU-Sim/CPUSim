@@ -407,110 +407,40 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         }
     }
 
-    private String otherBasesToolTip() {
+    private String allBasesToolTip() {
+        // use System.getProperty("line.separator") for tooltips instead of
+        // putting them all on the same line.
     	String toolTip = "";
+        String originalBase = base.getBase();
+        String newLine = System.getProperty("line.separator");
 
-    	if (base.getBase().equals(Base.HEX)) {
-    		// 1 
-    		toolTip += "D: ";
-    		base.setBase(Base.DECIMAL);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 2
-                toolTip += " UD: ";
-                base.setBase(Base.UNSIGNEDDECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// 3
-        	toolTip += " B: ";
-        	base.setBase(Base.BINARY);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 4                
-                toolTip += " A: ";
-                base.setBase(Base.ASCII);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // Set back to original
-    		base.setBase(Base.HEX);
-    	}
-    	else if (base.getBase().equals(Base.BINARY)) {
-    		// 1
-    		toolTip += "D: ";
-    		base.setBase(Base.DECIMAL);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 2
-                toolTip += " UD: ";
-                base.setBase(Base.UNSIGNEDDECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 3
-        	toolTip += " H: ";
-        	base.setBase(Base.HEX);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 4                
-                toolTip += " A: ";
-                base.setBase(Base.ASCII);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// Set back to original
-    		base.setBase(Base.BINARY);
-    	}
-        else if (base.getBase().equals(Base.DECIMAL)) {
-    		// 1
-                toolTip += "UD: ";
-                base.setBase(Base.UNSIGNEDDECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-    		// 2
-                toolTip += " B: ";
-    		base.setBase(Base.BINARY);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// 3
-        	toolTip += " H: ";
-        	base.setBase(Base.HEX);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 4                
-                toolTip += " A: ";
-                base.setBase(Base.ASCII);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// Set back to original
-    		base.setBase(Base.DECIMAL);
-    	}
-        else if (base.getBase().equals(Base.UNSIGNEDDECIMAL)) {
-    		// 1
-                toolTip += "D: ";
-                base.setBase(Base.DECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-    		// 2
-                toolTip += " B: ";
-    		base.setBase(Base.BINARY);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// 3
-        	toolTip += " H: ";
-        	base.setBase(Base.HEX);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // 4                
-                toolTip += " A: ";
-                base.setBase(Base.ASCII);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// Set back to original
-    		base.setBase(Base.UNSIGNEDDECIMAL);
-    	}
-        else {
-                // 1
-                toolTip += "D: ";
-                base.setBase(Base.DECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-    		// 2
-                toolTip += " UD: ";
-                base.setBase(Base.UNSIGNEDDECIMAL);
-                toolTip += formatString(convertLong(Long.parseLong(getString())));
-    		// 3
-                toolTip += " B: ";
-    		base.setBase(Base.BINARY);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-        	// 4
-        	toolTip += " H: ";
-        	base.setBase(Base.HEX);
-        	toolTip += formatString(convertLong(Long.parseLong(getString())));
-                // Set back to original
-    		base.setBase(Base.ASCII);
-    	}
-    	return toolTip;
+        // 1
+        toolTip += "Decimal: ";
+        base.setBase(Base.DECIMAL);
+        toolTip += formatString(convertLong(Long.parseLong(getString())));
+        toolTip += newLine;
+        // 2
+        toolTip += "Unsigned Decimal: ";
+        base.setBase(Base.UNSIGNEDDECIMAL);
+        toolTip += formatString(convertLong(Long.parseLong(getString())));
+        toolTip += newLine;
+        // 3
+        toolTip += "Binary: ";
+        base.setBase(Base.BINARY);
+        toolTip += formatString(convertLong(Long.parseLong(getString())));
+        toolTip += newLine;
+        // 4
+        toolTip += "Hexadecimal: ";
+        base.setBase(Base.HEX);
+        toolTip += formatString(convertLong(Long.parseLong(getString())));
+        toolTip += newLine;
+        // 5
+        toolTip += "Ascii: ";
+        base.setBase(Base.ASCII);
+        toolTip += formatString(convertLong(Long.parseLong(getString())));
+
+        base.setBase(originalBase);
+        return toolTip;
     }
 
     /**
@@ -523,7 +453,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         Object o = getTableRow().getItem();
         if (o instanceof Register) {
             cellSize = ((Register) o).getWidth();
-            tooltipStringProperty.set(otherBasesToolTip());
+            tooltipStringProperty.set(allBasesToolTip());
         }
         else if ((o instanceof RAMLocation) &&
                           getTableColumn().getText().equals("Data")) {
@@ -542,11 +472,11 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             cellSize = 31 - Integer.numberOfLeadingZeros(
                                              getTableView().getItems().size());
             // we don't care about tooltips for the address column
-            // tooltipStringProperty.set(otherBasesToolTip());
+            // tooltipStringProperty.set(allBasesToolTip());
         }
         else if (o instanceof EQU) {
         	cellSize = 32;
-        	tooltipStringProperty.set(otherBasesToolTip());
+        	tooltipStringProperty.set(allBasesToolTip());
         }
         else {
             cellSize = 32;
