@@ -44,12 +44,12 @@
                             </HBox>
                             <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1"
                                   spacing="5.0">
-                                <Label text="Length"/>
+                                <Label text="Length:"/>
                                 <Label fx:id="lengthLabel" text="Length"/>
                                 <Pane prefHeight="29.0" prefWidth="89.0"/>
                                 <Label text="Opcode"/>
                                 <TextField fx:id="opcodeTextField"
-                                           style="-fx-border-width: 1;-fx-border-color: black;"
+                                           style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"
                                            prefHeight="22.0" prefWidth="80.0"/>
                             </HBox>
                             <AnchorPane fx:id="instructionFormatPane" prefHeight="88.0"

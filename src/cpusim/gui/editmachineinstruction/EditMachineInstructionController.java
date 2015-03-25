@@ -189,8 +189,6 @@ public class EditMachineInstructionController implements Initializable {
         initializeAssemblyFormatPane();
 
         initializeImplementationFormatPane();
-
-
     }
 
     private void initializeOpcodeTextField() {
@@ -207,14 +205,19 @@ public class EditMachineInstructionController implements Initializable {
                     long newOpcode = Convert.fromAnyBaseStringToLong(newValue);
                     currentInstr.setOpcode(newOpcode);
                     Validate.instructionsOpcodeIsValid(instructions, currentInstr);
-                    opcodeTextField.setStyle("-fx-background-color:white;");
+                    opcodeTextField.setStyle("-fx-border-width:1;" +
+                            "-fx-background-color:white; -fx-border-color:black; " +
+                            "-fx-border-style:solid;");
                     opcodeTextField.setTooltip(new Tooltip("Binary: " +
                             Long.toBinaryString(newOpcode) +
-                            System.getProperty("line.separator") + "Decimal: " + newOpcode +
+                            System.getProperty("line.separator") + "Decimal: " +
+                            newOpcode +
                             System.getProperty("line.separator") + "Hex: " +
                             Long.toHexString(newOpcode)));
                 } catch (ValidationException ex) {
-                    opcodeTextField.setStyle("-fx-background-color:red;");
+                    opcodeTextField.setStyle("-fx-border-width:1;" +
+                            "-fx-background-color:red; -fx-border-color:black; " +
+                            "-fx-border-style:solid;");
                     opcodeTextField.setTooltip(new Tooltip("Illegal value"));
                 }
             }

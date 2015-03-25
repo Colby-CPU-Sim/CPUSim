@@ -375,14 +375,14 @@ public class Validate
      * determines if the opcode fits given the number of bits
      * @param instr the machine instruction (needed for the error message)
      */
-    public static void opcodeFits(MachineInstruction instr)
-    {
-        if (instr.getOpcode() >= (long) Math.pow(2, instr.getNumBits())) {
+    public static void opcodeFits(MachineInstruction instr) {
+        if (instr.getOpcode() >= (long) Math.pow(2, instr.getInstructionFields().get(0)
+                .getNumBits())) {
             throw new ValidationException("The opcode \"" +
-                        Convert.fromLongToHexadecimalString(instr.getOpcode(),
-                                                            instr.getNumBits()) +
-                        "\" (hex) of instruction \"" + instr.getName() +
-                        "\" is too big for the\nfirst field of the instruction.");
+                    Convert.fromLongToHexadecimalString(instr.getOpcode(),
+                            instr.getNumBits()) +
+                    "\" (hex) of instruction \"" + instr.getName() +
+                    "\" is too big for the\nfirst field of the instruction.");
         }
     }
 

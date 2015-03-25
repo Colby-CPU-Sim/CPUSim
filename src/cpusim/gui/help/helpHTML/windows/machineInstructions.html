@@ -17,8 +17,8 @@
     for the current machine. </FONT></P>
 
 <P class="p3" ALIGN="CENTER"><FONT FACE="Palatino">
-    <IMG border="1px" SRC="../generalHelp/tour/EditMachineInstr.jpg" HEIGHT="320"
-         WIDTH="542">
+    <IMG border="1px" SRC="EditMachineInstr.png" HEIGHT="317"
+         WIDTH="493">
     <BR>Figure 21a. The dialog for editing machine instructions.</FONT></P>
 
 <P><FONT FACE="Arial" COLOR="#0000ff"><B>The left section of the dialog</B></font></P>
@@ -70,11 +70,15 @@
     the right. To reorder the fields, just drag them left or right in the bar.</FONT></P>
 
 <UL>
-    <LI><FONT FACE="Palatino">The opcode value is displayed in hexadecimal notation and
-        all opcodes must be unique
-        non-negative numbers. If you type in
-        characters that are not hex characters (the hex characters are 0-9 and a-f and
-        A-F), the opcode box you are
+    <LI><FONT FACE="Palatino">
+        All opcodes must be unique non-negative numbers.
+        The opcode value is initially displayed in hexadecimal notation.  The tool tip
+        for the opcode box shows the value in other bases.  To enter a value in
+        binary, use the prefix "0b" and to enter a value in hexadecimal, use the
+        prefix "0x".
+        If you type in a value that is not a non-negative binary, decimal, or hexadecimal number,
+        or if you type in a number that is already the opcode of another instruction,
+        the opcode box you are
         editing will become highlighted in red.</FONT></LI>
     <LI><FONT FACE="Palatino">The format of an instruction is displayed using the color
         bars.  Each bar represents one field.

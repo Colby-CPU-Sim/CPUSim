@@ -408,8 +408,6 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     }
 
     private String allBasesToolTip() {
-        // use System.getProperty("line.separator") for tooltips instead of
-        // putting them all on the same line.
     	String toolTip = "";
         String originalBase = base.getBase();
         String newLine = System.getProperty("line.separator");
