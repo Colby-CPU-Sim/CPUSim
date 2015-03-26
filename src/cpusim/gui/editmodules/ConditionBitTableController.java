@@ -13,7 +13,7 @@ package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
 import cpusim.Module;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
@@ -124,7 +124,7 @@ public class ConditionBitTableController extends ModuleController implements Ini
                     @Override
                     public TableCell<ConditionBit, Integer> call(
                             TableColumn<ConditionBit, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<ConditionBit>();
+                        return new EditingNonNegativeIntCell<ConditionBit>();
                     }
                 };
 

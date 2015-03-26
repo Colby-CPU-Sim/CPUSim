@@ -9,7 +9,7 @@
 package cpusim.gui.editmodules.arrayregisters;
 
 import cpusim.Module;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.module.Register;
@@ -111,7 +111,7 @@ public class TableController extends TableView implements Initializable {
                     @Override
                     public TableCell<Register, Integer> call(
                             TableColumn<Register, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<>();
+                        return new EditingNonNegativeIntCell<>();
                     }
                 };
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellLongFactory =

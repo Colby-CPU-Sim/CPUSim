@@ -5,7 +5,6 @@
 
 package cpusim.gui.util;
 
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Convert;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
@@ -16,10 +15,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 
 /**
- * An editable cell class that allows the user to modify the integer in the cell.
+ * An editable cell class that allows the user to modify the long integer in the cell.
+ * It accepts any long (positive or negative).
  */
 
 public class EditingLongCell<T> extends TableCell<T, Long> {
@@ -78,6 +77,11 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
                 } else {
                     setText(getString());
                     setGraphic(null);
+                    setTooltip(new Tooltip("Binary: " + Long.toBinaryString(item) +
+                            System.getProperty("line.separator") +
+                            "Decimal: " + item +
+                            System.getProperty("line.separator") +
+                            "Hex: " + Long.toHexString(item)));
                 }
             }
         }
@@ -97,10 +101,6 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
                             try{
                                 long newLong = Convert.fromAnyBaseStringToLong(textField.getText());
                                 commitEdit(newLong);
-                                textField.setTooltip(new Tooltip("Binary: "+
-                                    Long.toBinaryString(newLong)+
-                                    System.getProperty("line.separator")+"Hex: "+
-                                    Long.toHexString(newLong)));
                             }
                             catch(NumberFormatException e){
                                 //didn't work because of issues with the focus
@@ -120,12 +120,9 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
                         try{
-                            long newLong = Convert.fromAnyBaseStringToLong(textField.getText());
-                                commitEdit(newLong);
-                                textField.setTooltip(new Tooltip("Binary: "+
-                                    Long.toBinaryString(newLong)+
-                                    System.getProperty("line.separator")+"Hex: "+
-                                    Long.toHexString(newLong)));
+                            long newLong = Convert.fromAnyBaseStringToLong(textField
+                                    .getText());
+                            commitEdit(newLong);
                         }
                         catch(NumberFormatException e){
                             textField.setStyle("-fx-background-color:red;");

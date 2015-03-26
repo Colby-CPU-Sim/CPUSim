@@ -13,7 +13,7 @@ package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
 import cpusim.Module;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.module.RAM;
 import cpusim.util.Validate;
@@ -102,7 +102,7 @@ public class RAMsTableController
                     @Override
                     public TableCell<RAM, Integer> call(
                             TableColumn<RAM, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<RAM>();
+                        return new EditingNonNegativeIntCell<RAM>();
                     }
                 };
 

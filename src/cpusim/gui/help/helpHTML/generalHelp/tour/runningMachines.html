@@ -57,7 +57,9 @@
 			To see the values in every register displayed in binary (base 2),
 			signed 2's complement decimal (base 10), unsigned decimal (base 10),
 			hexadecimal (base 16), or ASCII, select the appropriate item from the
-			popup menu labeled &quot;Data&quot; at the top of the window. Values
+			popup menu labeled &quot;Data&quot; at the top of the window. (If you hover your mouse
+            over the value of a register, a tooltip will appear showing that value in the other
+            bases and forms.) Values
 			in binary and hexadecimal format are displayed in four-digit groups
 			for readability. The values in the registers can be edited in any of
 			these display formats by double-clicking in the appropriate cell of
@@ -140,10 +142,12 @@
         </P><P class="p3">
             If you hover your mouse over a RAM location, there will
 			be a tooltip to show which instruction or pseudo-instruction this
-			RAM location corresponds to (if any).  In this example, tooltips appear only
+			RAM location corresponds to (if any).  In our case here, tooltips appear only
             on even-address rows because Wombat1 instructions occupy 16 bits, or 2 cells of
             memory.  Therefore half of an instruction appears in one row and the other
-            half in the next row.
+            half in the next row.  Note that there will not be a tooltip over a RAM
+            location unless an assembly program has been assembled and loaded into the
+        RAM.
 		</P>
 		<P class="p3">
 			<FONT FACE="Arial" SIZE=+1 COLOR="#0000ff">Running the program

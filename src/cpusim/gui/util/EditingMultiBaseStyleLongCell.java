@@ -458,7 +458,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             RAMLocation ramLoc = (RAMLocation) o;
             cellSize = ramLoc.getRam().getCellSize();
             if (ramLoc.getSourceLine() != null) {
-            	setTooltip(new Tooltip(ramLoc.getSourceLine().getLine()
+            	setTooltip(new Tooltip((ramLoc.getSourceLine().getLine()+1)
                         + ": " + ((RAMLocation) o).getComment()));
             }
             else {
@@ -469,8 +469,12 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                           getTableColumn().getText().equals("Addr")) {
             cellSize = 31 - Integer.numberOfLeadingZeros(
                                              getTableView().getItems().size());
-            // we don't care about tooltips for the address column
-            // tooltipStringProperty.set(allBasesToolTip());
+            tooltipStringProperty.set("Binary: " +
+                    Long.toBinaryString(getItem()) +
+                    System.getProperty("line.separator") +
+                    "Decimal: " + getItem() +
+                    System.getProperty("line.separator") +
+                    "Hex: " + Long.toHexString(getItem()));
         }
         else if (o instanceof EQU) {
         	cellSize = 32;

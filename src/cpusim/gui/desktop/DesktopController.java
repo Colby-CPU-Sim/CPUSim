@@ -1822,25 +1822,20 @@ public class DesktopController implements Initializable {
         // Stop
         executeMenu.getItems().get(7).disableProperty().bind(inRunningMode.not());
         // Reset Everything
-        executeMenu.getItems().get(8).disableProperty().bind(inRunningMode);
+        executeMenu.getItems().get(8).disableProperty().bind(inDebugOrRunningMode);
         // IO Options
         executeMenu.getItems().get(10).disableProperty().bind(inDebugOrRunningMode.or(
                 codeStoreIsNull));
         // Update codeStoreIsNull
-        executeMenu.setOnMenuValidation(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                codeStoreIsNull.set(mediator.getMachine().getCodeStore() == null);
-            }
-        });
+        executeMenu.setOnMenuValidation(event ->
+                codeStoreIsNull.set(mediator.getMachine().getCodeStore() == null));
 
         // if using the console for IO, then set the console's background to yellow
         // during input and set it to white during output and at the end.
         inRunningMode.addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean oldVal, Boolean newVal) {
-                boolean inRunMode = newVal.booleanValue();
+                                Boolean wasDebugMode, Boolean nowDebugMode) {
                 ObservableList<Microinstruction> ios = mediator.getMachine().getMicros
                         ("io");
                 boolean consoleIsInputOrOutputChannel = false;
@@ -1851,7 +1846,7 @@ public class DesktopController implements Initializable {
                     }
                 }
                 if (consoleIsInputOrOutputChannel) {
-                    if (inRunMode) {
+                    if (nowDebugMode) {
                         ioConsole.setStyle("-fx-background-color: yellow");
                         ioConsole.requestFocus();
                     } else {
@@ -3038,69 +3033,6 @@ public class DesktopController implements Initializable {
     public OtherSettings getOtherSettings() {
         return otherSettings;
     }
-
-    /**
-     * Binds the proper menu items to the correct key combinations based on the strings
-     * in the keyBindings data structure.
-     */
-//    private void createKeyCodes() {
-//
-//        KeyCode key = null;
-//
-//        int i = 0;
-//        for (String keycode : keyBindings) {
-//            KeyCodeCombination.ModifierValue shift = KeyCodeCombination.ModifierValue.UP;
-//            KeyCodeCombination.ModifierValue ctrl = KeyCodeCombination.ModifierValue.UP;
-//            KeyCodeCombination.ModifierValue alt = KeyCodeCombination.ModifierValue.UP;
-//            KeyCodeCombination.ModifierValue meta = KeyCodeCombination.ModifierValue.UP;
-//            KeyCodeCombination.ModifierValue shortcut = KeyCodeCombination
-//                    .ModifierValue.UP;
-//            String[] keys = keycode.split("-");
-//            key = KeyCode.getKeyCode(keys[keys.length - 1]);
-//            if (key == null) {
-//                key = Convert.charToKeyCode(keys[keys.length - 1]);
-//            }
-//            keys[keys.length - 1] = null;
-//            if (keys.length > 1) {
-//                for (String mod : keys) {
-//                    if (mod != null) {
-//                        switch (mod) {
-//                            case "Shift":
-//                                shift = KeyCodeCombination.ModifierValue.DOWN;
-//                                break;
-//                            case "Ctrl":
-//                                if (!System.getProperty("os.name").startsWith
-//                                        ("Windows")) {
-//                                    ctrl = KeyCodeCombination.ModifierValue.DOWN;
-//                                } else {
-//                                    shortcut = KeyCodeCombination.ModifierValue.DOWN;
-//                                }
-//                                break;
-//                            case "Alt":
-//                                alt = KeyCodeCombination.ModifierValue.DOWN;
-//                                break;
-//                            case "Meta":
-//                                meta = KeyCodeCombination.ModifierValue.DOWN;
-//                                break;
-//                            case "Cmd":
-//                                shortcut = KeyCodeCombination.ModifierValue.DOWN;
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//                    }
-//                }
-//            }
-//            keyCodeCombinations.get(i).set(null);
-//            if (key != null) {
-//                keyCodeCombinations.get(i).set(new KeyCodeCombination(key, shift, ctrl,
-//                        alt,
-//                        meta, shortcut));
-//            }
-//            i++;
-//        }
-//
-//    }
 
     /**
      * Uses the key code combinations in the keyCodeCombinations list to bind the proper

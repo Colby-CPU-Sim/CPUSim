@@ -19,7 +19,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.microinstruction.Shift;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -147,7 +147,7 @@ public class ShiftTableController
                     @Override
                     public TableCell<Shift, Integer> call(
                             TableColumn<Shift, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<Shift>();
+                        return new EditingNonNegativeIntCell<Shift>();
                     }
                 };
         Callback<TableColumn<Shift,Register>,TableCell<Shift,Register>> cellComboFactory =

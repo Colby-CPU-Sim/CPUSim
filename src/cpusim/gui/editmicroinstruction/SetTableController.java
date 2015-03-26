@@ -23,7 +23,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.microinstruction.CpusimSet;
@@ -43,7 +43,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -125,7 +124,7 @@ public class SetTableController
                     @Override
                     public TableCell<CpusimSet, Integer> call(
                             TableColumn<CpusimSet, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<CpusimSet>();
+                        return new EditingNonNegativeIntCell<CpusimSet>();
                     }
                 };
         Callback<TableColumn<CpusimSet,Long>,TableCell<CpusimSet,Long>> cellLongFactory =

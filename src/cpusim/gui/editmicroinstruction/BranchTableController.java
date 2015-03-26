@@ -11,7 +11,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.microinstruction.Branch;
 import cpusim.util.Validate;
@@ -102,7 +102,7 @@ public class BranchTableController
                     @Override
                     public TableCell<Branch, Integer> call(
                             TableColumn<Branch, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<Branch>();
+                        return new EditingNonNegativeIntCell<Branch>();
                     }
                 };
 

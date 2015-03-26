@@ -19,7 +19,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.microinstruction.Test;
@@ -124,7 +124,7 @@ public class TestTableController
                     @Override
                     public TableCell call(
                             TableColumn<Test, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<Test>();
+                        return new EditingNonNegativeIntCell<Test>();
                     }
                 };
         Callback<TableColumn<Test,Long>,TableCell<Test,Long>> cellLongFactory =

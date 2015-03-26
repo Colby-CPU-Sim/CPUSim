@@ -83,40 +83,22 @@ public class RamTableController implements Initializable {
 
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         
-        table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<RAMLocation>(){
-            @Override
-            public void changed(ObservableValue<? extends RAMLocation> ov, RAMLocation t, RAMLocation t1) {
-                updateTable();
-            }
-        });
+        table.getSelectionModel().selectedItemProperty().addListener(
+                (ov, t, t1) -> updateTable());
 
-        
+
         Callback<TableColumn<RAMLocation,Long>,TableCell<RAMLocation,Long>> cellValMultiBaseLongFactory =
-                new Callback<TableColumn<RAMLocation, Long>, TableCell<RAMLocation, Long>>() {
-                    @Override
-                    public TableCell<RAMLocation, Long> call(
-                            TableColumn<RAMLocation, Long> setStringTableColumn) {
-                    	EditingMultiBaseStyleLongCell<RAMLocation> a =
-                    			new EditingMultiBaseStyleLongCell<>(valBase, styleInfo);
-                        // we set the tooltip in the cell's setToolTipsAndCellSize() method
-                    	//a.setTooltip(new Tooltip());
-                    	//a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
-                    	return a;
-                    }
+                setStringTableColumn -> {
+                    EditingMultiBaseStyleLongCell<RAMLocation> a =
+                            new EditingMultiBaseStyleLongCell<>(valBase, styleInfo);
+                    return a;
                 };
 
         Callback<TableColumn<RAMLocation,Long>,TableCell<RAMLocation,Long>> cellAddrMultiBaseLongFactory =
-                new Callback<TableColumn<RAMLocation, Long>, TableCell<RAMLocation, Long>>() {
-                    @Override
-                    public TableCell<RAMLocation, Long> call(
-                            TableColumn<RAMLocation, Long> setStringTableColumn) {
-                    	EditingMultiBaseStyleLongCell<RAMLocation> a =
-                                new EditingMultiBaseStyleLongCell<RAMLocation>(addrBase, styleInfo);
-                    	// we dont' need tooltips for the addresses
-                    	// a.setTooltip(new Tooltip());
-                    	//a.tooltipProperty().get().textProperty().bind(a.tooltipStringProperty);
-                    	return a;
-                    }
+                setStringTableColumn -> {
+                    EditingMultiBaseStyleLongCell<RAMLocation> a =
+                            new EditingMultiBaseStyleLongCell<>(addrBase, styleInfo);
+                    return a;
                 };
         
         address.setCellFactory(cellAddrMultiBaseLongFactory);
@@ -130,20 +112,14 @@ public class RamTableController implements Initializable {
         data.prefWidthProperty().bind(table.widthProperty().divide(100/66.0));
         
                 
-        address.setCellValueFactory(
-                    new PropertyValueFactory<RAMLocation, Long>("address"));
-        data.setCellValueFactory(
-                new PropertyValueFactory<RAMLocation, Long>("value"));
+        address.setCellValueFactory(new PropertyValueFactory<>("address"));
+        data.setCellValueFactory(new PropertyValueFactory<>("value"));
 
-        data.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RAMLocation, Long>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RAMLocation, Long> text) {
-                        ((RAMLocation)text.getTableView().getItems().get(
-                                text.getTablePosition().getRow())).
-                                setValue(text.getNewValue());
-                        table.getStyleClass().add("tableRowCell");
-                    }
+        data.setOnEditCommit(text -> {
+                    text.getTableView().getItems().get(
+                            text.getTablePosition().getRow()).
+                            setValue(text.getNewValue());
+                    table.getStyleClass().add("tableRowCell");
                 }
         );
 
@@ -152,20 +128,12 @@ public class RamTableController implements Initializable {
         // Right clicks on table
         ContextMenu cm = new ContextMenu();
         MenuItem options = new MenuItem("Options");
-        options.setOnAction(new EventHandler<ActionEvent>() {
-        	public void handle(ActionEvent e) {
-        		desktop.openOptionsDialog(2);
-    		}
-    	});
+        options.setOnAction(e -> desktop.openOptionsDialog(2));
         MenuItem edit = new MenuItem("Edit Hardware");
-        edit.setOnAction(new EventHandler<ActionEvent>() {
-        	public void handle(ActionEvent e) {
-        		desktop.openHardwareModulesDialog(3);
-        	}
-        });
+        edit.setOnAction(e -> desktop.openHardwareModulesDialog(3));
         
         // bind disabled properties to whether their MenuItem is disabled
-        options.disableProperty().bind(desktop.executeMenu.getItems().get(10).disableProperty());
+        options.disableProperty().bind(desktop.executeMenu.getItems().get(11).disableProperty());
         edit.disableProperty().bind(desktop.modifyMenu.disableProperty());
         
     	cm.getItems().addAll(options, edit);

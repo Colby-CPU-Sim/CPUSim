@@ -14,7 +14,7 @@ package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
 import cpusim.Module;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
@@ -108,7 +108,7 @@ public class RegisterArrayTableController
                     @Override
                     public TableCell<RegisterArray, Integer> call(
                             TableColumn<RegisterArray, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<RegisterArray>();
+                        return new EditingNonNegativeIntCell<RegisterArray>();
                     }
                 };
 

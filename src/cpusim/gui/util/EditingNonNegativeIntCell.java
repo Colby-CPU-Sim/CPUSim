@@ -18,13 +18,14 @@ import javafx.scene.input.KeyEvent;
 
 /**
  * An editable cell class that allows the user to modify the integer in the cell.
+ * It only allows non-negative integers.
  */
 
-public class EditingIntCell<T> extends TableCell<T, Integer> {
+public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
  
         private TextField textField;
  
-        public EditingIntCell() {
+        public EditingNonNegativeIntCell() {
         }
  
         /**
@@ -76,6 +77,12 @@ public class EditingIntCell<T> extends TableCell<T, Integer> {
                 } else {
                     setText(getString());
                     setGraphic(null);
+                    setTooltip(new Tooltip("Binary: " +
+                            Integer.toBinaryString(item) +
+                            System.getProperty("line.separator") +
+                            "Decimal: " + item +
+                            System.getProperty("line.separator") +
+                            "Hex: " + Integer.toHexString(item)));
                 }
             }
         }
@@ -97,10 +104,6 @@ public class EditingIntCell<T> extends TableCell<T, Integer> {
                                 if (newInt >= 0){
                                     try{
                                         commitEdit(newInt);
-                                        textField.setTooltip(new Tooltip("Binary: "+
-                                                Integer.toBinaryString(newInt)+
-                                                System.getProperty("line.separator")+"Hex: "+
-                                                Integer.toHexString(newInt)));
                                     }
                                     catch(AssertionError e){
                                         if (textField.getScene() != null){
@@ -127,7 +130,7 @@ public class EditingIntCell<T> extends TableCell<T, Integer> {
                                 if (textField.getScene() != null){
                                     Dialogs.createErrorDialog(textField.getScene().getWindow(),
                                             "Integer Value Error", "This column requires "
-                                                    + "positive integer values").showAndWait();
+                                                    + "non-negative integer values").showAndWait();
                                     cancelEdit();
                                 }
                             }
@@ -165,7 +168,7 @@ public class EditingIntCell<T> extends TableCell<T, Integer> {
                         catch(NumberFormatException e){
                             textField.setStyle("-fx-background-color:red;");
                             textField.setTooltip(new Tooltip("You need to enter a "
-                                    + "positive integer"));
+                                    + "non-negative integer"));
                             //The following code crashes the program
                             //Dialogs.showErrorDialog(
                             //            (Stage)textField.getScene().getWindow(), 

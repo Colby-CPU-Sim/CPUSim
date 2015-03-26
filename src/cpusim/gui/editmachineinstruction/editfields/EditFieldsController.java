@@ -25,8 +25,7 @@ import cpusim.Field.Type;
 import cpusim.FieldValue;
 import cpusim.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
-import cpusim.gui.util.EditingIntCell;
-import cpusim.util.CPUSimConstants;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -233,7 +232,7 @@ public class EditFieldsController implements Initializable {
                     @Override
                     public TableCell call(
                             TableColumn<Field, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<Field>();
+                        return new EditingNonNegativeIntCell<Field>();
                     }
                 };
         Callback<TableColumn<Field,Field.Relativity>,

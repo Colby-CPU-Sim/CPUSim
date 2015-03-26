@@ -26,7 +26,7 @@ package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
 import cpusim.Module;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.module.Register;
@@ -125,7 +125,7 @@ public class RegistersTableController
                     @Override
                     public TableCell<Register, Integer> call(
                             TableColumn<Register, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<Register>();
+                        return new EditingNonNegativeIntCell<Register>();
                     }
                 };
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellLongFactory =

@@ -19,12 +19,12 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.microinstruction.TransferAtoR;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -134,7 +134,7 @@ public class TransferAtoRTableController
                     @Override
                     public TableCell call(
                             TableColumn<TransferAtoR, Integer> setIntegerTableColumn) {
-                        return new cpusim.gui.util.EditingIntCell<TransferAtoR>();
+                        return new EditingNonNegativeIntCell<TransferAtoR>();
                     }
                 };
         Callback<TableColumn<TransferAtoR,Register>,

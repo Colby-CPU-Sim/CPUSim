@@ -24,7 +24,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
-import cpusim.gui.util.EditingIntCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.microinstruction.TransferRtoR;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -128,7 +128,7 @@ public class TransferRtoRTableController
                     @Override
                     public TableCell call(
                             TableColumn<TransferRtoR, Integer> setIntegerTableColumn) {
-                        return new EditingIntCell<TransferRtoR>();
+                        return new EditingNonNegativeIntCell<TransferRtoR>();
                     }
                 };
         Callback<TableColumn<TransferRtoR,Register>,
