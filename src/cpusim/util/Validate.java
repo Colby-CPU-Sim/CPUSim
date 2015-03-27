@@ -29,7 +29,7 @@
  * -  buffersAreWideEnough (IOTableController) 
  * -  registersHaveEqualWeights (LogicalTableController)
  * -  rangeInBoundSet (SetTableController)
- * -  valueFitsInNumBits (SetTableController) 
+ * -  valueFitsInNumBitsForSetMicros (SetTableController)
  * -  noNegativeDistances (ShiftTableController)
  * -  registersHaveEqualWidths (ShiftTableController)
  * -  rangeInBound (TestTableController)
@@ -278,7 +278,7 @@ public class Validate
                         && opCodeFieldLength1 == opCodeFieldLength2) {
                     throw new ValidationException("The opcode \"" +
                              Convert.fromLongToHexadecimalString(
-                                  instrs.get(i).getOpcode(), opCodeFieldLength1) +
+                                     instrs.get(i).getOpcode(), opCodeFieldLength1) +
                              "\" (hex) is used more than once.\nAll opcode " +
                              "fields must have unique sizes or values.");
                 }
@@ -527,21 +527,16 @@ public class Validate
      * for n bits is -(2^(n-1)) to 2^n - 1.
      * @param sets an array of Objects to check.
      */
-    public static void valueFitsInNumBits(CpusimSet[] sets)
+    public static void valueFitsInNumBitsForSetMicros(CpusimSet[] sets)
     {
         for (CpusimSet set : sets) {
-            BigInteger bigValue = BigInteger.valueOf(set.getValue());
-            int numBits = set.getNumBits();
-            BigInteger twoToBits =
-                    BigInteger.valueOf(2).pow(numBits);
-            BigInteger twoToBitsMinusOne =
-                    BigInteger.valueOf(2).pow(numBits - 1);
-
-            if (bigValue.compareTo(twoToBits) >= 0 ||
-                    bigValue.compareTo(twoToBitsMinusOne.negate()) < 0) {
-                throw new ValidationException("The value " + set.getValue() +
-                        " doesn't fit in the given number of bits\n" +
-                        "in the instruction \"" + set.getName() + "\".");
+            try {
+                long value = set.getValue();
+                int numBits = set.getNumBits();
+                fitsInBits(value, numBits);
+            } catch (ValidationException e) {
+                throw new ValidationException(e.getMessage() +
+                        " in the microinstruction \"" + set.getName() + "\".");
             }
         }
     }
@@ -1519,23 +1514,53 @@ public class Validate
 		}
 	}
         
-        /**
+    /**
      * Checks whether the given long value can be represented in twos
      * complement using the given number of bits.
-     * @param inputLong the long value to be checked
+     * @param value the long value to be checked
      * @param numBits the number of bits into which the value must fit
      * @throws NumberFormatException if the value does not fit in the given
      *         number of bits
      */
-    public static void fitsInBits(long inputLong, int numBits) {
-    	boolean fits = false;
-    	BigInteger bigNum = BigInteger.valueOf(inputLong);
-        BigInteger two = BigInteger.valueOf(2);
-        fits = (bigNum.compareTo(two.pow(numBits)) < 0) &&
-              (bigNum.compareTo(two.pow(numBits-1).negate()) >= 0);
-        if (!fits) {
-            throw new ValidationException("The number " + inputLong +
-                    " won't fit in " + numBits + " bits.");
+    public static void fitsInBits(long value, int numBits) {
+        BigInteger bigValue = BigInteger.valueOf(value);
+        BigInteger twoToBits = BigInteger.valueOf(2).pow(numBits);
+        BigInteger twoToBitsMinusOne = BigInteger.valueOf(2).pow(numBits - 1);
+
+        if (bigValue.compareTo(twoToBits) >= 0 ||
+                bigValue.compareTo(twoToBitsMinusOne.negate()) < 0) {
+            throw new ValidationException("The value " + value +
+                    " doesn't fit in " + numBits + " bits\n");
+        }
+    }
+
+    public static void fieldIsValid(Field field) {
+        if(field.getNumBits() == 0 && field.getType().equals(Type.ignored))
+            throw new ValidationException("A field of length 0 cannot be ignored." +
+                    " Field " + field.getName() + " is such a field.");
+        if(! field.isSigned() && field.getDefaultValue() < 0)
+            throw new ValidationException("Field " + field.getName() + " is unsigned" +
+                    " but has a negative default value.");
+        if(field.getValues().size() > 0 &&
+                (! field.getRelativity().equals(Field.Relativity.absolute) ||
+                 field.getNumBits() == 0))
+            throw new ValidationException("Field " + field.getName() + " must be" +
+                    " absolute and have a positive number of bits in order to use " +
+                    " a set of fixed values.");
+        if(field.getNumBits() > 0)
+            fitsInBits(field.getDefaultValue(),field.getNumBits());
+        fieldValuesAreValid(field, field.getValues());
+    }
+
+    public static void fieldValuesAreValid(Field field, ObservableList<FieldValue>
+            allFieldValues) {
+        int numBits = field.getNumBits();
+        for(FieldValue fieldValue : allFieldValues) {
+            if(fieldValue.getValue() < 0 && ! field.isSigned())
+                throw new ValidationException("Field " + field.getName() + " is unsigned" +
+                    " and so " + fieldValue.getName() + " cannot have a negative field value.");
+            if(numBits > 0)
+                fitsInBits(fieldValue.getValue(), numBits);
         }
     }
 } //end of class Validate

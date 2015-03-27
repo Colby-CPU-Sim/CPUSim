@@ -11,7 +11,7 @@
  * enabled by that boolean value is now controlled by throwing ValidationException)
  * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
  * which throws a ValidationException in lieu of returning a boolean value
- * 3.) Moved valueFitsInNumBits and rangeInBound method to the Validate class and changed the return value to void
+ * 3.) Moved valueFitsInNumBitsForSetMicros and rangeInBound method to the Validate class and changed the return value to void
  * from boolean
  *
  * on 12/2/2013
@@ -302,7 +302,7 @@ public class SetTableController
 
         // check that all names are unique and nonempty
         Validate.rangeInBound(sets);
-        Validate.valueFitsInNumBits(sets);
+        Validate.valueFitsInNumBitsForSetMicros(sets);
     }
 
 

@@ -8,10 +8,8 @@ package cpusim;
 import cpusim.util.*;
 import cpusim.xml.*;
 import java.util.ArrayList;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -36,7 +34,7 @@ public class Field implements NamedObject {
     // The acceptable values for this field
     private ObservableList<FieldValue> values;  		
     // The value to use if optional or ignored
-    private SimpleIntegerProperty defaultValue; 		
+    private SimpleLongProperty defaultValue;
 
     // If true, allows only signed 2's complement values
     // If false, allows only unsigned binary values
@@ -60,7 +58,7 @@ public class Field implements NamedObject {
      */
     public Field(String name) {
         this(name, Type.required, 0, Relativity.absolute,
-             FXCollections.observableArrayList(new ArrayList<FieldValue>()), 0, true);
+             FXCollections.observableArrayList(new ArrayList<>()), 0, true);
     }
     
     /**
@@ -75,12 +73,12 @@ public class Field implements NamedObject {
      * @param signed - Whether or not the Field is a signed int.
      */
     public Field(String name, Type type, int length, Relativity relativity,
-               ObservableList<FieldValue> values, int defaultValue, boolean signed) {
+               ObservableList<FieldValue> values, long defaultValue, boolean signed) {
         this.name = new SimpleStringProperty();
         this.type = new SimpleObjectProperty<>();
         this.numBits = new SimpleIntegerProperty();
         this.relativity = new SimpleObjectProperty<>();
-        this.defaultValue = new SimpleIntegerProperty();
+        this.defaultValue = new SimpleLongProperty();
         this.signed = new SimpleBooleanProperty();
         
         this.name.set(name);
@@ -133,21 +131,17 @@ public class Field implements NamedObject {
         this.relativity.set(relativity);
     }
 
-    public ObservableList<FieldValue> getValues() {
-        return values;
-    }
+    public ObservableList<FieldValue> getValues() { return values; }
 
     public void setValues(ObservableList<FieldValue> values) {
         this.values = values;
     }
 
-    public int getDefaultValue() {
+    public long getDefaultValue() {
         return defaultValue.get();
     }
 
-    public void setDefaultValue(int defaultValue) {
-        this.defaultValue.set(defaultValue);
-    }
+    public void setDefaultValue(long defaultValue) { this.defaultValue.set(defaultValue); }
 
     public boolean isSigned() {
         return signed.get();
@@ -213,10 +207,23 @@ public class Field implements NamedObject {
         c.setType(type.get());
         c.setNumBits(numBits.get());
         c.setRelativity(relativity.get());
-        c.setValues(values);
+        c.setValues(copyOfFieldValues(values));
         c.setDefaultValue(defaultValue.get());
         c.setSigned(signed.get());
         return c;
+    }
+
+    /**
+     * clones the list of FieldValues
+     * @param values the list of FieldValues to be cloned
+     * @return the new list of clones of hte FieldValues
+     */
+    private ObservableList<FieldValue> copyOfFieldValues(ObservableList<FieldValue> values) {
+        ObservableList<FieldValue> result = FXCollections.observableArrayList();
+        for(FieldValue value : values) {
+            result.add(new FieldValue(value.getName(),value.getValue()));
+        }
+        return result;
     }
 
     /**

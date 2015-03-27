@@ -15,13 +15,13 @@
                 <Button id="new" graphicTextGap="15.0" mnemonicParsing="false"
                         onAction="#handleNew" prefHeight="22.0" styleClass="roundButton"
                         text="    New    "/>
-                <Button fx:id="delete" graphicTextGap="15.0" mnemonicParsing="false"
+                <Button fx:id="deleteButton" graphicTextGap="15.0" mnemonicParsing="false"
                         onAction="#handleDelete" prefHeight="22.0"
                         styleClass="roundButton" text="   Delete   "/>
-                <Button fx:id="duplicate" graphicTextGap="15.0" mnemonicParsing="false"
+                <Button fx:id="duplicateButton" graphicTextGap="15.0" mnemonicParsing="false"
                         onAction="#handleDuplicate" prefHeight="22.0"
                         styleClass="roundButton" text="  Duplicate  "/>
-                <Button fx:id="values" graphicTextGap="15.0" mnemonicParsing="false"
+                <Button fx:id="valuesButton" graphicTextGap="15.0" mnemonicParsing="false"
                         onAction="#handleValues" prefHeight="22.0"
                         styleClass="roundButton" text="   Values...   "/>
             </HBox>

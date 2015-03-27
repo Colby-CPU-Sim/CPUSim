@@ -18,10 +18,9 @@
  */
 package cpusim.gui.editmachineinstruction.editfields;
 
+import cpusim.Field;
 import cpusim.FieldValue;
-import cpusim.assembler.EQU;
 import cpusim.gui.util.EditingLongCell;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -30,10 +29,12 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -65,16 +66,19 @@ public class EditFieldValuesController implements Initializable {
     @FXML Button duplicate;
     
     private FieldValue selectedFieldValueName;
-    private EditFieldsController efController;
+    private Field field;
 
-    public EditFieldValuesController(EditFieldsController emiController, Stage stage) {
+    /**
+     * constructor
+     */
+    public EditFieldValuesController(Field f, Stage stage) {
         allFieldValues = FXCollections.observableArrayList();
         
-        this.efController = emiController;
+        this.field = f;
         
         this.stage = stage;
         
-        for (FieldValue fieldValue : efController.getFieldValues()){
+        for (FieldValue fieldValue : field.getValues()){
             allFieldValues.add(new FieldValue(fieldValue.getName(), fieldValue.getValue()));
         }
     }
@@ -99,73 +103,42 @@ public class EditFieldValuesController implements Initializable {
         
         Callback<TableColumn<FieldValue, String>,
                 TableCell<FieldValue, String>> cellStrFactory =
-                new Callback<TableColumn<FieldValue, String>,
-                        TableCell<FieldValue, String>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn setStringTableColumn) {
-                        return new cpusim.gui.util.EditingStrCell<>();
-                    }
-                };
+                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
         Callback<TableColumn<FieldValue,Long>,
                 TableCell<FieldValue,Long>> cellLongFactory =
-                new Callback<TableColumn<FieldValue,Long>,
-                        TableCell<FieldValue, Long>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn<FieldValue, Long> setIntegerTableColumn) {
-                        return new EditingLongCell<>();
-                    }
-                };
-        
-        
-        
-        name.setCellValueFactory(
-                new PropertyValueFactory<FieldValue, String>("name"));
-        value.setCellValueFactory(
-                new PropertyValueFactory<FieldValue, Long>("value"));
+                setIntegerTableColumn -> new EditingLongCell<>();
 
+        name.setCellValueFactory(
+                new PropertyValueFactory<>("name"));
+        value.setCellValueFactory(
+                new PropertyValueFactory<>("value"));
         
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<FieldValue, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<FieldValue, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                        }
-                        catch(ValidationException ex) {
-                            (text.getRowValue()).setName(oldName);
-                        }
-                        updateTable();
+                text -> {
+                    String newName = text.getNewValue();
+                    String oldName = text.getOldValue();
+                    ( text.getRowValue()).setName(newName);
+                    try{
+                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
                     }
+                    catch(ValidationException ex) {
+                        (text.getRowValue()).setName(oldName);
+                    }
+                    updateTable();
                 }
         );
 
         value.setCellFactory(cellLongFactory);
         value.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<FieldValue, Long>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<FieldValue, Long> text) {
-                        ((FieldValue)text.getRowValue()).setValue(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setValue(text.getNewValue())
         );
         
-        table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<FieldValue> () {
-
-            @Override
-            public void changed(ObservableValue<? extends FieldValue> ov, FieldValue t, FieldValue t1) {
-                delete.setDisable(false);
-                duplicate.setDisable(false);
-                selectedFieldValueName = t1;
-            }
+        table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
+            delete.setDisable(false);
+            duplicate.setDisable(false);
+            selectedFieldValueName = t1;
         });
                 
         table.setItems(allFieldValues);
@@ -181,9 +154,7 @@ public class EditFieldValuesController implements Initializable {
     protected void handleNew(ActionEvent ae){
         String uniqueName = createUniqueName(table.getItems(), "?");
         allFieldValues.add(0, new FieldValue(uniqueName, 0));
-        if (!table.getItems().isEmpty()){
-            table.scrollTo(0);
-        }
+        table.scrollTo(0);
         table.getSelectionModel().selectFirst();
     }
     
@@ -226,7 +197,6 @@ public class EditFieldValuesController implements Initializable {
         else{
             table.getSelectionModel().select(index-1);
         }
-        
     }
     
     /**
@@ -235,11 +205,16 @@ public class EditFieldValuesController implements Initializable {
      */
     @FXML
     protected void handleOkay(ActionEvent ae){
-        
-        efController.setFieldValues(allFieldValues);
+        try {
+            Validate.fieldValuesAreValid(field, allFieldValues);
+        }
+        catch (ValidationException ex) {
+            Dialogs.createErrorDialog(stage, "Field Value Error",
+                    ex.getMessage()).showAndWait();
+            return;
+        }
+        field.setValues(allFieldValues);
         stage.close();
-        
-        
     }
     
     /**
@@ -249,7 +224,7 @@ public class EditFieldValuesController implements Initializable {
     @FXML
     protected void handleCancel(ActionEvent ae){
 
-        //close window.
+        // just close window.
         stage.close();
     }
     
@@ -261,7 +236,7 @@ public class EditFieldValuesController implements Initializable {
         
         ArrayList<String> fieldNames = new ArrayList<>();
         for (FieldValue fieldValue : allFieldValues){
-            if (fieldValue.getName().indexOf(" ") != -1){
+            if (fieldValue.getName().contains(" ")){
                 Dialogs.createErrorDialog(stage, "Field Name Error",
                         "Field name '"+fieldValue.getName()+"' is not valid.").showAndWait();
 

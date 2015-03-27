@@ -25,16 +25,14 @@ import cpusim.Field.Type;
 import cpusim.FieldValue;
 import cpusim.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
+import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -58,8 +56,10 @@ import java.util.*;
  * @author Ben Borchard
  */
 public class EditFieldsController implements Initializable {
-    
+
+    /** clone of all the Fields */
     ObservableList<Field> allFields;
+    /** key = a field, value = a string with the names of all instructions using the field*/
     HashMap<Field, String> containingInstructions;
     
     ObservableList<MachineInstruction> instructions;
@@ -72,13 +72,13 @@ public class EditFieldsController implements Initializable {
     @FXML TableColumn<Field,String> name;
     @FXML TableColumn<Field,Field.Type> type;
     @FXML TableColumn<Field,Integer> numBits;
-    @FXML TableColumn<Field,Integer> defaultValue;
+    @FXML TableColumn<Field,Long> defaultValue;
     @FXML TableColumn<Field,Field.Relativity> relativity;
     @FXML TableColumn<Field,Boolean> signed;
     
-    @FXML Button delete;
-    @FXML Button duplicate;
-    @FXML Button values;
+    @FXML Button deleteButton;
+    @FXML Button duplicateButton;
+    @FXML Button valuesButton;
     
     private Field selectedField;
     private EditMachineInstructionController editMachineInstructionController;
@@ -98,7 +98,8 @@ public class EditFieldsController implements Initializable {
         this.editMachineInstructionController = editMachineInstructionController;
         
         this.stage = stage;
-        
+
+        // clone all the fields to fill up allFields
         for (Field field : editMachineInstructionController.getFields()){
             List<FieldValue> realFieldValues = field.getValues();
             ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
@@ -108,19 +109,17 @@ public class EditFieldsController implements Initializable {
             allFields.add(new Field(field.getName(), field.getType(), field.getNumBits(),
                     field.getRelativity(), fieldValues, field.getDefaultValue(), 
                     field.isSigned()));
-            
         }
-        
-        
-        
+
+        // clone the machine instructions using the cloned fields
         for (MachineInstruction instr : editMachineInstructionController.getInstructions()){
             
             ArrayList<Field> oldInstrFields = instr.getInstructionFields();
             ArrayList<Field> newInstrFields = new ArrayList<>();
             for (Field field : oldInstrFields){
-                for (int i=0; i<allFields.size(); i++){
-                    if (field.getName().equals(allFields.get(i).getName())){
-                        newInstrFields.add(allFields.get(i));
+                for (Field aField : allFields) {
+                    if (field.getName().equals(aField.getName())) {
+                        newInstrFields.add(aField);
                     }
                 }
             }
@@ -128,9 +127,9 @@ public class EditFieldsController implements Initializable {
             ArrayList<Field> oldAssemblyFields = instr.getAssemblyFields();
             ArrayList<Field> newAssemblyFields = new ArrayList<>();
             for (Field field : oldAssemblyFields){
-                for (int i=0; i<allFields.size(); i++){
-                    if (field.getName().equals(allFields.get(i).getName())){
-                        newAssemblyFields.add(allFields.get(i));
+                for (Field aField : allFields) {
+                    if (field.getName().equals(aField.getName())) {
+                        newAssemblyFields.add(aField);
                     }
                 }
             }
@@ -146,7 +145,7 @@ public class EditFieldsController implements Initializable {
         
         containingInstructions = new HashMap<>();
         
-        //initialize the containing instructions hash map
+        //initialize the containingInstructions hash map
         for (Field field : allFields){
             
             //put all the instructions containing the field in a list
@@ -176,9 +175,6 @@ public class EditFieldsController implements Initializable {
                 containingInstructions.put(field, instrs);
             }
         }
-        
-        
-        
     }
 
     /**
@@ -200,183 +196,82 @@ public class EditFieldsController implements Initializable {
         AnchorPane.setBottomAnchor(mainPane, 0.0);
         
         selectedField = null;
-        delete.setDisable(true);
-        duplicate.setDisable(true);
-        values.setDisable(true);
+        deleteButton.setDisable(true);
+        duplicateButton.setDisable(true);
+        valuesButton.setDisable(true);
+
+        final ObservableList<Field.Relativity> relBoxOptions = FXCollections.observableArrayList();
         
-                
-        final ObservableList<Field.Relativity> relboxoptions = FXCollections.observableArrayList();
+        relBoxOptions.addAll(Field.Relativity.absolute, Field.Relativity.pcRelativePreIncr,
+                Field.Relativity.pcRelativePostIncr);
         
-        relboxoptions.addAll(Field.Relativity.absolute, Field.Relativity.pcRelativePreIncr,
-                                    Field.Relativity.pcRelativePostIncr);
+        final ObservableList<Field.Type> typeBoxOptions = FXCollections.observableArrayList();
         
-        final ObservableList<Field.Type> typeboxoptions = FXCollections.observableArrayList();
+        typeBoxOptions.addAll(Field.Type.required, Field.Type.optional, Field.Type.ignored);
         
-        typeboxoptions.addAll(Field.Type.required, Field.Type.optional,
-                                    Field.Type.ignored);
-        
-        Callback<TableColumn<Field, String>,
-                TableCell<Field, String>> cellStrFactory =
-                new Callback<TableColumn<Field, String>,
-                        TableCell<Field, String>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn setStringTableColumn) {
-                        return new cpusim.gui.util.EditingStrCell<Field>();
-                    }
-                };
-        Callback<TableColumn<Field,Integer>,
-                TableCell<Field,Integer>> cellIntFactory =
-                new Callback<TableColumn<Field,Integer>,
-                        TableCell<Field, Integer>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn<Field, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<Field>();
-                    }
-                };
+        Callback<TableColumn<Field, String>, TableCell<Field, String>> cellStrFactory =
+                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
+        Callback<TableColumn<Field,Integer>, TableCell<Field,Integer>> cellIntFactory =
+                setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
+        Callback<TableColumn<Field,Long>, TableCell<Field,Long>> cellLongFactory =
+                setLongTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Field,Field.Relativity>,
                 TableCell<Field,Field.Relativity>> cellRelFactory =
-                new Callback<TableColumn<Field, Field.Relativity>,
-                        TableCell<Field, Field.Relativity>>() {
-                    @Override
-                    public TableCell<Field,Field.Relativity> call(
-                            TableColumn<Field, Field.Relativity> setStringTableColumn) {
-                        return new ComboBoxTableCell<Field,Field.Relativity>(relboxoptions);
-                    }
-                };
-        
+                setStringTableColumn -> new ComboBoxTableCell<>(relBoxOptions);
         Callback<TableColumn<Field,Boolean>,TableCell<Field,Boolean>> cellBoolFactory =
-                new Callback<TableColumn<Field, Boolean>, TableCell<Field, Boolean>>() {
-                    @Override
-                    public TableCell<Field, Boolean> call(
-                            TableColumn<Field, Boolean> booleanTableColumn) {
-                        return new CheckBoxTableCell<Field,Boolean>();
-                    }
-                };
-        
+                booleanTableColumn -> new CheckBoxTableCell<>();
         Callback<TableColumn<Field,Field.Type>,
                 TableCell<Field,Field.Type>> cellTypeFactory =
-                new Callback<TableColumn<Field, Field.Type>,
-                        TableCell<Field, Field.Type>>() {
-                    @Override
-                    public TableCell<Field,Field.Type> call(
-                            TableColumn<Field, Field.Type> setStringTableColumn) {
-                        return new ComboBoxTableCell<Field,Field.Type>(typeboxoptions);
-                    }
-                };
-        
-        
-        
-        name.setCellValueFactory(
-                new PropertyValueFactory<Field, String>("name"));
-        type.setCellValueFactory(
-                new PropertyValueFactory<Field, Field.Type>("type"));
-        numBits.setCellValueFactory(
-                new PropertyValueFactory<Field, Integer>("numBits"));
-        defaultValue.setCellValueFactory(
-                new PropertyValueFactory<Field, Integer>("defaultValue"));
-        relativity.setCellValueFactory(
-                new PropertyValueFactory<Field, Field.Relativity>("relativity"));
-        signed.setCellValueFactory(
-                new PropertyValueFactory<Field, Boolean>("signed"));
+                setStringTableColumn -> new ComboBoxTableCell<>(typeBoxOptions);
+
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        type.setCellValueFactory(new PropertyValueFactory<>("type"));
+        numBits.setCellValueFactory(new PropertyValueFactory<>("numBits"));
+        defaultValue.setCellValueFactory(new PropertyValueFactory<>("defaultValue"));
+        relativity.setCellValueFactory(new PropertyValueFactory<>("relativity"));
+        signed.setCellValueFactory(new PropertyValueFactory<>("signed"));
         
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Field, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                        }
-                        catch (ValidationException ex) {
-                            (text.getRowValue()).setName(oldName);
-                        }
-                        updateTable();
+                text -> {
+                    String newName = text.getNewValue();
+                    String oldName = text.getOldValue();
+                    ( text.getRowValue()).setName(newName);
+                    try{
+                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
                     }
+                    catch (ValidationException ex) {
+                        (text.getRowValue()).setName(oldName);
+                    }
+                    updateTable();
                 }
         );
         
-        
-
         type.setCellFactory(cellTypeFactory);
-        type.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, Field.Type>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<Field, Field.Type> text) {
-                        ((Field)text.getRowValue()).setType(
-                                text.getNewValue());
-                    }
-                }
-        );
+        type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         numBits.setCellFactory(cellIntFactory);
-        numBits.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<Field, Integer> text) {
-                        ((Field)text.getRowValue()).setNumBits(
-                                text.getNewValue());
-                    }
-                }
-        );
+        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
 
-        defaultValue.setCellFactory(cellIntFactory);
-        defaultValue.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<Field, Integer> text) {
-                        ((Field)text.getRowValue()).setDefaultValue(
-                                text.getNewValue());
-                    }
-                }
-        );
+        defaultValue.setCellFactory(cellLongFactory);
+        defaultValue.setOnEditCommit(text ->
+                text.getRowValue().setDefaultValue(text.getNewValue()));
 
         relativity.setCellFactory(cellRelFactory);
-        relativity.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, Field.Relativity>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<Field, Field.Relativity> text) {
-                        ((Field)text.getRowValue()).setRelativity(
-                                text.getNewValue());
-                    }
-                }
-        );
+        relativity.setOnEditCommit(text -> text.getRowValue().setRelativity(text.getNewValue()));
 
         signed.setCellFactory(cellBoolFactory);
-        signed.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Field, Boolean>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<Field, Boolean> text) {
-                        Field field = text.getRowValue();
-                        field.setSigned(text.getNewValue());
-                    }
-                }
-        );
-        
-        table.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Field> () {
+        signed.setOnEditCommit(text -> text.getRowValue().setSigned(text.getNewValue()));
 
-            @Override
-            public void changed(ObservableValue<? extends Field> ov, Field t, Field t1) {
-                delete.setDisable(false);
-                duplicate.setDisable(false);
-                values.setDisable(false);
-                selectedField = t1;
-            }
+        table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
+            deleteButton.setDisable(false);
+            duplicateButton.setDisable(false);
+            valuesButton.setDisable(false);
+            selectedField = t1;
         });
                 
         table.setItems(allFields);
-        
-        
     }
     
     /**
@@ -387,7 +282,6 @@ public class EditFieldsController implements Initializable {
     protected void handleNew(ActionEvent ae){
         String uniqueName = createUniqueName(table.getItems(), "?");
         Field newField = new Field(uniqueName);
-        newField.setNumBits(4);
         allFields.add(0, newField);
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
@@ -406,15 +300,15 @@ public class EditFieldsController implements Initializable {
             newName = selectedField.getName()+"copy"+i;
             i++;
         }
-        allFields.add(0, new Field(newName, selectedField.getType(),
-                selectedField.getNumBits(), selectedField.getRelativity(), selectedField.getValues(),
-                selectedField.getDefaultValue(), selectedField.isSigned()));
+        Field duplicateField = (Field) selectedField.clone();
+        duplicateField.setName(newName);
+        allFields.add(0, duplicateField);
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
     }
-    
+
     /**
-     * deletes the currently selected instruction
+     * deletes the currently selected field
      * @param ae unused action event
      */
     @FXML
@@ -427,7 +321,7 @@ public class EditFieldsController implements Initializable {
                             System.lineSeparator()+containingInstructions.get(selectedField)
                             +"If you delete this field all instances of "
                             + "this field will be removed.  Are you sure you want to delete this "
-                            + "instruction?");
+                            + "field?");
 
             Optional<ButtonType> result = dialog.showAndWait();
 
@@ -442,8 +336,6 @@ public class EditFieldsController implements Initializable {
         else{
             deleteField();
         }
-        
-        
     }
     
     /**
@@ -455,24 +347,24 @@ public class EditFieldsController implements Initializable {
     protected void handleValues(ActionEvent ae){
         FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource(
                 "editFieldValues.fxml"));
-        
-        
+
         Stage fieldStage = new Stage();
         Pane dialogRoot = null;
         
-        EditFieldValuesController controller = new EditFieldValuesController(this, fieldStage);
+        EditFieldValuesController controller =
+                new EditFieldValuesController(selectedField, fieldStage);
         fxmlLoader.setController(controller);
 
         try {
-            dialogRoot = (Pane) fxmlLoader.load();
+            dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
-            //TODO: something...
+            System.out.println(e.getMessage());
         }
         Scene dialogScene = new Scene(dialogRoot);
         fieldStage.setScene(dialogScene);
-        fieldStage.initOwner((Stage)table.getScene().getWindow());
+        fieldStage.initOwner(table.getScene().getWindow());
         fieldStage.initModality(Modality.WINDOW_MODAL);
-        fieldStage.setTitle("Edit Field Names");
+        fieldStage.setTitle("Edit field values for " + selectedField.getName());
         fieldStage.show();
     }
     
@@ -480,8 +372,16 @@ public class EditFieldsController implements Initializable {
     protected void handleOkay(ActionEvent ae){
         //get a handle to the stage.
         Stage stage = (Stage) table.getScene().getWindow();
-        
-        
+
+        // check that all the editing done results in legal fields
+        try {
+            checkValidity(allFields);
+        }
+        catch(ValidationException ex) {
+            Dialogs.createErrorDialog(stage, "Field Error", ex.getMessage()).showAndWait();
+            return;
+        }
+
         for (MachineInstruction instruction : instructions){
             //adds ignored instruction fields and associated colors to the assembly fields
             for (Field field : instruction.getInstructionFields()){
@@ -491,7 +391,7 @@ public class EditFieldsController implements Initializable {
                             instruction.getInstructionFields().indexOf(field)));
                 }
             }
-            //removes ignored instrution fields and associated colors
+            //removes ignored instruction fields and associated colors
             for (Field field : instruction.getAssemblyFields()){
                 if (field.getType() == Type.ignored){
                     instruction.getAssemblyColors().remove(instruction.getAssemblyFields().indexOf(field));
@@ -503,9 +403,6 @@ public class EditFieldsController implements Initializable {
         editMachineInstructionController.setFields(allFields);
         editMachineInstructionController.setInstructions(instructions);
         stage.close();
-        
-        
-        
     }
     
     /**
@@ -525,19 +422,20 @@ public class EditFieldsController implements Initializable {
      * checks whether everything is okay to be saved
      * @return true if everything is okay, else false
      */
-    private boolean isAbleToClose(){
-        
+    private boolean isAbleToClose() {
         ArrayList<String> fieldNames = new ArrayList<>();
-        for (Field field : allFields){
-            if (field.getName().indexOf(" ") != -1){
+        for (Field field : allFields) {
+            if (field.getName().indexOf(" ") != -1) {
                 Dialogs.createErrorDialog(stage,
-                        "Field Name Error", "Field name '"+field.getName()+"' is not valid.").showAndWait();
+                        "Field Name Error", "Field name '" + field.getName() + "' is " +
+                                "not valid.").showAndWait();
 
                 return false;
-            } 
-            if (fieldNames.contains(field.getName())){
+            }
+            if (fieldNames.contains(field.getName())) {
                 Dialogs.createErrorDialog(stage, "Field Name Error",
-                        "You cannot have two fields with the same name ("+field.getName()+")").showAndWait();
+                        "You cannot have two fields with the same name (" + field
+                                .getName() + ")").showAndWait();
 
                 return false;
             }
@@ -552,39 +450,21 @@ public class EditFieldsController implements Initializable {
      */
     private void deleteField(){
         int index = allFields.indexOf(selectedField);
-            allFields.remove(selectedField);
+        allFields.remove(selectedField);
 
-            if (allFields.isEmpty()){
-                delete.setDisable(true);
-                duplicate.setDisable(true);
-                values.setDisable(true);
-            }
+        if (allFields.isEmpty()) {
+            deleteButton.setDisable(true);
+            duplicateButton.setDisable(true);
+            valuesButton.setDisable(true);
+        }
+        else if (index == 0) {
+            table.getSelectionModel().select(index);
+        }
+        else {
+            table.getSelectionModel().select(index - 1);
+        }
+    }
 
-            if (index == 0){
-                table.getSelectionModel().select(index);
-
-            }
-            else{
-                table.getSelectionModel().select(index-1);
-            }
-    }
-    
-    /**
-     * returns the field values
-     * @return the field values
-     */
-    public ObservableList<FieldValue> getFieldValues(){
-        return selectedField.getValues();
-    }
-    
-    /**
-     * sets the field values
-     * @param fieldValues the field values
-     */
-    public void setFieldValues(ObservableList<FieldValue> fieldValues){
-        selectedField.setValues(fieldValues);
-    }
-    
     /**
      * returns a String that is different from all names of
      * existing objects in the given list.  It checks whether proposedName
@@ -608,18 +488,22 @@ public class EditFieldsController implements Initializable {
     
     /**
      * Checks the validity of a list of Fields.
+     * @param list a List of Fields to be checked for validity
+     * @throws ValidationException if something is not valid
      */
-    private boolean checkValidity(Object[] list) {
-            boolean result = true;
-            try {
-                    Validate.allNamesAreUnique(list);
-
-            } catch (ValidationException e) {
-                    result = false;
-            }
-            return result;
+    private void checkValidity(ObservableList<Field> list) {
+        Validate.allNamesAreNonEmpty(list.toArray());
+        Validate.allNamesAreUnique(list.toArray());
+        for(Field field : list) {
+            Validate.fieldIsValid(field);
+        }
     }
 
+    /**
+     * checks whether the given name is unique among all the fields
+     * @param newName the name to check for uniqueness
+     * @return true if the name is unique.
+     */
     private boolean fieldNameTaken(String newName) {
         for (Field field : allFields){
             if (field.getName().equals(newName)){
@@ -628,10 +512,16 @@ public class EditFieldsController implements Initializable {
         }
         return false;
     }
-    
+
+    /**
+     * redisplay the table so that the new values are properly shown.
+     */
     private void updateTable() {
+        // This is a hack.  There should be a better way to do this.
         name.setVisible(false);
         name.setVisible(true);
+        defaultValue.setVisible(false);
+        defaultValue.setVisible(true);
         double w =  table.getWidth();
         table.setPrefWidth(w-1);
         table.setPrefWidth(w);
