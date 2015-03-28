@@ -3,9 +3,8 @@ package cpusim.gui.desktop.editorpane;
 import cpusim.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.assembler.PunctChar;
-import cpusim.module.RAM;
-import cpusim.module.RAMLocation;
-import cpusim.util.SourceLine;
+import javafx.event.EventHandler;
+import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
@@ -158,4 +157,17 @@ public class CodePaneController
     public void setStyleInfo(String group, StyleInfo style) {
         styles.put(group, style);
     }
+
+/*
+    public void addMenuKeyboardShortcuts() {
+
+    }
+
+    EventHandler<? super KeyEvent> ctrlS = EventHandlerHelper
+            .on(keyPressed(S, CONTROL_DOWN)).act(event -> save())
+            .create();
+
+    EventHandlerHelper.install()//area.onKeyPressedProperty(), ctrlS);
+*/
+
 }

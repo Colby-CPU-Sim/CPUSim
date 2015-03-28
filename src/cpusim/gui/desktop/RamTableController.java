@@ -102,10 +102,8 @@ public class RamTableController implements Initializable {
                 };
         
         address.setCellFactory(cellAddrMultiBaseLongFactory);
-        cellAddrMultiBaseLongFactory.call(address);
 
         data.setCellFactory(cellValMultiBaseLongFactory);
-        cellValMultiBaseLongFactory.call(data);
 
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         address.prefWidthProperty().bind(table.widthProperty().divide(100/34.0));

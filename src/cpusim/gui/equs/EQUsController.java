@@ -286,9 +286,6 @@ public class EQUsController implements Initializable {
                 setLongTableColumn -> {
                     EditingMultiBaseStyleLongCell<EQU> a = new
                             EditingMultiBaseStyleLongCell<>(base, new FontData());
-                    a.setTooltip(new Tooltip());
-                    a.tooltipProperty().get().textProperty().bind(a
-                            .tooltipStringProperty);
                     return a;
                 };
 

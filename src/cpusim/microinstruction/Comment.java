@@ -89,12 +89,13 @@ public class Comment extends Microinstruction
         return "";
     }
 
-    public String toString()
-    {
-        //so that it always is displayed in italics and gray.
-        return "<html><em><font color=gray>" +
-                getHTMLName() + "</font></em></html>";
-    }
+//    Use the inherited toString() method that returns the name of the Microinstruction
+//    public String toString()
+//    {
+//        //so that it always is displayed in italics and gray.
+//        return "<html><em><font color=gray>" +
+//                getHTMLName() + "</font></em></html>";
+//    }
 
     /**
      * returns the XML description

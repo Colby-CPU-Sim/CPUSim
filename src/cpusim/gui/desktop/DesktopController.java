@@ -1356,6 +1356,7 @@ public class DesktopController implements Initializable {
      *                files)
      */
     public void addTab(String content, String title, File file) {
+
         // create the new tab and text area
         CodePaneTab newTab = new CodePaneTab();
         InlineStyleTextArea<StyleInfo> codeArea =
@@ -1365,21 +1366,20 @@ public class DesktopController implements Initializable {
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
                         (digits -> "")));
+
         // replace tabs with 4 or fewer spaces
         EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper
-                .on(keyPressed(TAB)).act(new Consumer<KeyEvent>() {
-                    @Override
-                    public void accept(KeyEvent event) {
-                        String spaces = "";
-                        int numSpaces = 4 - codeArea.getCaretColumn() % 4;
-                        for (int i = 0; i < numSpaces; i++) {
-                            spaces += " ";
-                        }
-                        codeArea.replaceSelection(spaces);
+                .on(keyPressed(TAB)).act(event -> {
+                    String spaces = "";
+                    int numSpaces = 4 - codeArea.getCaretColumn() % 4;
+                    for (int i = 0; i < numSpaces; i++) {
+                        spaces += " ";
                     }
+                    codeArea.replaceSelection(spaces);
                 })
                 .create();
         EventHandlerHelper.install(codeArea.onKeyPressedProperty(), tabHandler);
+
         newTab.setContent(codeArea);
 
         // whenever the text is changed, recompute the highlighting and set it dirty

@@ -9,6 +9,7 @@ import cpusim.Machine;
 import cpusim.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.StyledListCell;
 import cpusim.util.BackupManager;
 import cpusim.util.CPUSimConstants;
 import cpusim.util.OutlineChangesManager;
@@ -16,10 +17,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,6 +28,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.util.Callback;
 
 /**
  * A tool bar used for debug mode.
@@ -101,6 +100,7 @@ public class DebugToolBarController extends ToolBar
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        currentMicrosList.setCellFactory(param -> new StyledListCell<Microinstruction>());
     }
 
     /**

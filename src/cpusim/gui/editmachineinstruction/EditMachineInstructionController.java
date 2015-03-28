@@ -1145,9 +1145,13 @@ public class EditMachineInstructionController implements Initializable {
         for (final Microinstruction micro : currentInstr.getMicros()) {
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
-            if (micro instanceof Comment) {
-                microLabel.setStyle("-fx-text-fill:gray; -fx-font-style:italic;");
+            if (micro instanceof Comment){
+                microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
+                        "-fx-font-size:14; -fx-font-style:italic;");
                 commentLabel = true;
+            }
+            else {
+                microLabel.setStyle("-fx-font-family:Courier;-fx-font-size:14");
             }
             microLabel.setPrefWidth(implementationFormatPane.getPrefWidth());
             microLabel.setPrefHeight(20);
@@ -1216,6 +1220,7 @@ public class EditMachineInstructionController implements Initializable {
                         if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
                                 && mouseEvent.getClickCount() == 2) {
                             commentEditor = new TextField(microLabel.getText());
+                            commentEditor.setStyle("-fx-font-family:Courier;-fx-font-size:14");
                             commentEditor.setPrefWidth(implementationFormatPane
                                     .getWidth());
                             commentEditor.setOnKeyPressed(new EventHandler<KeyEvent>() {

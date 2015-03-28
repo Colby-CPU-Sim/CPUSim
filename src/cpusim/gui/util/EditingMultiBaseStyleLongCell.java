@@ -42,14 +42,10 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     private String errorMessage;
     private Boolean valid;
     private int cellSize;
-    public SimpleStringProperty tooltipStringProperty;
 
     public EditingMultiBaseStyleLongCell(Base base, FontData style) {
         this.base = base;
-        tooltipStringProperty = new SimpleStringProperty("");
         this.styleInfo = style;
-        setTooltip(new Tooltip());
-        tooltipProperty().get().textProperty().bind(tooltipStringProperty);
 
     }
 
@@ -131,7 +127,6 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                 setGraphic(graphic);
             }
         }
-
     }
 
     /**
@@ -407,7 +402,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         }
     }
 
-    private String allBasesToolTip() {
+    public String allBasesToolTip() {
     	String toolTip = "";
         String originalBase = base.getBase();
         String newLine = System.getProperty("line.separator");
@@ -451,7 +446,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         Object o = getTableRow().getItem();
         if (o instanceof Register) {
             cellSize = ((Register) o).getWidth();
-            tooltipStringProperty.set(allBasesToolTip());
+            setTooltip(new Tooltip(allBasesToolTip()));
         }
         else if ((o instanceof RAMLocation) &&
                           getTableColumn().getText().equals("Data")) {
@@ -469,16 +464,16 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                           getTableColumn().getText().equals("Addr")) {
             cellSize = 31 - Integer.numberOfLeadingZeros(
                                              getTableView().getItems().size());
-            tooltipStringProperty.set("Binary: " +
+            setTooltip(new Tooltip("Binary: " +
                     Long.toBinaryString(getItem()) +
                     System.getProperty("line.separator") +
                     "Decimal: " + getItem() +
                     System.getProperty("line.separator") +
-                    "Hex: " + Long.toHexString(getItem()));
+                    "Hex: " + Long.toHexString(getItem())));
         }
         else if (o instanceof EQU) {
         	cellSize = 32;
-        	tooltipStringProperty.set(allBasesToolTip());
+            setTooltip(new Tooltip(allBasesToolTip()));
         }
         else {
             cellSize = 32;

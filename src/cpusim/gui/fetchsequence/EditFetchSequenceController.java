@@ -67,7 +67,7 @@ public class EditFetchSequenceController implements Initializable {
     ObservableList<Microinstruction> micros;
                 
     Microinstruction draggingMicro;
-        
+
     public EditFetchSequenceController(Mediator mediator) {
         this.mediator = mediator;
     }
@@ -87,19 +87,19 @@ public class EditFetchSequenceController implements Initializable {
         
         updateMicros();
         
-        microInstrTreeView.setOnMousePressed(new EventHandler<MouseEvent>(){
+        microInstrTreeView.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                if (commentEditor != null){
+                if (commentEditor != null) {
                     commitCommentEdit();
                 }
             }
         });
         
-        implementationFormatPane.setOnMousePressed(new EventHandler<MouseEvent>(){
+        implementationFormatPane.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent t) {
-                if (commentEditor != null){
+                if (commentEditor != null) {
                     commitCommentEdit();
                 }
             }
@@ -109,7 +109,8 @@ public class EditFetchSequenceController implements Initializable {
             @Override
             public void handle(DragEvent event) {
                 event.acceptTransferModes(TransferMode.COPY);
-                double localY = implementationFormatPane.sceneToLocal(event.getSceneX(), event.getSceneY()).getY();
+                double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
+                        , event.getSceneY()).getY();
                 int index = getMicroinstrIndex(localY);
                 insertMicroinstr(index);
             }
@@ -123,30 +124,32 @@ public class EditFetchSequenceController implements Initializable {
                 String microName = db.getString().split(",")[0];
                 String className = db.getString().split(",")[1];
                 Microinstruction micro = null;
-                
-                for (String string : Machine.MICRO_CLASSES){
-                    for (Microinstruction instr : mediator.getMachine().getMicros(string)){
-                        if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)){
+
+                for (String string : Machine.MICRO_CLASSES) {
+                    for (Microinstruction instr : mediator.getMachine().getMicros
+                            (string)) {
+                        if (instr.getName().equals(microName) && instr.getMicroClass()
+                                .equals(className)) {
                             micro = instr;
                         }
                     }
                 }
-                if (className.equals("comment")){
+                if (className.equals("comment")) {
                     micro = new Comment();
                     micro.setName(microName);
                 }
-                double localY = implementationFormatPane.sceneToLocal(event.getSceneX(), event.getSceneY()).getY();
+                double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
+                        , event.getSceneY()).getY();
                 int index = getMicroinstrIndex(localY);
                 micros.add(index, micro);
-             }
+            }
         });
         implementationFormatPane.setOnDragExited(new EventHandler<DragEvent>() {
             @Override
             public void handle(DragEvent event) {
                 updateMicros();
-             }
+            }
         });
-        
     }
     
     @FXML
@@ -193,8 +196,12 @@ public class EditFetchSequenceController implements Initializable {
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
             if (micro instanceof Comment){
-                microLabel.setStyle("-fx-text-fill:gray; -fx-font-style:italic;");
+                microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
+                        "-fx-font-size:14; -fx-font-style:italic;");
                 commentLabel = true;
+            }
+            else {
+                microLabel.setStyle("-fx-font-family:Courier;-fx-font-size:14");
             }
             microLabel.setPrefWidth(implementationFormatPane.getPrefWidth());
             microLabel.setPrefHeight(20);
@@ -264,20 +271,22 @@ public class EditFetchSequenceController implements Initializable {
                         if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
                                 && mouseEvent.getClickCount() == 2 ){
                             commentEditor = new TextField(microLabel.getText());
-                            commentEditor.setPrefWidth(implementationFormatPane.getWidth());
-                            commentEditor.setOnKeyPressed(new EventHandler<KeyEvent>(){
+                            commentEditor.setPrefWidth(implementationFormatPane
+                                    .getWidth());
+                            commentEditor.setOnKeyPressed(new EventHandler<KeyEvent>() {
                                 @Override
                                 public void handle(KeyEvent t) {
                                     if (t.getCode() == KeyCode.ENTER) {
                                         commitCommentEdit();
-                                    } 
+                                    }
                                 }
                             });
                             int index = implementationFormatPane.getChildren().indexOf(microLabel);
                             microLabel.setVisible(false);
                             implementationFormatPane.getChildren().add(index, commentEditor);
                             commentEditor.setPrefHeight(20);
-                            commentEditor.setLayoutY(index*20);
+                            commentEditor.setLayoutY(index * 20);
+                            commentEditor.setStyle("-fx-font-family:Courier; -fx-font-size:14");
                             currentCommentMicro = micro;
                         }
                     }
