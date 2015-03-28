@@ -35,7 +35,7 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
     private ObservableSet<Paragraph> breakPoints;
 
     private static final String STYLESHEET = LineNumAndBreakpointFactory.class.getResource
-            ("../../css/LineNumbers.css").toExternalForm();
+            ("/cpusim/gui/css/LineNumbers.css").toExternalForm();
     private static final IntFunction<String> DEFAULT_FORMAT = (digits -> "%0" + digits + "d");
 
     /** factory methods for generating IntFunctions */

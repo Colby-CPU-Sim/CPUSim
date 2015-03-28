@@ -476,6 +476,7 @@ public class Mediator {
 
         this.desktopController.clearTables();
         this.desktopController.setUpTables();
+        this.desktopController.refreshTopTabPane();
     }
 
     //--------------------------------------------------------------------------

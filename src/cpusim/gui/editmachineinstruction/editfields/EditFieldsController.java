@@ -79,7 +79,7 @@ public class EditFieldsController implements Initializable {
     @FXML Button deleteButton;
     @FXML Button duplicateButton;
     @FXML Button valuesButton;
-    
+
     private Field selectedField;
     private EditMachineInstructionController editMachineInstructionController;
 
@@ -404,7 +404,7 @@ public class EditFieldsController implements Initializable {
         editMachineInstructionController.setInstructions(instructions);
         stage.close();
     }
-    
+
     /**
      * closes the window without saving any changes made
      * @param ae the ActionEvent referring to the cancel action

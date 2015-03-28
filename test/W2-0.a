@@ -21,7 +21,7 @@
 	;.include "bar.i"
 	;.include "foo.i"
 	load A3 negOne	; load -1 -> A3
-  	load A0 IO	; read n -> A0 
+  	load A0 IO 	; read n -> A0 
 	load A1	IO	; read m -> A1
 	jmpn A1 fixSign	; if m < 0 jump to fixSign
 	jump Clear	; jump to clear
@@ -48,4 +48,3 @@ pos:	store A2 IO	; output the final sum in A2
 negOne:	.data 2 -1	; constant -1
 sign:	.data 2 1	; will hold 1 or -1
 one:	.data 2 1	; constant 1
-

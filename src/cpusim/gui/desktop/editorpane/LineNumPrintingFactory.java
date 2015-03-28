@@ -24,7 +24,7 @@ public class LineNumPrintingFactory implements IntFunction<Node>
     private int numDigits;
 
     private static final String STYLESHEET = LineNumAndBreakpointFactory.class.getResource
-            ("../../css/LineNumbers.css").toExternalForm();
+            ("/cpusim/gui/css/LineNumbers.css").toExternalForm();
 
     /** factory method for generating the IntFunction */
     public static IntFunction<Node> get(StyledTextArea<?> area, int startingIndex, int

@@ -83,8 +83,6 @@ import cpusim.module.RegisterArray;
 import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
-import javafx.beans.*;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -723,7 +721,7 @@ public class DesktopController implements Initializable {
                                 (digits -> "%" + digits + "d") : (digits -> "")));
                 final InlineStyleTextArea<StyleInfo> immutablePage = page;
                 page.textProperty().addListener((obs, oldText, newText) -> {
-                    immutablePage.setStyleSpans(0, codePaneController.computeHighlighting
+                    immutablePage.setStyleSpans(0, codePaneController.computeStyleSpans
                             (newText));
                 });
                 lineCount = 0;
@@ -1344,8 +1342,9 @@ public class DesktopController implements Initializable {
         InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
         assmFontData.setFontAndBackground(codeArea);
         String text = codeArea.getText();
-        StyleSpans<StyleInfo> styleSpans = codePaneController.computeHighlighting(text);
+        StyleSpans<StyleInfo> styleSpans = codePaneController.computeStyleSpans(text);
         codeArea.setStyleSpans(0, styleSpans);
+        codeArea.positionCaret(0);
     }
 
     /**
@@ -1385,7 +1384,7 @@ public class DesktopController implements Initializable {
 
         // whenever the text is changed, recompute the highlighting and set it dirty
         codeArea.textProperty().addListener((obs, oldText, newText) -> {
-            codeArea.setStyleSpans(0, codePaneController.computeHighlighting(newText));
+            codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(newText));
             newTab.setDirty(true);
         });
 

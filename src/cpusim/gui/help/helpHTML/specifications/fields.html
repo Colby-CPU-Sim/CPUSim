@@ -108,42 +108,39 @@
 <p><B>Examples:</B></p>
 
 <P class="p3" ALIGN="CENTER"><IMG
-        SRC="../generalHelp/tour/EditMachineFields.jpg" HEIGHT="478"
-        WIDTH="475"><BR>Figure 23. The dialog for editing the fields
+        SRC="EditMachineInstrFields.png" HEIGHT="394"
+        WIDTH="513"><BR>Figure 23. The dialog for editing the fields
     of machine instructions.</P>
 
 <P>Consider the fields shown in Figure 23 above. Assume that the &quot;reg&quot; field has
     a set of three values
-    associated with it: A=2, B=3, and C=4. Also, assume that the three punctuation
-    characters '[' and ']' and ','
+    associated with it: A=2, B=3, and C=4. Also, assume that the punctuation
+    characters '[' and ']'
     are individual character tokens (see <A HREF="assemblyLanguage/tokens.html">the
         discussion of tokens</A> for
     information on setting the token usage of punctuation characters). Now consider two
-    machine instructions with
-    names &quot;foo&quot; and &quot;bar&quot; with opcodes 0 and 1 and the following
+    16-bit machine instructions with
+    names &quot;foo&quot; and &quot;bar&quot; with opcodes 0 and 1 and with the following
     respective formats:
- <pre>    op reg, reg un6
-    op un6 delta[reg]</pre>
+ <pre>    op reg reg un7
+    op delta[reg]</pre>
 These instructions can be called in assembly language as shown in these examples:
 <pre>    foo B C
-    foo B, C
     bar -2[A]
 </pre>
 and will be assembled into the following bits (with spaces inserted to indicate the
 separate fields):
-<pre>    0000 011 100 000101
-    0000 011 100 000101
-    0001 000101 110 010</pre>
-<P>Note that the delta value of -2 is converted to binary using 3-bit 2's complement
+<pre>    00000 011 100 0000101
+    00001 11111110 010</pre>
+<P>Note that the delta value of -2 is converted to binary using 8-bit 2's complement
     notation.</P>
 
-<P>If the three punctuation characters '[', ']', and ',' are not individual tokens and
+<P>If the two punctuation characters '[' and ']' are not individual tokens and
     instead form parts of
-    symbols, then you need to separate them from neighboring characters in instruction
-    calls to avoid ambiguity or
+    symbols, then you need to separate them with whitespace from neighboring characters in
+    instruction calls to avoid ambiguity or
     incorrect parsing. For example, you would need to write</P><pre>    foo B C
-    foo B , C
-    bar -2[ A ]
+    bar -2 [ A ]
 </pre>
 
 <P><B>Notes:</B></p>

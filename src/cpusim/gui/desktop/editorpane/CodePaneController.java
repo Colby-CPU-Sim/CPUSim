@@ -22,7 +22,7 @@ public class CodePaneController
 {
     private Mediator mediator;
 
-    /** the style info for the various parts of an assm language program */
+    /** the style info for the various parts of an assembly language program */
     private Map<String,StyleInfo> styles;
 
     public CodePaneController(Mediator m) {
@@ -46,13 +46,14 @@ public class CodePaneController
 
     /**
      * generate the regular expression pattern for color-coding the program in the CodeArea.
-     * Note: The pattern varies depending on the machine being simulated, so this pattern is
-     * regenerated every time computeHighlighting() is called.  If this turns out to be
-     * too slow, we can compute it once every time a machine is loaded and again every
-     * time a machine instruction or assembly punctuation changes.
      * @return  the Pattern for the CodeArea to use when highlighting its contents.
      */
     private Pattern computePatternForMachine() {
+        /* Note: The pattern varies depending on the machine being simulated, so this pattern is
+         * regenerated every time computeStyleSpans() is called.  If this turns out to be
+         * too slow, we can compute it once every time a machine is loaded and again every
+         * time a machine instruction or assembly punctuation changes.
+         */
         // get the regExpr for the instruction names
         List<MachineInstruction> instrs = mediator.getMachine().getInstructions();
         String[] instrNames = instrs.stream().map(MachineInstruction::getName).toArray
@@ -114,7 +115,7 @@ public class CodePaneController
         return Pattern.compile(wholeRegExpr);
     }
 
-    public StyleSpans<StyleInfo> computeHighlighting(String text) {
+    public StyleSpans<StyleInfo> computeStyleSpans(String text) {
         Pattern codePattern = computePatternForMachine();
         Matcher matcher = codePattern.matcher(text);
         int lastGroupEnd = 0; // index of the last character in the group to be styled

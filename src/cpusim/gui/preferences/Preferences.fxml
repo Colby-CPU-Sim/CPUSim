@@ -142,6 +142,8 @@
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
                                                     <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                    <String fx:value="24"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
@@ -162,6 +164,8 @@
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
                                                     <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                    <String fx:value="24"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
@@ -181,6 +185,8 @@
                                                     <String fx:value="12"/>
                                                     <String fx:value="14"/>
                                                     <String fx:value="16"/>
+                                                    <String fx:value="18"/>
+                                                    <String fx:value="24"/>
                                                 </FXCollections>
                                             </items>
                                             <GridPane.margin>
