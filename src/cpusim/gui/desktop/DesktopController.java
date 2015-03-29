@@ -752,7 +752,8 @@ public class DesktopController implements Initializable {
      *
      * @return the number of points in height of each line
      */
-    private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node) {
+    private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node)
+    {
         VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) node.lookup(".virtual-flow");
         double height = vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
         return height;
