@@ -157,17 +157,4 @@ public class CodePaneController
     public void setStyleInfo(String group, StyleInfo style) {
         styles.put(group, style);
     }
-
-/*
-    public void addMenuKeyboardShortcuts() {
-
-    }
-
-    EventHandler<? super KeyEvent> ctrlS = EventHandlerHelper
-            .on(keyPressed(S, CONTROL_DOWN)).act(event -> save())
-            .create();
-
-    EventHandlerHelper.install()//area.onKeyPressedProperty(), ctrlS);
-*/
-
 }

@@ -235,10 +235,11 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
 
             char[] stringWithoutWhiteSpace = Convert.removeAllWhiteSpace(s).toCharArray();
 
-            if (stringWithoutWhiteSpace.length > cellSize / 4) {
+            if (stringWithoutWhiteSpace.length > cellSize / 4 + (cellSize % 4 == 0 ? 0 : 1)) {
+                // need to round up cellSize / 4 since might have a cellSize of 3
                 this.valid = false;
                 errorMessage = "You have entered too many hexadecimal digits, you only "
-                        + "have " + cellSize / 4 + " available";
+                        + "have " + (cellSize / 4 + (cellSize % 4 == 0 ? 0 : 1)) + " available";
                 return;
             }
             this.valid = true;

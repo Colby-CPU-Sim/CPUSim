@@ -95,6 +95,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.print.*;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -108,22 +109,23 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.richtext.*;
 import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
 import java.io.*;
 import java.net.URL;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.prefs.Preferences;
 
-import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 import static javafx.scene.input.KeyCode.TAB;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
 /**
  * @author Ben Borchard
@@ -700,7 +702,7 @@ public class DesktopController implements Initializable {
     private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted,
                                 PageLayout layout) {
         LinkedList<Node> result = new LinkedList<>();
-        double lineHeight = computeParagraphHeight();
+        double lineHeight = computeParagraphHeight(nodeToBePrinted);
         double printableHeight = layout.getPrintableHeight();
         final int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight);
         int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
@@ -745,16 +747,55 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * computes the number of pixels in the text's height, based on the current font
+     * computes the number of points in the text's height, based on the current font
      * and font size for assembly language panes
      *
-     * @return the number of pixels in height of each line
+     * @return the number of points in height of each line
      */
-    private double computeParagraphHeight() {
-        Text text = new Text("HELLO");  // arbitrary text
-        text.setFont(new Font(assmFontData.font, Double.valueOf(assmFontData.fontSize)));
-        new Scene(new Group(text));  // to get it to layout the Text
-        return text.getLayoutBounds().getHeight();
+    private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node) {
+        VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) node.lookup(".virtual-flow");
+        double height = vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
+        return height;
+
+//        // attempt 1 (failed)
+//        Text text = new Text("HELLO");
+//        text.setFont(new Font(assmFontData.font,
+//                Double.valueOf(assmFontData.fontSize)));
+//        TextFlow flow = new TextFlow(text);
+//        new Scene(new Group(flow));  // to get it to layout the Text
+//        Bounds layoutBounds = flow.getLayoutBounds();
+//        Bounds localBounds = flow.getBoundsInLocal();
+//        Bounds parentBounds = flow.getBoundsInParent();
+//        double layoutHeight = layoutBounds.getHeight();
+//        double localHeight = localBounds.getHeight();
+//        double parentHeight = parentBounds.getHeight();
+//        return parentHeight;
+
+//        // attempt 2 (failed)
+//        int numParagraphs = node.getParagraphs().size();
+//        double height = node.getHeight();
+//        double paragraphHeight = height/numParagraphs;
+//        return paragraphHeight;
+
+//        // attempt 3 (failed)
+//        Paragraph<StyleInfo> p = node.getParagraph(0);
+//        InlineStyleTextArea<StyleInfo> page =
+//                new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
+//        assmFontData.setFontAndBackground(page);
+//        page.setWrapText(false); // can't print wrapped text
+//        page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
+//                0, 1, otherSettings.showLineNumbers.get() ?
+//                        (digits -> "%" + digits + "d") : (digits -> "")));
+//        final InlineStyleTextArea<StyleInfo> immutablePage = page;
+//        page.textProperty().addListener((obs, oldText, newText) -> {
+//            immutablePage.setStyleSpans(0, codePaneController.computeStyleSpans
+//                    (newText));
+//        });
+//        page.appendText(p.toString()); // skip newline char
+//        mainPane.getChildren().add(1, page);
+//        double lineHeight = page.getBoundsInParent().getHeight();
+//        mainPane.getChildren().remove(1);
+//        return lineHeight;
     }
 
     /**
@@ -1344,7 +1385,7 @@ public class DesktopController implements Initializable {
         String text = codeArea.getText();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeStyleSpans(text);
         codeArea.setStyleSpans(0, styleSpans);
-        codeArea.positionCaret(0);
+        codeArea.moveTo(0);
     }
 
     /**
@@ -1366,6 +1407,7 @@ public class DesktopController implements Initializable {
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
                 otherSettings.showLineNumbers.get() ? (digits -> "%" + digits + "d") :
                         (digits -> "")));
+        addMenuKeyboardShortcuts(codeArea);
 
         // replace tabs with 4 or fewer spaces
         EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper
@@ -3211,6 +3253,21 @@ public class DesktopController implements Initializable {
     public FontData getRamTableFontData() {
         return ramTableFontData;
     }
+
+
+    /**
+     * add the keyboard shortcuts of some menu items so that they also work when the
+     * focus is on the given codeArea.
+     */
+    public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
+        codeArea.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.Y) && event.isMetaDown())
+                handleFetchSequence(null);
+            else if (event.getCode().equals(KeyCode.D) && event.isMetaDown())
+                handleDebug(null);
+        });
+    }
+
 
     /**
      * A class to hold all other preference settings
