@@ -110,6 +110,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
@@ -388,10 +389,12 @@ public class DesktopController implements Initializable {
                     StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
                     codeArea.setWrapText(otherSettings.lineWrap.get());
                     LineNumAndBreakpointFactory lFactory =
-                            (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
+                            (LineNumAndBreakpointFactory) codeArea
+                                    .getParagraphGraphicFactory();
                     if (otherSettings.showLineNumbers.get()) {
                         lFactory.setFormat(digits -> "%" + digits + "d");
-                    } else {
+                    }
+                    else {
                         lFactory.setFormat(digits -> "");
                     }
                     refreshTopTabPane();
@@ -629,8 +632,21 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handlePrintSetup(ActionEvent event) {
 
-        currentPrinterJob = PrinterJob.createPrinterJob();
+        if(currentPrinterJob == null)
+            currentPrinterJob = PrinterJob.createPrinterJob();
         currentPrinterJob.showPageSetupDialog(stage);
+    }
+
+    /**
+     * add the keyboard shortcuts of some menu items so that they also work when the
+     * focus is on the given codeArea.
+     */
+    public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
+        codeArea.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.Y) && event.isMetaDown())
+                // ctrl-Y opens Fetch sequence dialog
+                handleFetchSequence(null);
+        });
     }
 
     /**
@@ -640,17 +656,24 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePrint(ActionEvent event) {
+        // the current job may have been set in the page setup dialog
         if (currentPrinterJob == null)
             currentPrinterJob = PrinterJob.createPrinterJob();
-        final boolean print = currentPrinterJob.showPrintDialog(stage);
+        boolean print = currentPrinterJob.showPrintDialog(stage);
         if (print) {
-            Printer printer = Printer.getDefaultPrinter();
-            PageLayout pageLayout = printer.createPageLayout(Paper.NA_LETTER,
-                    PageOrientation.PORTRAIT, Printer.MarginType.DEFAULT);
             Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem().getContent();
+
+            // break the node into pages and print them
             final List<Node> pages =
-                    getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted, pageLayout);
-            pages.forEach(currentPrinterJob::printPage);
+                    getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted);
+            PageRange[] ranges = currentPrinterJob.getJobSettings().getPageRanges();
+            if( ranges != null && ranges.length > 0)
+                for(PageRange range : ranges) {
+                    for(int i = range.getStartPage(); i <= range.getEndPage(); i++)
+                        currentPrinterJob.printPage(pages.get(i));
+                }
+            else
+                pages.forEach(currentPrinterJob::printPage);
             currentPrinterJob.endJob();
             currentPrinterJob = null;
         }
@@ -696,13 +719,15 @@ public class DesktopController implements Initializable {
      * constructs a list of pages to be printed
      *
      * @param nodeToBePrinted the StyledTextArea that has all the data to be printed
-     * @param layout          the PageLayout to use when constructing the pages
      * @return a List of the StyledTextAreas each constituting one page to be printed.
      */
-    private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted,
-                                PageLayout layout) {
+    private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted) {
+        PageLayout layout = currentPrinterJob.getJobSettings().getPageLayout();
         LinkedList<Node> result = new LinkedList<>();
-        double lineHeight = computeParagraphHeight(nodeToBePrinted);
+        double scale = layout.getPrintableWidth() /
+                                        nodeToBePrinted.getBoundsInParent().getWidth();
+        if(scale > 1)  scale = 1;
+        double lineHeight = scale * computeParagraphHeight(nodeToBePrinted);
         double printableHeight = layout.getPrintableHeight();
         final int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight);
         int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
@@ -728,11 +753,13 @@ public class DesktopController implements Initializable {
                 });
                 lineCount = 0;
                 pageCount++;
-                page.setPrefWidth(layout.getPrintableWidth());
-                page.setPrefHeight(
-                        pageCount != numPages ? lineHeight * numLinesPerPage :
-                                totalNumLines % numLinesPerPage == 0 ? lineHeight * numLinesPerPage :
-                                        (totalNumLines % numLinesPerPage) * lineHeight);
+                page.setPrefWidth(layout.getPrintableWidth() / scale);
+                double prefHeight = pageCount != numPages ? lineHeight * numLinesPerPage :
+                        totalNumLines % numLinesPerPage == 0 ? lineHeight *
+                                numLinesPerPage :
+                                (totalNumLines % numLinesPerPage) * lineHeight;
+                page.setPrefHeight(prefHeight / scale);
+                page.getTransforms().add(new Scale(scale, scale));
                 result.add(page);
             }
             lineCount++;
@@ -3243,7 +3270,8 @@ public class DesktopController implements Initializable {
                     + "highlight: " + file.getAbsolutePath()).showAndWait();
             return;
         }
-        InlineStyleTextArea textArea = (InlineStyleTextArea) getTabForFile(file).getContent();
+        InlineStyleTextArea textArea = (InlineStyleTextArea) getTabForFile(file)
+                .getContent();
         textArea.selectRange(token.offset, token.offset + token.contents.length());
     }
 
@@ -3255,19 +3283,6 @@ public class DesktopController implements Initializable {
         return ramTableFontData;
     }
 
-
-    /**
-     * add the keyboard shortcuts of some menu items so that they also work when the
-     * focus is on the given codeArea.
-     */
-    public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
-        codeArea.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.Y) && event.isMetaDown())
-                handleFetchSequence(null);
-            else if (event.getCode().equals(KeyCode.D) && event.isMetaDown())
-                handleDebug(null);
-        });
-    }
 
 
     /**
