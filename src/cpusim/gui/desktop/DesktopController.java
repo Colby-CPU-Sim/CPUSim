@@ -95,9 +95,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
-import javafx.print.*;
-import javafx.scene.Group;
+import javafx.print.PageLayout;
+import javafx.print.PageRange;
+import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -107,9 +107,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -638,18 +635,6 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * add the keyboard shortcuts of some menu items so that they also work when the
-     * focus is on the given codeArea.
-     */
-    public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
-        codeArea.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.Y) && event.isMetaDown())
-                // ctrl-Y opens Fetch sequence dialog
-                handleFetchSequence(null);
-        });
-    }
-
-    /**
      * prints all the code from the selected tab of assembly programs
      *
      * @param event the ignored Event (selection of Print from File menu)
@@ -665,7 +650,7 @@ public class DesktopController implements Initializable {
 
             // break the node into pages and print them
             final List<Node> pages =
-                    getPages((InlineStyleTextArea<StyleInfo>) nodeToBePrinted);
+                    getPagesForPrinting((InlineStyleTextArea<StyleInfo>) nodeToBePrinted);
             PageRange[] ranges = currentPrinterJob.getJobSettings().getPageRanges();
             if( ranges != null && ranges.length > 0)
                 for(PageRange range : ranges) {
@@ -721,7 +706,7 @@ public class DesktopController implements Initializable {
      * @param nodeToBePrinted the StyledTextArea that has all the data to be printed
      * @return a List of the StyledTextAreas each constituting one page to be printed.
      */
-    private List<Node> getPages(InlineStyleTextArea<StyleInfo> nodeToBePrinted) {
+    private List<Node> getPagesForPrinting(InlineStyleTextArea<StyleInfo> nodeToBePrinted) {
         PageLayout layout = currentPrinterJob.getJobSettings().getPageLayout();
         LinkedList<Node> result = new LinkedList<>();
         double scale = layout.getPrintableWidth() /
@@ -848,6 +833,31 @@ public class DesktopController implements Initializable {
 
 
     //================= handlers for EDIT menu =================================
+
+    /**
+     * add the keyboard shortcuts of some menu items so that they also work
+     * properly when focus is on the given codeArea.
+     */
+    public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
+        codeArea.setOnKeyPressed(event -> {
+            if (event.getCode().equals(KeyCode.Y) && event.isShortcutDown())
+            // ctrl-Y opens Fetch sequence dialog
+            {
+                DesktopController.this.handleFetchSequence(null);
+            }
+            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown() &&
+                    event.isShiftDown())
+            // ctrl-shift-Z is redo
+            {
+                handleRedo(null);
+            }
+            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown())
+            // ctrl-Z is undo
+            {
+                handleUndo(null);
+            }
+        });
+    }
 
     /**
      * Undoes the last thing done in the current
@@ -1453,10 +1463,19 @@ public class DesktopController implements Initializable {
         newTab.setContent(codeArea);
 
         // whenever the text is changed, recompute the highlighting and set it dirty
-        codeArea.textProperty().addListener((obs, oldText, newText) -> {
-            codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(newText));
+        codeArea.textProperty().addListener(obs -> {
+            codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea.getText()));
             newTab.setDirty(true);
         });
+        // these next two approaches didn't work quite right
+        // codeArea.richChanges().subscribe(change -> {
+        //     codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea.getText()));
+        //     newTab.setDirty(true);
+        // });
+        // codeArea.textProperty().addListener((obs, oldText, newText) -> {
+        //     codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(newText));
+        //     newTab.setDirty(true);
+        // });
 
         // add the content, set what to do when closed, and set the tooltip
         codeArea.replaceText(0, 0, content);

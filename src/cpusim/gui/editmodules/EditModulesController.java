@@ -77,7 +77,7 @@ public class EditModulesController implements Initializable {
     private Module seletedSet = null;
     private TableView activeTable;
     private ChangeTable tableMap;
-    private ContentChangeListener listener;
+    private ContentChangeListener contentChangeListener;
 
     public static final String CURRENT = "Current";
 
@@ -87,7 +87,7 @@ public class EditModulesController implements Initializable {
         this.desktop = desktop;
         activeTable = null;
         tableMap = new ChangeTable(mediator);
-        listener = new ContentChangeListener();
+        contentChangeListener = new ContentChangeListener();
     }
 
     /**
@@ -111,7 +111,7 @@ public class EditModulesController implements Initializable {
 
         activeTable = tableMap.getMap().get("Register");
 
-        activeTable.getSelectionModel().selectedItemProperty().addListener(listener);
+        activeTable.getSelectionModel().selectedItemProperty().addListener(contentChangeListener);
 
         // resizes the width and height of the content panes
 
@@ -147,7 +147,7 @@ public class EditModulesController implements Initializable {
                         ((ModuleController) activeTable).setClones(activeTable.getItems());
 
                         activeTable.getSelectionModel().selectedItemProperty().
-                                removeListener(listener);
+                                removeListener(contentChangeListener);
                         tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
                         tables.getChildren().clear();
                         tables.getChildren().add(
@@ -183,7 +183,7 @@ public class EditModulesController implements Initializable {
                         //listen for changes to the table selection and update the
                         // status of buttons.
                         activeTable.getSelectionModel().selectedItemProperty().
-                                addListener(listener);
+                                addListener(contentChangeListener);
                     }
                 });
 
@@ -559,14 +559,14 @@ public class EditModulesController implements Initializable {
 
         @Override
         public void changed(ObservableValue<? extends Module> selected,
-                            Module oldMicro,
-                            Module newMicro) {
-            if (newMicro == null) {
+                            Module oldModule,
+                            Module newModule) {
+            if (newModule == null) {
                 seletedSet = null;
                 deleteButton.setDisable(true);
                 duplicateButton.setDisable(true);
             } else {
-                seletedSet = newMicro;
+                seletedSet = newModule;
                 deleteButton.setDisable(false);
                 duplicateButton.setDisable(false);
             }
