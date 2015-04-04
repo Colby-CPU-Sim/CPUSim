@@ -49,7 +49,7 @@
                       text="Save machine in HTML..."/>
             <SeparatorMenuItem mnemonicParsing="false"/>
             <MenuItem mnemonicParsing="false" onAction="#handlePrintSetup"
-                      text="Print setup..."/>
+                      text="Page setup..."/>
             <MenuItem mnemonicParsing="false" onAction="#handlePrint"
                       text="Print..."/>
             <SeparatorMenuItem mnemonicParsing="false"/>

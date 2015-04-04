@@ -95,6 +95,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.print.JobSettings;
 import javafx.print.PageLayout;
 import javafx.print.PageRange;
 import javafx.print.PrinterJob;
@@ -117,6 +118,7 @@ import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.richtext.*;
 import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -612,17 +614,7 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * TODO: implement this or remove it
-     *
-     * @param event unused
-     */
-    @FXML
-    protected void handlePrintPreview(ActionEvent event) {
-        tempPrintDialog();
-    }
-
-    /**
-     * TODO:  implement this
+     * opens the page setup dialog to set the printer options for the current job
      *
      * @param event unused
      */
@@ -714,12 +706,12 @@ public class DesktopController implements Initializable {
         if(scale > 1)  scale = 1;
         double lineHeight = scale * computeParagraphHeight(nodeToBePrinted);
         double printableHeight = layout.getPrintableHeight();
-        final int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight);
+        // HACK:  the next line subtracts one because computeParagraphHeight() returns
+        //        a little less than it should.  Subtracting 1 seems to fix it.
+        int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight)-1;
         int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
         int pageCount = 0; // the number of pages so far
         int totalNumLines = nodeToBePrinted.getParagraphs().size();
-        int numPages = totalNumLines / numLinesPerPage +
-                (totalNumLines % numLinesPerPage == 0 ? 0 : 1); // last partial page
         InlineStyleTextArea<StyleInfo> page = null;
         for (Paragraph<StyleInfo> p : nodeToBePrinted.getParagraphs()) {
             if (lineCount >= numLinesPerPage) {
@@ -739,11 +731,7 @@ public class DesktopController implements Initializable {
                 lineCount = 0;
                 pageCount++;
                 page.setPrefWidth(layout.getPrintableWidth() / scale);
-                double prefHeight = pageCount != numPages ? lineHeight * numLinesPerPage :
-                        totalNumLines % numLinesPerPage == 0 ? lineHeight *
-                                numLinesPerPage :
-                                (totalNumLines % numLinesPerPage) * lineHeight;
-                page.setPrefHeight(prefHeight / scale);
+                page.setPrefHeight(printableHeight / scale);
                 page.getTransforms().add(new Scale(scale, scale));
                 result.add(page);
             }
@@ -767,8 +755,7 @@ public class DesktopController implements Initializable {
     private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node)
     {
         VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) node.lookup(".virtual-flow");
-        double height = vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
-        return height;
+        return vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
 
 //        // attempt 1 (failed)
 //        Text text = new Text("HELLO");
@@ -3265,15 +3252,6 @@ public class DesktopController implements Initializable {
      */
     public void setKeyBindings(Map<String, KeyCodeInfo> keyBindings) {
         this.keyBindings = keyBindings;
-    }
-
-    /**
-     * shows an info dialog telling the user that the print features have yet to
-     * be implemented
-     */
-    private void tempPrintDialog() {
-        Alert dialog = Dialogs.createInformationDialog(stage, "Not Implemented", "Not yet implemented (waiting for JavaFX 8)");
-        dialog.showAndWait();
     }
 
     /**
