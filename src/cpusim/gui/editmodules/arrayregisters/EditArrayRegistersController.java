@@ -1,4 +1,3 @@
-
 /*
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
  * with the following changes:
@@ -40,7 +39,7 @@ public class EditArrayRegistersController implements Initializable {
     @FXML
     BorderPane scene;
     @FXML
-    ComboBox<String> registerCombo;
+    Label arrayName;
     @FXML
     Pane tables;
     @FXML
@@ -77,7 +76,7 @@ public class EditArrayRegistersController implements Initializable {
         this.registerArrays = controller.getItems();
         activeTable = null;
 
-        selection = (registerArrays.get(0)).getName();
+        selection = registerArrays.get(0).getName();
     }
 
     /**
@@ -93,9 +92,9 @@ public class EditArrayRegistersController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
+        arrayName.setText(selection);
+
         tableMap = new ChangeTable(registerArrays);
-        registerCombo.setVisibleRowCount(registerArrays.size());
-        registerCombo.getSelectionModel().select(selection);
 
         tableMap.setParents(tables);
         tables.getChildren().clear();
@@ -132,38 +131,18 @@ public class EditArrayRegistersController implements Initializable {
                 }
         );
 
-        // listen for changes to the instruction combo box selection and update
-        // the displayed micro instruction table accordingly.
-        registerCombo.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> selected,
-                                        String oldType, String newType) {
-                        ((TableController) activeTable).setClones(activeTable.getItems());
-
-                        tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
-                        tables.getChildren().clear();
-                        tables.getChildren().add(
-                                tableMap.getMap().get(newType));
-
-                        activeTable = tableMap.getMap().get(newType);
-                        activeTable.setPrefSize(
-                                scene.getWidth(), scene.getHeight() - 100);
-                    }
-                });
-
         // Define an event filter for the ComboBox for Mouse_released events
         EventHandler validityFilter = new EventHandler<InputEvent>() {
             public void handle(InputEvent event) {
                 try {
                     ObservableList<Register> list = FXCollections.observableArrayList();
                     list.addAll(registerController.getItems());
-                    for (TableController r : tableMap.getMap().values()) {
+                    for (RegisterArrayTableView r : tableMap.getMap().values()) {
                         list.addAll(r.getItems());
                     }
 
                     Validate.allNamesAreUnique(list.toArray());
-                    ((TableController) activeTable).checkValidity(list);
+                    ((RegisterArrayTableView) activeTable).checkValidity(list);
                     event.consume();
                 } catch (ValidationException ex) {
                     Dialogs.createErrorDialog(tables.getScene().getWindow(),
@@ -171,7 +150,7 @@ public class EditArrayRegistersController implements Initializable {
                 }
             }
         };
-        registerCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
+        arrayName.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
     }
 
     /**
@@ -186,7 +165,7 @@ public class EditArrayRegistersController implements Initializable {
         try {
             ObservableList<Register> list = FXCollections.observableArrayList();
             list.addAll(registerController.getItems());
-            for (TableController r : tableMap.getMap().values()) {
+            for (RegisterArrayTableView r : tableMap.getMap().values()) {
                 list.addAll(r.getItems());
             }
             Validate.allNamesAreUnique(list.toArray());
@@ -240,8 +219,8 @@ public class EditArrayRegistersController implements Initializable {
      *
      * @return the table view object that is current being edited in the window.
      */
-    public TableController getCurrentController() {
-        return tableMap.getMap().get(registerCombo.getValue());
+    public RegisterArrayTableView getCurrentController() {
+        return tableMap.getMap().get(selection);
     }
 
     /**
@@ -298,7 +277,7 @@ public class EditArrayRegistersController implements Initializable {
     protected void updateRegisters() { // and the machine needs to be updated based on the changes
         // ma
         getCurrentController().setClones(activeTable.getItems());
-        for (TableController t : tableMap.getMap().values()) {
+        for (RegisterArrayTableView t : tableMap.getMap().values()) {
             ObservableList list = t.getItems();
             for (RegisterArray ra : registerArrays) {
                 if (ra.getName().equals(t.getArrayName())) {
@@ -336,7 +315,7 @@ public class EditArrayRegistersController implements Initializable {
      * a class that holds the current register array class
      */
     class ChangeTable {
-        Map<String, TableController> typesMap;
+        Map<String, RegisterArrayTableView> typesMap;
 
         /**
          * Constructor
@@ -356,10 +335,10 @@ public class EditArrayRegistersController implements Initializable {
          * @return the map that contains all the controllers
          */
         public Map buildMap(ObservableList<RegisterArray> arrays) {
-            Map<String, TableController> map = new HashMap();
+            Map<String, RegisterArrayTableView> map = new HashMap();
             for (RegisterArray ra : arrays) {
-                map.put(ra.getName(), new TableController(ra.getName(), ra.registers()));
-                registerCombo.getItems().add(ra.getName());
+                map.put(ra.getName(), new RegisterArrayTableView(ra.getName(), ra
+                        .registers()));
             }
             return map;
         }
@@ -369,7 +348,7 @@ public class EditArrayRegistersController implements Initializable {
          *
          * @return the map of controllers.
          */
-        public Map<String, TableController> getMap() {
+        public Map<String, RegisterArrayTableView> getMap() {
             return typesMap;
         }
 
@@ -379,7 +358,7 @@ public class EditArrayRegistersController implements Initializable {
          * @param tables the controller to be edited.
          */
         public void setParents(Node tables) {
-            for (TableController moduleController : typesMap.values()) {
+            for (RegisterArrayTableView moduleController : typesMap.values()) {
                 moduleController.setParentFrame(tables);
             }
         }

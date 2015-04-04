@@ -323,6 +323,7 @@ public class EditModulesController implements Initializable {
     public void onPropertiesButtonClick(ActionEvent e) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 mediator.getClass().getResource("gui/editmodules/arrayregisters/EditRegisters.fxml"));
+
         EditArrayRegistersController controller;
         if (activeTable.getSelectionModel().getSelectedIndex() == -1) {
             controller = new EditArrayRegistersController(mediator,
@@ -344,9 +345,11 @@ public class EditModulesController implements Initializable {
         final Stage dialogStage = new Stage();
         Pane dialogRoot = null;
         try {
-            dialogRoot = (Pane) fxmlLoader.load();
+            dialogRoot = fxmlLoader.load();
         } catch (IOException ex) {
-            //TODO: something...
+            //TODO: something better...
+            System.out.println("Unable to load EditRegisters.fxml");
+            return;
         }
         Scene dialogScene = new Scene(dialogRoot);
         dialogStage.setScene(dialogScene);

@@ -7,7 +7,7 @@
 
 <BorderPane fx:id="scene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="300.0" prefWidth="440.0" styleClass="root"
-            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <VBox id="VBox" fx:id="vBox" alignment="CENTER" spacing="5.0">
             <HBox id="HBox" alignment="CENTER" prefHeight="50.0" prefWidth="440.0"
@@ -39,12 +39,8 @@
     </stylesheets>
     <top>
         <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
-            <Label prefHeight="50.0" text="Name of Register Arrays:"/>
-            <ComboBox fx:id="registerCombo" minWidth="80">
-                <items>
-                    <FXCollections fx:factory="observableArrayList"/>
-                </items>
-            </ComboBox>
-        </HBox>
+            <Label prefHeight="50.0" text="Register Array:"/>
+            <Label fx:id="arrayName" minWidth="80" />
+         </HBox>
     </top>
 </BorderPane>

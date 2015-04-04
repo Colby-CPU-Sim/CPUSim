@@ -37,7 +37,7 @@ import java.util.*;
  * This class is the TableView for one of the register arrays.  One of these
  * TableViews is created for each register array.
  */
-public class TableController extends TableView implements Initializable {
+public class RegisterArrayTableView extends TableView implements Initializable {
     @FXML
     TableView<Register> table;
     @FXML
@@ -57,7 +57,7 @@ public class TableController extends TableView implements Initializable {
      * Constructor
      * @param registers holds the register arrays and information needed
      */
-    public TableController(String arrayName, ObservableList registers){
+    public RegisterArrayTableView(String arrayName, ObservableList registers){
         this.arrayName = arrayName;
         this.currentRegisters = registers;
         assocList = new HashMap();
