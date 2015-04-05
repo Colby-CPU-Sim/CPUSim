@@ -34,7 +34,7 @@
         <TableView id="equTable" fx:id="equsTable" editable="true">
           <columns>
             <TableColumn text="Name" fx:id="nameColumn" />
-            <TableColumn text="Value" fx:id="valueColumn" />
+            <TableColumn text="Value" fx:id="valueColumn" styleClass="table-row-cell"/>
           </columns>
         </TableView>
       </center>
