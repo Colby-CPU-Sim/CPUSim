@@ -13,7 +13,7 @@
     <stylesheets>
         <URL value="@../css/Desktop.css"/>
     </stylesheets>
-    <MenuBar>
+    <MenuBar fx:id="menuBar">
         <Menu mnemonicParsing="false" text="File" fx:id="fileMenu">
             <MenuItem mnemonicParsing="false" onAction="#handleNewText"
                       text="New text"/>

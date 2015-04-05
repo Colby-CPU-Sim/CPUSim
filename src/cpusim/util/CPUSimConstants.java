@@ -38,7 +38,7 @@ import cpusim.module.Register;
 
 public interface CPUSimConstants {
     // constant for the current version number of CPU Sim
-    public static final String VERSION_NUMBER = "4.0b41";
+    public static final String VERSION_NUMBER = "4.0.0";
 
     //is this a Macintosh?  This constant is used to set up the menus
     //differently for Macs and for other OS's.

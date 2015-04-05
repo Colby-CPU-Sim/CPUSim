@@ -177,6 +177,8 @@ public class DesktopController implements Initializable {
     private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
             ButtonBar.ButtonData.CANCEL_CLOSE);
     @FXML
+    protected MenuBar menuBar;
+    @FXML
     protected Menu fileMenu;
     @FXML
     protected Menu editMenu;
@@ -277,6 +279,8 @@ public class DesktopController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // prep the menu bar for Mac apps
+        menuBar.setUseSystemMenuBar(true);
 
         // add the ioConsole to the ioConsolePane
         ioConsolePane.getChildren().add(ioConsole);
