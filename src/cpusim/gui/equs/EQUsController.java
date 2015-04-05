@@ -264,7 +264,9 @@ public class EQUsController implements Initializable {
     private void setUpEqusTable() {
 
         // Accounts for width changes.
-        equsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        equsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        nameColumn.prefWidthProperty().bind(equsTable.widthProperty().divide(100 / 30.0));
+        valueColumn.prefWidthProperty().bind(equsTable.widthProperty().divide(100 / 70.0));
 
         // updates selectedSet
         updateButtonClickables();
@@ -275,6 +277,7 @@ public class EQUsController implements Initializable {
                                         EQU oldSet, EQU newSet) {
                         selectedSet = newSet;
                         updateButtonClickables();
+                        updateTable();
                     }
                 });
 
@@ -282,7 +285,7 @@ public class EQUsController implements Initializable {
         Callback<TableColumn<EQU, String>, TableCell<EQU, String>> cellStrFactory =
                 setStringTableColumn -> new EditingStrCell<>();
 
-        Callback<TableColumn<EQU, Long>, TableCell<EQU, Long>> cellLongFactory =
+        Callback<TableColumn<EQU, Long>, TableCell<EQU, Long>> cellMultiBaseLongFactory =
                 setLongTableColumn -> {
                     EditingMultiBaseStyleLongCell<EQU> a = new
                             EditingMultiBaseStyleLongCell<>(base, new FontData());
@@ -310,7 +313,7 @@ public class EQUsController implements Initializable {
                     updateTable();
                 });
 
-        valueColumn.setCellFactory(cellLongFactory);
+        valueColumn.setCellFactory(cellMultiBaseLongFactory);
         valueColumn.setOnEditCommit(
                 text -> {
                     Long newValue = text.getNewValue();
@@ -352,7 +355,7 @@ public class EQUsController implements Initializable {
                         else {
                             base.setBase(Base.HEX);
                         }
-                        refreshTable();
+                        updateTable();
                     }
                 });
     }
@@ -394,11 +397,8 @@ public class EQUsController implements Initializable {
     }
 
     private void updateTable() {
-        nameColumn.setVisible(false);
-        nameColumn.setVisible(true);
-        double w = equsTable.getWidth();
-        equsTable.setPrefWidth(w - 1);
-        equsTable.setPrefWidth(w);
+        valueColumn.setVisible(false);
+        valueColumn.setVisible(true);
     }
 
 }
