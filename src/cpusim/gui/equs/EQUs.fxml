@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 
-<BorderPane prefHeight="250.0" prefWidth="470.0" styleClass="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<BorderPane prefHeight="250.0" prefWidth="530.0" styleClass="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
   <bottom>
     <HBox id="HBox" alignment="CENTER" prefHeight="35.0" spacing="5.0">
       <children>
@@ -34,7 +34,7 @@
         <TableView id="equTable" fx:id="equsTable" editable="true">
           <columns>
             <TableColumn text="Name" fx:id="nameColumn" />
-            <TableColumn text="Value" fx:id="valueColumn" />
+            <TableColumn text="Value" fx:id="valueColumn" styleClass="table-row-cell"/>
           </columns>
         </TableView>
       </center>
