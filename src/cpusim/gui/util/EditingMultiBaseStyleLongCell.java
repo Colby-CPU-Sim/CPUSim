@@ -102,7 +102,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         styleInfo.setFontAndBackground(this);
 
 
-        if (empty) {
+        if (empty || item == null) {
             setText(null);
             setGraphic(null);
             setTooltip(null);
@@ -126,6 +126,8 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                 setContentDisplay(ContentDisplay.RIGHT);
                 setGraphic(graphic);
             }
+            else
+                setGraphic(null);
         }
     }
 
@@ -139,6 +141,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
 
         // if user takes focus from the textField, check the validity of its
         // contents and, if valid, save the changes, else, put up an error dialog.
+        // This listener actually does nothing, because
         textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> arg0,
@@ -148,12 +151,10 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                     if (valid) {
                         commitEdit(convertString(prepareString(textField.getText())));
                     }
-                    else {
-                        if (textField.getScene() != null) {
-                            Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                    else if (textField.getScene() != null) {
+                        Dialogs.createErrorDialog(textField.getScene().getWindow(),
                                     "Number Format Error", errorMessage).showAndWait();
-                            cancelEdit();
-                        }
+                        cancelEdit();
                     }
                 }
             }

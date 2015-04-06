@@ -2054,7 +2054,7 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * Opens the hardware modules dialog with the
+     * Opens the options dialog with the
      * specified selected section index.
      *
      * @param initialSection
@@ -2108,7 +2108,7 @@ public class DesktopController implements Initializable {
      */
     public void openModalDialog(String title, String fxmlPath, Object controller, int
             x, int y) {
-        openDialog(title, fxmlPath, controller, x, y, Modality.WINDOW_MODAL);
+        openDialog(title, fxmlPath, controller, x, y, Modality.APPLICATION_MODAL);
     }
 
     /**
@@ -2188,7 +2188,7 @@ public class DesktopController implements Initializable {
         }
         Scene dialogScene = new Scene(dialogRoot);
         dialogStage.setScene(dialogScene);
-        dialogStage.initOwner(stage);
+        //dialogStage.initOwner(stage);
         dialogStage.initModality(modality);
         dialogStage.setTitle(title);
         if (x >= 0 && y >= 0) {

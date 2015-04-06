@@ -551,6 +551,7 @@ public class FindReplaceController implements Initializable {
      * Opens a new find dialog and returns its FindReplaceController.
      *
      * @param m - The Mediator of the current application.
+     * @param useConsole - true if you are searching the console instead of the code area
      * @return - The FindReplaceController of the new Find/Replace Dialog.
      */
     public static FindReplaceController openFindReplaceDialog(Mediator m, boolean
@@ -561,10 +562,12 @@ public class FindReplaceController implements Initializable {
                 "FindReplaceFXML.fxml"));
         fxmlLoader.setController(frc);
         final Stage dialogStage = new Stage();
-        Pane dialogRoot = null;
+        Pane dialogRoot;
         try {
-            dialogRoot = (Pane) fxmlLoader.load();
+            dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
+            System.out.println("Exception opening FindReplaceFXML.fxml: " + e);
+            return null;
         }
 
         Scene dialogScene = new Scene(dialogRoot);
