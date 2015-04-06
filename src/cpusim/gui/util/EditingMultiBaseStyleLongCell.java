@@ -152,9 +152,12 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                         commitEdit(convertString(prepareString(textField.getText())));
                     }
                     else if (textField.getScene() != null) {
-                        Dialogs.createErrorDialog(textField.getScene().getWindow(),
-                                    "Number Format Error", errorMessage).showAndWait();
-                        cancelEdit();
+                        textField.setStyle("-fx-background-color:red;");
+                        textField.setTooltip(new Tooltip(errorMessage));
+                        textField.requestFocus();
+//                        Dialogs.createErrorDialog(textField.getScene().getWindow(),
+//                                    "Number Format Error", errorMessage).showAndWait();
+//                        cancelEdit();
                     }
                 }
             }
@@ -174,6 +177,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                     else {
                         textField.setStyle("-fx-background-color:red;");
                         textField.setTooltip(new Tooltip(errorMessage));
+                        textField.requestFocus();
                         // TODO make this work some other way
                         //The following code crashes the program
                         //Dialogs.showErrorDialog(
