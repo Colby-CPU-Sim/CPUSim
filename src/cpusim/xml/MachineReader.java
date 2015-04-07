@@ -244,14 +244,17 @@ public class MachineReader
 
         //add the punctuation characters
         PunctChar[] punctChars = chars.toArray(new PunctChar[]{});
-        if (punctChars.length == 0) //backwards compatibility for versions
+        if (punctChars.length == 0) { //backwards compatibility for versions
             //without punctChars
             punctChars = machine.getDefaultPunctChars();
-        try {
-            Validate.punctChars(chars);
-        } catch (ValidationException exc) {
-            throw new MachineReaderException(
-                    getCurrentLine() + exc.getMessage());
+        }
+        else {
+            try {
+                Validate.punctChars(chars);
+            } catch (ValidationException exc) {
+                throw new MachineReaderException(
+                        getCurrentLine() + exc.getMessage());
+            }
         }
         machine.setPunctChars(punctChars);
 

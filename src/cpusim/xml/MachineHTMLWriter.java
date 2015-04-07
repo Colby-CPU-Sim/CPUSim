@@ -52,8 +52,8 @@ public class MachineHTMLWriter
             " SIZE=\"+2\"><B>&nbsp;";
     private final String HEADER_SUFFIX = "</B></font></TD></TR>";
     private final String COL_HEADER_PREFIX = "<TR><TD><B>Name</B></TD><TD><B>";
-    private final int[] MODULE_COLUMNS = {2, 3, 4, 2};
-    private final int[] MICRO_COLUMNS = {5, 7, 4, 6, 5, 7, 2, 6, 9, 9, 2, 3, 5, 5};
+    private final int[] MODULE_COLUMNS = {4, 4, 4, 3};
+    private final int[] MICRO_COLUMNS = {5, 7, 5, 6, 5, 7, 2, 6, 9, 9, 2, 3, 5, 5};
 
     private String[] moduleHeaders, moduleColumnHeaders,
     microHeaders, microColumnHeaders;
@@ -80,7 +80,7 @@ public class MachineHTMLWriter
         microHeaders = new String[]{
             HEADER_PREFIX + "5" + HEADER_MIDDLE + "Set" + HEADER_SUFFIX,
             HEADER_PREFIX + "7" + HEADER_MIDDLE + "Test" + HEADER_SUFFIX,
-            HEADER_PREFIX + "4" + HEADER_MIDDLE + "Increment" + HEADER_SUFFIX,
+            HEADER_PREFIX + "5" + HEADER_MIDDLE + "Increment" + HEADER_SUFFIX,
             HEADER_PREFIX + "6" + HEADER_MIDDLE + "Shift" + HEADER_SUFFIX,
             HEADER_PREFIX + "5" + HEADER_MIDDLE + "Logical" + HEADER_SUFFIX,
             HEADER_PREFIX + "7" + HEADER_MIDDLE + "Arithmetic" + HEADER_SUFFIX,
@@ -106,6 +106,7 @@ public class MachineHTMLWriter
                 "<TD><B>Omission</B></TD></TR>",
             COL_HEADER_PREFIX + "Register</B></TD>" + //increment
                 "<TD><B>Overflow Bit</B></TD>" +
+                "<TD><B>Carry Bit</B></TD>" +
                 "<TD><B>Delta</B></TD></TR>",
             COL_HEADER_PREFIX + "Source</B></TD>" + //shift
                 "<TD><B>Destination</B></TD>" +
@@ -274,6 +275,21 @@ public class MachineHTMLWriter
                         EQUs.get(j)).getHTMLDescription());
         out.println("</TABLE><P></P>");
 
+        //print the fetch sequence
+        out.println();
+        out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
+                " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
+        out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Fetch Sequence"
+                + HEADER_SUFFIX);
+        out.println("<TR><TD><B>Microinstructions</B></TD></TR>");
+        MachineInstruction fetchSequence = machine.getFetchSequence();
+        out.println("<TR><TD>");
+        for (int i = 0; i < fetchSequence.getMicros().size(); i++) {
+            out.println(fetchSequence.getMicros().get(i).getHTMLName() +"<BR>");
+        }
+        out.println("</TD></TR>");
+        out.println("</TABLE><P></P>");
+
         //print the fields
         out.println();
         out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
@@ -298,26 +314,11 @@ public class MachineHTMLWriter
                 out.println(field.getHTMLDescription());
         out.println("</TABLE><P></P>");
 
-        //print the fetch sequence
-        out.println();
-        out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
-                " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
-        out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Fetch Sequence"
-                + HEADER_SUFFIX);
-        out.println("<TR><TD><B>Microinstructions</B></TD></TR>");
-        MachineInstruction fetchSequence = machine.getFetchSequence();
-        out.println("<TR><TD>");
-        for (int i = 0; i < fetchSequence.getMicros().size(); i++) {
-            out.println(fetchSequence.getMicros().get(i).getHTMLName() +"<BR>");
-        }
-        out.println("</TD></TR>");
-        out.println("</TABLE><P></P>");
-
         //print the machine instructions
         out.println();
         out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
                 " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
-        out.println(HEADER_PREFIX + "4" + HEADER_MIDDLE +
+        out.println(HEADER_PREFIX + "5" + HEADER_MIDDLE +
                 "Machine Instructions" + HEADER_SUFFIX);
         out.println("<TR><TD><B>Name</B></TD>" +
                 "<TD><B>Opcode (hex)</B></TD>" +

@@ -195,7 +195,7 @@ public class Register extends Module
     public String getHTMLDescription()
     {
         return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getWidth() + "</TD><TD>"
-                + getInitialValue() + "</TD><TD>" + getReadOnly() + "</TD><TD></TD></TR>";
+                + getInitialValue() + "</TD><TD>" + getReadOnly() + "</TD></TR>";
     }
 
     /**

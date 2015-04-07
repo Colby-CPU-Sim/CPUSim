@@ -102,8 +102,8 @@ import cpusim.module.RAM;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TabPane;
 import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -328,8 +328,8 @@ public class Validate
     public static void opcodeFieldIsFirst(MachineInstruction instr){
         if (!instr.getAssemblyColors().get(0).equals(instr.getInstructionColors().get(0))){
             throw new ValidationException("Your opcode (the first field in the instruction fields)"
-                    + "must be the first field in your assembly fields.  This is not the"
-                    + "case for instruction "+instr.getName()+".");
+                    + " must be the first field in your assembly fields.  This is not the"
+                    + " case for instruction "+instr.getName()+".");
         }
     }
 
@@ -350,7 +350,7 @@ public class Validate
             throw new ValidationException(
                     "The first field \"" + opField.getName() + "\"" +
                         " of instruction \"" + instr.getName() + "\" is not" +
-                        " legal.\nIt must have a positive length, " +
+                        " a legal opcode field.\nIt must have a positive length, " +
                         "be absolute, be required,\nand " +
                         "not restricted to particular values.");
         }
@@ -393,8 +393,7 @@ public class Validate
     public static void nameIsNonEmpty(String name)
     {
         if (name.equals("")) {
-            throw new ValidationException("A name must have at " +
-                    "least one character.");
+            throw new ValidationException("A name must have at least one character.");
         }
     }
 
@@ -938,9 +937,9 @@ public class Validate
         for (MachineInstruction instr : machineInstructions){
             if (!instr.equals(machineInstruction)){
                 if (instr.getOpcode() == machineInstruction.getOpcode()){
-                    throw new ValidationException("This opcode is currently the opcode"
-                            + "of the instruction "+instr.getName()+".  All opcodes"
-                            + " must be unique.");
+                    throw new ValidationException("This opcode is currently the opcode "
+                            + "of the instruction "+instr.getName()+".  All opcodes "
+                            + "must be unique.");
                 }
             }
         }
@@ -1062,7 +1061,7 @@ public class Validate
                 throw new ValidationException("The new width " + sourceWidth +
                         " of register " + shift.getSource() + "\nand new width " +
                         destWidth + " of register " + shift.getDestination() +
-                        "\ncauses microinstruction " + shift + " to be invalid.");
+                        "\ncause microinstruction " + shift + " to be invalid.");
             }
         }
         ObservableList<Microinstruction> logicals = machine.getMicros("logical");
@@ -1073,11 +1072,11 @@ public class Validate
             int destWidth = (Integer) newWidths.get(logical.getDestination());
             if (source1Width != destWidth || source2Width != destWidth) {
                 throw new ValidationException("The new width " + source1Width +
-                        " of register " + logical.getSource1() + "\nand new width " +
+                        " of register " + logical.getSource1() + ",\nnew width " +
                         source2Width + " of register " + logical.getSource2() +
                         "\nand new width " + destWidth +
                         " of register " + logical.getDestination() +
-                        "\ncauses microinstruction " + logical + " to be invalid.");
+                        "\ncause microinstruction " + logical + " to be invalid.");
             }
         }
         ObservableList<Microinstruction> sets = machine.getMicros("set");
@@ -1466,10 +1465,11 @@ public class Validate
      * 
      * @throws ValidationException if the input is not the newLine character
      */
-    public static void isNewLineCharacter(char c) throws ValidationException{
-            if (c != '\n'){
-                    throw new ValidationException("The inputted character is not equal to the \n newLine character");
-            }
+    public static void isNewLineCharacter(char c) throws ValidationException {
+        if (c != '\n') {
+            throw new ValidationException("The inputted character is not equal to the " +
+                    "\n newLine character");
+        }
     }
 
     /**

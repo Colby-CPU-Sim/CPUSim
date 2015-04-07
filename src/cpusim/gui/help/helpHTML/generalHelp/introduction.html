@@ -74,16 +74,19 @@
 
 <p class="p2"><B><FONT COLOR="#0000ff">
     Starting CPU Sim</FONT></B></p>
+<p><span class="p2">There are several ways to start CPU Sim.  Macintosh users can just
+    double-click on the CPUSim4.0.0.app application file and Windows users can double-click on the
+    CPUSim4.0.0.bat batch file.  In addition, CPU Sim can be started from the command
+    line as described below.
+</span></p>
+
 <OL>
     <LI>Open a command or terminal window and navigate to the "CPUSim4.0.0" folder.</LI>
     <LI>Type in one of the following commands (all on one line): <br>
         (Windows users)
-        <pre>	java -cp CPUSim4.0.0.jar;jhall.jar;CPUSimHelp4.0.0.jar cpusim.Main</pre>
+        <pre>	java -classpath CPUSim.jar;reactfx-2.0-M4.jar;undofx-1.1.jar;richtextfx-fat-0.6.3.jar cpusim.Main</pre>
         (Mac or Linux users)
-        <pre>	java -cp CPUSim4.0.0.jar:jhall.jar:CPUSimHelp4.0.0.jar cpusim.Main</pre>
-    </LI>
-    <LI>As an alternative to steps 1 and 2, Windows users can just double-click on the
-        "CPUSim.bat" file.
+        <pre>	java -classpath CPUSim.jar:reactfx-2.0-M4.jar:undofx-1.1.jar:richtextfx-fat-0.6.3.jar cpusim.Main</pre>
     </LI>
     <LI>You can also add three optional arguments at the end of the command line in any
         order:
@@ -93,9 +96,10 @@
         that appear in the SampleAssignments folder, you could type in the following
         command (all
         on one line) on Windows:
-			<pre>	java -cp CPUSim4.0.0.jar;jhall.jar;CPUSimHelp4.0.0.jar cpusim.Main<br>	-m SampleAssignments/Wombat1.cpu -t SampleAssignments/W1-0.a
+			<pre>	java -classpath CPUSim.jar;reactfx-2.0-M4.jar;undofx-1.1.jar;richtextfx-fat-0.6.3.jar
+        cpusim.Main -m SampleAssignments/Wombat1.cpu -t SampleAssignments/W1-0.a
 	   		</pre>
-        (This command is, in fact, the command in the "CPUSim.bat" file.)<BR><br>
+        (This command is, in fact, the command in the "CPUSim4.0.0.bat" file.)<BR><br>
         NOTES:<BR>
         <UL>
             <LI>
@@ -112,7 +116,6 @@
                 using the java.util.prefs package. The particular preferences stored
                 include:
                 <ul>
-                    <li>the size and location of each dialog box</li>
                     <li>the font, font size, and color information for text windows and
                         RAM and register windows
                     </li>

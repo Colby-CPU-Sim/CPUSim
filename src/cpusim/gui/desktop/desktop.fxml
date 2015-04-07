@@ -29,9 +29,9 @@
                       text="Save text as..."/>
             <SeparatorMenuItem mnemonicParsing="false"/>
             <Menu mnemonicParsing="false" fx:id="openRamMenu"
-                  text="Open RAM..."/>
+                  text="Open RAM"/>
             <Menu mnemonicParsing="false" fx:id="saveRamMenu"
-                  text="Save RAM..."/>
+                  text="Save RAM"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
             <MenuItem mnemonicParsing="false" onAction="#handleNewMachine"
                       text="New machine" fx:id="newMachine"/>

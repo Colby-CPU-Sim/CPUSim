@@ -2500,22 +2500,12 @@ public class DesktopController implements Initializable {
 
         for (RAM ram : rams) {
             final RAM finalRam = ram;
-            MenuItem saveMenuItem = new MenuItem("from " + ram.getName());
-            saveMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    saveRam(finalRam);
-                }
-            });
+            MenuItem saveMenuItem = new MenuItem("from " + ram.getName() + "...");
+            saveMenuItem.setOnAction(e -> saveRam(finalRam));
             saveRamMenu.getItems().add(saveMenuItem);
 
-            MenuItem openMenuItem = new MenuItem("into " + ram.getName());
-            openMenuItem.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    openRam(finalRam);
-                }
-            });
+            MenuItem openMenuItem = new MenuItem("into " + ram.getName() + "...");
+            openMenuItem.setOnAction(e -> openRam(finalRam));
             openRamMenu.getItems().add(openMenuItem);
         }
     }
@@ -2535,6 +2525,8 @@ public class DesktopController implements Initializable {
                         ".hex"));
 
         File fileToOpen = fileChooser.showOpenDialog(stage);
+        if( fileToOpen == null) // user cancelled
+            return;
 
         if (fileToOpen.getName().lastIndexOf(".mif") == fileToOpen.getName().length() -
                 4) {
