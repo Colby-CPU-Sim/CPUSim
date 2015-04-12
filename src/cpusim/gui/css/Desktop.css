@@ -70,7 +70,7 @@
 }
 
 .table-row-cell:selected:disabled {
-    /* -fx-opacity: -fx-disabled-opacity; */
+    /* -fx-opacity: -fx-disabled-opacity; */ /* this caused a bug */
 }
 
 .table-view:row-selection .table-row-cell:filled:hover {
@@ -147,7 +147,7 @@
 }
 
 .list-cell:filled:selected:focused:disabled, .list-cell:filled:selected:disabled {
-    /* -fx-opacity: -fx-disabled-opacity; */
+    /* -fx-opacity: -fx-disabled-opacity; */ /* this caused a bug */
 }
 
 .list-cell:filled:hover {

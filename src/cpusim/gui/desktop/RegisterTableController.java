@@ -104,11 +104,15 @@ public class RegisterTableController implements Initializable {
         width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
         data.setCellValueFactory(new PropertyValueFactory<Register, Long>("value"));
 
-        data.setOnEditCommit(text -> {
-                    Register register = text.getRowValue();
-                    if(! register.getReadOnly())
-                        register.setValue(text.getNewValue());
-                }
+        data.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Register,
+                                     Long>>() {
+                                 @Override
+                                 public void handle(TableColumn.CellEditEvent<Register, Long> text) {
+                                     Register register = text.getRowValue();
+                                     if (!register.getReadOnly())
+                                         register.setValue(text.getNewValue());
+                                 }
+                             }
         );
 
         table.setItems(registers);

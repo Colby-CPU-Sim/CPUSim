@@ -264,22 +264,21 @@ public class Convert
     /**
      * treats the long l as numBits bits and groups the bits into groups of 8
      * and converts each group to the corresponding ascii character.  If the character
-     * is unprintable (has an ascii value between 0 and 31), a box or Â˜ is printed out
-     * instead of blank space.
-     * numBits should be either 0, 8, 16, 24, 32, 40, 48, 54, or 64.
+     * is unprintable (has an ascii value between 0 and 31), a box is printed out.
+     *
      * @param l the long to be converted to an ascii string
-     * @param numBits number of bits in the long
-     * @return 
+     * @param numBits number of bits of the long to be converted, starting at the right
+     * @return the String with the ascii characters
      */
     public static String fromLongToAsciiString(long l, int numBits)
     {
         String result = "";
         for( int i = 0; i < numBits/8; i++) {
             //ASCII chars 0-31 are control characters,
-            //these are unprintable and should show a â˜� instead
+            //these are unprintable and should show a box instead
             //The box is the way the DELETE char is displayed
             if( (l&255)<32){
-                result = "Â˜" + result; //there is a DELETE char inside the quotes
+                result = "☐" + result;
             }
             
             else /* ascii character is printable */ {
@@ -288,6 +287,16 @@ public class Convert
             }
             
             l = l >>> 8;
+        }
+        if( numBits % 8 > 0) { // there are left-over bits
+            int remainingBits = numBits % 8;
+            int mask = (int) powerOfTwo(remainingBits) - 1;
+            if( (l & mask) < 32 )
+                result = "☐" + result;
+            else {
+                char c = (char) (l & mask);
+                result = c + result;
+            }
         }
         return result;
     }
@@ -347,8 +356,13 @@ public class Convert
     {
         if (s.charAt(0) == '-')
             throw new NumberFormatException
-                                    ("Negative signs are not allowed in binary");
-        BigInteger bigNum = new BigInteger(s, 2);
+                    ("Negative signs are not allowed in binary");
+        BigInteger bigNum;
+        try {
+            bigNum = new BigInteger(s, 2);
+        } catch (Exception e) {
+            throw new NumberFormatException("Not a valid binary number");
+        }
         if (bigNum.compareTo((new BigInteger("2")).pow(numBits - 1)) < 0)
             return bigNum.longValue();
         else if (bigNum.compareTo((new BigInteger("2")).pow(numBits)) < 0)
@@ -368,7 +382,12 @@ public class Convert
         if (s.charAt(0) == '-')
             throw new NumberFormatException(
                     "Negative signs are not allowed in hex in CPU Sim.");
-        BigInteger bigNum = new BigInteger(s, 16);
+        BigInteger bigNum = null;
+        try {
+            bigNum = new BigInteger(s, 16);
+        } catch (Exception e) {
+            throw new NumberFormatException("Not a valid hex value");
+        }
         if (bigNum.compareTo((new BigInteger("2")).pow(numBits - 1)) < 0)
             return bigNum.longValue();
         else if (bigNum.compareTo((new BigInteger("2")).pow(numBits)) < 0)
@@ -382,10 +401,10 @@ public class Convert
      * Converts a String representing an unsigned int to a long.
      *
      * @param s       the string to convert to a long
-     * @param numBits numBits the number of bits availible for the long
+     * @param numBits numBits the number of bits available for the long
      * @return The long value of the given String
-     * @throws NumberFormatException The given string exceeded the availible bits
-     *                               for the long.
+     * @throws NumberFormatException The given string is not an unsigned
+     *         int that fits in the given number of bits.
      */
     public static long fromUnsignedDecStringToLong(String s, int numBits)
             throws NumberFormatException
@@ -395,32 +414,74 @@ public class Convert
         try {
             bigNum = new BigInteger(s);
         } catch (NumberFormatException e) {
-            throw new NumberFormatException("The input \"" + s + "\" is " +
+            throw new NumberFormatException("The value \"" + s + "\" is " +
                     "not a valid integer.");
         }
-        if (bigNum.compareTo((new BigInteger("2")).pow(numBits)) < 0) {
-            return bigNum.longValue();
-        } else { //number is out of range
+        if (bigNum.compareTo(new BigInteger("0")) < 0)
+            throw new NumberFormatException("The number cannot be negative");
+        else if (bigNum.compareTo((new BigInteger("2")).pow(numBits)) < 0)
+                return bigNum.longValue();
+        else { //number is out of range
             throw new NumberFormatException("The number " + s +
                     " won't fit in " + numBits + " bits.");
         }
     }
 
-    //------------------------
-    //fromAsciiStringToLong
-    //returns the long number whose 64 bits are chosen from the chars in s.
-    //The 8 ASCII bits of each char are concatenated to form the long number,
-    //which is padded with 0's on the left, if necessary, to get 64 bits.
-    //s should have at most numBits/8 characters in it.
-    public static long fromAsciiStringToLong(String s, int numBits)
+    /**
+     * Converts an ASCII String to a long using the given number of bits.
+     * Each character in the String is converted to its 8-bit integer value and
+     * the 8-bit values are appended together.
+     * If numBits is not a multiple of 8, then the first char in s must fit
+     * in numBits % 8 bits.
+     * After all the characters have been converted, zeros are added to the
+     * left of the result, as necessary, to make a 64-bit long value.
+     * If any of the chars are "☐", then the corresponding 8 bits in the defaultLong
+     * are used instead of the value of "☐".
+     *
+     * @param s       the string to convert to a long
+     * @param numBits the number of bits in which the string must fit (a value <= 64)
+     * @param defaultLong the default bits to use if the char is "☐"
+     * @return The long value of the given String
+     * @throws NumberFormatException The given string exceeded the available bits
+     *                               for the long or any of the chars are not ASCII
+     */
+    public static long fromAsciiStringToLong(String s, int numBits, long defaultLong)
             throws NumberFormatException
     {
-        if( s.length() * 8 > numBits)
-            throw new NumberFormatException("value won't fit in the given bits");
+        if( numBits % 8 == 0 && numBits/8 < s.length() ||
+                numBits % 8 > 0 && numBits/8 < s.length()-1)
+            throw new NumberFormatException("The string is too long for the given bits");
+        s = removeBoxesFrom(s, defaultLong);
+        if( numBits % 8 != 0 && powerOfTwo(numBits % 8) <= (int) s.charAt(0))
+            throw new NumberFormatException("The first char won't fit in " + (numBits % 8) +
+                                            " bits");
 
         long result = 0;
-        for( int i = 0; i < s.length(); i++ )
+        for( int i = 0; i < s.length(); i++ ) {
+            if ((int) s.charAt(i) > 255)
+                throw new NumberFormatException("There are non-ASCII characters in the string");
             result = (result << 8) + (int) s.charAt(i);
+        }
+        return result;
+    }
+
+    /**
+     * returns a string that is the same as s except every box character "☐" is replaced
+     * by the integer formed from the corresponding 8 bits from the default long.
+     * It assumes the string s has at most 8 characters.
+     * @param s the string from which the boxes are to be removed
+     * @param defaultLong the 64-bit value whose bits are to be substituted for the boxes
+     * @return the new string
+     */
+    private static String removeBoxesFrom(String s, long defaultLong) {
+        String result = "";
+        for(int i = s.length()-1; i >= 0; i--) {
+            if(s.charAt(i) == '☐')
+                result = (char) (defaultLong&255) + result;
+            else
+                result = s.charAt(i) + result;
+            defaultLong <<= 8;
+        }
         return result;
     }
 
@@ -428,9 +489,9 @@ public class Convert
      * Converts a Unicode String to a long.
      *
      * @param s       the string to convert to a long
-     * @param numBits the number of bits availible for the long
+     * @param numBits the number of bits available for the long
      * @return The long value of the given String
-     * @throws NumberFormatException The given string exceeded the availible bits
+     * @throws NumberFormatException The given string exceeded the available bits
      *                               for the long.
      */
     public static long fromUnicodeStringToLong(String s, int numBits)

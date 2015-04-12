@@ -39,8 +39,6 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     private TextField textField;
     private Base base;
     private FontData styleInfo;
-    private String errorMessage;
-    private Boolean valid;
     private int cellSize;
 
     public EditingMultiBaseStyleLongCell(Base base, FontData style) {
@@ -147,17 +145,17 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             public void changed(ObservableValue<? extends Boolean> arg0,
                                 Boolean arg1, Boolean arg2) {
                 if (!arg2) {
-                    checkValidity(textField.getText());
-                    if (valid) {
+                    try {
                         commitEdit(convertString(prepareString(textField.getText())));
-                    }
-                    else if (textField.getScene() != null) {
-                        textField.setStyle("-fx-background-color:red;");
-                        textField.setTooltip(new Tooltip(errorMessage));
-                        textField.requestFocus();
-//                        Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                    } catch (NumberFormatException exc) {
+                        if (textField.getScene() != null) {
+                            textField.setStyle("-fx-background-color:red;");
+                            textField.setTooltip(new Tooltip(exc.getMessage()));
+                            textField.requestFocus();
+//                          Dialogs.createErrorDialog(textField.getScene().getWindow(),
 //                                    "Number Format Error", errorMessage).showAndWait();
-//                        cancelEdit();
+//                          cancelEdit();
+                        }
                     }
                 }
             }
@@ -165,18 +163,16 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
 
         // On ENTER , check for valid value and, if so,
         // save the changes, else, color the cell red.
-        // On CANCEL, cancel the editing.
+        // On CANCEL (Escape), cancel the editing.
         textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent t) {
                 if (t.getCode() == KeyCode.ENTER) {
-                    checkValidity(textField.getText());
-                    if (valid) {
+                    try {
                         commitEdit(convertString(prepareString(textField.getText())));
-                    }
-                    else {
+                    } catch (NumberFormatException exc) {
                         textField.setStyle("-fx-background-color:red;");
-                        textField.setTooltip(new Tooltip(errorMessage));
+                        textField.setTooltip(new Tooltip(exc.getMessage()));
                         textField.requestFocus();
                         // TODO make this work some other way
                         //The following code crashes the program
@@ -194,174 +190,42 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         });
     }
 
-    /**
-     * Checks the validity of the string using the current base and cell size.
-     * If not valid, an error message is saved to the errorMessage field.
-     * @param s the String whose validity is to be checked
-     */
-    private void checkValidity(String s) {
-        char[] string = textField.getText().toCharArray();
-
-        if (base.getBase().equals("Bin")) {
-
-            for (char c : string) {
-                if (c != '0' && c != '1' && c != ' ') {
-                    valid = false;
-                    errorMessage = "You need to enter a binary number";
-                    return;
-                }
-            }
-
-            char[] stringWithNoWhiteSpace = Convert.removeAllWhiteSpace(s).toCharArray();
-
-            if (stringWithNoWhiteSpace.length > cellSize) {
-                valid = false;
-                errorMessage = "This is too many bits, you only have " + cellSize + " available";
-                return;
-            }
-
-            valid = true;
-        }
-        else if (base.getBase().equals("Hex")) {
-            char[] validChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
-                    'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f', ' '};
-
-            for (char c : string) {
-                boolean valid = false;
-                for (char v : validChars) {
-                    valid = valid || c == v;
-                }
-                if (!valid) {
-                    this.valid = false;
-                    errorMessage = "You need to enter a hexadecimal number";
-                    return;
-                }
-            }
-
-            char[] stringWithoutWhiteSpace = Convert.removeAllWhiteSpace(s).toCharArray();
-
-            if (stringWithoutWhiteSpace.length > cellSize / 4 + (cellSize % 4 == 0 ? 0 : 1)) {
-                // need to round up cellSize / 4 since might have a cellSize of 3
-                this.valid = false;
-                errorMessage = "You have entered too many hexadecimal digits, you only "
-                        + "have " + (cellSize / 4 + (cellSize % 4 == 0 ? 0 : 1)) + " available";
-                return;
-            }
-            this.valid = true;
-        }
-        else if (base.getBase().equals("Dec")) {
-            char[] validChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
-            int i = 0;
-            for (char c : string) {
-                boolean valid = false;
-                for (char v : validChars) {
-                    valid = valid || c == v;
-                }
-                if (!valid) {
-                    if (i != 0 || c != '-') {
-                        this.valid = false;
-                        this.errorMessage = "You need to enter an integer";
-                        return;
-                    }
-                }
-                i++;
-            }
-
-            Integer value;
-            try  {
-                value = Integer.parseInt(Convert.removeAllWhiteSpace(s));
-                if (value > Math.pow(2, cellSize - 1) - 1 || value < -(Math.pow(2, cellSize - 1))) {
-                    this.valid = false;
-                    this.errorMessage = "There are not enough bits to represent this value.";
-                    return;
-                }
-            }
-            catch (NumberFormatException ex){
-                this.valid = false;
-                this.errorMessage = "There are not enough bits to represent this value.";
-                return;
-            }
-
-            this.valid = true;
-        }
-        
-        else if (base.getBase().equals("Unsigned Dec")) {
-            char[] validChars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-
-            for (char c : string) {
-                boolean valid = false;
-                for (char v : validChars) {
-                    valid = valid || c == v;
-                }
-                if (!valid) {
-                    this.valid = false;
-                    this.errorMessage = "You need to enter a positive integer";
-                    return;
-                }
-            }
-
-            Integer value;
-            try  {
-                value = Integer.parseInt(Convert.removeAllWhiteSpace(s));
-                if (value > Math.pow(2, cellSize)-1) {
-                    this.valid = false;
-                    this.errorMessage = "There are not enough bits to represent this value.";
-                    return;
-                }
-            }
-            catch (NumberFormatException ex){
-                this.valid = false;
-                this.errorMessage = "There are not enough bits to represent this value.";
-                return;
-            }
-
-            this.valid = true;
-        }
-        else{
-            if (s.length()*8 > cellSize){
-                this.valid = false;
-                this.errorMessage = "There are not enough bits to represent this value";
-                return;
-            }
-            this.valid = true;
-        }
-    }
 
     /**
      * Removes spaces and adds leading zeros to the string to make it the right
-     * length.
+     * length for base 2 and base 16 numbers.
      * @param s the String to be displayed
      * @return the String with spaces removed and leading zeros added as needed.
      */
     private String prepareString(String s) {
-        String string = Convert.removeAllWhiteSpace(s);
         switch (base.getBase()) {
             case "Bin": {
-                int zeroesNeeded = cellSize - string.length();
+                s = Convert.removeAllWhiteSpace(s);
+                int zeroesNeeded = cellSize - s.length();
                 String zeroString = "";
                 for (int i = 0; i < zeroesNeeded; i++) {
                     zeroString += "0";
                 }
-                string = zeroString + string;
+                s = zeroString + s;
                 break;
             }
             case "Hex": {
-                int zeroesNeeded = cellSize / 4 - string.length();
+                s = Convert.removeAllWhiteSpace(s);
+                int zeroesNeeded = cellSize / 4 - s.length() +
+                                   cellSize % 4 == 0 ? 0 : 1;
                 String zeroString = "";
                 for (int i = 0; i < zeroesNeeded; i++) {
                     zeroString += "0";
                 }
-                string = zeroString + string;
+                s = zeroString + s;
                 break;
             }
             case "Dec":
             case "Unsigned Dec":
-                string = s;
-                break;
+                s = Convert.removeAllWhiteSpace(s);
         }
 
-        return string;
+        return s;
     }
 
     private Long convertString(String s) {
@@ -371,11 +235,12 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             case "Hex":
                 return Convert.fromHexadecimalStringToLong(s, cellSize);
             case "Dec":
-                return Long.parseLong(s);
+                return Convert.fromDecimalStringToLong(s, cellSize);
             case "Unsigned Dec":
                 return Convert.fromUnsignedDecStringToLong(s, cellSize);
-            default:
-                return Convert.fromAsciiStringToLong(s, cellSize);
+            default: // "Ascii"
+                return Convert.fromAsciiStringToLong(s, cellSize,
+                        (getItem()<<(64-cellSize))>>>(64-cellSize));
         }
     }
 
@@ -390,7 +255,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             case "Unsigned Dec":
                 return Convert.fromLongToUnsignedDecString(l, cellSize);
             default:
-                return Convert.fromLongToAsciiString(l, cellSize + cellSize % 8);
+                return Convert.fromLongToAsciiString(l, cellSize);
         }
     }
 

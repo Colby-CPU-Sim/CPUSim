@@ -29,11 +29,9 @@
  * to remove validation of user input
  */
 package cpusim;
+
 import javafx.application.Platform;
-import javafx.event.EventHandler;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyledTextArea;
 
 /**
@@ -97,59 +95,60 @@ public class ConsoleChannel implements StringChannel {
 		this.ioConsole = med.getDesktopController().getIOConsole();
 
 		ioConsole.setEditable(false);
-		ioConsole.setOnKeyPressed(
-				new EventHandler<KeyEvent>() {
+		ioConsole.setOnKeyPressed(event -> {
+			if (ioConsole.isEditable()) {
+				String content = ioConsole.getText();
+				if (!inputStarted) {
+					startCaret = content.length();
+				}
 
-					@Override
-					public void handle(KeyEvent event) {
-						if (ioConsole.isEditable()) {
-							String content = ioConsole.getText();
-							if (!inputStarted) {
-								startCaret = content.length();
-							}
+				if (ioConsole.getCaretPosition() < startCaret) {
+					ioConsole.positionCaret(content.length());
+				}
 
-							if (ioConsole.getCaretPosition() < startCaret) {
-								ioConsole.positionCaret(content.length());
-							}
-
-							if (event.getCode().equals(KeyCode.BACK_SPACE)) {
-								if (ioConsole.getCaretPosition() == startCaret) {
-									ioConsole.insertText(startCaret, " ");
-								}
-							}
-							else if (event.getCode().equals(KeyCode.ENTER)) {
-								inputStarted = false;
-								userInput = (ioConsole.getText(startCaret, ioConsole.getText().length()));
-								ioConsole.appendText(LINE_SEPARATOR);
-
-								// reset
-								ioConsole.setEditable(false);
-								doneInput = true;
-								return;
-							}
-							inputStarted = true;
-						}
+				if (event.getCode().equals(KeyCode.BACK_SPACE)) {
+					if (ioConsole.getCaretPosition() == startCaret) {
+						ioConsole.insertText(startCaret, " ");
 					}
-					
-				});
+				}
+				else if (event.getCode().equals(KeyCode.ENTER)) {
+					inputStarted = false;
+					userInput = (ioConsole.getText(startCaret, ioConsole.getText()
+							.length()));
+					ioConsole.appendText(LINE_SEPARATOR);
 
-		ioConsole.setOnKeyReleased(
-				new EventHandler<KeyEvent>() {
-					@Override
-					public void handle(KeyEvent event) {
-						if (needToDeleteEnter) {
-							if (event.getCode().equals(KeyCode.ENTER)) {
-								String content = ioConsole.getText();
-//                              TODO: Do I need to fix the next line?  I commented it out
-//                                because ioConsole used to be a TextArea with a setText()
-//                                method but now it's a StyledTextArea with no setText() method
-//								ioConsole.setText(ioConsole.getText(0, content.length()-1));
-								ioConsole.positionCaret(content.length());
-								needToDeleteEnter = false;
-							}
-						}
-					}
-				});
+					// reset
+					ioConsole.setEditable(false);
+					doneInput = true;
+					return;
+				}
+				inputStarted = true;
+			}
+		});
+
+		// the following code is useless since it is the only place needToDeleteEnter
+		// is every accessed, and so it is always false.
+//		ioConsole.setOnKeyReleased(
+//				new EventHandler<KeyEvent>() {
+//					@Override
+//					public void handle(KeyEvent event) {
+//						if (needToDeleteEnter) {
+//							if (event.getCode().equals(KeyCode.ENTER)) {
+//								String content = ioConsole.getText();
+////                              TODO: Do I need to fix the next line?  I commented it
+// out
+////                                because ioConsole used to be a TextArea with a
+// setText()
+////                                method but now it's a StyledTextArea with no
+// setText() method
+////								ioConsole.setText(ioConsole.getText(0, content
+// .length()-1));
+//								ioConsole.positionCaret(content.length());
+//								needToDeleteEnter = false;
+//							}
+//						}
+//					}
+//				});
 	}
 
 	/**

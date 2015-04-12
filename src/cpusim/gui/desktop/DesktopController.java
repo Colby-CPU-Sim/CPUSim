@@ -95,19 +95,24 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.print.JobSettings;
+import javafx.geometry.Bounds;
 import javafx.print.PageLayout;
 import javafx.print.PageRange;
 import javafx.print.PrinterJob;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -118,7 +123,6 @@ import org.fxmisc.flowless.VirtualFlow;
 import org.fxmisc.richtext.*;
 import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
-import javax.swing.*;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -251,6 +255,8 @@ public class DesktopController implements Initializable {
     private SimpleBooleanProperty codeStoreIsNull;
     private HelpController helpController;
     private FindReplaceController findReplaceController;
+    private SimpleBooleanProperty canUndoProperty;
+    private SimpleBooleanProperty canRedoProperty;
 
     /**
      * constructor method that takes in a mediator and a stage
@@ -376,6 +382,8 @@ public class DesktopController implements Initializable {
         inDebugOrRunningMode.bind(inDebugMode.or(inRunningMode));
         anchorEqualsCarret = new SimpleBooleanProperty(false);
         codeStoreIsNull = new SimpleBooleanProperty(true);
+        canUndoProperty = new SimpleBooleanProperty(false);
+        canRedoProperty = new SimpleBooleanProperty(false);
         bindItemDisablesToSimpleBooleanProperties();
 
         // Set up channels
@@ -751,8 +759,7 @@ public class DesktopController implements Initializable {
     }
 
     /**
-     * computes the number of points in the text's height, based on the current font
-     * and font size for assembly language panes
+     * computes the number of points in the height of one line of the text area
      *
      * @return the number of points in height of each line
      */
@@ -762,18 +769,39 @@ public class DesktopController implements Initializable {
         return vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
 
 //        // attempt 1 (failed)
-//        Text text = new Text("HELLO");
+//        Text text = new Text(
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO\n" +
+//                "HELLO");
 //        text.setFont(new Font(assmFontData.font,
 //                Double.valueOf(assmFontData.fontSize)));
 //        TextFlow flow = new TextFlow(text);
+//        flow.setStyle("-fx-font-weight:bold");
 //        new Scene(new Group(flow));  // to get it to layout the Text
-//        Bounds layoutBounds = flow.getLayoutBounds();
-//        Bounds localBounds = flow.getBoundsInLocal();
+////        Bounds layoutBounds = flow.getLayoutBounds();
+////        Bounds localBounds = flow.getBoundsInLocal();
+////        double layoutHeight = layoutBounds.getHeight();
+////        double localHeight = localBounds.getHeight();
 //        Bounds parentBounds = flow.getBoundsInParent();
-//        double layoutHeight = layoutBounds.getHeight();
-//        double localHeight = localBounds.getHeight();
 //        double parentHeight = parentBounds.getHeight();
-//        return parentHeight;
+//        return parentHeight/20;
 
 //        // attempt 2 (failed)
 //        int numParagraphs = node.getParagraphs().size();
@@ -1031,35 +1059,36 @@ public class DesktopController implements Initializable {
             }
         }
 
+        codeArea.replaceText(0, text.length(), newText);
         // Note that the below implementation is a major hack.
         // We select the text we want to replace, paste the
         // contents in to replace, then return the Clipboard to
         // its original state. This way the actions can be un-done
         // and re-done.
-        codeArea.selectAll();
-        Clipboard clipboard = Clipboard.getSystemClipboard();
-
-        boolean setBack = true;
-        DataFormat df = null;
-        Object oldVal = null;
-        try {
-            df = (DataFormat) (clipboard.getContentTypes().toArray()[0]);
-            oldVal = (clipboard.getContent(df));
-        } catch (Exception e) {
-            setBack = false;
-        }
-
-        ClipboardContent content = new ClipboardContent();
-        content.putString(newText);
-        clipboard.setContent(content);
-        codeArea.paste();
-
-        if (setBack) {
-            ClipboardContent oldContent = new ClipboardContent();
-            oldContent.put(df, oldVal);
-            clipboard.setContent(oldContent);
-        }
-
+//        codeArea.selectAll();
+//        Clipboard clipboard = Clipboard.getSystemClipboard();
+//
+//        boolean setBack = true;
+//        DataFormat df = null;
+//        Object oldVal = null;
+//        try {
+//            df = (DataFormat) (clipboard.getContentTypes().toArray()[0]);
+//            oldVal = (clipboard.getContent(df));
+//        } catch (Exception e) {
+//            setBack = false;
+//        }
+//
+//        ClipboardContent content = new ClipboardContent();
+//        content.putString(newText);
+//        clipboard.setContent(content);
+//        codeArea.paste();
+//
+//        if (setBack) {
+//            ClipboardContent oldContent = new ClipboardContent();
+//            oldContent.put(df, oldVal);
+//            clipboard.setContent(oldContent);
+//        }
+//
         if (commenting) {
             codeArea.selectRange(lower + 1, upper + numIncreasedChars);
         } else {
@@ -1833,29 +1862,27 @@ public class DesktopController implements Initializable {
 
 
         // Edit Menu
-//        editMenu.setOnMenuValidation(event -> {
-//            boolean canUndo = false;
-//            boolean canRedo = false;
-//            boolean ancEqCar = false;
-//            if (!noTabSelected.get()) {
-//                Tab currTab = textTabPane.getSelectionModel().getSelectedItem();
-//                InlineStyleTextArea codeArea = (InlineStyleTextArea) currTab.getContent();
-//                Object o = codeArea.getSkin();
-//                System.out.println(o.getClass());
-//                TextInputControlBehavior<?> behavior =
-//                        ((TextInputControlSkin<?, ?>) codeArea.getSkin()).getBehavior();
-//                canUndo = behavior.canUndo();
-//                canRedo = behavior.canRedo();
-//                ancEqCar = (codeArea.getAnchor() == codeArea.getCaretPosition());
-//            }
-//            canUndoProperty.set(canUndo);
-//            canRedoProperty.set(canRedo);
-//            anchorEqualsCarret.set(ancEqCar);
-//        });
+        editMenu.setOnMenuValidation(event -> {
+            boolean canUndo = false;
+            boolean canRedo = false;
+            boolean ancEqCar = false;
+            if (!noTabSelected.get()) {
+                Tab currTab = textTabPane.getSelectionModel().getSelectedItem();
+                InlineStyleTextArea codeArea = (InlineStyleTextArea) currTab.getContent();
+                canUndo = codeArea.isUndoAvailable();
+                canRedo = codeArea.isRedoAvailable();
+                ancEqCar = (codeArea.getAnchor() == codeArea.getCaretPosition());
+            }
+            canUndoProperty.set(canUndo);
+            canRedoProperty.set(canRedo);
+            anchorEqualsCarret.set(ancEqCar);
+        });
         // Undo
-        editMenu.getItems().get(0).disableProperty().bind(noTabSelected);
+        editMenu.getItems().get(0).disableProperty().bind(
+                noTabSelected.or(canUndoProperty.not()));
         // Redo
-        editMenu.getItems().get(1).disableProperty().bind(noTabSelected);
+        editMenu.getItems().get(1).disableProperty().bind(
+                noTabSelected.or(canRedoProperty.not()));
         // Cut
         editMenu.getItems().get(3).disableProperty().bind(noTabSelected.or
                 (anchorEqualsCarret));
