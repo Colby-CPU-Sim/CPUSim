@@ -38,7 +38,7 @@
             <Tab fx:id="IOOptionsTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" style=""
                  text="IO Connections">
-                <BorderPane prefHeight="44.0" prefWidth="200.0">
+                <BorderPane prefHeight="354.0" prefWidth="600.0">
                     <bottom>
                         <HBox alignment="CENTER" prefHeight="43.0"
                               prefWidth="600.0" spacing="20.0"
@@ -56,25 +56,18 @@
                         </HBox>
                     </bottom>
                     <center>
-                        <AnchorPane id="Content" fx:id="ioOptionsAnchorPane"
-                                    minHeight="0.0" minWidth="0.0"
-                                    prefHeight="180.0" prefWidth="200.0">
-                            <TableView fx:id="IOOptionsTable" editable="true"
-                                       prefHeight="342.0" prefWidth="598.0"
-                                       AnchorPane.bottomAnchor="0.0"
-                                       AnchorPane.leftAnchor="0.0"
-                                       AnchorPane.rightAnchor="0.0"
-                                       AnchorPane.topAnchor="0.0">
-                                <columns>
-                                    <TableColumn editable="false"
-                                                 minWidth="50.0" text="Name"
-                                                 fx:id="nameColumn"/>
-                                    <TableColumn minWidth="50.0"
-                                                 text="Connection"
-                                                 fx:id="connectionColumn"/>
-                                </columns>
-                            </TableView>
-                        </AnchorPane>
+                        <TableView fx:id="IOOptionsTable" editable="true"
+                                       prefHeight="354.0" prefWidth="600.0" >
+                            <columns>
+                                <TableColumn editable="false"
+                                             minWidth="50.0"
+                                             prefWidth="150" text="Name"
+                                             fx:id="nameColumn"/>
+                                <TableColumn minWidth="50.0" prefWidth="450"
+                                             text="Connection"
+                                             fx:id="connectionColumn"/>
+                            </columns>
+                        </TableView>
                     </center>
                 </BorderPane>
             </Tab>
@@ -169,27 +162,27 @@
             </Tab>
             <Tab fx:id="punctuationTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" text="Punctuation">
-                <HBox minHeight="60.0" prefHeight="60.0" prefWidth="218.0">
+                <HBox minHeight="60.0">
                     <TableView id="punctuationTable"
-                               fx:id="leftPunctuationTable" editable="true"
-                               maxHeight="-Infinity" minHeight="-Infinity"
-                               prefHeight="421.0" prefWidth="296.0">
+                               fx:id="leftPunctuationTable" editable="true">
+                               <!--prefHeight="354.0" prefWidth="300.0"-->
+                               <!--maxHeight="-Infinity" minHeight="-Infinity"-->
                         <columns>
-                            <TableColumn editable="false" minWidth="100.0"
-                                         prefWidth="150.0" text="ASCII Symbol"
+                            <TableColumn editable="false" minWidth="50.0"
+                                         text="ASCII Symbol"  prefWidth="150.0"
                                          fx:id="leftASCIIColumn"/>
-                            <TableColumn minWidth="100.0" prefWidth="150.0"
+                            <TableColumn minWidth="50.0" prefWidth="150.0"
                                          text="Type" fx:id="leftTypeColumn"/>
                         </columns>
                     </TableView>
-                    <TableView fx:id="rightPunctuationTable" editable="true"
-                               maxHeight="-Infinity" minHeight="-Infinity"
-                               prefHeight="421.0" prefWidth="296.0">
+                    <TableView fx:id="rightPunctuationTable" editable="true">
+                               <!--prefHeight="354.0" prefWidth="300.0"-->
+                               <!--maxHeight="-Infinity" minHeight="-Infinity"-->
                         <columns>
-                            <TableColumn editable="false" minWidth="100.0"
-                                         prefWidth="150.0" text="ASCII Symbol"
+                            <TableColumn editable="false" minWidth="50.0"
+                                          text="ASCII Symbol" prefWidth="150.0"
                                          fx:id="rightASCIIColumn"/>
-                            <TableColumn minWidth="100.0" prefWidth="150.0"
+                            <TableColumn minWidth="50.0" prefWidth="150.0"
                                          text="Type" fx:id="rightTypeColumn"/>
                         </columns>
                     </TableView>

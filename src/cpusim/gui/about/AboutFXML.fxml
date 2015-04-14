@@ -24,11 +24,10 @@
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>
     <top>
-        <AnchorPane prefHeight="225.0" prefWidth="429.0">
+        <StackPane prefHeight="225.0" prefWidth="429.0">
             <ImageView fx:id="imageView" fitHeight="191.0" fitWidth="355.0"
                        pickOnBounds="true" preserveRatio="true"
-                       AnchorPane.bottomAnchor="17.0" AnchorPane.leftAnchor="48.0"
-                       AnchorPane.rightAnchor="47.0" AnchorPane.topAnchor="17.0"/>
-        </AnchorPane>
+                       />
+        </StackPane>
     </top>
 </BorderPane>

@@ -99,8 +99,6 @@ public class OptionsController implements Initializable {
     private Tab indexingTab;
 
     @FXML
-    private AnchorPane ioOptionsAnchorPane;
-    @FXML
     private TableView<IOOptionsData> IOOptionsTable;
     @FXML
     private TableColumn<IOOptionsData, IO> nameColumn;
@@ -640,15 +638,15 @@ public class OptionsController implements Initializable {
      */
     private void initializePunctuationTab() {
 
-        // Accounts for width changes.
-        leftASCIIColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-        leftTypeColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-        rightASCIIColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
-        rightTypeColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
-
-        // Making column widths adjust properly
-        leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//        // Accounts for width changes.
+//        leftASCIIColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
+//        leftTypeColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
+//        rightASCIIColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
+//        rightTypeColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
+//
+//        // Making column widths adjust properly
+//        leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//        rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Callbacks
         Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>> cellStrFactory =
@@ -750,14 +748,7 @@ public class OptionsController implements Initializable {
             }
         }
 
-        // Making column widths adjust properly
-        IOOptionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        // Accounts for width changes.
-        nameColumn.minWidthProperty().bind(ioOptionsAnchorPane.widthProperty().divide(100 / 20.0));
-        connectionColumn.minWidthProperty().bind(ioOptionsAnchorPane.widthProperty().divide(100 / 79.5));
-
-        // updates selectedSet
+       // updates selectedSet
         IOOptionsTable.getSelectionModel().selectedItemProperty().addListener(
                 new ChangeListener<IOOptionsData>() {
                     @Override
