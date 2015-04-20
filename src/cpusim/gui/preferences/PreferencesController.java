@@ -1,6 +1,19 @@
 /**
  * auther: Jinghui Yu
  * last edit date: 6/3/2013
+ * <p>
+ * File: PreferencesController
+ * Authors: Joseph Harwood and Jake Epstein
+ * Date: 11/15/13
+ * <p>
+ * Added field clearConsoleOnRun as a CheckBox from an fxml source.
+ * (Additionally added the separator and checkbox in Preferences.fxml)
+ * <p>
+ * Edited method saveOtherTab to save the value of the clearConsoleOnRun CheckBox
+ * to the DesktopController's OtherSettings object.
+ * <p>
+ * Edited method setValues to load the CheckBox with the appropriate state as
+ * signified by the DesktopController's OtherSettings object.
  */
 
 /**
@@ -27,29 +40,23 @@ import cpusim.gui.desktop.KeyCodeInfo;
 import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.help.HelpController;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 /**
  * The controller for the Preferences Dialog.
@@ -134,30 +141,18 @@ public class PreferencesController implements Initializable {
     Button closeButton;
 
     @FXML
-    AnchorPane keyBindingsPane;
-    @FXML
-    AnchorPane menuItemsPane;
-
-    @FXML
-    ScrollPane kbScrollPane;
-
-    @FXML
-    BorderPane mainPane;
+    GridPane keyPrefsPane;
 
     @FXML
     TabPane tabPane;
-
-    @FXML
-    Tab keyBindingsTab;
 
     private final Mediator mediator;
     private final DesktopController desktopController;
 
     // fields for the key bindings tab
-    private List<String> keyBindings;  // local copy of the bindings for editing
     private boolean listening;
     private Label currLabel; // the current binding label
-    private String currBinding; // the binding in the currLabel
+    private Label[] keyBindingLabels; // the labels in the right column of the table
 
 
     public PreferencesController(Mediator mediator, DesktopController desktopController) {
@@ -176,41 +171,27 @@ public class PreferencesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // fit main pane to the screen (roughly)
-        double screenWidth = Screen.getPrimary().getBounds().getWidth();
-        double screenHeight = Screen.getPrimary().getBounds().getHeight();
-        if (mainPane.getPrefWidth() > screenWidth) {
-            mainPane.setPrefWidth(screenWidth - 75);
-        }
-        if (mainPane.getPrefHeight() > screenHeight) {
-            mainPane.setPrefHeight(screenHeight - 40);
-        }
+        // fit the Preferences dialog to be smaller than the desktop stage
+        tabPane.setMaxHeight(desktopController.getStage().getHeight() - 100);
+        //keyPrefsPane.setGridLinesVisible(true); // for debugging
 
-        initializeKeyTab();
         initializeFontTab();
+        initializeKeyTab();
         initializeOtherTab();
     }
 
     private void initializeKeyTab() {
+        initializeKeyBindingColumn();
         listening = false;
-        kbScrollPane.setStyle("-fx-background-color:white;");
-        tabPane.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> ov, Number t, Number
-                    t1) {
-                if (t.intValue() == 1 && listening) {
-                    currLabel.setStyle("-fx-background-color:white;" +
-                            "-fx-border-color:white;");
-                    keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel),
-                            currBinding);
-                    updateKeyBindingDisplay();
-                    stopListening();
-                }
-            }
-        });
-        initKeyBindingsField();
-        updateKeyBindingDisplay();
-        currLabel = (Label) keyBindingsPane.getChildren().get(0);
+        currLabel = keyBindingLabels[0];
+
+        //if you change tabs away from the Keys tab, be sure the currLabel is de-selected
+        tabPane.getSelectionModel().selectedIndexProperty().addListener(
+                (ov, prevIndex, newIndex) -> {
+                    if (prevIndex.intValue() == 1 && listening) {
+                        PreferencesController.this.stopListening();
+                    }
+                });
     }
 
     private void initializeOtherTab() {
@@ -381,10 +362,10 @@ public class PreferencesController implements Initializable {
     }
 
     private void saveKeyBindingsTab() {
-        Map<String,KeyCodeInfo> realBindings = desktopController.getKeyBindings();
+        Map<String, KeyCodeInfo> realBindings = desktopController.getKeyBindings();
         int i = 0;
-        for(KeyCodeInfo info : realBindings.values()) {
-            info.setKeyCode(keyBindings.get(i));
+        for (KeyCodeInfo info : realBindings.values()) {
+            info.setKeyCode(keyBindingLabels[i].getText());
             i++;
         }
     }
@@ -420,12 +401,13 @@ public class PreferencesController implements Initializable {
     }
 
     @FXML
-    protected void handleDefault(ActionEvent e) {
-        keyBindings.clear();
-        for (String[] kb : desktopController.DEFAULT_KEY_BINDINGS) {
-            keyBindings.add(kb[1]);
+    protected void handleSetDefaultKeyBindings(ActionEvent e) {
+        int i = 0;
+        for (String[] kb : DesktopController.DEFAULT_KEY_BINDINGS) {
+            keyBindingLabels[i].setText(kb[1]);
+            i++;
         }
-        updateKeyBindingDisplay();
+        stopListening();
     }
 
     @FXML
@@ -492,82 +474,62 @@ public class PreferencesController implements Initializable {
     }
 
     /**
-     * initializes the keyBindings variable based on what the key bindings according
-     * to the desktop controller
-     */
-    private void initKeyBindingsField() {
-        keyBindings = new ArrayList<>();
-
-        Map<String, KeyCodeInfo> realKeyBindings = desktopController.getKeyBindings();
-
-        for (String menuItem : realKeyBindings.keySet()) {
-            keyBindings.add(realKeyBindings.get(menuItem).getKeyCode());
-        }
-    }
-
-    /**
-     * updates the display of the key bindings on the left side of the key bindings
+     * initializes the display of the key bindings on the left side of the key bindings
      * tab
      */
-    private void updateKeyBindingDisplay() {
-        keyBindingsPane.getChildren().clear();
-        int currY = 2;
+    private void initializeKeyBindingColumn() {
+        keyBindingLabels = new Label[DesktopController.DEFAULT_KEY_BINDINGS.length];
+
+        int currRow = 0;
         ContextMenu contextMenu = new ContextMenu();
         MenuItem setToDefault = new MenuItem("setToDefault");
         MenuItem setToNoKeyBinding = new MenuItem("setToNoKeyBinding");
-        for (String binding : keyBindings) {
+
+        Map<String, KeyCodeInfo> realKeyBindings = desktopController.getKeyBindings();
+        for (String menuItem : realKeyBindings.keySet()) {
+            // Note:  The correct order is preserved since realKeyBindings is
+            //        actually a LinkedHashMap
+            String binding = realKeyBindings.get(menuItem).getKeyCode();
 
             final Label kbLabel = new Label(binding);
-            kbLabel.setLayoutY(currY);
-            kbLabel.setOnContextMenuRequested(t -> currLabel = kbLabel);
-            kbLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent t) {
-                    if (t.getButton() == MouseButton.PRIMARY) {
-                        currLabel.setStyle("-fx-background-color:white;" +
-                                "-fx-border-color:white;");
-                        kbLabel.setStyle("-fx-background-color:lightblue;" +
-                                "-fx-border-style:solid;"
-                                + "-fx-border-color:black;");
-                        currBinding = kbLabel.getText();
-                        currLabel = kbLabel;
-                        listenForKeyEvents();
-                    }
-                }
+            keyPrefsPane.add(kbLabel, 1, currRow);
+            keyBindingLabels[currRow] = kbLabel;
+            kbLabel.setOnMouseClicked(t -> {
+                    currLabel.setStyle("-fx-background-color:white;" +
+                            "-fx-border-color:white;");
+                    kbLabel.setStyle("-fx-background-color:lightblue;" +
+                            "-fx-border-style:solid;"
+                            + "-fx-border-color:black;");
+                    currLabel = kbLabel;
+                    listenForKeyEvents();
             });
             setToDefault.setOnAction(t -> {
                 String kbString = DesktopController
-                        .DEFAULT_KEY_BINDINGS[keyBindingsPane.getChildren().indexOf
-                        (currLabel)][1];
+                        .DEFAULT_KEY_BINDINGS[GridPane.getRowIndex(currLabel)][1];
                 boolean conflict = false;
-                for (Node label : keyBindingsPane.getChildren()) {
-                    if (((Label) label).getText().equals(kbString)
+                int conflictIndex = 0;
+                for (Label label : keyBindingLabels) {
+                    if (label.getText().equals(kbString)
                             && !label.equals(currLabel)) {
                         conflict = true;
-                        String conflictMenuItem = ((Label) menuItemsPane.getChildren()
-                                .get(
-                                        keyBindingsPane.getChildren().indexOf(label)))
-                                .getText();
+                        String conflictMenuItem =
+                                DesktopController.DEFAULT_KEY_BINDINGS[conflictIndex][0];
+
                         Optional<ButtonType> result = Dialogs.createConfirmationDialog(
-                                keyBindingsPane.getScene().getWindow(),
+                                keyPrefsPane.getScene().getWindow(),
                                 "Key Binding Conflict",
-                                "The key binding of the menu item '" +
+                                "The menu item '" +
                                         conflictMenuItem
-                                        + "' already has the key binding '" + kbString
-                                        + "'.  Would you"
-                                        + "like to reassign the key binding of '" +
-                                        conflictMenuItem + "'?").showAndWait();
+                                        + "' already uses the key binding '" + kbString
+                                        + "'.  Would you like to "
+                                        + "reassign the key binding?").showAndWait();
 
                         if (result.get() == ButtonType.OK) {
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (label), "          ");
-                            currBinding = ((Label) label).getText();
+                            label.setText("          ");
                             currLabel.setText(kbString);
                             currLabel.setStyle("-fx-background-color:white;" +
                                     "-fx-border-color:white;");
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (currLabel), kbString);
-                            currLabel = (Label) label;
+                            currLabel = label;
                             currLabel.setText("         ");
                             currLabel.setStyle("-fx-background-color:lightblue;" +
                                     "-fx-border-style:solid;"
@@ -579,36 +541,27 @@ public class PreferencesController implements Initializable {
                             return;
                         }
                         else /* response == Actions.NO */ {
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (label), "          ");
+                            label.setText("          ");
                             currLabel.setText(kbString);
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (currLabel), kbString);
-                            currLabel = (Label) label;
+                            currLabel = label;
                             currLabel.setText("         ");
                         }
                         break;
                     }
+                    conflictIndex++;
                 }
                 if (!conflict) {
                     currLabel.setText(kbString);
-                    keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel),
-                            kbString);
                 }
             });
             setToNoKeyBinding.setOnAction(t -> {
                 currLabel.setText("         ");
-                keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel), "" +
-                        "       ");
                 stopListening();
-                currLabel.setStyle("-fx-background-color:white;" +
-                        "-fx-border-color:white;");
             });
             contextMenu.getItems().clear();
             contextMenu.getItems().addAll(setToDefault, setToNoKeyBinding);
             kbLabel.setContextMenu(contextMenu);
-            keyBindingsPane.getChildren().add(kbLabel);
-            currY += 16;
+            currRow++;
         }
     }
 
@@ -619,152 +572,144 @@ public class PreferencesController implements Initializable {
     private void listenForKeyEvents() {
         listening = true;
 
-        keyBindingsPane.getScene().setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                //System.out.println(t.getCode());
+        keyPrefsPane.getScene().setOnKeyPressed(t -> {
+            if (t.getCode().isModifierKey()) {
+                return; // wait until they press the regular key
+            }
 
-                if (t.getCode().isModifierKey()) {
-                    return;
-                }
+            String keyString = String.valueOf(t.getCode());
+            if (keyString.contains("DIGIT")) {
+                keyString = keyString.replaceAll("DIGIT", "");
+            }
 
-                String keyString = String.valueOf(t.getCode());
-                if (keyString.indexOf("DIGIT") != -1) {
-                    keyString = keyString.replaceAll("DIGIT", "");
+            if (keyString.length() > 1) {
+                String[] words = keyString.split("_");
+                keyString = "";
+                for (String word : words) {
+                    keyString += word.substring(0, 1) + word.substring(1)
+                            .toLowerCase() + "_";
                 }
+                keyString = keyString.substring(0, keyString.length() - 1);
+            }
 
-
-                if (keyString.length() > 1) {
-
-                    String[] words = keyString.split("_");
-                    keyString = "";
-                    for (String word : words) {
-                        keyString += word.substring(0, 1) + word.substring(1)
-                                .toLowerCase() + "_";
-                    }
-                    keyString = keyString.substring(0, keyString.length() - 1);
-                }
-
-
-                String kbString;
-                if (t.isShiftDown() && t.isAltDown() && t.isControlDown()) {
-                    if (System.getProperty("os.name").startsWith("Windows")) {
-                        kbString = desktopController.SHORTCUT + "-Shift-Alt-" + keyString;
-                    }
-                    else {
-                        kbString = desktopController.SHORTCUT + "-Shift-Alt-Ctrl-" +
-                                keyString;
-                    }
-                }
-                else if (t.isAltDown() && t.isControlDown()) {
-                    if (System.getProperty("os.name").startsWith("Windows")) {
-                        kbString = desktopController.SHORTCUT + "-Alt-" + keyString;
-                    }
-                    else {
-                        kbString = desktopController.SHORTCUT + "-Alt-Ctrl-" + keyString;
-                    }
-                }
-                else if (t.isShiftDown() && t.isControlDown()) {
-                    if (System.getProperty("os.name").startsWith("Windows")) {
-                        kbString = desktopController.SHORTCUT + "-Shift-" + keyString;
-                    }
-                    else {
-                        kbString = desktopController.SHORTCUT + "-Shift-Ctrl-" +
-                                keyString;
-                    }
-                }
-                else if (t.isControlDown()) {
-                    if (System.getProperty("os.name").startsWith("Windows")) {
-                        kbString = desktopController.SHORTCUT + "-" + keyString;
-                    }
-                    else {
-                        kbString = desktopController.SHORTCUT + "-Shift-Ctrl-" +
-                                keyString;
-                    }
-                }
-                else if (t.isShiftDown() && t.isAltDown()) {
-                    kbString = desktopController.SHORTCUT + "-Shift-Alt-" + keyString;
-                }
-                else if (t.isShiftDown()) {
-                    kbString = desktopController.SHORTCUT + "-Shift-" + keyString;
-                }
-                else if (t.isAltDown()) {
-                    kbString = desktopController.SHORTCUT + "-Alt-" + keyString;
+            String kbString;
+            if (t.isShiftDown() && t.isAltDown() && t.isControlDown()) {
+                if (System.getProperty("os.name").startsWith("Windows")) {
+                    kbString = DesktopController.SHORTCUT + "-Shift-Alt-" + keyString;
                 }
                 else {
-                    kbString = desktopController.SHORTCUT + "-" + keyString;
+                    kbString = DesktopController.SHORTCUT + "-Shift-Alt-Ctrl-" +
+                            keyString;
                 }
-                boolean stillListening = false;
-                int conflictIndex = 0;
-                for (Node label : keyBindingsPane.getChildren()) {
-                    if (((Label) label).getText().equals(kbString)
-                            && !((Label) label).equals(currLabel)) {
+            }
+            else if (t.isAltDown() && t.isControlDown()) {
+                if (System.getProperty("os.name").startsWith("Windows")) {
+                    kbString = DesktopController.SHORTCUT + "-Alt-" + keyString;
+                }
+                else {
+                    kbString = DesktopController.SHORTCUT + "-Alt-Ctrl-" + keyString;
+                }
+            }
+            else if (t.isShiftDown() && t.isControlDown()) {
+                if (System.getProperty("os.name").startsWith("Windows")) {
+                    kbString = DesktopController.SHORTCUT + "-Shift-" + keyString;
+                }
+                else {
+                    kbString = DesktopController.SHORTCUT + "-Shift-Ctrl-" +
+                            keyString;
+                }
+            }
+            else if (t.isControlDown()) {
+                if (System.getProperty("os.name").startsWith("Windows")) {
+                    kbString = DesktopController.SHORTCUT + "-" + keyString;
+                }
+                else {
+                    kbString = DesktopController.SHORTCUT + "-Shift-Ctrl-" +
+                            keyString;
+                }
+            }
+            else if (t.isShiftDown() && t.isAltDown()) {
+                kbString = DesktopController.SHORTCUT + "-Shift-Alt-" + keyString;
+            }
+            else if (t.isShiftDown()) {
+                kbString = DesktopController.SHORTCUT + "-Shift-" + keyString;
+            }
+            else if (t.isAltDown()) {
+                kbString = DesktopController.SHORTCUT + "-Alt-" + keyString;
+            }
+            else {
+                kbString = DesktopController.SHORTCUT + "-" + keyString;
+            }
+            boolean stillListening = false;
 
-                        String conflictMenuItem = ((Label) menuItemsPane.getChildren()
-                                .get(
-                                        keyBindingsPane.getChildren().indexOf(label))).getText();
-                        Optional<ButtonType> result = Dialogs.createConfirmationDialog(
-                                keyBindingsPane.getScene().getWindow(),
-                                "Key Binding Conflict",
-                                "The key binding of the menu item '" +
-                                        conflictMenuItem
-                                        + "' already has the key binding '" + kbString
-                                        + "'.  Would you"
-                                        + "like to reassign the key binding of '" +
-                                        conflictMenuItem + "'?").showAndWait();
+            // check for duplicate bindings
+            int conflictIndex = 0;
+            for (Label label : keyBindingLabels) {
+                if (label.getText().equals(kbString)
+                        && !label.equals(currLabel)) {
 
-                        if (result.get() == ButtonType.OK) {
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (label), "          ");
-                            currBinding = ((Label) label).getText();
-                            stillListening = true;
+                    String conflictMenuItem =
+                            DesktopController.DEFAULT_KEY_BINDINGS[conflictIndex][0];
+                    Optional<ButtonType> result = Dialogs.createConfirmationDialog(
+                            keyPrefsPane.getScene().getWindow(),
+                            "Key Binding Conflict",
+                            "The key binding of the menu item '" +
+                                    conflictMenuItem
+                                    + "' already has the key binding '" + kbString
+                                    + "'.  Would you "
+                                    + "like to reassign the key binding of '" +
+                                    conflictMenuItem + "'?").showAndWait();
 
-                        }
-                        else if (result.get() == ButtonType.CANCEL) {
-                            return;
-                        }
-                        else {
-                            keyBindings.set(keyBindingsPane.getChildren().indexOf
-                                    (label), "          ");
-
-                        }
-                        break;
+                    if (result.get() == ButtonType.OK) {
+                        label.setText("          ");
+                        stillListening = true;
                     }
-                    conflictIndex++;
+                    else if (result.get() == ButtonType.CANCEL) {
+                        return;
+                    }
+                    else {
+                        label.setText("          ");
+                    }
+                    break;
                 }
+                conflictIndex++;
+            }
 
-                //don't let the user assign key bindings that cannot be changed
-                if (kbString.equals("Ctrl-X") || kbString.equals("Ctrl-V") || kbString
-                        .equals("Ctrl-A")
-                        || kbString.equals("Ctrl-C") || kbString.equals("Ctrl-Z") ||
-                        kbString.equals("Ctrl-X")
-                        || kbString.equals("Ctrl-Shift-Z") || kbString.equals("Cmd-X")
-                        || kbString.equals("Cmd-V") || kbString.equals("Cmd-A")
-                        || kbString.equals("Cmd-C") || kbString.equals("Cmd-Z") ||
-                        kbString.equals("Cmd-X")
-                        || kbString.equals("Cmd-Shift-Z")) {
-                    Dialogs.createErrorDialog(keyBindingsPane.getScene().getWindow(),
-                            "Reserved Key Binding", "The key binding " + kbString + " cannot be assigned"
-                                    + " to a menu item").showAndWait();
-                    return;
-
-                }
-
-
-                keyBindings.set(keyBindingsPane.getChildren().indexOf(currLabel),
-                        kbString);
-                updateKeyBindingDisplay();
-                stopListening();
-                if (stillListening) {
-                    currLabel = (Label) keyBindingsPane.getChildren().get(conflictIndex);
-                    currLabel.setStyle("-fx-background-color:lightblue;" +
-                            "-fx-border-style:solid;"
-                            + "-fx-border-color:black;");
-                    listenForKeyEvents();
-                }
-
+            //don't let the user assign key bindings that cannot be changed
+            if (kbString.equals("Ctrl-X")
+                    || kbString.equals("Ctrl-V")
+                    || kbString.equals("Ctrl-A")
+                    || kbString.equals("Ctrl-C")
+                    || kbString.equals("Ctrl-Z")
+                    || kbString.equals("Ctrl-X")
+                    || kbString.equals("Ctrl-Shift-Z")
+                    || kbString.equals("Cmd-X")
+                    || kbString.equals("Cmd-V")
+                    || kbString.equals("Cmd-A")
+                    || kbString.equals("Cmd-C")
+                    || kbString.equals("Cmd-Z")
+                    || kbString.equals("Cmd-X")
+                    || kbString.equals("Cmd-Shift-Z")) {
+                Dialogs.createErrorDialog(keyPrefsPane.getScene().getWindow(),
+                        "Reserved Key Binding", "The key binding " + kbString +
+                                " is reserved and so you cannot assign it"
+                                + " to another menu item").showAndWait();
+                return;
 
             }
+
+
+            currLabel.setText(kbString);
+            stopListening();
+            if (stillListening) {
+                currLabel = (Label) getNodeFromGridPane(keyPrefsPane, 1, conflictIndex);
+                currLabel.setStyle("-fx-background-color:lightblue;" +
+                        "-fx-border-style:solid;"
+                        + "-fx-border-color:black;");
+                listenForKeyEvents();
+            }
+
+
         });
     }
 
@@ -773,7 +718,9 @@ public class PreferencesController implements Initializable {
      */
     private void stopListening() {
         listening = false;
-        keyBindingsPane.getScene().setOnKeyPressed(null);
+        currLabel.setStyle("-fx-background-color:white;" +
+                "-fx-border-color:white;");
+        keyPrefsPane.getScene().setOnKeyPressed(null);
     }
 
     public static String toRGBCode(Color color) {
@@ -781,5 +728,26 @@ public class PreferencesController implements Initializable {
                 (int) (color.getRed() * 255),
                 (int) (color.getGreen() * 255),
                 (int) (color.getBlue() * 255));
+    }
+
+    /**
+     * Given the row and col index, it returns the Node in that location in
+     * the given GridPane.
+     * (This function should have been included with the JavaFX
+     * GridPane class.)
+     * @param gridPane the GridPane whose cell is desired
+     * @param col the col index of the desired cell
+     * @param row the row index of the desired cell
+     * @return the Node at the given row and col
+     */
+    private Node getNodeFromGridPane(GridPane gridPane, int col, int row) {
+        for (Node node : gridPane.getChildren()) {
+            int nodeCol = GridPane.getColumnIndex(node);
+            int rowCol = GridPane.getRowIndex(node);
+            if (nodeCol == col && rowCol == row) {
+                return node;
+            }
+        }
+        return null;
     }
 }

@@ -11,7 +11,7 @@
 /*  Button */
 .roundButton {
     -fx-background-radius: 30;
-    -fx-font: 13px "System";
+    -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 0;
     -fx-shadow-highlight-color: f0f0f0;
@@ -24,7 +24,7 @@
 
 .roundBlueButton {
     -fx-background-radius: 30;
-    -fx-font: 13px "System";
+    -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-text-fill: black;
     -fx-padding: 0 0 0 0;
@@ -51,7 +51,7 @@
 
 .helpButton {
     -fx-background-radius: 30;
-    -fx-font: 13px "System";
+    -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 0;
     -fx-shadow-highlight-color: f0f0f0;
@@ -86,7 +86,7 @@
 
 /* label */
 .label {
-    -fx-font-size: 12px;
+     /*    -fx-font-size: 16px; */
     -fx-text-fill: #333333;
     -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,0 );
 }

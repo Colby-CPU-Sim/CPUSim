@@ -2202,8 +2202,7 @@ public class DesktopController implements Initializable {
         URL url = getClass().getResource("/cpusim/gui/about/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
-        if (controller instanceof PreferencesController ||
-                controller instanceof EditMachineInstructionController ||
+        if (controller instanceof EditMachineInstructionController ||
                 controller instanceof EditFetchSequenceController) {
             dialogStage.setResizable(false);
         }

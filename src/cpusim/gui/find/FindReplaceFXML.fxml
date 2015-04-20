@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 
 <BorderPane prefHeight="284.0" prefWidth="350.0" styleClass="root"
-            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
         <GridPane prefHeight="80.0" prefWidth="234.0">
             <columnConstraints>
@@ -20,80 +23,96 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
             </rowConstraints>
-            <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="0"
-                  GridPane.rowIndex="0">
-                <Button fx:id="replaceButton" minWidth="80.0"
-                        mnemonicParsing="false" onAction="#onReplaceButtonClicked"
-                        prefHeight="22.0" prefWidth="100.0"
-                        styleClass="roundButton" text="Replace"/>
-            </HBox>
-            <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="0"
-                  GridPane.rowIndex="1">
-                <Button fx:id="replaceAllButton" minWidth="80.0"
-                        mnemonicParsing="false"
-                        onAction="#onReplaceAllButtonClicked" prefHeight="22.0"
-                        prefWidth="100.0" styleClass="roundButton"
-                        text="Replace All"/>
-            </HBox>
-            <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1"
-                  GridPane.rowIndex="0">
-                <Button fx:id="findNextButton" minWidth="80.0"
-                        mnemonicParsing="false"
-                        onAction="#onFindNextButtonClicked" prefHeight="22.0"
-                        prefWidth="100.0" styleClass="roundButton"
-                        text="Find Next"/>
-            </HBox>
-            <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1"
-                  GridPane.rowIndex="1">
-                <Button fx:id="closeButton" cancelButton="true" minWidth="80.0"
-                        mnemonicParsing="false" onAction="#onCloseButtonClicked"
-                        prefHeight="22.0" prefWidth="100.0"
-                        styleClass="roundButton" text="Close"/>
-            </HBox>
+            <children>
+                <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="0"
+                      GridPane.rowIndex="0">
+                    <children>
+                        <Button fx:id="replaceButton" minWidth="80.0"
+                                mnemonicParsing="false" onAction="#onReplaceButtonClicked"
+                                prefHeight="22.0" prefWidth="100.0"
+                                styleClass="roundButton" text="Replace"/>
+                    </children>
+                </HBox>
+                <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="0"
+                      GridPane.rowIndex="1">
+                    <children>
+                        <Button fx:id="replaceAllButton" minWidth="80.0"
+                                mnemonicParsing="false"
+                                onAction="#onReplaceAllButtonClicked" prefHeight="22.0"
+                                prefWidth="100.0" styleClass="roundButton"
+                                text="Replace All"/>
+                    </children>
+                </HBox>
+                <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1"
+                      GridPane.rowIndex="0">
+                    <children>
+                        <Button fx:id="findNextButton" minWidth="80.0"
+                                mnemonicParsing="false"
+                                onAction="#onFindNextButtonClicked" prefHeight="22.0"
+                                prefWidth="100.0" styleClass="roundButton"
+                                text="Find Next"/>
+                    </children>
+                </HBox>
+                <HBox id="HBox" alignment="CENTER" spacing="5.0" GridPane.columnIndex="1"
+                      GridPane.rowIndex="1">
+                    <children>
+                        <Button fx:id="closeButton" cancelButton="true" minWidth="80.0"
+                                mnemonicParsing="false" onAction="#onCloseButtonClicked"
+                                prefHeight="22.0" prefWidth="100.0"
+                                styleClass="roundButton" text="Close"/>
+                    </children>
+                </HBox>
+            </children>
         </GridPane>
     </bottom>
     <center>
         <AnchorPane prefHeight="194.0" prefWidth="350.0">
-            <Pane minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0"
-                  prefWidth="322.0" style="-fx-background-color: #CCCCCC;"
-                  AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="14.0"
-                  AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="11.0">
-                <GridPane alignment="CENTER" layoutX="20.0" layoutY="9.0"
-                          minHeight="-Infinity" minWidth="-Infinity"
-                          prefHeight="80.0" prefWidth="283.0">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"
-                                           minWidth="10.0" prefWidth="100.0"/>
-                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"
-                                           minWidth="10.0" prefWidth="100.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0"
-                                        valignment="CENTER" vgrow="SOMETIMES"/>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0"
-                                        vgrow="SOMETIMES"/>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0"
-                                        vgrow="SOMETIMES"/>
-                    </rowConstraints>
-                    <Label alignment="CENTER" contentDisplay="CENTER"
-                           text="Options" GridPane.columnIndex="0"
-                           GridPane.rowIndex="0"/>
-                    <CheckBox fx:id="caseSensitive" mnemonicParsing="false"
-                              text="Case Sensitive" GridPane.columnIndex="0"
-                              GridPane.rowIndex="1"/>
-                    <CheckBox fx:id="wholeWord" mnemonicParsing="false"
-                              text="Whole Word" GridPane.columnIndex="0"
-                              GridPane.rowIndex="2"/>
-                    <RadioButton fx:id="forwardRB" mnemonicParsing="false"
-                                 text="Forward" GridPane.columnIndex="1"
-                                 GridPane.rowIndex="1"/>
-                    <RadioButton fx:id="backwardRB" mnemonicParsing="false"
-                                 text="Backward" GridPane.columnIndex="1"
-                                 GridPane.rowIndex="2"/>
-                    <Label text="Direction" GridPane.columnIndex="1"
-                           GridPane.rowIndex="0"/>
-                </GridPane>
-            </Pane>
+            <children>
+                <Pane minHeight="-Infinity" minWidth="-Infinity" prefHeight="98.0"
+                      prefWidth="322.0" style="-fx-background-color: #CCCCCC;"
+                      AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="14.0"
+                      AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="11.0">
+                    <children>
+                        <GridPane alignment="CENTER" layoutX="20.0" layoutY="9.0"
+                                  minHeight="-Infinity" minWidth="-Infinity"
+                                  prefHeight="80.0" prefWidth="283.0">
+                            <columnConstraints>
+                                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"
+                                                   minWidth="10.0" prefWidth="100.0"/>
+                                <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"
+                                                   minWidth="10.0" prefWidth="100.0"/>
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                valignment="CENTER" vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                vgrow="SOMETIMES"/>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0"
+                                                vgrow="SOMETIMES"/>
+                            </rowConstraints>
+                            <children>
+                                <Label alignment="CENTER" contentDisplay="CENTER"
+                                       text="Options" GridPane.columnIndex="0"
+                                       GridPane.rowIndex="0"/>
+                                <CheckBox fx:id="caseSensitive" mnemonicParsing="false"
+                                          text="Case Sensitive" GridPane.columnIndex="0"
+                                          GridPane.rowIndex="1"/>
+                                <CheckBox fx:id="wholeWord" mnemonicParsing="false"
+                                          text="Whole Word" GridPane.columnIndex="0"
+                                          GridPane.rowIndex="2"/>
+                                <RadioButton fx:id="forwardRB" mnemonicParsing="false"
+                                             text="Forward" GridPane.columnIndex="1"
+                                             GridPane.rowIndex="1"/>
+                                <RadioButton fx:id="backwardRB" mnemonicParsing="false"
+                                             text="Backward" GridPane.columnIndex="1"
+                                             GridPane.rowIndex="2"/>
+                                <Label text="Direction" GridPane.columnIndex="1"
+                                       GridPane.rowIndex="0"/>
+                            </children>
+                        </GridPane>
+                    </children>
+                </Pane>
+            </children>
         </AnchorPane>
     </center>
     <stylesheets>
@@ -101,29 +120,39 @@
     </stylesheets>
     <top>
         <AnchorPane prefHeight="89.0" prefWidth="350.0">
-            <VBox id="VBox" alignment="CENTER" prefHeight="80.0" prefWidth="320.0"
-                  spacing="5.0" AnchorPane.bottomAnchor="-1.0"
-                  AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0"
-                  AnchorPane.topAnchor="10.0">
-                <HBox id="HBox" alignment="CENTER" spacing="5.0">
-                    <VBox id="VBox" alignment="CENTER_LEFT" spacing="5.0">
-                        <Label text="Find:"/>
-                        <Label text="Replace with:"/>
-                    </VBox>
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                        <HBox.margin>
-                            <Insets left="20.0"/>
-                        </HBox.margin>
-                        <TextField fx:id="findTF" prefWidth="200.0"
-                                   promptText="text to find"/>
-                        <TextField fx:id="replaceWithTF" prefWidth="200.0"
-                                   promptText="replace with"/>
-                    </VBox>
-                </HBox>
-                <Label fx:id="statusLabel" alignment="CENTER"
-                       contentDisplay="RIGHT" prefWidth="199.99990000000253"
-                       text="none"/>
-            </VBox>
+            <children>
+                <VBox id="VBox" alignment="CENTER" prefHeight="80.0" prefWidth="320.0"
+                      spacing="5.0" AnchorPane.bottomAnchor="-1.0"
+                      AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="20.0"
+                      AnchorPane.topAnchor="10.0">
+                    <children>
+                        <HBox id="HBox" alignment="CENTER" spacing="5.0">
+                            <children>
+                                <VBox id="VBox" alignment="CENTER_LEFT" spacing="5.0">
+                                    <children>
+                                        <Label text="Find:" />
+                                        <Label text="Replace with:"/>
+                                    </children>
+                                </VBox>
+                                <VBox id="VBox" alignment="CENTER" spacing="5.0">
+                                    <HBox.margin>
+                                        <Insets left="20.0"/>
+                                    </HBox.margin>
+                                    <children>
+                                        <TextField fx:id="findTF" prefWidth="200.0"
+                                                   promptText="text to find"/>
+                                        <TextField fx:id="replaceWithTF" prefWidth="200.0"
+                                                   promptText="replace with"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <Label fx:id="statusLabel" alignment="CENTER"
+                               contentDisplay="RIGHT" prefWidth="199.99990000000253"
+                               text="none"/>
+                    </children>
+                </VBox>
+            </children>
         </AnchorPane>
     </top>
 </BorderPane>
