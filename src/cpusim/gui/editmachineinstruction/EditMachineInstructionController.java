@@ -1098,13 +1098,15 @@ public class EditMachineInstructionController {
             boolean commentLabel = false;
             if (micro instanceof Comment){
                 microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
-                        "-fx-font-size:14; -fx-font-style:italic;");
+                        "--fx-font-style:italic;");
                 commentLabel = true;
             }
             else {
-                microLabel.setStyle("-fx-font-family:Courier;-fx-font-size:14");
+                microLabel.setStyle("-fx-font-family:Courier;");
             }
-            microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
+            // The following line is commented out because it somehow causes the
+            // scroll pane's width to increase sometimes when dragging micros
+            //microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
             microLabel.setPrefHeight(newLabelHeight);
             microLabel.setLayoutY(nextYPosition);
             microLabel.setTooltip(new Tooltip(micro.getMicroClass()));

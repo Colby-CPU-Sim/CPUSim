@@ -32,7 +32,6 @@ import cpusim.util.ValidationException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -40,7 +39,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -56,7 +54,7 @@ public class EditFetchSequenceController implements Initializable {
 
     @FXML ScrollPane implementationFormatScrollPane;
     @FXML AnchorPane implementationFormatPane;
-    @FXML TreeView microInstrTreeView;
+    @FXML TreeView<String> microInstrTreeView;
 
     Mediator mediator;
     TextField commentEditor;
@@ -64,7 +62,6 @@ public class EditFetchSequenceController implements Initializable {
     Microinstruction currentCommentMicro;
 
     ObservableList<Microinstruction> micros;
-    Microinstruction draggingMicro;
 
     public EditFetchSequenceController(Mediator mediator) {
         this.mediator = mediator;
@@ -85,69 +82,52 @@ public class EditFetchSequenceController implements Initializable {
         
         updateMicros();
         
-        microInstrTreeView.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if (commentEditor != null) {
-                    commitCommentEdit();
-                }
+        microInstrTreeView.setOnMousePressed(t -> {
+            if (commentEditor != null) {
+                commitCommentEdit();
             }
         });
         
-        implementationFormatPane.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent t) {
-                if (commentEditor != null) {
-                    commitCommentEdit();
-                }
+        implementationFormatPane.setOnMousePressed(t -> {
+            if (commentEditor != null) {
+                commitCommentEdit();
             }
         });
 
-        implementationFormatPane.setOnDragOver(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                event.acceptTransferModes(TransferMode.COPY);
-                double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
-                        , event.getSceneY()).getY();
-                int index = getMicroinstrIndex(localY);
-                moveMicrosToMakeRoom(index);
-            }
+        implementationFormatPane.setOnDragOver(event -> {
+            event.acceptTransferModes(TransferMode.COPY);
+            double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
+                    , event.getSceneY()).getY();
+            int index = getMicroinstrIndex(localY);
+            moveMicrosToMakeRoom(index);
         });
-        implementationFormatPane.setOnDragDropped(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                /* data dropped */
-                /* if there is a string data on dragboard, read it and use it */
-                Dragboard db = event.getDragboard();
-                String microName = db.getString().split(",")[0];
-                String className = db.getString().split(",")[1];
-                Microinstruction micro = null;
+        implementationFormatPane.setOnDragDropped(event -> {
+            /* data dropped */
+            /* if there is a string data on dragboard, read it and use it */
+            Dragboard db = event.getDragboard();
+            String microName = db.getString().split(",")[0];
+            String className = db.getString().split(",")[1];
+            Microinstruction micro = null;
 
-                for (String string : Machine.MICRO_CLASSES) {
-                    for (Microinstruction instr : mediator.getMachine().getMicros
-                            (string)) {
-                        if (instr.getName().equals(microName) && instr.getMicroClass()
-                                .equals(className)) {
-                            micro = instr;
-                        }
+            for (String string : Machine.MICRO_CLASSES) {
+                for (Microinstruction instr : mediator.getMachine().getMicros
+                        (string)) {
+                    if (instr.getName().equals(microName) && instr.getMicroClass()
+                            .equals(className)) {
+                        micro = instr;
                     }
                 }
-                if (className.equals("comment")) {
-                    micro = new Comment();
-                    micro.setName(microName);
-                }
-                double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
-                        , event.getSceneY()).getY();
-                int index = getMicroinstrIndex(localY);
-                micros.add(index, micro);
             }
-        });
-        implementationFormatPane.setOnDragExited(new EventHandler<DragEvent>() {
-            @Override
-            public void handle(DragEvent event) {
-                updateMicros();
+            if (className.equals("comment")) {
+                micro = new Comment();
+                micro.setName(microName);
             }
+            double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
+                    , event.getSceneY()).getY();
+            int index = getMicroinstrIndex(localY);
+            micros.add(index, micro);
         });
+        implementationFormatPane.setOnDragExited(event -> updateMicros());
     }
     
     @FXML
@@ -202,93 +182,84 @@ public class EditFetchSequenceController implements Initializable {
             else {
                 microLabel.setStyle("-fx-font-family:Courier;");
             }
-            microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
+            // The following command is commented out since it causes the scroll pane
+            // width to expand for some reason when you drag around some micros.
+            //microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
             microLabel.setPrefHeight(labelHeight);
             microLabel.setLayoutY(nextYPosition);
             microLabel.setTooltip(new Tooltip(micro.getMicroClass()));
 
             //makes the labels movable
-            microLabel.setOnDragDetected(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    
-                    //This is to make sure no error is thrown when the drag is detected
-                    //while still editing the text of a comment
-                    if(implementationFormatPane.getChildren().contains(microLabel)){
-                    
-                        /* drag was detected, start a drag-and-drop gesture*/
-                        /* allow any transfer mode */
-                        Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
+            microLabel.setOnDragDetected(event -> {
 
-                        micros.remove(
-                                implementationFormatPane.getChildren().indexOf(microLabel));
-                        updateMicros();
+                //This is to make sure no error is thrown when the drag is detected
+                //while still editing the text of a comment
+                if(implementationFormatPane.getChildren().contains(microLabel)){
 
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(microLabel.getText()+","+microLabel.getTooltip().getText());
-                        db.setContent(content);
+                    /* drag was detected, start a drag-and-drop gesture*/
+                    /* allow any transfer mode */
+                    Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
 
-                        event.consume();
-                    }
+                    micros.remove(
+                            implementationFormatPane.getChildren().indexOf(microLabel));
+                    updateMicros();
+
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(microLabel.getText()+","+microLabel.getTooltip().getText());
+                    db.setContent(content);
+
+                    event.consume();
                 }
             });
 
             //determines what happens when the label is doubleClicked
             if (!commentLabel){
-                microLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent mouseEvent) {
-                        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
-                                && mouseEvent.getClickCount() == 2 ){
-                            ObservableList<TreeItem> list = microInstrTreeView.getRoot().getChildren();
+                microLabel.setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
+                            && mouseEvent.getClickCount() == 2 ){
+                        ObservableList<TreeItem<String>> list =
+                                          microInstrTreeView.getRoot().getChildren();
 
-                            for (TreeItem<String> t : list){
-                                if (t.getValue().equals(micro.getMicroClass())){
-                                    t.setExpanded(true);
-                                    microInstrTreeView.scrollTo(list.indexOf(t));
-                                    ObservableList<TreeItem<String>> nodes = t.getChildren();
+                        for (TreeItem<String> t : list){
+                            if (t.getValue().equals(micro.getMicroClass())){
+                                t.setExpanded(true);
+                                microInstrTreeView.scrollTo(list.indexOf(t));
+                                ObservableList<TreeItem<String>> nodes = t.getChildren();
 
-                                    for (TreeItem<String> tt : nodes){
-                                        if (tt.getValue().equals(micro.getName())){
-                                            microInstrTreeView.getSelectionModel().select(
-                                                    list.indexOf(t)+nodes.indexOf(tt)+2);
-                                        }
-
+                                for (TreeItem<String> tt : nodes){
+                                    if (tt.getValue().equals(micro.getName())){
+                                        microInstrTreeView.getSelectionModel().select(
+                                                list.indexOf(t)+nodes.indexOf(tt)+2);
                                     }
+
                                 }
-                                else {
-                                    t.setExpanded(false);
-                                }
+                            }
+                            else {
+                                t.setExpanded(false);
                             }
                         }
                     }
                 });
             }
             else{
-                microLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent mouseEvent) {
-                        if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
-                                && mouseEvent.getClickCount() == 2 ){
-                            commentEditor = new TextField(microLabel.getText());
-                            commentEditor.setPrefWidth(implementationFormatPane
-                                    .getWidth());
-                            commentEditor.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                                @Override
-                                public void handle(KeyEvent t) {
-                                    if (t.getCode() == KeyCode.ENTER) {
-                                        commitCommentEdit();
-                                    }
-                                }
-                            });
-                            int index = implementationFormatPane.getChildren().indexOf(microLabel);
-                            microLabel.setVisible(false);
-                            implementationFormatPane.getChildren().add(index, commentEditor);
-                            commentEditor.setPrefHeight(labelHeight);
-                            commentEditor.setLayoutY(index * labelHeight);
-                            commentEditor.setStyle("-fx-font-family:Courier; -fx-font-size:14");
-                            currentCommentMicro = micro;
-                        }
+                microLabel.setOnMouseClicked(mouseEvent -> {
+                    if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
+                            && mouseEvent.getClickCount() == 2 ){
+                        commentEditor = new TextField(microLabel.getText());
+                        commentEditor.setPrefWidth(implementationFormatPane
+                                .getWidth());
+                        commentEditor.setOnKeyPressed(t -> {
+                            if (t.getCode() == KeyCode.ENTER) {
+                                commitCommentEdit();
+                            }
+                        });
+                        int index = implementationFormatPane.getChildren().indexOf(microLabel);
+                        microLabel.setVisible(false);
+                        implementationFormatPane.getChildren().add(index, commentEditor);
+                        commentEditor.setPrefHeight(labelHeight);
+                        commentEditor.setLayoutY(index * labelHeight);
+                        commentEditor.setStyle("-fx-font-family:Courier; -fx-font-size:14");
+                        currentCommentMicro = micro;
                     }
                 });
             }
@@ -303,14 +274,9 @@ public class EditFetchSequenceController implements Initializable {
 
         TreeItem<String> rootNode = new TreeItem<>("MicroInstructions");
 
-        microInstrTreeView.setCellFactory(new Callback<TreeView<String>, TreeCell<String>>() {
-            @Override
-            public TreeCell<String> call(TreeView<String> param) {
-                return new DragTreeCell(mediator,
-                        (Stage)implementationFormatPane.getScene().getWindow(),
-                        microInstrTreeView, getClasses() );
-            }
-        });
+        microInstrTreeView.setCellFactory(param -> new DragTreeCell(mediator,
+                (Stage)implementationFormatPane.getScene().getWindow(),
+                microInstrTreeView, getClasses() ));
 
         rootNode.setExpanded(true);
 
