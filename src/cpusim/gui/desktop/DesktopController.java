@@ -95,24 +95,18 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Bounds;
 import javafx.print.PageLayout;
 import javafx.print.PageRange;
 import javafx.print.PrinterJob;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -363,15 +357,11 @@ public class DesktopController implements Initializable {
         // For disabling/enabling
         noTabSelected = new SimpleBooleanProperty();
         textTabPane.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<Tab>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Tab> arg0, Tab
-                            oldTab, Tab newTab) {
-                        noTabSelected.set(newTab == null);
-                        if (newTab != null) {
-                            final Node node = newTab.getContent();
-                            Platform.runLater(() -> node.requestFocus());
-                        }
+                (arg0, oldTab, newTab) -> {
+                    noTabSelected.set(newTab == null);
+                    if (newTab != null) {
+                        final Node node = newTab.getContent();
+                        Platform.runLater(node::requestFocus);
                     }
                 });
 
@@ -1563,7 +1553,7 @@ public class DesktopController implements Initializable {
 
         MenuItem closeOthers = new MenuItem("Close Others");
         closeOthers.setOnAction(e -> {
-            ArrayList<Tab> tabs = new ArrayList<Tab>();
+            ArrayList<Tab> tabs = new ArrayList<>();
             for (Tab tab : textTabPane.getTabs()) {
                 tabs.add(tab);
             }
@@ -2202,17 +2192,13 @@ public class DesktopController implements Initializable {
         URL url = getClass().getResource("/cpusim/gui/about/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
-        if (controller instanceof EditMachineInstructionController ||
-                controller instanceof EditFetchSequenceController) {
-            dialogStage.setResizable(false);
-        }
         Pane dialogRoot = null;
 
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
-            //TODO: something better...
-            System.out.println(e.getMessage());
+            // should never happen
+            assert false : "Unable to load file: " + fxmlPath;
         }
         Scene dialogScene = new Scene(dialogRoot);
         dialogStage.setScene(dialogScene);
@@ -2225,13 +2211,10 @@ public class DesktopController implements Initializable {
         }
         // pressing escape key causes the dialog to close without saving changes
         dialogScene.addEventFilter(
-                KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(KeyEvent event) {
-                        if (event.getCode().equals(KeyCode.ESCAPE)) {
-                            if (dialogStage.isFocused()) {
-                                dialogStage.close();
-                            }
+                KeyEvent.KEY_RELEASED, event -> {
+                    if (event.getCode().equals(KeyCode.ESCAPE)) {
+                        if (dialogStage.isFocused()) {
+                            dialogStage.close();
                         }
                     }
                 });

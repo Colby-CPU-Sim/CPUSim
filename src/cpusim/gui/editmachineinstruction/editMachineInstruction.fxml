@@ -5,145 +5,184 @@
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
 
-<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="453.0"
-            prefWidth="739.0" styleClass="root" xmlns:fx="http://javafx.com/fxml"
+<BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
+            styleClass="root" xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx/8">
     <bottom>
-        <HBox alignment="CENTER" prefHeight="55.000099999997474" prefWidth="739.0"
-              spacing="15.0">
-            <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                    onAction="#handleHelp" prefHeight="25.0" prefWidth="25.0"
-                    styleClass="helpButton" text="?"/>
-            <Pane prefHeight="42.0" prefWidth="260.0">
-                <Label text=" " visible="false"/>
-            </Pane>
-            <Button defaultButton="true" minHeight="-Infinity" minWidth="100.0"
-                    mnemonicParsing="false" onAction="#handleOkay" prefHeight="22.0"
-                    prefWidth="180.0" styleClass="roundBlueButton" text="OK"/>
-            <Button cancelButton="true" minHeight="-Infinity" minWidth="100.0"
-                    mnemonicParsing="false" onAction="#handleCancel" prefHeight="22.0"
-                    prefWidth="180.0" styleClass="roundButton" text="Cancel"/>
-        </HBox>
+        <VBox>
+            <Separator/>
+            <GridPane hgap="3.0" vgap="3.0">
+                <!--style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"-->
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <children>
+                    <HBox alignment="CENTER_LEFT">
+                        <children>
+                            <Button minHeight="30.0" minWidth="30.0"
+                                    mnemonicParsing="false"
+                                    onAction="#handleHelp" styleClass="helpButton"
+                                    text="?"/>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0"
+                          GridPane.columnIndex="1">
+                        <children>
+                            <Button defaultButton="true" minHeight="30"
+                                    mnemonicParsing="false" onAction="#handleOkay"
+                                    styleClass="roundBlueButton"
+                                    text="            OK            ">
+                            </Button>
+                            <Button cancelButton="true" minHeight="30"
+                                    mnemonicParsing="false"
+                                    onAction="#handleCancel" styleClass="roundButton"
+                                    text="         Cancel         ">
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
+            </GridPane>
+        </VBox>
     </bottom>
     <center>
-        <TabPane prefWidth="581.0" tabClosingPolicy="UNAVAILABLE">
-            <Tab text="Format">
-                <BorderPane prefHeight="380.0" prefWidth="701.0">
-                    <center>
-                        <VBox id="VBox" alignment="CENTER" prefHeight="370.0"
-                              prefWidth="512.9998779296875" spacing="5.0">
-                            <padding>
-                                <Insets left="5.0" right="5.0"/>
-                            </padding>
-                            <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="30.0"
-                                  prefWidth="604.0" spacing="5.0">
-                                <padding>
-                                    <Insets left="15.0" fx:id="x1"/>
-                                </padding>
-                                <Label contentDisplay="CENTER" text="Instruction"/>
-                            </HBox>
-                            <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1"
+        <HBox>
+            <VBox id="VBox" alignment="CENTER" spacing="5">
+                <padding>
+                    <Insets bottom="3" left="3" right="3" top="3"/>
+                </padding>
+                <Label text="Instructions"/>
+                <ListView fx:id="instructionList" editable="true" VBox.vgrow="ALWAYS"/>
+                <HBox alignment="CENTER" spacing="3" minWidth="200">
+                    <Button fx:id="newButton" contentDisplay="CENTER"
+                            mnemonicParsing="false" onAction="#handleNewInstruction"
+                            text=" new "/>
+                    <Button fx:id="dupButton" contentDisplay="CENTER"
+                            mnemonicParsing="false" onAction="#handleDuplicateInstruction"
+                            text=" dup "/>
+                    <Button fx:id="deleteButton" contentDisplay="CENTER"
+                            mnemonicParsing="false" onAction="#handleDeleteInstruction"
+                            text=" del "/>
+                </HBox>
+            </VBox>
+            <TabPane tabClosingPolicy="UNAVAILABLE" HBox.hgrow="ALWAYS">
+                <Tab text="Format">
+                    <BorderPane>
+                        <padding>
+                            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"
+                                    fx:id="x2"/>
+                        </padding>
+                        <center>
+                            <VBox id="VBox" alignment="CENTER" spacing="5.0">
+                                <VBox id="HBox" alignment="CENTER_LEFT"
+                                      VBox.vgrow="ALWAYS">
+                                    <padding>
+                                        <Insets left="15.0" fx:id="x1"/>
+                                    </padding>
+                                    <Label contentDisplay="CENTER" text="Instruction"/>
+                                    <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1"
+                                          spacing="5.0" >
+                                        <Label text="Length:"/>
+                                        <Label fx:id="lengthLabel" text="Length"/>
+                                        <Label text="          Opcode"/>
+                                        <TextField fx:id="opcodeTextField"
+                                                   style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"
+                                                   text="" prefColumnCount="5"/>
+                                    </HBox>
+                                </VBox>
+                                <AnchorPane fx:id="instructionFormatPane"
+                                            VBox.vgrow="ALWAYS"/>
+                                <Separator/>
+                                <VBox fx:id="noFieldsLabel">
+                                    <Label
+                                            text="To add fields, drag them in from the list of fields on the right."
+                                            wrapText="true"/>
+                                    <Label text="To delete fields, drag them out away from the other fields."
+                                           wrapText="true" />
+                                </VBox>
+                                <Separator/>
+                                <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0"
+                                      padding="$x1" VBox.vgrow="ALWAYS">
+                                    <Label text="Assembly"/>
+                                </HBox>
+                                <AnchorPane fx:id="assemblyFormatPane"
+                                            VBox.vgrow="ALWAYS"/>
+                            </VBox>
+                        </center>
+                        <right>
+                            <VBox fx:id="fieldsList" id="VBox" alignment="CENTER"
                                   spacing="5.0">
-                                <Label text="Length:"/>
-                                <Label fx:id="lengthLabel" text="Length"/>
-                                <Pane prefHeight="29.0" prefWidth="89.0"/>
-                                <Label text="Opcode"/>
-                                <TextField fx:id="opcodeTextField"
-                                           style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"
-                                           prefHeight="22.0" prefWidth="80.0"/>
-                            </HBox>
-                            <AnchorPane fx:id="instructionFormatPane" prefHeight="88.0"
-                                        prefWidth="412.9998779296875"/>
-                            <Separator/>
-                            <Label fx:id="noFieldsLabel" prefHeight="42.0"
-                                   text="Drag fields in from the list of fields on the right. To delete fields, drag them out away from the other instructions"
-                                   wrapText="true"/>
-                            <Separator/>
-                            <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1"
-                                  prefHeight="30.0" spacing="5.0">
-                                <Label text="Assembly"/>
-                            </HBox>
-                            <AnchorPane fx:id="assemblyFormatPane" prefHeight="88.0"
-                                        prefWidth="412.9998779296875"/>
-                        </VBox>
-                    </center>
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" fx:id="x2"/>
-                    </padding>
-                    <right>
-                        <VBox id="VBox" alignment="CENTER" spacing="1.0">
-                            <Label text="All Fields"/>
-                            <ScrollPane id="ScrollPane" prefHeight="332.0"
-                                        prefViewportHeight="16.0"
-                                        prefViewportWidth="47.0" prefWidth="133.0">
-                                <AnchorPane id="AnchorPane" fx:id="fieldPane"
-                                            prefHeight="326.0" prefWidth="130.0">
-                                    <Label prefWidth="132.0" text="Length"/>
-                                </AnchorPane>
-                            </ScrollPane>
-                            <ToolBar minHeight="22.0" prefHeight="29.0"
-                                     prefWidth="133.0">
-                                <Button contentDisplay="CENTER"
-                                        mnemonicParsing="false"
-                                        onAction="#handleEditFields"
-                                        prefWidth="110.0" styleClass="smallButton"
-                                        text="Edit Fields..."/>
-                            </ToolBar>
-                        </VBox>
-                    </right>
-                </BorderPane>
-            </Tab>
-            <Tab text="Implementation">
-                <BorderPane padding="$x2">
-                    <left>
-                        <VBox id="VBox" alignment="TOP_CENTER" spacing="5.0">
-                            <Label id="lengthLabel" text="Execute sequence"/>
-                            <ScrollPane id="ScrollPane" prefHeight="353.9998779296875"
-                                        prefViewportHeight="16.0"
-                                        prefViewportWidth="47.0" prefWidth="248.0">
-                                <AnchorPane id="AnchorPane"
-                                            fx:id="implementationFormatPane"
-                                            prefHeight="343.9998779296875"
-                                            prefWidth="245.0"/>
-                            </ScrollPane>
-                        </VBox>
-                    </left>
-                    <right>
-                        <TitledPane animated="false" collapsible="false"
-                                    prefHeight="369.9998779296875" prefWidth="304.0"
-                                    text="MicroInstructions">
-                            <TreeView fx:id="microInstrTreeView" prefHeight="200.0"
-                                      prefWidth="200.0"/>
-                        </TitledPane>
-                    </right>
-                </BorderPane>
-            </Tab>
-        </TabPane>
+                                <padding>
+                                    <Insets bottom="3.0" left="3.0" right="5.0"
+                                            top="3.0"/>
+                                </padding>
+                                <Label text="All Fields"/>
+                                <ScrollPane id="ScrollPane" VBox.vgrow="ALWAYS"
+                                            fitToHeight="true" fitToWidth="true">
+                                    <AnchorPane id="AnchorPane" fx:id="fieldPane"
+                                                minWidth="30.0"
+                                                style="-fx-background-color:white">
+                                    </AnchorPane>
+                                </ScrollPane>
+                                <HBox alignment="CENTER">
+                                    <Button contentDisplay="CENTER"
+                                            mnemonicParsing="false"
+                                            onAction="#handleEditFields"
+                                            text=" Edit Fields... "/>
+                                </HBox>
+                            </VBox>
+                        </right>
+                    </BorderPane>
+                </Tab>
+                <Tab text="Implementation">
+                    <HBox maxWidth="1.7976931348623157E308">
+                        <children>
+                            <TitledPane animated="false" collapsible="false"
+                                        maxHeight="1.7976931348623157E308"
+                                        maxWidth="1.7976931348623157E308"
+                                        text="Execute sequence" textAlignment="CENTER"
+                                        HBox.hgrow="ALWAYS">
+                                <content>
+                                    <ScrollPane id="ScrollPane" fitToHeight="true"
+                                                fitToWidth="true"
+                                                fx:id="implementationFormatScrollPane">
+                                        <content>
+                                            <AnchorPane fx:id="implementationFormatPane"
+                                                        style="-fx-background-color:white"/>
+                                        </content>
+                                    </ScrollPane>
+                                </content>
+                                <HBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0"
+                                            top="10.0"/>
+                                </HBox.margin>
+                            </TitledPane>
+                            <TitledPane animated="false" collapsible="false"
+                                        maxHeight="1.7976931348623157E308"
+                                        maxWidth="1.7976931348623157E308"
+                                        text="MicroInstructions"
+                                        textAlignment="CENTER" HBox.hgrow="ALWAYS">
+                                <content>
+                                    <TreeView fx:id="microInstrTreeView"/>
+                                </content>
+                                <HBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0"
+                                            top="10.0"/>
+                                </HBox.margin>
+                            </TitledPane>
+                        </children>
+                    </HBox>
+
+                </Tab>
+            </TabPane>
+        </HBox>
     </center>
-    <left>
-        <VBox id="VBox" alignment="TOP_CENTER" minWidth="149.0" prefHeight="411.0"
-              prefWidth="173.0" spacing="1.0">
-            <TitledPane animated="false" collapsible="false" minWidth="149.0"
-                        prefHeight="380.0" prefWidth="149.0" text="Instructions">
-                <ListView fx:id="instructionList" editable="true" prefHeight="358.0"
-                          prefWidth="199.0"/>
-            </TitledPane>
-            <ToolBar minHeight="21.0" prefHeight="29.0" prefWidth="203.0">
-                <Button fx:id="newButton" contentDisplay="CENTER"
-                        mnemonicParsing="false" onAction="#handleNewInstruction"
-                        prefHeight="20.0" prefWidth="46.0" styleClass="smallButton"
-                        text="new"/>
-                <Button fx:id="dupButton" contentDisplay="CENTER"
-                        mnemonicParsing="false" onAction="#handleDuplicateInstruction"
-                        prefHeight="20.0" prefWidth="46.0" styleClass="smallButton"
-                        text="dup"/>
-                <Button fx:id="deleteButton" contentDisplay="CENTER"
-                        mnemonicParsing="false" onAction="#handleDeleteInstruction"
-                        prefHeight="20.0" prefWidth="46.0" styleClass="smallButton"
-                        text="del"/>
-            </ToolBar>
-        </VBox>
-    </left>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>

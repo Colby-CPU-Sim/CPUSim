@@ -382,7 +382,7 @@ public class Validate
                     Convert.fromLongToHexadecimalString(instr.getOpcode(),
                             instr.getNumBits()) +
                     "\" (hex) of instruction \"" + instr.getName() +
-                    "\" is too big for the\nfirst field of the instruction.");
+                    "\" is too big for the first field of the instruction.");
         }
     }
 

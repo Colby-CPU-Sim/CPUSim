@@ -8,7 +8,7 @@
 
 <VBox id="MainPane" fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
       minHeight="-Infinity" minWidth="-Infinity" prefHeight="873.0" prefWidth="1400.0"
-      styleClass="root" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="root" xmlns:fx="http://javafx.com/fxml"
       xmlns="http://javafx.com/javafx/8">
     <stylesheets>
         <URL value="@../css/Desktop.css"/>

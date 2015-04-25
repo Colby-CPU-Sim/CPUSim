@@ -498,7 +498,7 @@ public class PreferencesController implements Initializable {
                     currLabel.setStyle("-fx-background-color:white;" +
                             "-fx-border-color:white;");
                     kbLabel.setStyle("-fx-background-color:lightblue;" +
-                            "-fx-border-style:solid;"
+                            "-fx-border-style:solid; -fx-padding:1;"
                             + "-fx-border-color:black;");
                     currLabel = kbLabel;
                     listenForKeyEvents();
@@ -532,7 +532,7 @@ public class PreferencesController implements Initializable {
                             currLabel = label;
                             currLabel.setText("         ");
                             currLabel.setStyle("-fx-background-color:lightblue;" +
-                                    "-fx-border-style:solid;"
+                                    "-fx-border-style:solid; -fx-padding:1"
                                     + "-fx-border-color:black;");
                             listenForKeyEvents();
 
@@ -704,7 +704,7 @@ public class PreferencesController implements Initializable {
             if (stillListening) {
                 currLabel = (Label) getNodeFromGridPane(keyPrefsPane, 1, conflictIndex);
                 currLabel.setStyle("-fx-background-color:lightblue;" +
-                        "-fx-border-style:solid;"
+                        "-fx-border-style:solid; -fx-padding:1"
                         + "-fx-border-color:black;");
                 listenForKeyEvents();
             }

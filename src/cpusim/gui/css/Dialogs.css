@@ -10,7 +10,7 @@
 
 /*  Button */
 .roundButton {
-    -fx-background-radius: 30;
+    -fx-background-radius: 8;
     -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 0;
@@ -23,7 +23,7 @@
 }
 
 .roundBlueButton {
-    -fx-background-radius: 30;
+    -fx-background-radius: 8;
     -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-text-fill: black;
@@ -38,7 +38,6 @@
 
 .smallButton {
     -fx-background-radius: 5;
-    -fx-font: 13px "System";
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 0;
     -fx-shadow-highlight-color: f0f0f0;
@@ -50,7 +49,7 @@
 }
 
 .helpButton {
-    -fx-background-radius: 30;
+    -fx-background-radius: 20;
     -fx-font-family: "System";
     -fx-font-weight: bold;
     -fx-padding: 0 0 0 0;
@@ -171,6 +170,8 @@
     -fx-background-radius: 5 5 0 0, 4 4 0 0, 3 3 0 0;
     -fx-padding: 0.166667em 0.833333em 0.25em 0.833333em; /* 2 10 3 10 */
     -fx-text-fill: black;
+    -fx-border-color:whitesmoke whitesmoke black whitesmoke;
+    -fx-border-width:1;
 }
 
 .titled-pane:focused {

@@ -26,7 +26,6 @@ import cpusim.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.microinstruction.Comment;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -55,17 +54,16 @@ import java.util.ResourceBundle;
  */
 public class EditFetchSequenceController implements Initializable {
 
+    @FXML ScrollPane implementationFormatScrollPane;
     @FXML AnchorPane implementationFormatPane;
-    
     @FXML TreeView microInstrTreeView;
 
     Mediator mediator;
-    
     TextField commentEditor;
+
     Microinstruction currentCommentMicro;
-    
+
     ObservableList<Microinstruction> micros;
-                
     Microinstruction draggingMicro;
 
     public EditFetchSequenceController(Mediator mediator) {
@@ -112,7 +110,7 @@ public class EditFetchSequenceController implements Initializable {
                 double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
                         , event.getSceneY()).getY();
                 int index = getMicroinstrIndex(localY);
-                insertMicroinstr(index);
+                moveMicrosToMakeRoom(index);
             }
         });
         implementationFormatPane.setOnDragDropped(new EventHandler<DragEvent>() {
@@ -191,21 +189,22 @@ public class EditFetchSequenceController implements Initializable {
     
     public void updateMicros() {
         implementationFormatPane.getChildren().clear();
-        int i = 0;
+        int nextYPosition = 0;
+        int labelHeight = 30;
         for (final Microinstruction micro : micros){
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
             if (micro instanceof Comment){
                 microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
-                        "-fx-font-size:14; -fx-font-style:italic;");
+                        "-fx-font-style:italic;");
                 commentLabel = true;
             }
             else {
-                microLabel.setStyle("-fx-font-family:Courier;-fx-font-size:14");
+                microLabel.setStyle("-fx-font-family:Courier;");
             }
-            microLabel.setPrefWidth(implementationFormatPane.getPrefWidth());
-            microLabel.setPrefHeight(20);
-            microLabel.setLayoutY(i);
+            microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
+            microLabel.setPrefHeight(labelHeight);
+            microLabel.setLayoutY(nextYPosition);
             microLabel.setTooltip(new Tooltip(micro.getMicroClass()));
 
             //makes the labels movable
@@ -221,7 +220,8 @@ public class EditFetchSequenceController implements Initializable {
                         /* allow any transfer mode */
                         Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
 
-                        micros.remove(micro);
+                        micros.remove(
+                                implementationFormatPane.getChildren().indexOf(microLabel));
                         updateMicros();
 
                         ClipboardContent content = new ClipboardContent();
@@ -284,8 +284,8 @@ public class EditFetchSequenceController implements Initializable {
                             int index = implementationFormatPane.getChildren().indexOf(microLabel);
                             microLabel.setVisible(false);
                             implementationFormatPane.getChildren().add(index, commentEditor);
-                            commentEditor.setPrefHeight(20);
-                            commentEditor.setLayoutY(index * 20);
+                            commentEditor.setPrefHeight(labelHeight);
+                            commentEditor.setLayoutY(index * labelHeight);
                             commentEditor.setStyle("-fx-font-family:Courier; -fx-font-size:14");
                             currentCommentMicro = micro;
                         }
@@ -294,7 +294,7 @@ public class EditFetchSequenceController implements Initializable {
             }
 
 
-            i += 20;
+            nextYPosition += labelHeight;
             implementationFormatPane.getChildren().add(microLabel);
         }
     }
@@ -333,7 +333,7 @@ public class EditFetchSequenceController implements Initializable {
             Label label = (Label) instr;
             cutOffLocs.add(label.getLayoutY()+.5*label.getPrefHeight());
         }
-        cutOffLocs.add(implementationFormatPane.getPrefHeight());
+        cutOffLocs.add(implementationFormatPane.getHeight());
         int index = 0;
         for (int i=0; i<cutOffLocs.size()-1; i++){
             if (localY >= cutOffLocs.get(i) && localY < cutOffLocs.get(i+1)){
@@ -342,8 +342,13 @@ public class EditFetchSequenceController implements Initializable {
         }
         return index;
     }
-    
-    private void insertMicroinstr(int index) {
+
+    /**
+     * move the micros in the implementationFormatPane so that there is a blank space
+     * at the given index.
+     * @param index  where the blank space is to appear.
+     */
+    private void moveMicrosToMakeRoom(int index) {
         int i = 0;
 //        currentInstr.getMicros().clear();
 //        currentInstr.getMicros().add(index, new Branch("",0,new ControlUnit("", mediator.getMachine())));
@@ -351,7 +356,7 @@ public class EditFetchSequenceController implements Initializable {
         for(Node instr : implementationFormatPane.getChildren()){
             Label label = (Label)instr;
             if (i >= index){
-                label.setPrefHeight(label.getPrefHeight()+20);
+                label.setPrefHeight(3*label.getPrefHeight());
             }
             i++;
         }

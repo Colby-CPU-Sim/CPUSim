@@ -1,33 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.web.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.web.WebView?>
 <?import java.net.URL?>
 
-<BorderPane minWidth="450.0" prefHeight="700.0" prefWidth="450.0" styleClass="root"
-            xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<BorderPane prefWidth="550.0" prefHeight="700" styleClass="root"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <bottom>
-        <HBox id="HBox" alignment="CENTER" prefHeight="49.0"
-              prefWidth="450.0" spacing="5.0">
-            <Button fx:id="okButton" contentDisplay="CENTER" defaultButton="true"
-                    maxWidth="Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                    onAction="#onOkButtonClicked" prefHeight="22.0" prefWidth="160.0"
-                    text="OK"/>
+        <HBox id="HBox" alignment="CENTER" spacing="5.0">
+            <children>
+                <Button fx:id="okButton" contentDisplay="CENTER" defaultButton="true"
+                        maxWidth="Infinity" minWidth="-Infinity" mnemonicParsing="false"
+                        onAction="#onOkButtonClicked"
+                        text="OK" textAlignment="CENTER">
+                    <HBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </HBox.margin>
+                </Button>
+            </children>
         </HBox>
     </bottom>
     <center>
-        <WebView fx:id="webView" prefHeight="270.0" prefWidth="450.0"/>
+        <WebView fx:id="webView" />
     </center>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>
     <top>
-        <StackPane prefHeight="225.0" prefWidth="429.0">
-            <ImageView fx:id="imageView" fitHeight="191.0" fitWidth="355.0"
-                       pickOnBounds="true" preserveRatio="true"
-                       />
+        <StackPane>
+            <children>
+                <ImageView fx:id="imageView" fitHeight="191.0" fitWidth="355.0"
+                           pickOnBounds="true" preserveRatio="true">
+                    <StackPane.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    </StackPane.margin>
+                </ImageView>
+            </children>
         </StackPane>
     </top>
 </BorderPane>
