@@ -15,7 +15,6 @@ import cpusim.Mediator;
 import cpusim.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;
@@ -42,11 +41,9 @@ import java.util.*;
  */
 public class EditMicroinstructionsController implements Initializable {
     @FXML
-    BorderPane scene;
-    @FXML
     ComboBox<String> microinstructionCombo;
     @FXML
-    Pane tables;
+    Pane tablePane;
     @FXML
     Button newButton;
     @FXML
@@ -62,7 +59,7 @@ public class EditMicroinstructionsController implements Initializable {
 
     Mediator mediator;
 
-    private Microinstruction seletedSet = null;
+    private Microinstruction selectedSet = null;
     private TableView activeTable;
     private ChangeTable tableMap;
     private ContentChangeListener listener;
@@ -96,83 +93,53 @@ public class EditMicroinstructionsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        microinstructionCombo.setVisibleRowCount(14);
+        microinstructionCombo.setVisibleRowCount(14); // show all micros at once
 
-        tableMap.setParents(tables);
-        tables.getChildren().clear();
-        tables.getChildren().add(tableMap.getMap().get("TransferRtoR"));
-
+        tableMap.setParents(tablePane);
+        tablePane.getChildren().clear();
         activeTable = tableMap.getMap().get("TransferRtoR");
+        tablePane.getChildren().add(activeTable);
 
-        if (!((MicroController)activeTable).newMicrosAreAllowed()) {
-            newButton.setDisable(true);
-        }
-        else {
-            newButton.setDisable(false);
-        }
+        activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        newButton.setDisable(!((MicroController)activeTable).newMicrosAreAllowed());
+
         activeTable.getSelectionModel().selectedItemProperty().addListener(listener);
 
-        // resizes the width and height of the content panes
-
-        // listens for changes to the size of the dialog window and updates the
-        // content panes.
-        scene.widthProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(
-                            ObservableValue<? extends Number> observableValue,
-                            Number oldValue,
-                            Number newValue) {
-                        Double newWidth = (Double) newValue;
-                        activeTable.setPrefWidth(newWidth);
-                    }
-                }
+        // resizes the width and height of the table to match the dialog
+        tablePane.widthProperty().addListener((observableValue, oldValue, newValue) ->
+                    activeTable.setPrefWidth((Double) newValue)
         );
-        scene.heightProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(
-                            ObservableValue<? extends Number> observableValue,
-                            Number oldValue,
-                            Number newValue) {
-                        Double newHeight = (Double) newValue;
-                        activeTable.setPrefHeight(newHeight - 130);
-                    }
-                }
+        tablePane.heightProperty().addListener((observableValue, oldValue, newValue) ->
+                    activeTable.setPrefHeight((Double)newValue)
         );
 
         // listen for changes to the instruction combo box selection and update
         // the displayed micro instruction table accordingly.
         microinstructionCombo.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> selected,
-                                        String oldType, String newType) {
-                        activeTable.getSelectionModel().selectedItemProperty().
-                                removeListener(listener);
-                        tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
-                        tables.getChildren().clear();
-                        tables.getChildren().add(
-                                tableMap.getMap().get(newType));
+                (selected, oldType, newType) -> {
+                    activeTable.getSelectionModel().selectedItemProperty().
+                            removeListener(listener);
+                    tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
+                    tablePane.getChildren().clear();
+                    tablePane.getChildren().add(
+                            tableMap.getMap().get(newType));
 
-                        activeTable = tableMap.getMap().get(newType);
-                        activeTable.setPrefSize(
-                                scene.getWidth(), scene.getHeight() - 130);
+                    activeTable = tableMap.getMap().get(newType);
+                    activeTable.setPrefWidth(tablePane.getWidth());
+                    activeTable.setPrefHeight(tablePane.getHeight());
+                    activeTable.setColumnResizePolicy(TableView
+                            .CONSTRAINED_RESIZE_POLICY);
 
-                        if (!((MicroController)activeTable).newMicrosAreAllowed()) {
-                            newButton.setDisable(true);
-                        }
-                        else {
-                            newButton.setDisable(false);
-                        }
 
-                        seletedSet = null;
-                        deleteButton.setDisable(true);
-                        duplicateButton.setDisable(true);
+                    newButton.setDisable(!((MicroController) activeTable).newMicrosAreAllowed());
 
-                        activeTable.getSelectionModel().selectedItemProperty().
-                                addListener(listener);
-                    }
+                    selectedSet = null;
+                    deleteButton.setDisable(true);
+                    duplicateButton.setDisable(true);
+
+                    activeTable.getSelectionModel().selectedItemProperty().
+                            addListener(listener);
                 });
 
         // Define an event filter for the ComboBox for Mouse_released events
@@ -182,7 +149,7 @@ public class EditMicroinstructionsController implements Initializable {
                     ((MicroController)activeTable).checkValidity(activeTable.getItems());
 
                 } catch (ValidationException ex){
-                    Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                    Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
                             "Microinstruction Error", ex.getMessage()).showAndWait();
 
                     event.consume();
@@ -242,7 +209,8 @@ public class EditMicroinstructionsController implements Initializable {
                     message += instrsThatUseIt.elementAt(i) + " ";
                 message += ".\nReally delete it?";
 
-                Alert dialog = Dialogs.createConfirmationDialog(tables.getScene().getWindow(),
+                Alert dialog = Dialogs.createConfirmationDialog(tablePane.getScene()
+                                .getWindow(),
                         "Confirm Deletion", message);
                 Optional<ButtonType> result = dialog.showAndWait();
                 if(result.get() == ButtonType.CANCEL ||
@@ -252,7 +220,7 @@ public class EditMicroinstructionsController implements Initializable {
             }
         }
 
-        activeTable.getItems().remove(activeTable.getItems().indexOf(seletedSet));
+        activeTable.getItems().remove(activeTable.getItems().indexOf(selectedSet));
 
         if (selected == 0) {
             activeTable.getSelectionModel().select(0);
@@ -270,7 +238,7 @@ public class EditMicroinstructionsController implements Initializable {
     @FXML
     public void onDuplicateButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
-        Microinstruction newObject = (Microinstruction) seletedSet.clone();
+        Microinstruction newObject = (Microinstruction) selectedSet.clone();
         String uniqueName = createUniqueDuplicatedName(activeTable.getItems(), newObject.getName());
         newObject.setName(uniqueName);
         activeTable.getItems().add(0, newObject);
@@ -302,7 +270,7 @@ public class EditMicroinstructionsController implements Initializable {
             if (parent != null)
                 parent.updateDisplay();
         } catch (ValidationException ex){
-            Dialogs.createErrorDialog(tables.getScene().getWindow(),
+            Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
                     "Microinstruction Error", ex.getMessage()).showAndWait();
         }
 
@@ -422,12 +390,12 @@ public class EditMicroinstructionsController implements Initializable {
                             Microinstruction oldMicro,
                             Microinstruction newMicro) {
             if (newMicro == null) {
-                seletedSet = null;
+                selectedSet = null;
                 deleteButton.setDisable(true);
                 duplicateButton.setDisable(true);
             }
             else {
-                seletedSet = newMicro;
+                selectedSet = newMicro;
                 deleteButton.setDisable(false);
                 duplicateButton.setDisable(false);
             }

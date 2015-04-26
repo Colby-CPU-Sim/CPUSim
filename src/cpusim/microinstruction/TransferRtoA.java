@@ -278,9 +278,9 @@ public class TransferRtoA extends Microinstruction {
         //validate the ability to write to the destination register
         Register destination = dest.get().registers().get((int) indexValue);
         if (destination.getReadOnly() == true)
-            throw new ExecutionException("Destination Register: " +
-                    destination.getName() + "is read-only in the transferRtoA " +
-                    "microinstruction:" + getName());
+            throw new ExecutionException("Attempt to write to read-only Register " +
+                    destination.getName() + " in the transferRtoA " +
+                    "microinstruction: " + getName());
         
         //transfer the data from the registers
         

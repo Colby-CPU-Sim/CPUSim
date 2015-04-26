@@ -182,19 +182,14 @@ public class EditFieldsController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/19.0));
-        type.prefWidthProperty().bind(table.prefWidthProperty().divide(100/19.0));
-        numBits.prefWidthProperty().bind(table.prefWidthProperty().divide(100/16.0));
-        defaultValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/12.0));
-        relativity.prefWidthProperty().bind(table.prefWidthProperty().divide(100/23.0));
-        signed.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        
-        AnchorPane.setTopAnchor(mainPane, 0.0);
-        AnchorPane.setRightAnchor(mainPane, 0.0);
-        AnchorPane.setLeftAnchor(mainPane, 0.0);
-        AnchorPane.setBottomAnchor(mainPane, 0.0);
-        
+        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.15));
+        type.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.16));
+        numBits.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.17));
+        defaultValue.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.20));
+        relativity.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.18));
+        signed.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.14));
+
         selectedField = null;
         deleteButton.setDisable(true);
         duplicateButton.setDisable(true);
@@ -218,10 +213,10 @@ public class EditFieldsController implements Initializable {
         Callback<TableColumn<Field,Field.Relativity>,
                 TableCell<Field,Field.Relativity>> cellRelFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(relBoxOptions);
-        Callback<TableColumn<Field,Boolean>,TableCell<Field,Boolean>> cellBoolFactory =
+        Callback<TableColumn<Field,Boolean>,TableCell<Field, Boolean>> cellBoolFactory =
                 booleanTableColumn -> new CheckBoxTableCell<>();
         Callback<TableColumn<Field,Field.Type>,
-                TableCell<Field,Field.Type>> cellTypeFactory =
+                TableCell<Field, Field.Type>> cellTypeFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(typeBoxOptions);
 
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -240,19 +235,19 @@ public class EditFieldsController implements Initializable {
                     ( text.getRowValue()).setName(newName);
                     try{
                         Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                    }
-                    catch (ValidationException ex) {
+                    } catch (ValidationException ex) {
                         (text.getRowValue()).setName(oldName);
                     }
                     updateTable();
                 }
         );
-        
+
         type.setCellFactory(cellTypeFactory);
         type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         numBits.setCellFactory(cellIntFactory);
-        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
+        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue
+                ()));
 
         defaultValue.setCellFactory(cellLongFactory);
         defaultValue.setOnEditCommit(text ->

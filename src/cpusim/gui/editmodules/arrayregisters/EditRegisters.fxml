@@ -3,44 +3,63 @@
 <?import javafx.collections.FXCollections?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 <?import java.net.URL?>
 
-<BorderPane fx:id="scene" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="300.0" prefWidth="440.0" styleClass="root"
-            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <bottom>
-        <VBox id="VBox" fx:id="vBox" alignment="CENTER" spacing="5.0">
-            <HBox id="HBox" alignment="CENTER" prefHeight="50.0" prefWidth="440.0"
-                  spacing="5.0">
-                <Button fx:id="helpButton" contentDisplay="CENTER"
-                        minHeight="-Infinity" minWidth="-Infinity"
-                        mnemonicParsing="false" onAction="#onHelpButtonClick"
-                        prefHeight="25.0" prefWidth="25.0" styleClass="helpButton"
-                        text="?"/>
-                <Pane prefHeight="50.0" prefWidth="50.0"/>
-                <Button fx:id="okButton" defaultButton="true"
-                        minHeight="-Infinity" minWidth="100.0"
-                        mnemonicParsing="false" onAction="#onOKButtonClick"
-                        prefHeight="22.0" prefWidth="160.0"
-                        styleClass="roundBlueButton" text="OK"/>
-                <Button fx:id="cancelButton" cancelButton="true"
-                        minHeight="-Infinity" minWidth="100.0"
-                        mnemonicParsing="false" onAction="#onCancelButtonClick"
-                        prefHeight="22.0" prefWidth="160.0"
-                        styleClass="roundButton" text="Cancel"/>
-            </HBox>
-        </VBox>
-    </bottom>
+<BorderPane prefHeight="500.0" prefWidth="440.0" styleClass="root"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Label text="Register Array:"/>
+            <ComboBox fx:id="arrayCombo" />
+        </HBox>
+    </top>
     <center>
-        <Pane fx:id="tables"/>
+        <Pane fx:id="tablePane"/>
     </center>
+    <bottom>
+            <GridPane hgap="3.0" vgap="3.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <children>
+                    <HBox alignment="CENTER_LEFT">
+                        <children>
+                            <Button fx:id="helpButton" minHeight="30.0" minWidth="30.0"
+                                    mnemonicParsing="false"
+                                    onAction="#onHelpButtonClick" styleClass="helpButton"
+                                    text="?"/>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0"
+                          GridPane.columnIndex="1">
+                        <children>
+                            <Button fx:id="okButton" defaultButton="true" minHeight="30"
+                                    mnemonicParsing="false" onAction="#onOKButtonClick"
+                                    styleClass="roundBlueButton"
+                                    text="            OK            ">
+                            </Button>
+                            <Button fx:id="cancelButton" cancelButton="true" minHeight="30"
+                                    mnemonicParsing="false"
+                                    onAction="#onCancelButtonClick" styleClass="roundButton"
+                                    text="         Cancel         ">
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
+            </GridPane>
+    </bottom>
     <stylesheets>
         <URL value="@../../css/Dialogs.css"/>
     </stylesheets>
-    <top>
-        <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
-            <Label prefHeight="50.0" text="Register Array:"/>
-            <Label fx:id="arrayName" minWidth="80" />
-         </HBox>
-    </top>
 </BorderPane>

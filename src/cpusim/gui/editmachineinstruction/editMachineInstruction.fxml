@@ -8,49 +8,6 @@
 <BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity"
             styleClass="root" xmlns:fx="http://javafx.com/fxml"
             xmlns="http://javafx.com/javafx/8">
-    <bottom>
-        <VBox>
-            <Separator/>
-            <GridPane hgap="3.0" vgap="3.0">
-                <!--style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"-->
-                <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-                </columnConstraints>
-                <rowConstraints>
-                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-                </rowConstraints>
-                <children>
-                    <HBox alignment="CENTER_LEFT">
-                        <children>
-                            <Button minHeight="30.0" minWidth="30.0"
-                                    mnemonicParsing="false"
-                                    onAction="#handleHelp" styleClass="helpButton"
-                                    text="?"/>
-                        </children>
-                    </HBox>
-                    <HBox alignment="CENTER_RIGHT" spacing="10.0"
-                          GridPane.columnIndex="1">
-                        <children>
-                            <Button defaultButton="true" minHeight="30"
-                                    mnemonicParsing="false" onAction="#handleOkay"
-                                    styleClass="roundBlueButton"
-                                    text="            OK            ">
-                            </Button>
-                            <Button cancelButton="true" minHeight="30"
-                                    mnemonicParsing="false"
-                                    onAction="#handleCancel" styleClass="roundButton"
-                                    text="         Cancel         ">
-                            </Button>
-                        </children>
-                    </HBox>
-                </children>
-                <padding>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                </padding>
-            </GridPane>
-        </VBox>
-    </bottom>
     <center>
         <HBox>
             <VBox id="VBox" alignment="CENTER" spacing="5">
@@ -183,6 +140,49 @@
             </TabPane>
         </HBox>
     </center>
+    <bottom>
+        <VBox>
+            <Separator/>
+            <GridPane hgap="3.0" vgap="3.0">
+                <!--style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"-->
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <children>
+                    <HBox alignment="CENTER_LEFT">
+                        <children>
+                            <Button minHeight="30.0" minWidth="30.0"
+                                    mnemonicParsing="false"
+                                    onAction="#handleHelp" styleClass="helpButton"
+                                    text="?"/>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0"
+                          GridPane.columnIndex="1">
+                        <children>
+                            <Button defaultButton="true" minHeight="30"
+                                    mnemonicParsing="false" onAction="#handleOkay"
+                                    styleClass="roundBlueButton"
+                                    text="            OK            ">
+                            </Button>
+                            <Button cancelButton="true" minHeight="30"
+                                    mnemonicParsing="false"
+                                    onAction="#handleCancel" styleClass="roundButton"
+                                    text="         Cancel         ">
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
+            </GridPane>
+        </VBox>
+    </bottom>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>

@@ -8,6 +8,7 @@ package cpusim.gui.editmodules.arrayregisters;
 
 import cpusim.Mediator;
 import cpusim.Module;
+import cpusim.gui.editmodules.ModuleController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
 import cpusim.gui.editmodules.RegistersTableController;
 import cpusim.gui.help.HelpController;
@@ -28,20 +29,19 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EditArrayRegistersController implements Initializable {
     @FXML
-    BorderPane scene;
+    ComboBox<String> arrayCombo;
     @FXML
-    Label arrayName;
-    @FXML
-    Pane tables;
+    Pane tablePane;
     @FXML
     Button okButton;
     @FXML
@@ -92,44 +92,48 @@ public class EditArrayRegistersController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        arrayName.setText(selection);
+        arrayCombo.getItems().addAll(registerArrays.stream().map(
+                RegisterArray::getName).collect(Collectors.toList()));
+        arrayCombo.getSelectionModel().select(selection);
 
         tableMap = new ChangeTable(registerArrays);
-
-        tableMap.setParents(tables);
-        tables.getChildren().clear();
-        tables.getChildren().add(tableMap.getMap().get(selection));
+        tableMap.setParents(tablePane);
+        tablePane.getChildren().clear();
+        tablePane.getChildren().add(tableMap.getMap().get(selection));
 
         activeTable = tableMap.getMap().get(selection);
+        activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // resizes the width and height of the content panes
+        tablePane.widthProperty().addListener((observableValue, oldValue, newValue) ->
+                        activeTable.setPrefWidth((Double) newValue)
+        );
+        tablePane.heightProperty().addListener((observableValue, oldValue, newValue) ->
+                        activeTable.setPrefHeight((Double) newValue)
+        );
 
-        // listens for changes to the size of the dialog window and updates the
-        // content panes.
-        scene.widthProperty().addListener(
-                new ChangeListener<Number>() {
+        // listen for changes to the instruction combo box selection and update
+        // the displayed micro instruction table accordingly.
+        arrayCombo.getSelectionModel().selectedItemProperty().addListener(
+                new ChangeListener<String>() {
                     @Override
-                    public void changed(
-                            ObservableValue<? extends Number> observableValue,
-                            Number oldValue,
-                            Number newValue) {
-                        Double newWidth = (Double) newValue;
-                        activeTable.setPrefWidth(newWidth);
+                    public void changed(ObservableValue<? extends String> selected,
+                                        String oldType, String newType) {
+                        ((RegisterArrayTableView) activeTable).setClones(activeTable
+                                .getItems());
+                        activeTable = tableMap.getMap().get(newType);
+                        tableMap.getMap().get(oldType).getSelectionModel()
+                                .clearSelection();
+                        tablePane.getChildren().clear();
+                        tablePane.getChildren().add(
+                                tableMap.getMap().get(newType));
+                        activeTable.setPrefWidth(tablePane.getWidth());
+                        activeTable.setPrefHeight(tablePane.getHeight());
+                        activeTable.setColumnResizePolicy(TableView
+                                .CONSTRAINED_RESIZE_POLICY);
+
                     }
-                }
-        );
-        scene.heightProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(
-                            ObservableValue<? extends Number> observableValue,
-                            Number oldValue,
-                            Number newValue) {
-                        Double newHeight = (Double) newValue;
-                        activeTable.setPrefHeight(newHeight - 100);
-                    }
-                }
-        );
+                });
 
         // Define an event filter for the ComboBox for Mouse_released events
         EventHandler validityFilter = new EventHandler<InputEvent>() {
@@ -143,14 +147,14 @@ public class EditArrayRegistersController implements Initializable {
 
                     Validate.allNamesAreUnique(list.toArray());
                     ((RegisterArrayTableView) activeTable).checkValidity(list);
-                    event.consume();
                 } catch (ValidationException ex) {
-                    Dialogs.createErrorDialog(tables.getScene().getWindow(),
+                    Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
                             "Registers Error", ex.getMessage()).showAndWait();
+                    event.consume();
                 }
             }
         };
-        arrayName.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
+        arrayCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
     }
 
     /**
@@ -177,7 +181,7 @@ public class EditArrayRegistersController implements Initializable {
             //close window.
             stage.close();
         } catch (Exception ex) {
-            Dialogs.createErrorDialog(tables.getScene().getWindow(),
+            Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
                     "Registers Error", ex.getMessage()).showAndWait();
         }
     }
@@ -220,53 +224,7 @@ public class EditArrayRegistersController implements Initializable {
      * @return the table view object that is current being edited in the window.
      */
     public RegisterArrayTableView getCurrentController() {
-        return tableMap.getMap().get(selection);
-    }
-
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "?" and tries again.
-     *
-     * @param list         list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    public String createUniqueName(ObservableList list, String proposedName) {
-        String oldName;
-        for (Object obj : list) {
-            oldName = obj.toString();
-            if (oldName != null && oldName.equals(proposedName))
-                return createUniqueName(list, proposedName + "?");
-        }
-        return proposedName;
-    }
-
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "copy" and tries again.
-     *
-     * @param list         list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    protected String createUniqueDuplicatedName(ObservableList list,
-                                                String proposedName) {
-        int i = 1;
-        String s = proposedName + "_copy1";
-
-        for (Object aList : list) {
-            String oldName = aList.toString();
-            // Duplicating name properly
-            if (oldName != null && oldName.equals(s)) {
-                i++;
-                s = s.substring(0, s.length() - 1) + String.valueOf(i);
-            }
-        }
-        return s;
+        return tableMap.getMap().get(arrayCombo.getValue());
     }
 
     /**
@@ -275,10 +233,9 @@ public class EditArrayRegistersController implements Initializable {
      * made while the dialog was open (JRL)
      */
     protected void updateRegisters() { // and the machine needs to be updated based on the changes
-        // ma
+        // made.
         getCurrentController().setClones(activeTable.getItems());
         for (RegisterArrayTableView t : tableMap.getMap().values()) {
-            ObservableList list = t.getItems();
             for (RegisterArray ra : registerArrays) {
                 if (ra.getName().equals(t.getArrayName())) {
                     ra.registers().setAll(t.createNewModulesList(t.getClones()));
@@ -286,28 +243,6 @@ public class EditArrayRegistersController implements Initializable {
             }
         }
 
-    }
-
-    //sorts the given Vector of Modules in place by name
-    //using Selection Sort.  It returns the modified vector.
-    private Vector sortVectorByName(Vector modules) {
-        for (int i = 0; i < modules.size() - 1; i++) {
-            //find the smallest from positions i to the end
-            String nameOfSmallest = ((Module) modules.elementAt(i)).getName();
-            int indexOfSmallest = i;
-            for (int j = i + 1; j < modules.size(); j++) {
-                Module next = (Module) modules.elementAt(j);
-                if (next.getName().compareTo(nameOfSmallest) < 0) {
-                    indexOfSmallest = j;
-                    nameOfSmallest = next.getName();
-                }
-            }
-            //swap smallest into position i
-            Object temp = modules.elementAt(i);
-            modules.setElementAt(modules.elementAt(indexOfSmallest), i);
-            modules.setElementAt(temp, indexOfSmallest);
-        }
-        return modules;
     }
 
 

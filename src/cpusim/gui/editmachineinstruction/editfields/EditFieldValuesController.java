@@ -88,14 +88,9 @@ public class EditFieldValuesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/54.0));
-        value.prefWidthProperty().bind(table.prefWidthProperty().divide(100/54.0));
-        
-        AnchorPane.setTopAnchor(mainPane, 0.0);
-        AnchorPane.setRightAnchor(mainPane, 0.0);
-        AnchorPane.setLeftAnchor(mainPane, 0.0);
-        AnchorPane.setBottomAnchor(mainPane, 0.0);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+//        name.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.5));
+//        value.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.5));
         
         selectedFieldValueName = null;
         delete.setDisable(true);
