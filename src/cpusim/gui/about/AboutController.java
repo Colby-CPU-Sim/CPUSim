@@ -29,6 +29,7 @@ public class AboutController implements Initializable {
         WebEngine webEngine = webView.getEngine();
         url = getClass().getResource("/cpusim/gui/about/aboutCPUSim.html");
         webEngine.load(url.toExternalForm());
+        webView.setZoom(javafx.stage.Screen.getPrimary().getDpi() / 96);
     }
 
     @FXML

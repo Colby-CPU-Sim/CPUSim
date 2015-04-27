@@ -152,6 +152,13 @@
     -fx-text-fill: -fx-text-inner-color;
 }
 
+.table-row-cell:empty {
+-fx-background-color: white;
+}
+
+.table-row-cell:empty .table-cell {
+-fx-border-width: 0px;
+}
 
 /* tool bar. */
 .tool-bar {

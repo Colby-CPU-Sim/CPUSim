@@ -19,8 +19,6 @@ import cpusim.gui.util.EditingMultiBaseStyleLongCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -32,7 +30,9 @@ import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /*
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
@@ -71,7 +71,6 @@ public class EQUsController implements Initializable {
     private EQU selectedSet;
     private Mediator mediator;
     private Base base;
-    private ObservableList<Base> bases;
 
     ///////////////// Constructor and Initializer /////////////////
 
@@ -154,7 +153,7 @@ public class EQUsController implements Initializable {
     public void onNewButtonClicked() {
         // Make unique Name
         String s = "?";
-        ArrayList<String> names = getNames();
+        List<String> names = getNames();
         while (names.contains(s)) {
             s += "?";
         }
@@ -168,7 +167,7 @@ public class EQUsController implements Initializable {
         equsTable.getSelectionModel().selectFirst();
         equsTable.scrollTo(0);
 
-        updateButtonClickables();
+        updateButtonEnabling();
     }
 
     /**
@@ -191,7 +190,7 @@ public class EQUsController implements Initializable {
             equsTable.getSelectionModel().select(indexToSelect);
         }
 
-        updateButtonClickables();
+        updateButtonEnabling();
     }
 
     /**
@@ -207,7 +206,7 @@ public class EQUsController implements Initializable {
             EQU newSet = (EQU) (selectedSet.clone());
             String orig = newSet.getName() + "_copy";
             String s = newSet.getName() + "_copy";
-            ArrayList<String> names = getNames();
+            List<String> names = getNames();
             int i = 1;
             while (names.contains(s)) {
                 s = s.substring(0, orig.length()) + String.valueOf(i);
@@ -221,7 +220,7 @@ public class EQUsController implements Initializable {
             equsTable.getSelectionModel().selectFirst();
             equsTable.scrollTo(0);
         }
-        updateButtonClickables();
+        updateButtonEnabling();
     }
 
     ///////////////// Update which buttons are disabled /////////////////
@@ -233,28 +232,26 @@ public class EQUsController implements Initializable {
      * the New, Delete, and Duplicate buttons according
      * to the state of the window.
      */
-    public void updateButtonClickables() {
+    private void updateButtonEnabling() {
         if (equsTable.getItems().isEmpty()) {
             deleteButton.setDisable(true);
             duplicateButton.setDisable(true);
         }
+        else if (selectedSet == null) {
+            deleteButton.setDisable(true);
+            duplicateButton.setDisable(true);
+        }
+        else if (equsTable.getItems().indexOf(selectedSet) >= 0) {
+            deleteButton.setDisable(false);
+            duplicateButton.setDisable(false);
+        }
         else {
-            if (selectedSet == null) {
-                deleteButton.setDisable(true);
-                duplicateButton.setDisable(true);
-            }
-            else {
-                if (equsTable.getItems().indexOf(selectedSet) >= 0) {
-                    deleteButton.setDisable(false);
-                    duplicateButton.setDisable(false);
-                }
-                else {
-                    deleteButton.setDisable(true);
-                    duplicateButton.setDisable(true);
-                }
-            }
+            deleteButton.setDisable(true);
+            duplicateButton.setDisable(true);
         }
     }
+
+
 
     ///////////////// Initializer Help Methods /////////////////
 
@@ -265,20 +262,16 @@ public class EQUsController implements Initializable {
 
         // Accounts for width changes.
         equsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        nameColumn.prefWidthProperty().bind(equsTable.widthProperty().divide(100 / 30.0));
-        valueColumn.prefWidthProperty().bind(equsTable.widthProperty().divide(100 / 70.0));
+        nameColumn.prefWidthProperty().bind(equsTable.widthProperty().subtract(4).multiply(.3));
+        valueColumn.prefWidthProperty().bind(equsTable.widthProperty().subtract(4).multiply(.7));
 
         // updates selectedSet
-        updateButtonClickables();
+        updateButtonEnabling();
         equsTable.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<EQU>() {
-                    @Override
-                    public void changed(ObservableValue<? extends EQU> selected,
-                                        EQU oldSet, EQU newSet) {
-                        selectedSet = newSet;
-                        updateButtonClickables();
-                        updateTable();
-                    }
+                (selected, oldSet, newSet) -> {
+                    selectedSet = newSet;
+                    updateButtonEnabling();
+                    updateTable();
                 });
 
         // Callbacks
@@ -288,7 +281,7 @@ public class EQUsController implements Initializable {
         Callback<TableColumn<EQU, Long>, TableCell<EQU, Long>> cellMultiBaseLongFactory =
                 setLongTableColumn -> {
                     EditingMultiBaseStyleLongCell<EQU> a = new
-                            EditingMultiBaseStyleLongCell<>(base, new FontData());
+                            EditingMultiBaseStyleLongCell<>(base, null);
                     return a;
                 };
 
@@ -314,8 +307,7 @@ public class EQUsController implements Initializable {
                 });
 
         valueColumn.setCellFactory(cellMultiBaseLongFactory);
-        valueColumn.setOnEditCommit(
-                text -> {
+        valueColumn.setOnEditCommit( text -> {
                     Long newValue = text.getNewValue();
                     text.getRowValue().setValue(newValue);
                 });
@@ -335,46 +327,28 @@ public class EQUsController implements Initializable {
      * listeners to change the content of the
      * value column.
      */
-    public void setUpBaseComboBox() {
-        bases = FXCollections.observableArrayList(new Base(Base.DECIMAL),
-                new Base(Base.BINARY), new Base(Base.HEX));
+    private void setUpBaseComboBox() {
+        ObservableList<Base> bases = FXCollections.observableArrayList(
+                new Base(Base.DECIMAL), new Base(Base.BINARY), new Base(Base.HEX));
         baseComboBox.setItems(bases);
         baseComboBox.setValue(bases.get(0));
 
         baseComboBox.getSelectionModel().selectedIndexProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> arg0,
-                                        Number old_value, Number new_value) {
-                        if (new_value.equals(0)) {
-                            base.setBase(Base.DECIMAL);
-                        }
-                        else if (new_value.equals(1)) {
-                            base.setBase(Base.BINARY);
-                        }
-                        else {
-                            base.setBase(Base.HEX);
-                        }
-                        updateTable();
+                (arg0, old_value, new_value) -> {
+                    if (new_value.equals(0)) {
+                        base.setBase(Base.DECIMAL);
                     }
+                    else if (new_value.equals(1)) {
+                        base.setBase(Base.BINARY);
+                    }
+                    else {
+                        base.setBase(Base.HEX);
+                    }
+                    updateTable();
                 });
     }
 
     ///////////////// Other Private Help Methods /////////////////
-
-    /**
-     * Refreshes the EQUs table.
-     */
-    public void refreshTable() {
-        // New way to refresh table that doesn't change column width
-        ObservableList<EQU> items = equsTable.getItems();
-        ObservableList<EQU> copy = FXCollections.observableArrayList();
-        for (EQU equ : items) {
-            copy.add((EQU) (equ.clone()));
-        }
-        items.removeAll(items);
-        items.addAll(copy);
-    }
 
     /**
      * Returns an ArrayList which contains all the
@@ -383,17 +357,8 @@ public class EQUsController implements Initializable {
      * @return ArrayList which contains all the
      * names of the items in the table.
      */
-    private ArrayList<String> getNames() {
-        ObservableList<EQU> data = equsTable.getItems();
-        ArrayList<String> al = new ArrayList<>();
-        if (data.isEmpty()) {
-            return al;
-        }
-
-        for (EQU equ : data) {
-            al.add(equ.getName());
-        }
-        return al;
+    private List<String> getNames() {
+        return equsTable.getItems().stream().map(EQU::getName).collect(Collectors.toList());
     }
 
     private void updateTable() {

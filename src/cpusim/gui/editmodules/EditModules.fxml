@@ -7,7 +7,7 @@
 <?import java.lang.String?>
 <?import java.net.URL?>
 
-<BorderPane prefHeight="300.0" prefWidth="500.0" styleClass="root"
+<BorderPane prefHeight="600.0" prefWidth="600.0" styleClass="root"
             xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/8">
 
     <top>

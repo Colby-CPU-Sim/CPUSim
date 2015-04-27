@@ -7,56 +7,96 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
+<?import javafx.geometry.*?>
 
-<BorderPane prefHeight="250.0" prefWidth="530.0" styleClass="root" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
-  <bottom>
-    <HBox id="HBox" alignment="CENTER" prefHeight="35.0" spacing="5.0">
-      <children>
-        <Button fx:id="helpButton" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onHelpButtonClicked" prefHeight="25.0" prefWidth="25.0" styleClass="helpButton" text="?" />
-        <Pane prefHeight="35.0" prefWidth="78.0" />
-        <Button fx:id="okButton" defaultButton="true" minHeight="-Infinity" minWidth="70.0" mnemonicParsing="false" onAction="#onOkButtonClicked" prefHeight="22.0" prefWidth="140.0" styleClass="roundBlueButton" text="OK" />
-        <Button fx:id="cancelButton" cancelButton="true" minHeight="-Infinity" minWidth="70.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="22.0" prefWidth="140.0" styleClass="roundButton" text="Cancel" />
-      </children>
-    </HBox>
-  </bottom>
-  <center>
-    <BorderPane prefHeight="193.0">
-      <bottom>
-        <HBox id="HBox" alignment="CENTER" prefHeight="36.0" spacing="5.0">
-          <children>
-            <Button fx:id="newButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onNewButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="New" />
-            <Button id="duplicateButton" fx:id="deleteButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onDeleteButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="Delete" />
-            <Button fx:id="duplicateButton" minHeight="-Infinity" minWidth="80.0" mnemonicParsing="false" onAction="#onDuplicateButtonClicked" prefHeight="22.0" prefWidth="90.0" styleClass="roundButton" text="Duplicate" />
-          </children>
+<BorderPane prefHeight="400.0" prefWidth="600.0" styleClass="root"
+            xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/8">
+    <top>
+        <HBox id="HBox" alignment="CENTER" spacing="5.0">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <children>
+                <Label text="Base:"/>
+                <ComboBox id="baseCB" fx:id="baseComboBox">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                            <String fx:value="Decimal"/>
+                            <String fx:value="Binary"/>
+                            <String fx:value="Hexadecimal"/>
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+            </children>
         </HBox>
-      </bottom>
-      <center>
+    </top>
+    <center>
         <TableView id="equTable" fx:id="equsTable" editable="true">
-          <columns>
-            <TableColumn text="Name" fx:id="nameColumn" />
-            <TableColumn text="Value" fx:id="valueColumn" styleClass="table-row-cell"/>
-          </columns>
+            <columns>
+                <TableColumn text="Name" fx:id="nameColumn"/>
+                <TableColumn text="Value" fx:id="valueColumn" />
+                             <!--styleClass="table-row-cell"-->
+            </columns>
         </TableView>
-      </center>
-    </BorderPane>
-  </center>
-  <stylesheets>
-    <URL value="@../css/Dialogs.css" />
-  </stylesheets>
-  <top>
-    <HBox id="HBox" alignment="CENTER" prefHeight="36.0" prefWidth="450.0" spacing="5.0">
-      <children>
-        <Label minHeight="-Infinity" minWidth="-Infinity" text="Base:" />
-        <ComboBox id="baseCB" fx:id="baseComboBox" minHeight="-Infinity" minWidth="-Infinity" prefWidth="126.0">
-          <items>
-            <FXCollections fx:factory="observableArrayList">
-              <String fx:value="Item 1" />
-              <String fx:value="Item 2" />
-              <String fx:value="Item 3" />
-            </FXCollections>
-          </items>
-        </ComboBox>
-      </children>
-    </HBox>
-  </top>
+    </center>
+    <bottom>
+        <VBox alignment="CENTER" spacing="5.0">
+            <HBox id="HBox" alignment="CENTER" spacing="5.0">
+                <children>
+                    <Button fx:id="newButton" mnemonicParsing="false"
+                            onAction="#onNewButtonClicked" text="New"/>
+                    <Button fx:id="deleteButton" mnemonicParsing="false"
+                            onAction="#onDeleteButtonClicked" text="Delete"/>
+                    <Button fx:id="duplicateButton" mnemonicParsing="false"
+                            onAction="#onDuplicateButtonClicked" text="Duplicate"/>
+                </children>
+            </HBox>
+            <Separator/>
+            <GridPane hgap="3.0" vgap="3.0">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <children>
+                    <HBox alignment="CENTER_LEFT">
+                        <children>
+                            <Button fx:id="helpButton" minHeight="30.0" minWidth="30.0"
+                                    mnemonicParsing="false"
+                                    onAction="#onHelpButtonClicked" styleClass="helpButton"
+                                    text="?"/>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0"
+                          GridPane.columnIndex="1">
+                        <children>
+                            <Button fx:id="okButton" defaultButton="true" minHeight="30"
+                                    mnemonicParsing="false" onAction="#onOkButtonClicked"
+                                    styleClass="roundBlueButton"
+                                    text="            OK            ">
+                            </Button>
+                            <Button fx:id="cancelButton" cancelButton="true"
+                                    minHeight="30"
+                                    mnemonicParsing="false"
+                                    onAction="#onCancelButtonClicked"
+                                    styleClass="roundButton"
+                                    text="         Cancel         ">
+                            </Button>
+                        </children>
+                    </HBox>
+                </children>
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </padding>
+            </GridPane>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
+    </bottom>
+    <stylesheets>
+        <URL value="@../css/Dialogs.css"/>
+    </stylesheets>
 </BorderPane>

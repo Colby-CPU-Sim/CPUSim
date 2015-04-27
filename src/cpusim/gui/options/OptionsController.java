@@ -167,10 +167,10 @@ public class OptionsController implements Initializable {
      */
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
+        initializeIOOptionsTab();
         initializeHighlightingTab();
         initializeLoadingTab();
         initializePunctuationTab();
-        initializeIOOptionsTab();
         initializeIndexingTab();
     }
 
@@ -227,9 +227,7 @@ public class OptionsController implements Initializable {
     public void onOKButtonClicked() {
         // Save individual tabs
 
-        boolean canClose = true;
-
-        canClose &= saveIndexingTab();
+        boolean canClose = saveIndexingTab();
         saveHighlightingTab();
         saveIOOptionsTab();
         canClose &= saveLoadingTab();
@@ -248,13 +246,11 @@ public class OptionsController implements Initializable {
     }
 
     /**
-     * Called whenever the Cancel button
+     * Called whenever the Close button
      * is clicked.
      */
-    public void onCancelButtonClicked() {
-        cancelButton.setDisable(true);
-        //close window.
-        ((Stage) (helpButton.getScene().getWindow())).close();
+    public void onCloseButtonClicked() {
+         ((Stage) (helpButton.getScene().getWindow())).close();
     }
 
     /**
@@ -638,15 +634,9 @@ public class OptionsController implements Initializable {
      */
     private void initializePunctuationTab() {
 
-//        // Accounts for width changes.
-//        leftASCIIColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-//        leftTypeColumn.prefWidthProperty().bind(leftPunctuationTable.widthProperty().divide(100 / 50.0));
-//        rightASCIIColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
-//        rightTypeColumn.prefWidthProperty().bind(rightPunctuationTable.widthProperty().divide(100 / 50.0));
-//
-//        // Making column widths adjust properly
-//        leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-//        rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        // Making column widths adjust properly
+        leftPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Callbacks
         Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>> cellStrFactory =
@@ -747,6 +737,11 @@ public class OptionsController implements Initializable {
                 allChannels.add(channel);
             }
         }
+
+        // Accounts for width changes.
+        IOOptionsTable.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+        nameColumn.prefWidthProperty().bind(IOOptionsTable.widthProperty().subtract(4).multiply(.25));
+        connectionColumn.prefWidthProperty().bind(IOOptionsTable.widthProperty().subtract(4).multiply(.75));
 
        // updates selectedSet
         IOOptionsTable.getSelectionModel().selectedItemProperty().addListener(
@@ -867,8 +862,7 @@ public class OptionsController implements Initializable {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose Data File");
         fileChooser.setInitialDirectory(null);
-        File file = fileChooser.showOpenDialog(
-                helpButton.getScene().getWindow());
+        File file = fileChooser.showOpenDialog(helpButton.getScene().getWindow());
 
         try {
             if (file != null) {

@@ -10,46 +10,6 @@
 
 <BorderPane styleClass="root" xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml">
-    <bottom>
-        <GridPane hgap="3.0" vgap="3.0">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-            </rowConstraints>
-            <children>
-                <HBox alignment="CENTER_LEFT">
-                    <children>
-                        <Button mnemonicParsing="false" onAction="#handleHelp"
-                                minHeight="30.0" minWidth="30.0" styleClass="helpButton"
-                                text="?"/>
-                    </children>
-                </HBox>
-                <HBox alignment="CENTER_RIGHT"
-                      spacing="10.0" GridPane.columnIndex="1">
-                    <children>
-                        <Button fx:id="applyButton" minHeight="30" mnemonicParsing="false"
-                                onAction="#onApplyButtonClick"
-                                styleClass="roundButton" text="    Apply    ">
-                        </Button>
-                        <Button fx:id="okayButton" defaultButton="true" minHeight="30"
-                                mnemonicParsing="false" onAction="#onOKButtonClick"
-                                styleClass="roundBlueButton" text="    OK    ">
-                         </Button>
-                        <Button fx:id="closeButton" cancelButton="true" minHeight="30"
-                                mnemonicParsing="false" onAction="#onCloseButtonClick"
-                                styleClass="roundButton" text="    Close    ">
-                        </Button>
-                    </children>
-                </HBox>
-            </children>
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-            </padding>
-        </GridPane>
-    </bottom>
     <center>
         <TabPane fx:id="tabPane">
             <tabs>
@@ -644,6 +604,46 @@
             </tabs>
         </TabPane>
     </center>
+    <bottom>
+        <GridPane hgap="3.0" vgap="3.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#handleHelp"
+                                minHeight="30.0" minWidth="30.0" styleClass="helpButton"
+                                text="?"/>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT"
+                      spacing="10.0" GridPane.columnIndex="1">
+                    <children>
+                        <Button fx:id="applyButton" minHeight="30" mnemonicParsing="false"
+                                onAction="#onApplyButtonClick"
+                                styleClass="roundButton" text="    Apply    ">
+                        </Button>
+                        <Button fx:id="okayButton" defaultButton="true" minHeight="30"
+                                mnemonicParsing="false" onAction="#onOKButtonClick"
+                                styleClass="roundBlueButton" text="    OK    ">
+                        </Button>
+                        <Button fx:id="closeButton" cancelButton="true" minHeight="30"
+                                mnemonicParsing="false" onAction="#onCloseButtonClick"
+                                styleClass="roundButton" text="    Close    ">
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </GridPane>
+    </bottom>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>

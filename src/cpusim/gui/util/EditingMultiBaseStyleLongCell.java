@@ -41,10 +41,15 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     private FontData styleInfo;
     private int cellSize;
 
+    /**
+     * constructor
+     * @param base the base in which the data is to be edited
+     * @param style the font and background info for displaying the cell.
+     *              If style=null, the default font and background are used.
+     */
     public EditingMultiBaseStyleLongCell(Base base, FontData style) {
         this.base = base;
         this.styleInfo = style;
-
     }
 
     public Base getBase(){
@@ -97,7 +102,8 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     public void updateItem(Long item, boolean empty) {
         super.updateItem(item, empty);
 
-        styleInfo.setFontAndBackground(this);
+        if( styleInfo != null )
+            styleInfo.setFontAndBackground(this);
 
 
         if (empty || item == null) {
@@ -117,7 +123,8 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             setText(formatString(convertLong(Long.parseLong(getString()))));
             if(isReadOnlyRegisterValue()) {
                 ImageView graphic = new ImageView(new Image("cpusim/gui/desktop/Lock.png"));
-                graphic.setFitHeight(Integer.parseInt(styleInfo.fontSize));
+                graphic.setFitHeight(styleInfo == null ? this.getHeight() :
+                                                   Integer.parseInt(styleInfo.fontSize));
                 graphic.setSmooth(true);
                 graphic.setPreserveRatio(true);
                 graphic.setCache(true);

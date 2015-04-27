@@ -6,142 +6,105 @@
 <?import javafx.scene.layout.*?>
 <?import java.lang.*?>
 <?import java.net.URL?>
+
 <BorderPane fx:id="mainBorderPane" prefHeight="550.0" prefWidth="600.0" styleClass="root"
             xmlns:fx="http://javafx.com/fxml">
-    <bottom>
-        <HBox id="HBox" alignment="CENTER" minHeight="17.0" prefHeight="63.0"
-              prefWidth="600.0" spacing="15.0">
-            <Button id="HelpButton" fx:id="helpButton" maxHeight="-Infinity"
-                    maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                    mnemonicParsing="false" onAction="#onHelpButtonClicked"
-                    prefHeight="25.0" prefWidth="25.0" styleClass="helpButton"
-                    text="?"/>
-            <Pane prefHeight="63.0" prefWidth="81.0"/>
-            <Button fx:id="applyButton" minHeight="-Infinity" minWidth="100.0"
-                    mnemonicParsing="false" onAction="#onApplyButtonClicked"
-                    prefHeight="22.0" prefWidth="131.0" styleClass="roundButton"
-                    text="Apply"/>
-            <Button fx:id="OKButton" defaultButton="true" minHeight="-Infinity"
-                    minWidth="100.0" mnemonicParsing="false"
-                    onAction="#onOKButtonClicked" prefHeight="22.0" prefWidth="131.0"
-                    styleClass="roundBlueButton" text="OK"/>
-            <Button id="CancelButton" fx:id="cancelButton" maxHeight="-Infinity"
-                    maxWidth="-Infinity" minHeight="-Infinity" minWidth="100.0"
-                    mnemonicParsing="false" onAction="#onCancelButtonClicked"
-                    prefHeight="22.0" prefWidth="131.0" styleClass="roundButton"
-                    text="Cancel"/>
-        </HBox>
-    </bottom>
     <center>
-        <TabPane fx:id="tabPane" prefHeight="390.0" prefWidth="600.0"
+        <TabPane fx:id="tabPane"
                  tabClosingPolicy="UNAVAILABLE">
             <Tab fx:id="IOOptionsTab" closable="false"
-                 onSelectionChanged="#onSelectionChanged" style=""
+                 onSelectionChanged="#onSelectionChanged"
                  text="IO Connections">
-                <BorderPane prefHeight="354.0" prefWidth="600.0">
-                    <bottom>
-                        <HBox alignment="CENTER" prefHeight="43.0"
-                              prefWidth="600.0" spacing="20.0"
+                <BorderPane>
+                    <center>
+                        <TableView fx:id="IOOptionsTable" editable="true">
+                            <columns>
+                                <TableColumn editable="false"
+                                             minWidth="50.0"
+                                             text="Name"
+                                             fx:id="nameColumn"/>
+                                <TableColumn minWidth="50.0"
+                                             text="Connection"
+                                             fx:id="connectionColumn"/>
+                            </columns>
+                        </TableView>
+                    </center>
+                    <bottom><VBox>
+                        <HBox alignment="CENTER" spacing="15.0"
                               BorderPane.alignment="CENTER">
                             <Label id="setAllConnectionsLabel"
                                    text="Set all connections"/>
-                            <ComboBox fx:id="changeAllCombo"
-                                      prefWidth="250.0">
+                            <ComboBox fx:id="changeAllCombo">
                                 <items>
                                     <FXCollections
                                             fx:factory="observableArrayList">
                                     </FXCollections>
                                 </items>
                             </ComboBox>
-                        </HBox>
+                            <padding>
+                                <Insets bottom="5" left="5" right="5" top="5" />
+                            </padding>
+                        </HBox><Separator /></VBox>
                     </bottom>
-                    <center>
-                        <TableView fx:id="IOOptionsTable" editable="true"
-                                       prefHeight="354.0" prefWidth="600.0" >
-                            <columns>
-                                <TableColumn editable="false"
-                                             minWidth="50.0"
-                                             prefWidth="150" text="Name"
-                                             fx:id="nameColumn"/>
-                                <TableColumn minWidth="50.0" prefWidth="450"
-                                             text="Connection"
-                                             fx:id="connectionColumn"/>
-                            </columns>
-                        </TableView>
-                    </center>
                 </BorderPane>
             </Tab>
             <Tab fx:id="highlightingTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" text="Highlighting">
-                <BorderPane prefHeight="354.0" prefWidth="600.0">
-                    <bottom>
-                        <HBox id="HBox" alignment="CENTER" prefHeight="43.0"
-                              prefWidth="600.0" spacing="25.0">
-                            <Button fx:id="newButton" minHeight="-Infinity"
-                                    minWidth="50.0" mnemonicParsing="false"
-                                    onAction="#onNewButtonClicked"
-                                    prefHeight="22.0" styleClass="roundButton"
-                                    text="     New     "/>
-                            <Button fx:id="deleteButton" minHeight="-Infinity"
-                                    minWidth="80.0" mnemonicParsing="false"
-                                    onAction="#onDeleteButtonClicked"
-                                    prefHeight="22.0" styleClass="roundButton"
-                                    text="    Delete    "/>
-                            <Button fx:id="duplicateButton"
-                                    minHeight="-Infinity" minWidth="80.0"
-                                    mnemonicParsing="false"
-                                    onAction="#onDuplicateButtonClicked"
-                                    prefHeight="22.0" styleClass="roundButton"
-                                    text="   Duplicate   "/>
-                        </HBox>
-                    </bottom>
+                <BorderPane>
                     <center>
-                        <TableView fx:id="highlightingTable" editable="true"
-                                   prefHeight="354.0" prefWidth="600.0">
+                        <TableView fx:id="highlightingTable" editable="true">
                             <columns>
-                                <TableColumn minWidth="80.0" text="Register"
+                                <TableColumn text="Register"
                                              fx:id="registerColumn"/>
-                                <TableColumn minWidth="80.0" text="RAM"
+                                <TableColumn text="RAM"
                                              fx:id="RAMColumn"/>
-                                <TableColumn minWidth="80.0" sortable="false"
-                                             style="" text="Dynamic"
+                                <TableColumn sortable="false"
+                                             text="Dynamic"
                                              fx:id="dynamicColumn"/>
                             </columns>
                         </TableView>
                     </center>
+                    <bottom><VBox>
+                        <HBox id="HBox" alignment="CENTER" spacing="20.0">
+                            <Button fx:id="newButton" mnemonicParsing="false"
+                                    onAction="#onNewButtonClicked"
+                                    text="     New     "/>
+                            <Button fx:id="deleteButton" mnemonicParsing="false"
+                                    onAction="#onDeleteButtonClicked"
+                                    text="    Delete    "/>
+                            <Button fx:id="duplicateButton"
+                                    mnemonicParsing="false"
+                                    onAction="#onDuplicateButtonClicked"
+                                    text="   Duplicate   "/>
+                            <padding>
+                                <Insets bottom="5" left="5" right="5" top="5" />
+                            </padding>
+                        </HBox><Separator /></VBox>
+                    </bottom>
                 </BorderPane>
             </Tab>
             <Tab fx:id="loadingTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" text="Loading">
-                <HBox alignment="CENTER" minHeight="-Infinity"
-                      minWidth="-Infinity" prefHeight="103.0" prefWidth="427.0">
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                        <Label alignment="CENTER_RIGHT"
-                               contentDisplay="CENTER" text="Code Store:">
+                <HBox alignment="CENTER" >
+                    <VBox id="VBox" alignment="CENTER_RIGHT" spacing="5.0">
+                        <Label contentDisplay="CENTER" text="Code Store:">
                             <VBox.margin>
                                 <Insets bottom="15.0"/>
                             </VBox.margin>
                         </Label>
-                        <Label alignment="CENTER_RIGHT"
-                               contentDisplay="CENTER"
+                        <Label contentDisplay="CENTER"
                                text="Starting Address:"/>
                     </VBox>
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
+                    <VBox id="VBox" alignment="CENTER_LEFT" spacing="5.0">
                         <HBox.margin>
                             <Insets left="25.0"/>
                         </HBox.margin>
-                        <ChoiceBox id="codeStoreChoiceBox"
-                                   fx:id="codeStore" maxHeight="-Infinity"
-                                   maxWidth="-Infinity"
-                                   minHeight="-Infinity"
-                                   minWidth="-Infinity" prefWidth="200.0"
-                                   VBox.vgrow="ALWAYS">
+                        <ChoiceBox id="codeStoreChoiceBox" fx:id="codeStore">
                             <VBox.margin>
                                 <Insets bottom="5.0"/>
                             </VBox.margin>
                             <items>
-                                <FXCollections
-                                        fx:factory="observableArrayList">
+                                <FXCollections fx:factory="observableArrayList">
                                     <String fx:value="Item 1"/>
                                     <String fx:value="Item 2"/>
                                     <String fx:value="Item 3"/>
@@ -150,9 +113,7 @@
                         </ChoiceBox>
                         <TextField id="startingAddressTe"
                                    fx:id="startingAddress"
-                                   minHeight="-Infinity"
-                                   minWidth="-Infinity" prefWidth="200.0"
-                                   text="0" VBox.vgrow="ALWAYS">
+                                   text="0">
                             <VBox.margin>
                                 <Insets top="5.0"/>
                             </VBox.margin>
@@ -163,58 +124,33 @@
             <Tab fx:id="punctuationTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" text="Punctuation">
                 <HBox minHeight="60.0">
-                    <TableView id="punctuationTable"
+                    <TableView id="punctuationTable" HBox.hgrow="ALWAYS"
                                fx:id="leftPunctuationTable" editable="true">
-                               <!--prefHeight="354.0" prefWidth="300.0"-->
-                               <!--maxHeight="-Infinity" minHeight="-Infinity"-->
                         <columns>
-                            <TableColumn editable="false" minWidth="50.0"
-                                         text="ASCII Symbol"  prefWidth="150.0"
+                            <TableColumn editable="false"
+                                         text="ASCII Symbol"
                                          fx:id="leftASCIIColumn"/>
-                            <TableColumn minWidth="50.0" prefWidth="150.0"
-                                         text="Type" fx:id="leftTypeColumn"/>
+                            <TableColumn text="Type" fx:id="leftTypeColumn"/>
                         </columns>
                     </TableView>
-                    <TableView fx:id="rightPunctuationTable" editable="true">
-                               <!--prefHeight="354.0" prefWidth="300.0"-->
-                               <!--maxHeight="-Infinity" minHeight="-Infinity"-->
+                    <TableView fx:id="rightPunctuationTable" editable="true"
+                               HBox.hgrow="ALWAYS">
                         <columns>
-                            <TableColumn editable="false" minWidth="50.0"
-                                          text="ASCII Symbol" prefWidth="150.0"
+                            <TableColumn editable="false"
+                                          text="ASCII Symbol"
                                          fx:id="rightASCIIColumn"/>
-                            <TableColumn minWidth="50.0" prefWidth="150.0"
-                                         text="Type" fx:id="rightTypeColumn"/>
+                            <TableColumn text="Type" fx:id="rightTypeColumn"/>
                         </columns>
                     </TableView>
                 </HBox>
             </Tab>
             <Tab fx:id="indexingTab" closable="false"
                  onSelectionChanged="#onSelectionChanged" text="Indexing">
-                <HBox alignment="CENTER" minHeight="-Infinity"
-                      minWidth="-Infinity" prefHeight="103.0" prefWidth="427.0">
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                        <Label alignment="CENTER_RIGHT"
-                               contentDisplay="CENTER"
-                               text="Index bits in registers from the">
-                            <VBox.margin>
-                                <Insets bottom="15.0"/>
-                            </VBox.margin>
-                        </Label>
-                    </VBox>
-                    <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                        <HBox.margin>
-                            <Insets left="25.0"/>
-                        </HBox.margin>
-                        <ChoiceBox id="indexChoiceBox" fx:id="indexChoice"
-                                   maxHeight="-Infinity"
-                                   maxWidth="-Infinity"
-                                   minHeight="-Infinity"
-                                   minWidth="-Infinity" prefWidth="70.0"
-                                   VBox.vgrow="ALWAYS">
-                            <VBox.margin>
-                                <Insets bottom="5.0"/>
-                            </VBox.margin>
-                            <items>
+                <HBox alignment="CENTER" spacing="5">
+                        <Label contentDisplay="CENTER"
+                               text="Index bits in registers from the" />
+                        <ChoiceBox id="indexChoiceBox" fx:id="indexChoice" >
+                             <items>
                                 <FXCollections
                                         fx:factory="observableArrayList">
                                     <String fx:value="left"/>
@@ -222,11 +158,50 @@
                                 </FXCollections>
                             </items>
                         </ChoiceBox>
-                    </VBox>
                 </HBox>
             </Tab>
         </TabPane>
     </center>
+    <bottom>
+        <GridPane hgap="3.0" vgap="3.0">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+            </rowConstraints>
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Button mnemonicParsing="false" onAction="#onHelpButtonClicked"
+                                minHeight="30.0" minWidth="30.0" styleClass="helpButton"
+                                fx:id="helpButton" text="?"/>
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT"
+                      spacing="10.0" GridPane.columnIndex="1">
+                    <children>
+                        <Button fx:id="applyButton" minHeight="30" mnemonicParsing="false"
+                                onAction="#onApplyButtonClicked"
+                                styleClass="roundButton" text="      Apply      ">
+                        </Button>
+                        <Button fx:id="okayButton" defaultButton="true" minHeight="30"
+                                mnemonicParsing="false" onAction="#onOKButtonClicked"
+                                styleClass="roundBlueButton" text="         OK         ">
+                        </Button>
+                        <Button fx:id="closeButton" cancelButton="true" minHeight="30"
+                                mnemonicParsing="false" onAction="#onCloseButtonClicked"
+                                styleClass="roundButton" text="      Close      ">
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+            </padding>
+        </GridPane>
+    </bottom>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>

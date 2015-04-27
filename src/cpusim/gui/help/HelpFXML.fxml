@@ -10,6 +10,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.web.WebView?>
 <?import java.lang.*?>
 <?import java.net.URL?>
@@ -17,14 +18,10 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
 <BorderPane fx:id="helpPane" prefHeight="750.0" prefWidth="950.0" styleClass="root"
             xmlns:fx="http://javafx.com/fxml">
     <center>
-        <SplitPane dividerPositions="0.3" focusTraversable="true" prefHeight="160.0"
-                   prefWidth="200.0">
-            <!-- SRW -->
-            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" tabMinWidth="100">
+        <SplitPane dividerPositions="0.3" focusTraversable="true">
+            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
                 <Tab fx:id="treeTab"  text="Files">
-                    <!-- Start Tree View -->
-                    <TreeView fx:id="treeView" prefHeight="702.0"
-                              prefWidth="300.0">
+                    <TreeView fx:id="treeView" >
                         <TreeItem expanded="true" value="CPU Sim Help">
                             <children>
                                 <TreeItem expanded="true"
@@ -635,64 +632,61 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                         </TreeItem>
                     </TreeView>
                 </Tab>
-                <!-- SRW -->
                 <Tab fx:id="searchTab" text="Search">
-                    <GridPane fx:id="searchPane" prefHeight="750.0"
-                              styleClass="root" xmlns:fx="http://javafx.com/fxml">
-                        <HBox fx:id="searchBox" styleClass="hbox"
-                              GridPane.rowIndex="0" minHeight="35.0"
+                    <GridPane fx:id="searchPane" styleClass="root">
+                        <HBox fx:id="searchBox" spacing="3"
+                              GridPane.rowIndex="0"
                               GridPane.hgrow="ALWAYS" alignment="TOP_CENTER">
-                            <TextField fx:id="searchTF" prefWidth="175"
+                            <TextField fx:id="searchTF"
                                        HBox.hgrow="ALWAYS" promptText="Search"
                                        editable="true"
                                        focusTraversable="true"/>
-                            <ComboBox fx:id="searchModeCB"
+                            <ComboBox fx:id="searchModeCB" value="Normal"
                                       GridPane.halignment="RIGHT"
-                                      GridPane.valignment="CENTER"
-                                      maxWidth="25.0" minWidth="25.0"
-                                      maxHeight="25.0" minHeight="25.0">
+                                      GridPane.valignment="CENTER">
                                 <items>
-                                    <FXCollections
-                                            fx:factory="observableArrayList">
+                                    <FXCollections fx:factory="observableArrayList">
                                         <String fx:value="Normal"/>
-                                        <String fx:value="Regular Expressions"/>
+                                        <String fx:value="Reg Expr"/>
                                         <String fx:value="Whole Words"/>
                                         <String fx:value="Match Case"/>
-                                        <String fx:value="Whole Words Match Case"/>
+                                        <String fx:value="Both"/>
                                     </FXCollections>
                                 </items>
                             </ComboBox>
+                            <padding>
+                                <Insets top="3" right="3" left="3" bottom="3" />
+                            </padding>
                         </HBox>
-                        <Label text="Occurrence Count: File Name"
-                               GridPane.hgrow="ALWAYS" alignment="CENTER"
-                               GridPane.rowIndex="1"/>
+                        <Label text=" Occurrence Count:  File Name" GridPane.hgrow="ALWAYS"
+                               alignment="CENTER" GridPane.rowIndex="1"/>
                         <ListView fx:id="searchList" GridPane.rowIndex="2"
-                                  prefHeight="750.0" prefWidth="600.0">
+                                GridPane.vgrow="ALWAYS" >
+                            <placeholder>
+                                <Label alignment="CENTER" text="No files found." />
+                            </placeholder>
                         </ListView>
                     </GridPane>
                 </Tab>
             </TabPane>
-            <WebView fx:id="webView" prefHeight="702.0" prefWidth="500.0"/>
+            <WebView fx:id="webView" />
         </SplitPane>
     </center>
     <stylesheets>
         <URL value="@../css/Dialogs.css"/>
     </stylesheets>
     <top>
-        <HBox id="HBox" alignment="CENTER" prefHeight="46.0" prefWidth="600.0"
+        <HBox id="HBox" alignment="CENTER"
               spacing="10.0">
-            <Button id="previous" fx:id="backButton" maxWidth="-Infinity"
-                    minWidth="-Infinity" mnemonicParsing="false"
-                    onAction="#onBackButtonClicked" prefHeight="22.0" prefWidth="80.0"
-                    styleClass="roundButton" text="Back"/>
-            <Button id="nextButton" fx:id="forwardButton" maxWidth="-Infinity"
-                    minWidth="-Infinity" mnemonicParsing="false"
-                    onAction="#onForwardButtonClicked" prefHeight="22.0"
-                    prefWidth="80.0" styleClass="roundButton" text="Forward"/>
-            <Button fx:id="closeButton" maxWidth="-Infinity" minWidth="-Infinity"
-                    mnemonicParsing="false" onAction="#onCloseButtonClicked"
-                    prefHeight="22.0" prefWidth="80.0" styleClass="roundButton"
-                    text="Close"/>
+            <padding>
+                <Insets top="5" bottom="5" left="5" right="5" />
+            </padding>
+            <Button id="previous" fx:id="backButton"  mnemonicParsing="false"
+                    onAction="#onBackButtonClicked" text="Back"/>
+            <Button id="nextButton" fx:id="forwardButton"  mnemonicParsing="false"
+                    onAction="#onForwardButtonClicked"  text="Forward"/>
+            <Button fx:id="closeButton"
+                    mnemonicParsing="false" onAction="#onCloseButtonClicked" text="Close"/>
         </HBox>
     </top>
 </BorderPane>
