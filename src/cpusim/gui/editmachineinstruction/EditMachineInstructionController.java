@@ -535,6 +535,7 @@ public class EditMachineInstructionController {
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
+            // should never happen
             assert false : "Unable to load file: " +
                     "gui/editmachineinstruction/editfields/editFields.fxml";
         }

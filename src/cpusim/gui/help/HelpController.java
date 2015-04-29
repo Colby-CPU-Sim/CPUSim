@@ -76,8 +76,6 @@ import java.util.*;
 
 public class HelpController implements Initializable {
 
-    //////////////////// Fields ////////////////////
-
     @FXML
     private TreeView<String> treeView;
     @FXML
@@ -678,12 +676,12 @@ public class HelpController implements Initializable {
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
 
-        Pane dialogRoot;
+        Pane dialogRoot = null;
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
-            //TODO:  add something here
-            throw new RuntimeException();
+            // should never happen
+            assert false : "Unable to load file: HelpFXML.fxml";
         }
 
         Scene dialogScene = new Scene(dialogRoot);

@@ -70,7 +70,8 @@ public class DecodeTableController
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: decodeTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

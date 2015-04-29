@@ -323,9 +323,8 @@ public class EditModulesController implements Initializable {
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException ex) {
-            //TODO: something better...
-            System.out.println("Unable to load EditRegisters.fxml");
-            return;
+            // should never happen
+            assert false : "Unable to load file: EditRegisters.fxml";
         }
         Scene dialogScene = new Scene(dialogRoot);
         dialogStage.setScene(dialogScene);

@@ -2677,10 +2677,10 @@ public class DesktopController implements Initializable {
         Pane registerTableRoot = null;
 
         try {
-            registerTableRoot = (Pane) registerFxmlLoader.load();
+            registerTableRoot = registerFxmlLoader.load();
         } catch (IOException e) {
-            //TODO: something more meaningful
-            System.out.println("IOException: " + e.getMessage());
+            // should never happen
+            assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
         }
         registerTableController.setDataBase(regDataBase);
 
@@ -2713,7 +2713,8 @@ public class DesktopController implements Initializable {
                 try {
                     registerArrayTableRoot = (Pane) registerArrayFxmlLoader.load();
                 } catch (IOException e) {
-                    //TODO: something...
+                    // should never happen
+                    assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
                 }
                 registerArrayTableController.setDataBase(regDataBase);
 
@@ -2753,7 +2754,8 @@ public class DesktopController implements Initializable {
                 try {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
                 } catch (IOException e) {
-                    //TODO: something...
+                    // should never happen
+                    assert false : "Unable to load file: gui/desktop/RamTable.fxml";
                 }
 
                 ramTableController.setDataBase(ramDataBase);
@@ -2824,9 +2826,10 @@ public class DesktopController implements Initializable {
 
 
                 try {
-                    registerArrayTableRoot = (Pane) registerArrayFxmlLoader.load();
+                    registerArrayTableRoot = registerArrayFxmlLoader.load();
                 } catch (IOException e) {
-                    //TODO: something...
+                    // should never happen
+                    assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
                 }
                 registerArrayTableController.setDataBase(regDataBase);
 
@@ -2868,7 +2871,8 @@ public class DesktopController implements Initializable {
                 try {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
                 } catch (IOException e) {
-                    //TODO: something...
+                    // should never happen
+                    assert false : "Unable to load file: gui/desktop/RamTable.fxml";
                 }
 
                 ramTableController.setDataBase(ramDataBase);

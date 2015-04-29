@@ -51,10 +51,8 @@ public class GUIMain extends Application {
         try {
             mainPane = fxmlLoader.load();
         } catch (Exception e) {
-            Dialogs.createErrorDialog(null, "Error finding Resource",
-                    "The FXML resource for the Desktop could not be found.").showAndWait();
-
-            System.exit(1);
+            // should never happen
+            assert false : "Unable to load file: gui/desktop/desktop.fxml";
         }
         Scene mainScene = new Scene(mainPane);
         stage.setScene(mainScene);

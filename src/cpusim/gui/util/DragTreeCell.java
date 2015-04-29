@@ -106,9 +106,10 @@ public class DragTreeCell extends TreeCell<String> {
                         final Stage dialogStage = new Stage();
                         Pane dialogRoot = null;
                         try {
-                            dialogRoot = (Pane) fxmlLoader.load();
+                            dialogRoot = fxmlLoader.load();
                         } catch (IOException e) {
-                            //TODO: something...
+                            // should never happen
+                            assert false : "Unable to load file: EditMicroinstructions.fxml";
                         }
                         Scene dialogScene = new Scene(dialogRoot);
                         dialogStage.setScene(dialogScene);

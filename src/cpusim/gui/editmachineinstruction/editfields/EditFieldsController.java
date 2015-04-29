@@ -353,7 +353,8 @@ public class EditFieldsController implements Initializable {
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            // should never happen
+            assert false : "Unable to load file: editFieldValues.fxml";
         }
         Scene dialogScene = new Scene(dialogRoot);
         fieldStage.setScene(dialogScene);

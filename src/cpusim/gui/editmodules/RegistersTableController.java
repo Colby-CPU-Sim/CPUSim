@@ -86,7 +86,8 @@ public class RegistersTableController
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: registersTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

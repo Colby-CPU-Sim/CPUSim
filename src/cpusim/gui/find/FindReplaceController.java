@@ -562,12 +562,12 @@ public class FindReplaceController implements Initializable {
                 "FindReplaceFXML.fxml"));
         fxmlLoader.setController(frc);
         final Stage dialogStage = new Stage();
-        Pane dialogRoot;
+        Pane dialogRoot = null;
         try {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
-            System.out.println("Exception opening FindReplaceFXML.fxml: " + e);
-            return null;
+            // should never happen
+            assert false : "Unable to load file: FindReplaceFXML.fxml";
         }
 
         Scene dialogScene = new Scene(dialogRoot);

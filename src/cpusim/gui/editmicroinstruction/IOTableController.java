@@ -75,7 +75,8 @@ public class IOTableController
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: ioTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

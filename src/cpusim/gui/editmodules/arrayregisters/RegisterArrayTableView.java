@@ -73,7 +73,8 @@ public class RegisterArrayTableView extends TableView implements Initializable {
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: tables.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

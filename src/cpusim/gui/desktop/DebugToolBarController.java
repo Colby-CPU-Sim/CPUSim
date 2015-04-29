@@ -87,7 +87,8 @@ public class DebugToolBarController extends ToolBar
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: DebugToolBar.fxml";
         }
     }
 

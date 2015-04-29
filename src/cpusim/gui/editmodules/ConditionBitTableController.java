@@ -84,7 +84,8 @@ public class ConditionBitTableController extends ModuleController implements Ini
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            // should never happen
+            assert false : "Unable to load file: conditionBitTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){
