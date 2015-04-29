@@ -1,6 +1,7 @@
 /**
  * File: BreakException
  * Last update: August 2013
+ * Author: Dale Skrien
  */
 package cpusim;
 
