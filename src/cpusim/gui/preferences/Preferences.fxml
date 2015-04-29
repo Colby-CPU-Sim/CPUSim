@@ -581,6 +581,7 @@
                                         <Insets top="20.0"/>
                                     </padding>
                                 </Label>
+                                <!--useless comment-->
                                 <CheckBox fx:id="showLineNumbers" mnemonicParsing="false"
                                           text="Show line numbers.">
                                 </CheckBox>
