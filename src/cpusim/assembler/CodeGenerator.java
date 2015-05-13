@@ -203,7 +203,7 @@ public class CodeGenerator
             boolean currentFieldSign = posLenFieldSigns[actualIndex];
             long op = getLong(operands.get(i-1)); //operand index = field index -1
             instrParts[actualIndex] = toBinary(op, currentFieldLength, currentFieldSign,
-                                           false, operands.get(i-1), false);
+                                           true, operands.get(i-1), false);
         }
 
         String combinedFields = "";

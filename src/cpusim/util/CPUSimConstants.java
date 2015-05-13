@@ -10,10 +10,7 @@
 
 package cpusim.util;
 
-import cpusim.BufferedChannel;
-import cpusim.ConsoleChannel;
-import cpusim.DialogChannel;
-import cpusim.IOChannel;
+import cpusim.*;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
 
@@ -28,7 +25,7 @@ public interface CPUSimConstants {
     // as the ConditionBit.  Setting or clearing this bit does nothing since the
     // Register it uses is hidden from the rest of the machine.
     ConditionBit NO_CONDITIONBIT =
-            new ConditionBit("(none)", null, new Register("", 1), 0, false);
+            new ConditionBit("(none)", new Machine("None"), new Register("", 1), 0, false);
 
     // the three standard options available for io channels
     IOChannel CONSOLE_CHANNEL =
