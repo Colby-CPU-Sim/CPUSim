@@ -283,7 +283,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      * @return - an Array of the default PunctChars and their
      * Uses.
      */
-    public PunctChar[] getDefaultPunctChars() {
+    public static PunctChar[] getDefaultPunctChars() {
         //for the punctuation characters:  !@$%^&*()_={}[]|\:;,.?/~#-+`
         //    creates the default uses.
         //The other four punctuation characters: <>"'

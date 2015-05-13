@@ -183,6 +183,10 @@ public class Validate
      */
     public static void punctChars(List<PunctChar> chars)
     {
+        assert chars.size() == Machine.getDefaultPunctChars().length :
+                "The size of the chars list when done with MachineReader does not match " +
+                        "the size of the default set of chars";
+
         //check that there is exactly one each of usages of label, pseudo,
         //and comment
         char label = 'a', pseudo = 'a', comment = 'a';

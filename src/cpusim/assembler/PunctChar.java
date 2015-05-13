@@ -15,7 +15,7 @@ import cpusim.xml.HtmlEncoder;
  *  !@#$%^&*()_-+={}[]|\:;"',.?/~`
  */
 public class PunctChar {
-    public static enum Use {symbol, label, comment, pseudo, token, illegal}
+    public enum Use {symbol, label, comment, pseudo, token, illegal}
 
     private final SimpleStringProperty ch;
     private SimpleObjectProperty<Use> use;

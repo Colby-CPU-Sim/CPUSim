@@ -53,11 +53,11 @@ import cpusim.Field;
 import cpusim.Machine;
 import cpusim.assembler.AssemblyException;
 import cpusim.assembler.Token;
+import javafx.scene.input.KeyCode;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Vector;
-import javafx.scene.input.KeyCode;
 
 /**
  * This class contains a collection of static conversion methods, mostly for converting
@@ -606,7 +606,7 @@ public class Convert
      * @return an array list of fields determined by the format string
      */
     public static ArrayList<Field> formatStringToFields(String format, Machine machine){
-        String[] stringFields = format.split(" ");
+        String[] stringFields = format.split("\\s"); // split on whitespace
         ArrayList<Field> assemblyFormat = new ArrayList<>();
         for (String field1 : stringFields){
             for (Field field2 : machine.getFields()){
