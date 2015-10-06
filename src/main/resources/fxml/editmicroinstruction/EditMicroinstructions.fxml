@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import java.net.URL?>
+
+<BorderPane prefWidth="700" prefHeight="600" styleClass=".root"
+            xmlns:fx="http://javafx.com/fxml" xmlns="http://javafx.com/javafx/8">
+    <top>
+        <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Label text="Type of Microinstruction:"/>
+            <ComboBox fx:id="microinstructionCombo" value="TransferRtoR">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="TransferRtoR"/>
+                        <String fx:value="TransferRtoA"/>
+                        <String fx:value="TransferAtoR"/>
+                        <String fx:value="Arithmetic"/>
+                        <String fx:value="Branch"/>
+                        <String fx:value="Test"/>
+                        <String fx:value="MemoryAccess"/>
+                        <String fx:value="Set"/>
+                        <String fx:value="Increment"/>
+                        <String fx:value="Shift"/>
+                        <String fx:value="Logical"/>
+                        <String fx:value="IO"/>
+                        <String fx:value="Decode"/>
+                        <String fx:value="SetCondBit"/>
+                    </FXCollections>
+                </items>
+            </ComboBox>
+        </HBox>
+    </top>
+    <center>
+        <Pane fx:id="tablePane"/>
+    </center>
+    <bottom>
+        <VBox id="VBox" fx:id="vBox" alignment="CENTER" spacing="5.0">
+            <children>
+                <HBox id="HBox" alignment="CENTER" spacing="15.0">
+                    <Button fx:id="newButton" disable="true" minHeight="-Infinity"
+                            mnemonicParsing="false" onAction="#onNewButtonClick"
+                            text="     New     "/>
+                    <Button fx:id="deleteButton" disable="true" minHeight="-Infinity"
+                            mnemonicParsing="false" onAction="#onDeleteButtonClick"
+                            text="    Delete    "/>
+                    <Button fx:id="duplicateButton" disable="true"
+                            minHeight="-Infinity" mnemonicParsing="false"
+                            onAction="#onDuplicateButtonClick"
+                            text="   Duplicate   "/>
+                </HBox>
+                <Separator/>
+                <GridPane hgap="3.0" vgap="3.0">
+                    <!--style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;"-->
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="helpButton" minHeight="30.0" minWidth="30.0"
+                                        mnemonicParsing="false"
+                                        onAction="#onHelpButtonClick" styleClass="helpButton"
+                                        text="?"/>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0"
+                              GridPane.columnIndex="1">
+                            <children>
+                                <Button fx:id="okButton" defaultButton="true" minHeight="30"
+                                        mnemonicParsing="false" onAction="#onOKButtonClick"
+                                        styleClass="roundBlueButton"
+                                        text="            OK            ">
+                                </Button>
+                                <Button fx:id="cancelButton" cancelButton="true" minHeight="30"
+                                        mnemonicParsing="false"
+                                        onAction="#onCancelButtonClick" styleClass="roundButton"
+                                        text="         Cancel         ">
+                                </Button>
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                </GridPane>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
+    </bottom>
+    <stylesheets>
+        <URL value="@../css/Dialogs.css"/>
+    </stylesheets>
+</BorderPane>
