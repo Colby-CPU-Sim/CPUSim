@@ -2189,7 +2189,7 @@ public class DesktopController implements Initializable {
         }
         final Stage dialogStage = new Stage();
         // Load in icon for the new dialog
-        URL url = getClass().getResource("/cpusim/gui/about/cpusim_icon.jpg");
+        URL url = getClass().getResource("fxml/about/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
         Pane dialogRoot = null;
@@ -2812,8 +2812,7 @@ public class DesktopController implements Initializable {
         if (!registerArrays.isEmpty()) {
             for (int i = 0; i < registerArrays.size(); i++) {
                 FXMLLoader registerArrayFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("gui/desktop/RegisterTable" +
-                                ".fxml"));
+                        mediator.getClass().getResource("fxml/desktop/RegisterTable.fxml"));
 
                 RegisterTableController registerArrayTableController = new
                         RegisterTableController(
@@ -2829,7 +2828,7 @@ public class DesktopController implements Initializable {
                     registerArrayTableRoot = registerArrayFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
-                    assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
+                    assert false : "Unable to load file: fxml/desktop/RegisterTable.fxml";
                 }
                 registerArrayTableController.setDataBase(regDataBase);
 
@@ -2858,7 +2857,7 @@ public class DesktopController implements Initializable {
 
             for (int i = 0; i < rams.size(); i++) {
                 FXMLLoader ramFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("gui/desktop/RamTable.fxml"));
+                        mediator.getClass().getResource("fxml/desktop/RamTable.fxml"));
                 ramTableController = new RamTableController(
                         this,
                         rams.get(i),
@@ -2872,7 +2871,7 @@ public class DesktopController implements Initializable {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
-                    assert false : "Unable to load file: gui/desktop/RamTable.fxml";
+                    assert false : "Unable to load file: fxml/desktop/RamTable.fxml";
                 }
 
                 ramTableController.setDataBase(ramDataBase);

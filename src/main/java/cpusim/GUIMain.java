@@ -5,18 +5,15 @@
 package cpusim;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.util.CPUSimConstants;
+
 import java.net.URL;
 
-import cpusim.util.Dialogs;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 
-import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -46,7 +43,7 @@ public class GUIMain extends Application {
 		DesktopController deskController = new DesktopController(mediator, stage);
 		Pane mainPane = null;
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-				"gui/desktop/desktop.fxml"));
+                "fxml/desktop/desktop.fxml"));
 		fxmlLoader.setController(deskController);
         try {
             mainPane = fxmlLoader.load();

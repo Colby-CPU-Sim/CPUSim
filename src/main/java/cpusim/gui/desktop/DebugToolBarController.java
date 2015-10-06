@@ -80,7 +80,7 @@ public class DebugToolBarController extends ToolBar
         this.desktop = desktop;
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "DebugToolBar.fxml"));
+                "fxml/desktop/DebugToolBar.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
 

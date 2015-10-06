@@ -62,4 +62,32 @@ This project is licensed under the **TODO INSERT LICENSE HERE** located in LICEN
 
 ### Building CPUSim
 
-CPU Sim requires Java 1.8+, and Gradle to be built. 
+CPU Sim requires *Oracle* Java 1.8+ (Oracle is required for JavaFX), and Gradle 2.+ to be built. This guide assumes you 
+have Gradle installed and is accessible via `gradle` on the command-line (Window's users, it is likely `gradle.bat`). 
+
+For all development environments, clone the repository: `git clone https://github.com/Colby-CPU-Sim/CPUSimFX2015.git`
+
+#### Within IntelliJ
+
+Most developers will use (IntelliJ Idea)[https://www.jetbrains.com/idea/] by JetBrains. To develop with IntelliJ, 
+download and install IntelliJ. 
+
+1. Open IntelliJ
+2. Import the Project Directory, choose "Gradle" as the import type
+3. Select the JDK to be Oracle 1.8 and set the Gradle Home if you haven't already
+    * On Linux, this will likely be: `/usr/lib/gradle/$GRADLE_VERSION`
+    * On Mac, if you installed via homebrew, `/usr/local/Cellar/gradle/$GRADLE_VERSION/libexec`
+    * On Windows, TODO :(
+4. Let the gradle import run
+
+#### From the command-line
+
+This guide involves working directly with the command-line, for *NIX like environments (OS X, Linux) it is the same 
+directions. 
+
+##### Linux/Mac OS X
+
+1. Open up a Terminal (xterm, iTerm, Terminal, Konsole, etc.)
+2. Change to the clone directory: `cd path/to/cpusim/clone`
+3. Build the distribution: `gradle dist`
+4. Run the project: `java -jar ./build/libs/CPUSim-*.jar`
