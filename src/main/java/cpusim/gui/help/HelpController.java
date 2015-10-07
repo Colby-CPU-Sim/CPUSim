@@ -38,6 +38,7 @@
 package cpusim.gui.help;
 
 import cpusim.gui.desktop.DesktopController;
+import cpusim.gui.util.FXMLLoaderFactory;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -411,7 +412,6 @@ public class HelpController implements Initializable {
         WebEngine webEngine = webView.getEngine();
         webView.setZoom(javafx.stage.Screen.getPrimary().getDpi() / 96);
 
-
         webEngine.getLoadWorker().stateProperty().addListener(
                 (arg0, oldState, newState) -> {
                     if (newState == State.SUCCEEDED) {
@@ -665,11 +665,8 @@ public class HelpController implements Initializable {
     public static HelpController openHelpDialog(DesktopController d, String initialWindow,
                                                 String appendString) {
         final HelpController helpController = new HelpController(d, initialWindow, appendString);
-        FXMLLoader fxmlLoader = new FXMLLoader(helpController.getClass().getResource(
-                "/cpusim/gui/help/HelpFXML.fxml"));
-        fxmlLoader.setController(helpController);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(helpController, "HelpFXML.fxml");
         final Stage dialogStage = new Stage();
-
 
         // Load in image
         URL url = HelpController.class.getResource("/images/icons/cpusim_icon.jpg");

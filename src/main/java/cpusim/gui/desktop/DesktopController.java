@@ -2750,7 +2750,7 @@ public class DesktopController implements Initializable {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
-                    assert false : "Unable to load file: fxml/desktop/RamTable.fxml";
+                    assert false : "Unable to load file: RamTable.fxml";
                 }
 
                 ramTableController.setDataBase(ramDataBase);
