@@ -524,7 +524,7 @@ public class EditMachineInstructionController {
     @FXML
     protected void handleEditFields(ActionEvent ae) {
         FXMLLoader fxmlLoader = new FXMLLoader(mediator.getClass().getResource(
-                "gui/editmachineinstruction/editfields/editFields.fxml"));
+                "/fxml/editmachineinstruction/editfields/editFields.fxml"));
 
         final Stage fieldStage = new Stage();
         Pane dialogRoot = null;
@@ -537,7 +537,7 @@ public class EditMachineInstructionController {
         } catch (IOException e) {
             // should never happen
             assert false : "Unable to load file: " +
-                    "gui/editmachineinstruction/editfields/editFields.fxml";
+                    "/fxml/editmachineinstruction/editfields/editFields.fxml";
         }
         Scene dialogScene = new Scene(dialogRoot);
         fieldStage.setScene(dialogScene);

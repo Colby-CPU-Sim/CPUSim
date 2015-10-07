@@ -5,11 +5,14 @@
 package cpusim;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import cpusim.gui.desktop.DesktopController;
 
 import java.net.URL;
+import java.util.Optional;
 
+import cpusim.gui.util.FXMLLoaderFactory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -42,25 +45,25 @@ public class GUIMain extends Application {
 		Mediator mediator = new Mediator(stage);
 		DesktopController deskController = new DesktopController(mediator, stage);
 		Pane mainPane = null;
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "fxml/desktop/desktop.fxml"));
-		fxmlLoader.setController(deskController);
+
+		FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(deskController, "desktop.fxml");
+
         try {
             mainPane = fxmlLoader.load();
-        } catch (Exception e) {
+        } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: gui/desktop/desktop.fxml";
+           throw new IllegalStateException("Unable to load file: desktop.fxml", e);
         }
         Scene mainScene = new Scene(mainPane);
         stage.setScene(mainScene);
 
         // Load in the CPU Sim icon image
-        URL iconURL = getClass().getResource("/cpusim/gui/about/cpusim_icon.jpg");
+        URL iconURL = getClass().getResource("/images/icons/cpusim_icon.jpg");
         Image icon = new Image(iconURL.toExternalForm());
         stage.getIcons().add(icon);
 
         // Load the stylesheet for the line numbers in the CodePanes
-        URL styleSheetURL = getClass().getResource("/cpusim/gui/css/LineNumbers.css");
+        URL styleSheetURL = getClass().getResource("gui/css/LineNumbers.css");
         String stylesheet = styleSheetURL.toExternalForm();
         mainScene.getStylesheets().add(stylesheet);
 

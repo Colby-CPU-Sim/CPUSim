@@ -17,6 +17,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Arithmetic;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
@@ -73,10 +74,7 @@ public class ArithmeticTableController
                 NO_CONDITIONBIT, NO_CONDITIONBIT);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "arithmeticTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "arithmeticTable.fxml");
 
         try {
             fxmlLoader.load();

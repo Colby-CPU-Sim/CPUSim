@@ -76,6 +76,7 @@ import cpusim.gui.find.FindReplaceController;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.options.OptionsController;
 import cpusim.gui.preferences.PreferencesController;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.IO;
 import cpusim.module.RAM;
 import cpusim.module.Register;
@@ -285,7 +286,7 @@ public class DesktopController implements Initializable {
         // add the ioConsole to the ioConsolePane
         ioConsolePane.getChildren().add(ioConsole);
 
-        // create the consoleManager
+        // fromRootController the consoleManager
         consoleManager = new ConsoleManager(ioConsole);
 
         //initialize the list of controllers
@@ -742,7 +743,7 @@ public class DesktopController implements Initializable {
                 if (lineCount == numLinesPerPage)
                     page.appendText(p.toString()); // skip newline char for the last line
                 else
-                    page.appendText(p.fullText()); // text plus newline
+                    page.appendText(p.toString()); // text plus newline
 
         }
         return result;
@@ -1110,7 +1111,7 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePreferences(ActionEvent event) {
-        openModalDialog("Preferences", "gui/preferences/Preferences.fxml",
+        openModalDialog("Preferences", "/fxml/preferences/Preferences.fxml",
                 new PreferencesController(mediator, this));
     }
 
@@ -1126,7 +1127,7 @@ public class DesktopController implements Initializable {
         EditMachineInstructionController controller = new
                 EditMachineInstructionController(mediator);
         openModalDialog("Edit Machine Instructions",
-                "gui/editmachineinstruction/editMachineInstruction.fxml", controller);
+                "editMachineInstruction.fxml", controller);
     }
 
     /**
@@ -1139,7 +1140,7 @@ public class DesktopController implements Initializable {
         EditMicroinstructionsController controller = new
                 EditMicroinstructionsController(mediator);
         openModalDialog("Edit Microinstructions",
-                "gui/editmicroinstruction/EditMicroinstructions.fxml", controller);
+                "EditMicroinstructions.fxml", controller);
     }
 
     /**
@@ -1159,7 +1160,7 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleEQUs(ActionEvent event) {
-        openModalDialog("EQUs", "gui/equs/EQUs.fxml",
+        openModalDialog("EQUs", "EQUs.fxml",
                 new EQUsController(mediator));
     }
 
@@ -1173,7 +1174,7 @@ public class DesktopController implements Initializable {
         EditFetchSequenceController controller = new EditFetchSequenceController
                 (mediator);
         openModalDialog("Edit Fetch Sequence",
-                "gui/fetchsequence/editFetchSequence.fxml", controller);
+                "editFetchSequence.fxml", controller);
     }
 
 
@@ -1326,7 +1327,7 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleAboutCPUSim(ActionEvent event) {
-        openModalDialog("About CPU Sim", "gui/about/AboutFXML.fxml",
+        openModalDialog("About CPU Sim", "AboutFXML.fxml",
                 new AboutController());
     }
 
@@ -1446,7 +1447,7 @@ public class DesktopController implements Initializable {
      */
     public void addTab(String content, String title, File file) {
 
-        // create the new tab and text area
+        // fromRootController the new tab and text area
         CodePaneTab newTab = new CodePaneTab();
         InlineStyleTextArea<StyleInfo> codeArea =
                 new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
@@ -2063,7 +2064,7 @@ public class DesktopController implements Initializable {
         if (0 <= initialSection && initialSection <= 3) {
             EditModulesController controller = new EditModulesController(mediator, this);
             openModalDialog("Edit Modules",
-                    "gui/editmodules/EditModules.fxml", controller);
+                    "EditModules.fxml", controller);
             controller.selectSection(initialSection);
         } else {
             openHardwareModulesDialog(0);
@@ -2079,7 +2080,7 @@ public class DesktopController implements Initializable {
     public void openOptionsDialog(int initialSection) {
         if (0 <= initialSection && initialSection <= 3) {
             OptionsController controller = new OptionsController(mediator);
-            openModalDialog("Options", "gui/options/OptionsFXML.fxml",
+            openModalDialog("Options", "OptionsFXML.fxml",
                     controller);
             controller.selectTab(initialSection);
         } else {
@@ -2183,13 +2184,21 @@ public class DesktopController implements Initializable {
      */
     private void openDialog(String title, String fxmlPath,
                             Object controller, int x, int y, Modality modality) {
-        FXMLLoader fxmlLoader = new FXMLLoader(mediator.getClass().getResource(fxmlPath));
-        if (controller != null) {
-            fxmlLoader.setController(controller);
+
+
+
+
+        FXMLLoader fxmlLoader;
+        if (null == controller) {
+            final Optional<URL> uri = FXMLLoaderFactory.getURL(getClass(), fxmlPath);
+            fxmlLoader = new FXMLLoader(uri.get());
+        } else {
+            fxmlLoader = FXMLLoaderFactory.fromController(controller, fxmlPath);
         }
+
         final Stage dialogStage = new Stage();
         // Load in icon for the new dialog
-        URL url = getClass().getResource("fxml/about/cpusim_icon.jpg");
+        URL url = getClass().getResource("/images/icons/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
         Pane dialogRoot = null;
@@ -2262,13 +2271,8 @@ public class DesktopController implements Initializable {
 
             return content;
         } catch (IOException ioe) {
-            //TODO: something...
-            System.out.println("IO fail");
-
+            throw new IllegalStateException(ioe);
         }
-        return null;
-
-
     }
 
     /**
@@ -2362,12 +2366,10 @@ public class DesktopController implements Initializable {
             // Update Menu
             MenuItem copyPath = new MenuItem("Copy Path Name ");
             copyPath.setOnAction(e -> {
-                if (finalFileToSave != null) {
-                    Clipboard clipboard = Clipboard.getSystemClipboard();
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString(finalFileToSave.getAbsolutePath());
-                    clipboard.setContent(content);
-                }
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent content = new ClipboardContent();
+                content.putString(finalFileToSave.getAbsolutePath());
+                clipboard.setContent(content);
             });
             ObservableList<MenuItem> mi = tab.getContextMenu().getItems();
             mi.remove(3);
@@ -2668,11 +2670,8 @@ public class DesktopController implements Initializable {
 
         RegisterTableController registerTableController =
                 new RegisterTableController(this, registers, "Registers");
-        FXMLLoader registerFxmlLoader = new FXMLLoader(
-                mediator.getClass().getResource("gui/desktop/RegisterTable.fxml"));
-        registerFxmlLoader.setController(registerTableController);
+        FXMLLoader registerFxmlLoader = FXMLLoaderFactory.fromController(registerTableController, "RegisterTable.fxml");
         registerControllers.add(registerTableController);
-
 
         Pane registerTableRoot = null;
 
@@ -2680,7 +2679,7 @@ public class DesktopController implements Initializable {
             registerTableRoot = registerFxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
+            assert false : "Unable to load file: RegisterTable.fxml";
         }
         registerTableController.setDataBase(regDataBase);
 
@@ -2696,25 +2695,23 @@ public class DesktopController implements Initializable {
 
         if (!registerArrays.isEmpty()) {
             for (int i = 0; i < registerArrays.size(); i++) {
-                FXMLLoader registerArrayFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("gui/desktop/RegisterTable" +
-                                ".fxml"));
-
                 RegisterTableController registerArrayTableController = new
                         RegisterTableController(
                         this,
                         registerArrays.get(i).registers(),
                         registerArrays.get(i).getName());
+                FXMLLoader registerArrayFxmlLoader = FXMLLoaderFactory.fromController(registerArrayTableController, "RegisterTable" +
+                        ".fxml");
+
                 registerArrayFxmlLoader.setController(registerArrayTableController);
 
                 registerControllers.add(registerArrayTableController);
-
 
                 try {
                     registerArrayTableRoot = (Pane) registerArrayFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
-                    assert false : "Unable to load file: gui/desktop/RegisterTable.fxml";
+                    assert false : "Unable to load file: fxml/desktop/RegisterTable.fxml";
                 }
                 registerArrayTableController.setDataBase(regDataBase);
 
@@ -2740,28 +2737,26 @@ public class DesktopController implements Initializable {
             RamTableController ramTableController;
 
             for (int i = 0; i < rams.size(); i++) {
-                FXMLLoader ramFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("gui/desktop/RamTable.fxml"));
+
                 ramTableController = new RamTableController(
                         this,
                         rams.get(i),
                         rams.get(i).getName());
-                ramFxmlLoader.setController(ramTableController);
+                FXMLLoader ramFxmlLoader = FXMLLoaderFactory.fromController(ramTableController, "RamTable.fxml");
 
                 ramControllers.add(ramTableController);
-
 
                 try {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
-                    assert false : "Unable to load file: gui/desktop/RamTable.fxml";
+                    assert false : "Unable to load file: fxml/desktop/RamTable.fxml";
                 }
 
                 ramTableController.setDataBase(ramDataBase);
                 ramTableController.setAddressBase(ramAddressBase);
 
-                ramVbox.setVgrow(ramSplitPane, Priority.ALWAYS);
+                VBox.setVgrow(ramSplitPane, Priority.ALWAYS);
                 ramSplitPane.getItems().add(ramTableRoot);
 
             }
@@ -2811,18 +2806,15 @@ public class DesktopController implements Initializable {
 
         if (!registerArrays.isEmpty()) {
             for (int i = 0; i < registerArrays.size(); i++) {
-                FXMLLoader registerArrayFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("fxml/desktop/RegisterTable.fxml"));
-
                 RegisterTableController registerArrayTableController = new
                         RegisterTableController(
                         this,
                         registerArrays.get(i).registers(),
                         registerArrays.get(i).getName());
-                registerArrayFxmlLoader.setController(registerArrayTableController);
+                FXMLLoader registerArrayFxmlLoader = FXMLLoaderFactory.fromController(registerArrayTableController,
+                        "RegisterTable.fxml");
 
                 registerControllers.add(registerArrayTableController);
-
 
                 try {
                     registerArrayTableRoot = registerArrayFxmlLoader.load();
@@ -2856,16 +2848,14 @@ public class DesktopController implements Initializable {
             RamTableController ramTableController;
 
             for (int i = 0; i < rams.size(); i++) {
-                FXMLLoader ramFxmlLoader = new FXMLLoader(
-                        mediator.getClass().getResource("fxml/desktop/RamTable.fxml"));
+
                 ramTableController = new RamTableController(
                         this,
                         rams.get(i),
                         rams.get(i).getName());
-                ramFxmlLoader.setController(ramTableController);
+                FXMLLoader ramFxmlLoader = FXMLLoaderFactory.fromController(ramTableController, "RamTable.fxml");
 
                 ramControllers.add(ramTableController);
-
 
                 try {
                     ramTableRoot = (Pane) ramFxmlLoader.load();
@@ -2877,7 +2867,7 @@ public class DesktopController implements Initializable {
                 ramTableController.setDataBase(ramDataBase);
                 ramTableController.setAddressBase(ramAddressBase);
 
-                ramVbox.setVgrow(ramSplitPane, Priority.ALWAYS);
+                VBox.setVgrow(ramSplitPane, Priority.ALWAYS);
                 ramSplitPane.getItems().add(ramTableRoot);
             }
 
@@ -2903,12 +2893,8 @@ public class DesktopController implements Initializable {
     }
 
     public void updateRegisterAndRAMDisplays() {
-        for (RamTableController rtc : ramControllers) {
-            rtc.updateTable();
-        }
-        for (RegisterTableController rtc : registerControllers) {
-            rtc.updateTable();
-        }
+        ramControllers.forEach(RamTableController::updateTable);
+        registerControllers.forEach(RegisterTableController::updateTable);
     }
 
     /**
@@ -3084,12 +3070,7 @@ public class DesktopController implements Initializable {
 //
 //        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
 
-        for (RegisterTableController rtc : registerControllers) {
-            rtc.updateTable();
-        }
-        for (RamTableController rtc : ramControllers) {
-            rtc.updateTable();
-        }
+        updateRegisterAndRAMDisplays();
     }
 
     /**

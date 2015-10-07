@@ -170,7 +170,7 @@ public class EditMicroinstructionsController implements Initializable {
         String uniqueName = createUniqueName(activeTable.getItems(), "?");
         Object newObject = getCurrentController().getNewObject(uniqueName);
 
-        // A really ugly hack to create a unique opcode
+        // A really ugly hack to fromRootController a unique opcode
         // required by InstructionDialog
         /**
          if (EditDialog.this instanceof InstructionDialog) {

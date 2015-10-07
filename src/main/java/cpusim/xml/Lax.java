@@ -255,7 +255,7 @@ public class Lax extends org.xml.sax.helpers.DefaultHandler
         // Get a "parser factory", an an object that creates parsers
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
-        // Set up the factory to create the appropriate type of parser
+        // Set up the factory to fromRootController the appropriate type of parser
         saxParserFactory.setValidating(isValidating);
         saxParserFactory.setNamespaceAware(false); // Not this month...
 

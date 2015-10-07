@@ -20,6 +20,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.SetCondBit;
 import cpusim.module.ConditionBit;
 import cpusim.util.Validate;
@@ -68,10 +69,7 @@ public class SetCondBitTableController
         this.prototype = new SetCondBit("???", machine, cBit, "0");
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "setCondBitTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "setCondBitTable.fxml");
 
         try {
             fxmlLoader.load();

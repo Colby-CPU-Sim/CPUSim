@@ -15,6 +15,7 @@ import cpusim.Mediator;
 import cpusim.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.RAM;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -56,10 +57,7 @@ public class RAMsTableController
         this.prototype = new RAM("???",128, 8);
         clones = (Module[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "ramTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ramTable.fxml");
 
         try {
             fxmlLoader.load();

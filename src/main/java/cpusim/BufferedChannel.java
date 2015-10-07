@@ -38,7 +38,7 @@ public class BufferedChannel implements IOChannel {
 	private String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	/**
-	 * The constructor to create a ConcreteChannel.
+	 * The constructor to fromRootController a ConcreteChannel.
 	 * 
 	 * @param n - The name of the channel.
 	 * @param s - The actual channel this concrete channel

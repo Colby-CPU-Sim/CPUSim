@@ -18,6 +18,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.IO;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -67,10 +68,7 @@ public class IOTableController
         this.prototype = new IO("???", machine, "integer", r, "input");
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "ioTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ioTable.fxml");
 
         try {
             fxmlLoader.load();

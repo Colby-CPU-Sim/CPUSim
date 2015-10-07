@@ -25,6 +25,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.TransferRtoR;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -75,10 +76,7 @@ public class TransferRtoRTableController
         this.prototype = new TransferRtoR("???", machine, r, 0, r, 0, 0);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "transferRtoRTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "transferRtoRTable.fxml");
 
         try {
             fxmlLoader.load();

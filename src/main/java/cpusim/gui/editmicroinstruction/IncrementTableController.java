@@ -18,6 +18,7 @@ import cpusim.Mediator;
 import cpusim.Microinstruction;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Increment;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
@@ -71,10 +72,7 @@ public class IncrementTableController
         this.prototype = new Increment("???", machine, r, NO_CONDITIONBIT, NO_CONDITIONBIT, Long.valueOf(1));
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "incrementTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "incrementTable.fxml");
 
         try {
             fxmlLoader.load();

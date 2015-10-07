@@ -78,7 +78,7 @@ public class DragTreeCell extends TreeCell<String> {
                         .getClickCount() == 2) {
                     FXMLLoader fxmlLoader = new FXMLLoader(
                             mediator.getClass().getResource
-                                    ("gui/editmicroinstruction/EditMicroinstructions" +
+                                    ("/fxml/editmicroinstruction/EditMicroinstructions" +
                                             ".fxml"));
                     EditMicroinstructionsController controller = new
                             EditMicroinstructionsController(mediator, getClasses());
@@ -230,11 +230,11 @@ public class DragTreeCell extends TreeCell<String> {
         //set icons for the treeCells
         if (isClass) {
             setGraphic(new ImageView(this.getClass().getResource(
-                    "FolderIcon16x16.png").toExternalForm()));
+                    "/images/icons/FolderIcon16x16.png").toExternalForm()));
         }
         else if (!isNothing) {
             setGraphic(new ImageView(this.getClass().getResource(
-                    "FileIcon16x16.png").toExternalForm()));
+                    "/images/icons/FileIcon16x16.png").toExternalForm()));
         }
 
 

@@ -16,6 +16,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Decode;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -62,10 +63,7 @@ public class DecodeTableController
         this.prototype = new Decode("???", machine, r);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "decodeTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "decodeTable.fxml");
 
         try {
             fxmlLoader.load();

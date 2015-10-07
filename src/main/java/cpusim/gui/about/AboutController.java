@@ -22,12 +22,12 @@ public class AboutController implements Initializable {
     @Override
     public void initialize(URL arg0, ResourceBundle arg1) {
         // Load in image
-        URL url = getClass().getResource("/cpusim/gui/about/cpusim_logo.jpg");
+        URL url = getClass().getResource("/images/icons/cpusim_logo.jpg");
         imageView.setImage(new Image(url.toExternalForm()));
 
         // Set up Text in Web View
         WebEngine webEngine = webView.getEngine();
-        url = getClass().getResource("/cpusim/gui/about/aboutCPUSim.html");
+        url = getClass().getResource("/html/aboutCPUSim.html");
         webEngine.load(url.toExternalForm());
         webView.setZoom(javafx.stage.Screen.getPrimary().getDpi() / 96);
     }

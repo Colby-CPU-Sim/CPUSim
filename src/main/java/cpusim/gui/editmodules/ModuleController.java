@@ -231,7 +231,7 @@ public abstract class ModuleController
 
     /**
      * checks if new modules of this class can be created.
-     * This may be false, for example, if you wanted to create
+     * This may be false, for example, if you wanted to fromRootController
      * a Transfer before any Registers have been created.
      * @return true if new modules of this class can be created.
      */

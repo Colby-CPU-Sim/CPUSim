@@ -40,7 +40,7 @@ import java.math.BigInteger;
 
 
 /**
- * Edit the parameters associated with any register or create new or delete old registers.
+ * Edit the parameters associated with any register or fromRootController new or delete old registers.
  */
 public class Register extends Module
 {

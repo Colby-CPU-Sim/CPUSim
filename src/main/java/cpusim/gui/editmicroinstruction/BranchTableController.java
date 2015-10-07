@@ -13,6 +13,7 @@ import cpusim.Mediator;
 import cpusim.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Branch;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -57,10 +58,7 @@ public class BranchTableController
         this.prototype = new Branch("???", machine, 0, machine.getControlUnit());
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "branchTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "branchTable.fxml");
 
         try {
             fxmlLoader.load();

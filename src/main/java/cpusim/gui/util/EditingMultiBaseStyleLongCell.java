@@ -17,8 +17,6 @@ import cpusim.gui.desktop.FontData;
 import cpusim.module.RAMLocation;
 import cpusim.module.Register;
 import cpusim.util.Convert;
-import cpusim.util.Dialogs;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -122,7 +120,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             setTooltipsAndCellSize();
             setText(formatString(convertLong(Long.parseLong(getString()))));
             if(isReadOnlyRegisterValue()) {
-                ImageView graphic = new ImageView(new Image("cpusim/gui/desktop/Lock.png"));
+                ImageView graphic = new ImageView(new Image("/images/icons/Lock.png"));
                 graphic.setFitHeight(styleInfo == null ? this.getHeight() :
                                                    Integer.parseInt(styleInfo.fontSize));
                 graphic.setSmooth(true);

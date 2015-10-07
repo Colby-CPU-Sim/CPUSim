@@ -296,7 +296,7 @@ public class Scanner
 
     //-------------------------------
     //initialize char type array
-    //create an array of size 128 to accommodate the 128 possible
+    //fromRootController an array of size 128 to accommodate the 128 possible
     //ASCII characters, then set the ones we need to deal with to their
     //corresponding constants.
     private void initializeCharTypeArray()

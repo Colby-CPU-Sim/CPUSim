@@ -22,6 +22,7 @@ import cpusim.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Test;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -74,10 +75,7 @@ public class TestTableController
         this.prototype = new Test("???", machine, r, 0, 1, "EQ", Long.valueOf(0), 0);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "testTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "testTable.fxml");
 
         try {
             fxmlLoader.load();

@@ -141,7 +141,7 @@ public class BackupManager
 	private void restoreMicroChanges() {
 		HashMap table = machineInstructionStack.peek().pop();
 		//the restoration will cause all restorations to be saved in
-		//a backup state, so we'll create a new segment here and then
+		//a backup state, so we'll fromRootController a new segment here and then
 		//dump it after doing the restorations.
 		startNewBackupMicroState(null);
 

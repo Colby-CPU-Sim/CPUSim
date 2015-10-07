@@ -9,6 +9,7 @@ import cpusim.Machine;
 import cpusim.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.StyledListCell;
 import cpusim.util.BackupManager;
 import cpusim.util.CPUSimConstants;
@@ -28,7 +29,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.util.Callback;
 
 /**
  * A tool bar used for debug mode.
@@ -79,10 +79,7 @@ public class DebugToolBarController extends ToolBar
         this.outlineChangesManager = new OutlineChangesManager(backupManager, desktop);
         this.desktop = desktop;
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "fxml/desktop/DebugToolBar.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "DebugToolBar.fxml");
 
         try {
             fxmlLoader.load();

@@ -178,7 +178,7 @@ public class Normalizer
                         currAddressInBits/cellSize + "", true);
                 //we must remove the colon from the end of its contents
                 //because it isn't referenced with the colon in the code.
-                //We create a clone since all tokens are final.
+                //We fromRootController a clone since all tokens are final.
                 Token clone = new Token(label.filename,
                         label.type,
                         label.lineNumber,
@@ -261,7 +261,7 @@ public class Normalizer
                         //replace the contents of the op token with the
                         //value of the label or the value of the label minus
                         //the current address, if pcRelative addressing is used.
-                        //Since tokens are final, we need to create a whole new token.
+                        //Since tokens are final, we need to fromRootController a whole new token.
                         //If the token is not a valid label, the token is not
                         //replaced and the code generator will catch the error.
                         Token opValue = labelHash.get(op);

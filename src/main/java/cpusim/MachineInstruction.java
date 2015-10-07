@@ -268,7 +268,7 @@ public class MachineInstruction
             i++;
         }
         
-        //create the relative positions of the instruction fields compared to the
+        //fromRootController the relative positions of the instruction fields compared to the
         //assembly fields
         int[] relativePositions = new int[aColors.size()];
         i = 0;

@@ -16,7 +16,7 @@
 //   classify the different MicroInstructions just as MicroInstructions rather than
 //   Arithmetics, Shifts, and so on.  It saves time, space, and code.
 //
-//   It is abstract so no one will ever create an object of this class.
+//   It is abstract so no one will ever fromRootController an object of this class.
 
 
 ///////////////////////////////////////////////////////////////////////////////

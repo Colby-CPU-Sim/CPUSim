@@ -30,7 +30,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Using Help">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -39,7 +39,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Introduction">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -52,7 +52,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Part 1: Running CPU Sim">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -62,7 +62,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Part 2: Creating New Machines">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -72,7 +72,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Part 3: Modifying Existing Machines">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -81,7 +81,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                             </children>
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FolderIcon16x16.png"
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -90,7 +90,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                     </children>
                                     <graphic>
                                         <ImageView>
-                                            <Image url="@FolderIcon16x16.png"
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
                                                    preserveRatio="false"
                                                    smooth="false"/>
                                         </ImageView>
@@ -101,7 +101,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="File Menu">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -110,7 +110,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Edit Menu">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -119,7 +119,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Modify Menu">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -128,7 +128,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Execute Menu">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -137,7 +137,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Help Menu">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -146,7 +146,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                     </children>
                                     <graphic>
                                         <ImageView>
-                                            <Image url="@FolderIcon16x16.png"
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
                                                    preserveRatio="false"
                                                    smooth="false"/>
                                         </ImageView>
@@ -157,7 +157,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Desktop Window">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -167,7 +167,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Machine Instruction Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -177,7 +177,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Machine Instruction Fields Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -187,7 +187,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Fetch Sequence Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -197,7 +197,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Hardware Modules Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -207,7 +207,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Hardware Modules Register Arrays Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -217,7 +217,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Microinstructions Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -226,7 +226,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="EQU Editor">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -236,7 +236,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Preferences Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -245,7 +245,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Options Dialog">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -254,7 +254,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                     </children>
                                     <graphic>
                                         <ImageView>
-                                            <Image url="@FolderIcon16x16.png"
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
                                                    preserveRatio="false"
                                                    smooth="false"/>
                                         </ImageView>
@@ -265,7 +265,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Global EQUs">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -274,7 +274,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Debug Mode">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -284,7 +284,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Keyboard Shortcuts">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -293,7 +293,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                     </children>
                                     <graphic>
                                         <ImageView>
-                                            <Image url="@FolderIcon16x16.png"
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
                                                    preserveRatio="false"
                                                    smooth="false"/>
                                         </ImageView>
@@ -304,7 +304,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Names">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -313,7 +313,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Fetch Sequence">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -323,7 +323,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 value="Machine Instructions">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -332,7 +332,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                         <TreeItem value="Fields">
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FileIcon16x16.png"
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -345,7 +345,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Registers">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -355,7 +355,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Register Arrays">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -364,7 +364,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="RAMs">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -374,7 +374,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Condition Bits">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -383,7 +383,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                             </children>
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FolderIcon16x16.png"
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -396,7 +396,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Arithmetic">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -405,7 +405,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Branch">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -414,7 +414,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Decode">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -423,7 +423,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="End">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -433,7 +433,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Increment">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -442,7 +442,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="IO">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -451,7 +451,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Logical">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -461,7 +461,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="MemoryAccess">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -470,7 +470,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Set">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -480,7 +480,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="SetCondBit">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -489,7 +489,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Shift">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -498,7 +498,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Test">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -508,7 +508,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Transfer">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -517,7 +517,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                             </children>
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FolderIcon16x16.png"
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -529,7 +529,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Syntax">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -539,7 +539,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value="Regular Instructions">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -549,7 +549,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value=".data Statements">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -559,7 +559,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value=".include Statements">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -569,7 +569,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value=".ascii Statements">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -579,7 +579,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                         value=".global Statements">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -588,7 +588,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="Macros">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -597,7 +597,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                                 <TreeItem value="EQUs">
                                                     <graphic>
                                                         <ImageView>
-                                                            <Image url="@FileIcon16x16.png"
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
                                                                    preserveRatio="false"
                                                                    smooth="false"/>
                                                         </ImageView>
@@ -606,7 +606,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                             </children>
                                             <graphic>
                                                 <ImageView>
-                                                    <Image url="@FolderIcon16x16.png"
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
                                                            preserveRatio="false"
                                                            smooth="false"/>
                                                 </ImageView>
@@ -615,7 +615,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                     </children>
                                     <graphic>
                                         <ImageView>
-                                            <Image url="@FolderIcon16x16.png"
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
                                                    preserveRatio="false"
                                                    smooth="false"/>
                                         </ImageView>
@@ -624,7 +624,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                             </children>
                             <graphic>
                                 <ImageView>
-                                    <Image url="@FolderIcon16x16.png"
+                                    <Image url="@/images/icons/FolderIcon16x16.png"
                                            preserveRatio="false"
                                            smooth="false"/>
                                 </ImageView>

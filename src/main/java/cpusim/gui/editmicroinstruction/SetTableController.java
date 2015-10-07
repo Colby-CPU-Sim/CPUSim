@@ -26,6 +26,7 @@ import cpusim.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.CpusimSet;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -44,6 +45,7 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -72,14 +74,11 @@ public class SetTableController
         this.currentMicros = machine.getMicros("set");
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
-        this.prototype = new CpusimSet("???", machine, r, 0, 1, Long.valueOf(0));
+        this.prototype = new CpusimSet("???", machine, r, 0, 1, 0l);
         clones = (Microinstruction[]) createClones();
 
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "setTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "setTable.fxml");
 
         try {
             fxmlLoader.load();
@@ -88,8 +87,9 @@ public class SetTableController
             assert false : "Unable to load file: setTable.fxml";
         }
 
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((CpusimSet)clones[i]);
+        List<CpusimSet> items = table.getItems();
+        for (Microinstruction ins: clones) {
+            items.add((CpusimSet)ins);
         }
     }
 

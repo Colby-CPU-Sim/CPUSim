@@ -79,7 +79,7 @@ public class RAM extends Module
         for (int i=0; i<length; i++){
             this.data.add(new RAMLocation(i, 0, this, false, "", null));
         }
-        this.haltAtBreaks = false; //can only create RAM when not in debug mode
+        this.haltAtBreaks = false; //can only fromRootController RAM when not in debug mode
         cellMask = 0;
         for (int i = 0; i < cellSize; i++)
             cellMask = (cellMask << 1) + 1;

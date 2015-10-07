@@ -169,7 +169,7 @@ public class CpusimSet extends Microinstruction{
         if(leftOffsetShift != 64)
             rightPart = (registerValue << leftOffsetShift) >>> leftOffsetShift;
             
-        //create the resulting value and puit it in the register
+        //fromRootController the resulting value and puit it in the register
         long result = (leftPart | middlePart | rightPart) >> (fullShift);
         register.get().setValue(result);    
     }

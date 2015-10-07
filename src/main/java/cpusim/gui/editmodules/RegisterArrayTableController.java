@@ -16,6 +16,7 @@ import cpusim.Mediator;
 import cpusim.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
 import cpusim.util.Validate;
@@ -62,10 +63,7 @@ public class RegisterArrayTableController
         this.prototype = new RegisterArray("???",4, 32);
         clones = (Module[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "registerArrayTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "registerArrayTable.fxml");
 
         try {
             fxmlLoader.load();

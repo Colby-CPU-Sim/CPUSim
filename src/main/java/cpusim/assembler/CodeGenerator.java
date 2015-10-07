@@ -214,7 +214,7 @@ public class CodeGenerator
         int numBits = combinedFields.length();
 
         //parse the combinedFields string, radix 2 (from binary), into a long
-        //create a new Assembled instruction call with this long value and its
+        //fromRootController a new Assembled instruction call with this long value and its
         //field lengths
         long longVal = Long.parseLong(combinedFields, 2);
         longVal = (longVal << (64 - numBits)) >> (64 - numBits); //extend the sign bit

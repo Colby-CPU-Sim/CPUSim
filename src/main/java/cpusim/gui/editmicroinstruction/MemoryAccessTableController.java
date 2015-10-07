@@ -16,6 +16,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.MemoryAccess;
 import cpusim.module.RAM;
 import cpusim.module.Register;
@@ -69,10 +70,7 @@ public class MemoryAccessTableController
         this.prototype = new MemoryAccess("???", machine, "read", ram, r, r);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "memoryAccessTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "memoryAccessTable.fxml");
 
         try {
             fxmlLoader.load();

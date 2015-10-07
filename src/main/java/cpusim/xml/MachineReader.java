@@ -1601,7 +1601,7 @@ public class MachineReader implements CPUSimConstants
         try {
             if (currentInstruction.getInstructionFields().size() == 0) {
                 // it must be the old version where there were only FieldLengths,
-                // so now create the Fields and then set the instruction and
+                // so now fromRootController the Fields and then set the instruction and
                 // assembly fields
                 String[] fieldNames = currentFormat.split("\\s");
                 for (String fieldName : fieldNames) {

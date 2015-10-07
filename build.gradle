@@ -5,7 +5,6 @@ plugins {
 apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
 
 apply plugin: 'java'
-apply plugin: 'idea'
 
 repositories {
     mavenCentral()
@@ -20,11 +19,16 @@ version = '4.0.2'
 dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
     compile 'org.fxmisc.undo:undofx:1.1.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.6.3'
+    compile 'org.fxmisc.richtext:richtextfx:0.6.9'
 }
 
-task compile(dependsOn: [compileJava]) {
-    println 'Compiling..'
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java", 'src/main/resources']
+            excludes = ['**/*.java', '**/*.class']
+        }
+    }
 }
 
 task getDeps(type: Copy) {
@@ -41,6 +45,6 @@ jar {
     }
 }
 
-task dist(dependsOn: [compile, getDeps, jar]) {
+task dist(dependsOn: [compileJava, getDeps, jar]) {
     println 'Packaging for distribution'
 }

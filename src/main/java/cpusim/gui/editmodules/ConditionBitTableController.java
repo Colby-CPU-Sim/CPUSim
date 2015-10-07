@@ -15,6 +15,7 @@ import cpusim.Mediator;
 import cpusim.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.ConditionBit;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
@@ -76,10 +77,7 @@ public class ConditionBitTableController extends ModuleController implements Ini
         clones = (Module[]) createClones();
         fixClonesToUseCloneRegisters();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "conditionBitTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "conditionBitTable.fxml");
 
         try {
             fxmlLoader.load();

@@ -18,6 +18,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.Microinstruction;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.Logical;
 import cpusim.module.Register;
 import cpusim.util.Validate;
@@ -68,10 +69,7 @@ public class LogicalTableController
         this.prototype = new Logical("???", machine, "AND", r, r, r);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "logicalTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "logicalTable.fxml");
 
         try {
             fxmlLoader.load();

@@ -13,6 +13,7 @@ import cpusim.Module;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.RAM;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
@@ -295,9 +296,7 @@ public class EditModulesController implements Initializable {
      */
     @FXML
     public void onPropertiesButtonClick(ActionEvent e) {
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                mediator.getClass().getResource
-                        ("gui/editmodules/arrayregisters/EditRegisters.fxml"));
+
 
         EditArrayRegistersController controller;
         if (activeTable.getSelectionModel().getSelectedIndex() == -1) {
@@ -316,7 +315,7 @@ public class EditModulesController implements Initializable {
         }
 
         //controller
-        fxmlLoader.setController(controller);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(controller, "EditRegisters.fxml");
 
         final Stage dialogStage = new Stage();
         Pane dialogRoot = null;

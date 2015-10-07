@@ -443,7 +443,7 @@ public class HelpController implements Initializable {
                 });
 
         URL url = getClass().getResource
-                ("/cpusim/gui/help/helpHTML/generalHelp/introduction.html");
+                ("/html/help/generalHelp/introduction.html");
         if (startingPage != null) {
             url = getClass().getResource(urls.get(startingPage));
         }
@@ -477,7 +477,7 @@ public class HelpController implements Initializable {
      */
     public void initializeSearchField() {
 //        searchTF.getStylesheets().add(getClass().getResource
-//                ("/cpusim/gui/help/SearchComboBox.css").toExternalForm());
+//                ("/cpusim/gui/help/SearchComboBox.cpusim.gui.css").toExternalForm());
         searchTF.setOnKeyReleased(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -549,7 +549,7 @@ public class HelpController implements Initializable {
                 performSearchFor(searchTF.getText());
         });
 //        searchBox.getStylesheets().add(getClass().getResource
-//                ("/cpusim/gui/help/SearchComboBox.css").toExternalForm());
+//                ("/cpusim/gui/help/SearchComboBox.cpusim.gui.css").toExternalForm());
     }
 
     /**
@@ -672,7 +672,7 @@ public class HelpController implements Initializable {
 
 
         // Load in image
-        URL url = HelpController.class.getResource("/cpusim/gui/about/cpusim_icon.jpg");
+        URL url = HelpController.class.getResource("/images/icons/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
 

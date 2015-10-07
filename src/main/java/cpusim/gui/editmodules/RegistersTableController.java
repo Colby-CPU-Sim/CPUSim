@@ -29,6 +29,7 @@ import cpusim.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.EditingLongCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.Register;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -78,10 +79,7 @@ public class RegistersTableController
         this.prototype = new Register("???", 16, 0, false);
         clones = (Module[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "registersTable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "registersTable.fxml");
 
         try {
             fxmlLoader.load();

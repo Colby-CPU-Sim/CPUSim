@@ -19,7 +19,7 @@ package cpusim.assembler;
  * 1.) Added two stacks, includeFileNames and includeLabelHashStack.  The former has the
  * current file being parsed on top, the latter has the hash of original label tokens and 
  * new label tokens with a unique name
- * 2.) Made the Include() method have a first pass to find label tokens and create new
+ * 2.) Made the Include() method have a first pass to find label tokens and fromRootController new
  * label tokens with unique names
  * 3.) Changed the advance() method so that it replaces the token just received with a new
  * token with a unique name if appropriate (if it is in an include file and working with a
@@ -902,7 +902,7 @@ public class Parser {
             if (t.contents.charAt(t.contents.length() - 1) == labelChar) {
                 //we must remove the colon from the end of its contents
                 //because it isn't referenced with the colon in the code
-                //create a clone since all tokens are final
+                //fromRootController a clone since all tokens are final
                 t = new Token(t.filename, t.type, t.lineNumber,
                         t.columnNumber, t.offset, t.contents.substring(0,
                         t.contents.length() - 1), t.isLegal);

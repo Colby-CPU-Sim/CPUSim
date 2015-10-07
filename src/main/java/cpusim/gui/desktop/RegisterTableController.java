@@ -100,9 +100,9 @@ public class RegisterTableController implements Initializable {
         width.prefWidthProperty().bind(table.widthProperty().divide(100 / 15.0));
         data.prefWidthProperty().bind(table.widthProperty().divide(100 / 60.0));
 
-        name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
-        width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
-        data.setCellValueFactory(new PropertyValueFactory<Register, Long>("value"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        width.setCellValueFactory(new PropertyValueFactory<>("width"));
+        data.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         data.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Register,
                                      Long>>() {

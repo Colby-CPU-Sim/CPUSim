@@ -14,6 +14,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.microinstruction.TransferRtoA;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
@@ -70,10 +71,7 @@ public class TransferRtoATableController
         this.prototype = new TransferRtoA("???", machine, r, 0, a, 0, 0, r,0, 0);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "transferRtoATable.fxml"));
-        fxmlLoader.setRoot(this);
-        fxmlLoader.setController(this);
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "transferRtoATable.fxml");
 
         try {
             fxmlLoader.load();
