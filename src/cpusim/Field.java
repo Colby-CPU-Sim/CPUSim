@@ -5,23 +5,23 @@
  */
 package cpusim; 
 
-import cpusim.util.*;
-import cpusim.xml.*;
-import java.util.ArrayList;
-
+import cpusim.util.NamedObject;
+import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.util.ArrayList;
 
 /**
  * Class used to hold field options for each field of 
  * a machine instruction.
  */
-public class Field implements NamedObject {
+public class Field implements NamedObject, Cloneable {
 
-	public static enum Relativity {absolute, pcRelativePreIncr,
+	public enum Relativity {absolute, pcRelativePreIncr,
                                     pcRelativePostIncr}
-    public static enum Type {required, optional, ignored}
+    public enum Type {required, optional, ignored}
 
     // The name of the field
     private SimpleStringProperty name;    
@@ -91,10 +91,12 @@ public class Field implements NamedObject {
 
         String s = super.toString();
         int index = s.indexOf('@');
-        if (index == -1)
+        if (index == -1) {
             ID = s;
-        else
+        }
+        else {
             ID = s.substring(7, index) + s.substring(index + 1);
+        }
     }
 
     ////////////////// Setters and getters //////////////////
@@ -202,7 +204,12 @@ public class Field implements NamedObject {
      * Returns a clone of this field.
      */
     public Object clone() {
-        Field c = new Field();
+        Field c = null;
+        try {
+            c = (Field) super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace(); //should never happen since Fields implement Cloneable
+        }
         c.setName(name.get());
         c.setType(type.get());
         c.setNumBits(numBits.get());
