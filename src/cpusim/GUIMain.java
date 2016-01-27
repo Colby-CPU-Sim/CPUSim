@@ -83,6 +83,13 @@ public class GUIMain extends Application {
             deskController.open(new File(textFileName));
         }
 
+        // Fixes crash on Windows 10 systems with Intel Chips
+        // See http://stackoverflow.com/questions/31786980/javafx-windows-10-combobox-error
+        // Setting this property will prevent automatic screen readers from working wth the application
+        // and may disable other similar accessibility features
+        System.setProperty("glass.accessible.force", "false");
+
+
         stage.show();
 	}
 }

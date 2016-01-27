@@ -1959,11 +1959,11 @@ public class DesktopController implements Initializable
         // Save Text As
         fileMenu.getItems().get(5).disableProperty().bind(noTabSelected);
         // New Machine
-        fileMenu.getItems().get(10).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(10).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Open Machine
-        fileMenu.getItems().get(11).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(11).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Reopen Machine
-        fileMenu.getItems().get(12).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(12).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Print
         fileMenu.getItems().get(19).disableProperty().bind(noTabSelected);
 
