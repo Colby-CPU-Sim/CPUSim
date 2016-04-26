@@ -109,6 +109,59 @@
  * 2.) Changed saveAs() method so that the fileChooser dialog has the .a file
  * extenstion filter
  * extension
+ * <p>
+ * File: DesktopController
+ * Author: Pratap Luitel, Scott Franchi, Stephen Webel
+ * Date: 10/27/13
+ * <p>
+ * Fields removed:
+ * private SimpleBooleanProperty machineDirty
+ * private File machineFile
+ * private SimpleStringProperty machineDirtyString
+ * private String currentMachineDirectory
+ * <p>
+ * Methods added:
+ * public ArrayDeque<String> getReopenMachineFiles()
+ * public void setReopenMachineFiles()
+ * public ConsoleManager getConsoleManager()
+ * <p>
+ * Methods removed:
+ * public void machineChanged()
+ * public SimpleStringProperty getMachineDirtyProperty()
+ * private void addMachineStateListeners()
+ * private void saveMachine()
+ * private void saveAsMachine()
+ * public void newMachine()
+ * public void openMachine(File fileToOpen)
+ * <p>
+ * Methods modified:
+ * protected void handleNewMachine(ActionEvent event)
+ * protected void handleOpenMachine(ActionEvent event)
+ * public void updateReopenMachineMenu()
+ * public void updateReopenMachineFiles()
+ * private boolean confirmClosing()
+ * public void clearTables()
+ * public void loadPreferences()
+ * public void storePreferences()
+ * protected void handleSaveMachine(ActionEvent event)
+ * protected void handleSaveAsMachine(ActionEvent event)
+ * public void initFileChooser(FileChooser fileChooser, String title, boolean text)
+ * <p>
+ * <p>
+ * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
+ * with the following changes:
+ * <p>
+ * 1.) added capability for the register and ram tables to handle the Unsigned Decimal
+ * and Ascii bases except in the ram address column
+ * <p>
+ * on 11/25:
+ * <p>
+ * 1.) Changed saveAsHTMLMachine() method so that the fileChooser dialog has the .html
+ * file extenstion
+ * filter
+ * 2.) Changed saveAs() method so that the fileChooser dialog has the .a file
+ * extenstion filter
+ * extension
  */
 
 /**
@@ -371,7 +424,10 @@ public class DesktopController implements Initializable
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // prep the menu bar for Mac apps
-        menuBar.setUseSystemMenuBar(true);
+        // TODO:  uncomment the next line when RichTextFX is fixed
+        //        Right now, it causes undo/redo/cut/copy/paste to be
+        //        executed twice when you choose the keyboard shortcut
+        //menuBar.setUseSystemMenuBar(true);
 
         // add the ioConsole to the ioConsolePane
         ioConsolePane.getChildren().add(ioConsole);
@@ -960,18 +1016,18 @@ public class DesktopController implements Initializable
             {
                 DesktopController.this.handleFetchSequence(null);
             }
-            // these next ones are already taken care of in StyleTextAreaBehavior
-            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown() &&
-                    event.isShiftDown())
-            // ctrl-shift-Z is redo
-            {
-                handleRedo(null);
-            }
-            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown())
-            // ctrl-Z is undo
-            {
-                handleUndo(null);
-            }
+//  // these next ones are already taken care of in StyleTextAreaBehavior
+//            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown() &&
+//                    event.isShiftDown())
+//            // ctrl-shift-Z is redo
+//            {
+//                handleRedo(null);
+//            }
+//            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown())
+//            // ctrl-Z is undo
+//            {
+//                handleUndo(null);
+//            }
         });
     }
 
@@ -981,9 +1037,9 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleUndo(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
-                .getSelectionModel().getSelectedItem().getContent();
-        codeArea.undo();
+//        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+//                .getSelectionModel().getSelectedItem().getContent();
+//        codeArea.undo();
     }
 
     /**
@@ -992,9 +1048,9 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleRedo(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
-                .getSelectionModel().getSelectedItem().getContent();
-        codeArea.redo();
+//        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+//                .getSelectionModel().getSelectedItem().getContent();
+//        codeArea.redo();
     }
 
     /**
@@ -1587,7 +1643,8 @@ public class DesktopController implements Initializable
 
         newTab.setContent(codeArea);
 
-        // whenever the text is changed, recompute the highlighting and set it dirty
+        // add InvalidationListener so that whenever the text is changed,
+        // we recompute the highlighting and set the file to dirty
         codeArea.textProperty().addListener(obs -> {
             codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea
                     .getText()));
@@ -3283,93 +3340,76 @@ public class DesktopController implements Initializable
             }
             // Delete: DELETE
             else if (menuItem.getText().equals("Delete")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.DELETE,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP));
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP));
             }
             // Undo: SHORTCUT-Z
             else if (menuItem.getText().equals("Undo")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.Z,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+Z"));
+
+//                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN));
             }
             // Redo: SHORTCUT-Shift-Z
             else if (menuItem.getText().equals("Redo")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.Z,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN,
-                // KeyCodeCombination.ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+SHIFT+Z"));
+
+//                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN));
             }
             // Cut: SHORTCUT-X
             else if (menuItem.getText().equals("Cut")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.X,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.X,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.DOWN));
             }
             // Copy: SHORTCUT-C
             else if (menuItem.getText().equals("Copy")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.C,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.C,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.DOWN));
             }
             // Paste: SHORTCUT-V
             else if (menuItem.getText().equals("Paste")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.V,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.V,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.DOWN));
             }
             else if (menuItem.getText().equals("Select All")) {
-                //                menuItem.setAccelerator(new KeyCodeCombination
-                // (KeyCode.A,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.UP, KeyCodeCombination
-                // .ModifierValue.UP,
-                //                        KeyCodeCombination.
-                //                                ModifierValue.DOWN));
+                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.A,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        KeyCodeCombination.
+                        ModifierValue.DOWN));
             }
             else {
                 menuItems.add(menuItem);
