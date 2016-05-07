@@ -245,6 +245,7 @@ public class HelpController implements Initializable {
      *                  down the HTML page.
      */
     public HelpController(DesktopController d, String startPage, String as) {
+
         desktop = d;
         startingPage = startPage;
         appendString = as;

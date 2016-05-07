@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CPUSim4.0b49.iml" filepath="$PROJECT_DIR$/CPUSim4.0b49.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CPUSimFXProj.iml" filepath="$PROJECT_DIR$/CPUSimFXProj.iml" />
     </modules>
   </component>
 </project>

@@ -4,22 +4,17 @@
  */
 package cpusim;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.List;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.util.CPUSimConstants;
-import java.net.URL;
-
-import cpusim.util.Dialogs;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-
-import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.net.URL;
+import java.util.List;
 
 /**
  * A class to start the GUI. This is used every time 
@@ -33,7 +28,7 @@ public class GUIMain extends Application {
 	@Override
 	public void start(Stage stage)
     {
-		List<String> params = getParameters().getRaw();
+        List<String> params = getParameters().getRaw();
 		
         //netbeans has an issue with running CPUSim from the command line
         // so if you use netbeans, you may need to set the the variables
