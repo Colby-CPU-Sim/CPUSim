@@ -184,10 +184,10 @@ public class Arithmetic extends Microinstruction {
             overflowBit.get().set(1);
 
         //set the carry bit if necessary
-        if (type.equals("ADD") &&
+        if (type.get().equals("ADD") &&
                 ((value1 < 0 && value2 < 0) ||
-                        (value1 < 0 && value2 > value1) ||
-                        (value2 < 0 && value1 > value2)))
+                        (value1 < 0 && value2 >= -value1) ||
+                        (value2 < 0 && value1 >= -value2)))
             carryBit.get().set(1);
 
         //save the result

@@ -169,10 +169,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     /**
      * StateWrapper class wraps a State enum and an Object value so that listeners will
-     * register
-     * a change when the state is set, even if the enum is the same so that changed
-     * method is
-     * always called by listeners
+     * register a change when the state is set, even if the enum is the same so
+     * that changed method is always called by listeners
      */
     public class StateWrapper {
 
@@ -243,6 +241,13 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
          */
         public void setValue(Object newValue) {
             this.value = newValue;
+        }
+
+        /**
+         * @return a string displaying the state and the value
+         */
+        public String toString() {
+            return this.state + ":" + this.value;
         }
     }
 
@@ -921,10 +926,10 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                     // fire a property change that execution halted or aborted
                     setState(
                             runMode == RunModes.ABORT ? Machine.State.EXECUTION_ABORTED :
-                                    mode == RunModes.STEP_BY_MICRO ? Machine.State
-                                            .HALTED_STEP_BY_MICRO :
-                         /* else */ Machine.State.EXECUTION_HALTED, haltBitsThatAreSet
-                                    ().size() > 0);
+                                       mode == RunModes.STEP_BY_MICRO ?
+                                               Machine.State.HALTED_STEP_BY_MICRO :
+                                       /* else */ Machine.State.EXECUTION_HALTED,
+                            haltBitsThatAreSet().size() > 0);
 
                     // write buf to output file channel
                     if ((getStateWrapper().getState() == Machine.State.EXECUTION_HALTED &&

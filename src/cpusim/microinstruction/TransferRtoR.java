@@ -178,52 +178,51 @@ public class TransferRtoR extends Microinstruction {
      * execute the micro instruction from machine
      */
     public void execute()
-    {   
+    {
+        //move the bit values of the registers to the far left end of the 64-bit long
         int srcFullShift = 64 - source.get().getWidth();
         int destFullShift = 64 - dest.get().getWidth();
-        
-        //move the bit value of the register to the far left end of memory
         long sourceValue = source.get().getValue() << (srcFullShift);
         long destValue = dest.get().getValue() << (destFullShift);
 
-        //manipulate variables depending on the indexing scheme
+        // get the shift amounts needed to extra the appropriate bits from src & dest
         int destRightShift;
         int destLeftShift;
         int srcRightShift;
         int srcLeftShift;
-        int srcOffsetShift = 64 - numBits.get();
-        if(!machine.getIndexFromRight()){
+        if (machine.getIndexFromRight()) {
+            destRightShift = destFullShift + destStartBit.get() + numBits.get();
+            destLeftShift = dest.get().getWidth() - destStartBit.get();
+            srcLeftShift = source.get().getWidth() - srcStartBit.get() - numBits.get();
+            srcRightShift = dest.get().getWidth() - destStartBit.get() - numBits.get();
+        }
+        else {
             destRightShift = 64 - destStartBit.get();
             destLeftShift = destStartBit.get() + numBits.get();
             srcLeftShift = srcStartBit.get();
             srcRightShift = destStartBit.get();
         }
-        else{
-            destRightShift = srcFullShift + destStartBit.get() + numBits.get();
-            destLeftShift = dest.get().getWidth() - destStartBit.get();
-            srcLeftShift = source.get().getWidth() - srcStartBit.get() - numBits.get();
-            srcRightShift = dest.get().getWidth() - destStartBit.get() - numBits.get();
-        }
-        
-        //shave of the middle part of the destination register by getting rid of
-        //bits on either side.
+
+        // get the left and right parts of the dest register to save
+        // and get the middle part of the src register to transfer.
         //NOTE: java won't allow shifts greater than 63, so if the shift is 64,
         //we bypass the actual shifting and just set the value to 0 since a
         //64 bit shift would result in 0 anyway
-        long leftDestPart = 0;
-        if(destRightShift != 64){
-            leftDestPart = (destValue >>> (destRightShift))
-                                << (destRightShift);
+        long leftDestPart = 0;  // the bits in dest register's left part to save
+        if(destRightShift < 64){ // zero out all but that left part
+            leftDestPart = (destValue >>> destRightShift) << destRightShift;
         }
-        long rightDestPart = 0;
-        if (destLeftShift != 64){
-            rightDestPart = (destValue << (destLeftShift))
-                                >>> (destLeftShift);
+
+        long rightDestPart = 0; // the bits in dest register's right part to save
+        if (destLeftShift < 64){ // zero out all but that right part
+            rightDestPart = (destValue << destLeftShift) >>> destLeftShift;
         }
-        
-        //trim the sides of the source register as dictated by the
-        long middlePart = (((sourceValue << srcLeftShift) >>> (srcOffsetShift))
-                        << (srcOffsetShift)) >>> srcRightShift;
+
+        // get the bits in the src register to be transferred
+        int srcOffsetShift = 64 - numBits.get();
+        long middlePart = (((sourceValue << srcLeftShift) >>> srcOffsetShift)
+                << srcOffsetShift) >>> srcRightShift;
+
         long result = leftDestPart | middlePart | rightDestPart;
         result = result >> destFullShift;
         dest.get().setValue(result);
@@ -267,4 +266,15 @@ public class TransferRtoR extends Microinstruction {
         return (m == source.get() || m == dest.get());
     }
 
+    public static void main(String[] args) {
+        Register src = new Register("SRC", 10);
+        src.setValue(21);
+        System.out.println("src: " + Long.toBinaryString(src.getValue()));
+        Register dst = new Register("DST", 8);
+        dst.setValue(-1);
+        System.out.println("dest: " + Long.toBinaryString(dst.getValue()));
+        TransferRtoR micro = new TransferRtoR("milo", null, src, 4,dst,1,5);
+        micro.execute();
+        System.out.println("new dest: " + Long.toBinaryString(dst.getValue()));
+    }
 }
