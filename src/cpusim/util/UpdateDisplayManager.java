@@ -2,10 +2,7 @@ package cpusim.util;
 
 import cpusim.Machine;
 import cpusim.Mediator;
-import cpusim.Microinstruction;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.microinstruction.IO;
-import cpusim.module.ControlUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
