@@ -282,7 +282,8 @@ public class DebugToolBarController extends ToolBar implements Initializable,
             backupMachineInstrButton.setDisable(true);
             startOverButton.setDisable(true);
         }
-
+        // Can this next if stmt be commented out because the start of cycle values are already saved
+        // whenever the machine state is START_OF_MACHINE_CYCLE in HighlightManager.changed()?
         if (index == 0 && machine.getFetchSequence() == currentInstruction) {
             desktop.getHighlightManager().saveStartOfCycleValues();
         }
@@ -336,7 +337,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
                     newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
                     newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED ||
                     newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
-                //enable all buttons after a execution finished
+                //enable all buttons after execution finished
                 Platform.runLater(() -> setDisableAllButtons(false));
             }
         }

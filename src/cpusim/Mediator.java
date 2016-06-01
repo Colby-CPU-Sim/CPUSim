@@ -91,28 +91,25 @@ import cpusim.module.RegisterArray;
 import cpusim.util.*;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.stage.Stage;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.stage.FileChooser;
-import org.xml.sax.SAXParseException;
 
 /**
  * This class is the repository of global data, such as the current machine.
@@ -663,7 +660,8 @@ public class Mediator {
     private boolean load(boolean clearing) {
 
         if (machine.get().getCodeStore() == null) {
-            Dialogs.createErrorDialog(stage, "Error finding RAM", "The machine has no RAM's and so there is " +
+            Dialogs.createErrorDialog(stage, "Error finding RAM",
+                    "The machine has no RAM's and so there is " +
                     "nowhere to load the assembled code.").showAndWait();
             return false;
         }
@@ -685,7 +683,8 @@ public class Mediator {
             setBreakPointsInRam();
             return true;
         } catch (LoadException ex) {
-            Dialogs.createErrorDialog(stage, "RAM Load Error", ex.getMessage()).showAndWait();
+            Dialogs.createErrorDialog(stage, "RAM Load Error",
+                    ex.getMessage()).showAndWait();
             return false;
         }
     }
@@ -1154,12 +1153,16 @@ public class Mediator {
         }
     }
 
-    public void setBreakPointsInRam() {
+    /**
+     * sets the break point status of all RAMLocations so that they match the break
+     * point status of the corresponding lines of the currently loaded assembly program.
+     */
+    private void setBreakPointsInRam() {
         RAM ram = machine.get().getCodeStore();
         for (RAMLocation rLoc : ram.data()) {
             if (rLoc.getSourceLine() != null) {
                 SourceLine sourceLine = rLoc.getSourceLine();
-                Set<Integer> breakPoints = desktopController.getAllBreakPointsForFile(
+                Set<Integer> breakPoints = desktopController.getAllBreakPointLineNumbersForFile(
                         sourceLine.getFileName());
                 rLoc.setBreak(breakPoints.contains(sourceLine.getLine()));
             }

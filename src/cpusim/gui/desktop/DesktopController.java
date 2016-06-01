@@ -1604,7 +1604,11 @@ public class DesktopController implements Initializable
         assmFontData.setFontAndBackground(codeArea);
         String text = codeArea.getText();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeStyleSpans(text);
+        Set<Integer> breakLineNumbers = ((LineNumAndBreakpointFactory)
+                codeArea.getParagraphGraphicFactory()).getAllBreakPointLineNumbers();
         codeArea.setStyleSpans(0, styleSpans);
+        ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory()).
+                setAllBreakPoints(breakLineNumbers);
         codeArea.moveTo(0);
     }
 
@@ -1679,8 +1683,7 @@ public class DesktopController implements Initializable
 
         // add a listener to the codeArea's set of breakpoints
         // so that breakpoints can be added dynamically as the code is being stepped
-        // through
-        // when in debug mode
+        // through when in debug mode
         ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory())
                 .getBreakPoints().
                 addListener((SetChangeListener<Paragraph>) change -> {
@@ -1700,7 +1703,7 @@ public class DesktopController implements Initializable
     }
 
 
-    public Set<Integer> getAllBreakPointsForFile(String fileName) {
+    public Set<Integer> getAllBreakPointLineNumbersForFile(String fileName) {
         return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) getTabForFile(new
                 File(fileName)).getContent()).getParagraphGraphicFactory())
                 .getAllBreakPointLineNumbers();

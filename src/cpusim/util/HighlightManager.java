@@ -3,14 +3,14 @@
  * Author:		Dale Skrien
  * Project: 	CPU Sim
  * Date:    	June, 2001
-
+ * <p>
  * Description:
- *  This file contains the class that manages the highlighting
- *  of the rows of RAM and assembly code during stepping.  It is only active when the
- *  debug toolbar is visible.  It stores Register/RAM pairs and
- *  is a ChangeListener to the machine, which tells it when
- *  to highlight the rows of RAMs and the corresponding row of the assembly program.
-*/
+ * This file contains the class that manages the highlighting
+ * of the rows of RAM and assembly code during stepping.  It is only active when the
+ * debug toolbar is visible.  It stores Register/RAM pairs and
+ * is a ChangeListener to the machine, which tells it when
+ * to highlight the rows of RAMs and the corresponding row of the assembly program.
+ */
 
 package cpusim.util;
 
@@ -19,6 +19,7 @@ import cpusim.Machine;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
+import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.module.RAM;
 import cpusim.module.Register;
 import javafx.beans.value.ChangeListener;
@@ -34,14 +35,15 @@ import java.util.*;
 /**
  * class to handle highlighting of rows in the table when in debug mode
  */
-public class HighlightManager
-        implements ChangeListener<Machine.StateWrapper> {
+public class HighlightManager implements ChangeListener<Machine.StateWrapper>
+{
 
     private DesktopController desktop;
     private Mediator mediator;
-    private int breakAddress;  //the address to be highlighted in red
-    private RAM breakRAM;      //the ram in which the break address resides
     private HashMap<RAM, Vector<RegisterRAMPair>> highlightingPairs;
+    private boolean startBreak, endBreak;
+    private RAM breakRAM;
+    private int breakAddress;
 
     /**
      * Constructor
@@ -49,12 +51,13 @@ public class HighlightManager
      * @param mediator stores the machine and information needed
      * @param desktop  desktop that holds the register table and ram table
      */
-    public HighlightManager(Mediator mediator,
-                            DesktopController desktop) {
+    public HighlightManager(Mediator mediator, DesktopController desktop) {
         this.desktop = desktop;
         this.mediator = mediator;
+        this.breakRAM = null;
+        this.breakAddress = -1;
+        this.startBreak = false;
         highlightingPairs = new HashMap<>();
-        breakAddress = -1; //no break address
         mediator.getMachine().stateProperty().addListener(this);
     }
 
@@ -67,8 +70,7 @@ public class HighlightManager
         highlightingPairs.clear();
         ObservableList rams = mediator.getMachine().getModule("rams");
         for (Object ram : rams) {
-            highlightingPairs.put((RAM) ram,
-                    new Vector<>());
+            highlightingPairs.put((RAM) ram, new Vector<>());
         }
         for (RegisterRAMPair pair : newPairs) {
             highlightingPairs.get(pair.getRam()).addElement(pair);
@@ -99,15 +101,17 @@ public class HighlightManager
 
         //update pairs for new RAMs
         for (Object ram : rams) {
-            if (!highlightingPairs.containsKey(ram))
+            if (!highlightingPairs.containsKey(ram)) {
                 highlightingPairs.put((RAM) ram, new Vector<>());
+            }
         }
         //update pairs for deleted RAMs
         //the keySet is created to avoid ConcurrentModificationExceptions
         Set<RAM> keySet = new HashSet<>(highlightingPairs.keySet());
         for (RAM ram : keySet) {
-            if (!rams.contains(ram))
+            if (!rams.contains(ram)) {
                 highlightingPairs.remove(ram);
+            }
         }
 
         //update pairs for deleted Registers
@@ -115,8 +119,9 @@ public class HighlightManager
         for (Vector<RegisterRAMPair> pairs : highlightingPairs.values()) {
             for (int i = pairs.size() - 1; i >= 0; i--) {
                 RegisterRAMPair pair = pairs.elementAt(i);
-                if (!allRegisters.contains(pair.getRegister()))
+                if (!allRegisters.contains(pair.getRegister())) {
                     pairs.remove(pair);
+                }
             }
         }
     }
@@ -125,25 +130,89 @@ public class HighlightManager
      * highlights and scrolls to the cells of RAM that are specified in the
      * highlightingPairs table.  If the RAM cell has a corresponding non-null
      * SourceLine, then that line of the text file is also brought to front
-     * and highlighted.
+     * and highlighted.  Also, if the machine stopped at a break point, the break point
+     * is highlighted in both RAM and text.
      */
     public void highlightCellsAndText() {
         ObservableList<RamTableController> ramTableControllers = desktop.getRAMControllers();
 
+        // highlight RAM cells and text for RegisterRAM pairs
         for (RamTableController controller : ramTableControllers) {
             RAM ram = controller.getRam();
             int[] addresses = getAddressesToHighlight(ram);
-            //now have the window highlight the cells
+            //now have the ram window highlight the cells
             controller.highlightRows(addresses);
+            //now have the text window highlight the corresponding rows
             highlightText(ram, addresses);
 
-            if (ram == breakRAM) {
-                controller.highlightBreak(breakAddress);
-                breakRAM = null; //turn off highlight when execution resumes
+
+            // if break occurred, highlight the cell and text at the break point
+            // if ending a break, unhighlight the cell and text
+            if (startBreak && ram == breakRAM) {
+                // highlight the RAM cell and corresponding text line in the code
+                // and change the icon in the left column to an orange block
+                controller.highlightBreakInRAM(breakAddress, true);
+                highlightBreakInText(breakRAM, breakAddress);
+            }
+            else if (endBreak && ram == breakRAM) {
+                // unhighlight the break line in RAM
+//                controller.highlightBreakInRAM(breakAddress, false);
+                // and unhighlight the corresponding text line in the code
+                // and change the icon in the left column back to its original form
+                unhighlightBreakInText(breakRAM, breakAddress);
+                endBreak = false;
             }
         }
     }
 
+
+    /**
+     * Checks the address of the given RAM and if it has a non-null
+     * SourceLine, then bring the text window to front and highlight the
+     * row.
+     * Displays an error message if the text file doesn't exist or if
+     * the desired line of the file does not exist.
+     *
+     * @param ram          the RAM with the SourceLines to be highlighted
+     * @param breakAddress the address of the break point in ram
+     */
+    private void highlightBreakInText(RAM ram, int breakAddress) {
+        SourceLine sourceLine = ram.getSourceLine(breakAddress);
+        if (sourceLine != null) {
+            File file = new File(sourceLine.getFileName());
+            if (!file.canRead()) {
+                return;
+            }
+            Tab newTabForFile = desktop.getTabForFile(file);
+            InlineStyleTextArea text = (InlineStyleTextArea) newTabForFile.getContent();
+            int line = sourceLine.getLine();
+            int start = getLineStartOffset(text.getText(), line);
+            int end = getLineEndOffset(text.getText(), line);
+            text.selectRange(start, end);
+
+            // now change the background of the label in left column to orange
+            LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
+            lFactory.setCurrentBreakPointLineNumber(line);
+        }
+    }
+
+
+    private void unhighlightBreakInText(RAM ram, int breakAddress) {
+        SourceLine sourceLine = ram.getSourceLine(breakAddress);
+        if (sourceLine != null) {
+            File file = new File(sourceLine.getFileName());
+            if (!file.canRead()) {
+                return;
+            }
+            Tab newTabForFile = desktop.getTabForFile(file);
+            InlineStyleTextArea text = (InlineStyleTextArea) newTabForFile.getContent();
+//            text.selectRange(0, 0); // unselect everything else
+
+            // now change the background of the label in left column to orange
+            LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
+            lFactory.setCurrentBreakPointLineNumber(-1);
+        }
+    }
 
     /**
      * Checks the addresses of the given RAM and if they have a non-null
@@ -161,9 +230,7 @@ public class HighlightManager
             if (sourceLine != null) {
                 File file = new File(sourceLine.getFileName());
                 if (!file.canRead()) {
-                    Dialogs.createErrorDialog(desktop.getStage(),
-                            "File Not Found", "CPU Sim could not find the file to open and highlight:  " +
-                                    file.getAbsolutePath()).showAndWait();
+                    Dialogs.createErrorDialog(desktop.getStage(), "File Not Found", "CPU Sim could not find the file to open and highlight:  " + file.getAbsolutePath()).showAndWait();
                     return;
                 }
                 Tab newTabForFile = desktop.getTabForFile(file);
@@ -187,15 +254,17 @@ public class HighlightManager
      * @return the offset
      */
     private int getLineStartOffset(String content, int line) {
-        if(line == 0)
+        if (line == 0) {
             return 0;
+        }
         int count = 0;
         int lineNum = 0;
         while (count < content.length()) {
             if (content.substring(count, count + 1).equals("\n")) {
                 lineNum++;
                 count++;
-            } else {
+            }
+            else {
                 count++;
             }
             if (lineNum == line) {
@@ -217,10 +286,12 @@ public class HighlightManager
         while (count < content.length()) {
             if (content.substring(count, count + 1).equals("\n")) {
                 count++;
-                if (count >= content.length())
+                if (count >= content.length()) {
                     count = content.length() - 1;
+                }
                 return count;
-            } else {
+            }
+            else {
                 count++;
             }
         }
@@ -229,16 +300,18 @@ public class HighlightManager
 
     //--------------------------------
     // returns an array of addresses to be highlighted for the given RAM
-    public int[] getAddressesToHighlight(RAM ram) {
+    private int[] getAddressesToHighlight(RAM ram) {
         Vector<RegisterRAMPair> registerRAMPairs = highlightingPairs.get(ram);
         int[] addresses = new int[registerRAMPairs.size()];
         for (int i = 0; i < addresses.length; i++) {
             RegisterRAMPair pair = registerRAMPairs.elementAt(i);
             Register register = pair.getRegister();
-            if (pair.isDynamic())
+            if (pair.isDynamic()) {  // get the current value of the register
                 addresses[i] = (int) register.getValue();
-            else
+            }
+            else { // get the value of the register at the start of the machine cycle.
                 addresses[i] = pair.getAddressAtStart();
+            }
             //if address register has 1 in the leftmost bit, its value is stored
             //as a 2's complement negative, but we want to treat it as an
             //unsigned decimal
@@ -263,14 +336,14 @@ public class HighlightManager
     }
 
     // never used
-//    public void clearHighlights() {
-//        ObservableList ramTables = desktop.getRAMControllers();
-//        for (Object key : ramTables) {
-//            RamTableController table = (RamTableController) key;
-//            table.getTable().getSelectionModel().clearSelection();
-//        }
-//
-//    }
+    //    public void clearHighlights() {
+    //        ObservableList ramTables = desktop.getRAMControllers();
+    //        for (Object key : ramTables) {
+    //            RamTableController table = (RamTableController) key;
+    //            table.getTable().getSelectionModel().clearSelection();
+    //        }
+    //
+    //    }
 
     /**
      * Receive notifications that a module
@@ -283,16 +356,21 @@ public class HighlightManager
      * @param newStateWrapper the new state object
      */
     public void changed(ObservableValue<? extends Machine.StateWrapper> stateWrapper,
-                        Machine.StateWrapper oldStateWrapper,
-                        Machine.StateWrapper newStateWrapper) {
+                Machine.StateWrapper oldStateWrapper, Machine.StateWrapper newStateWrapper) {
         if (newStateWrapper.getState() == Machine.State.START_OF_MACHINE_CYCLE) {
             //save values of all the registers
             saveStartOfCycleValues();
-        } else if (newStateWrapper.getState() == Machine.State.BREAK) {
-            breakAddress = ((BreakException) newStateWrapper.getValue()).breakAddress;
-            breakRAM = ((BreakException) newStateWrapper.getValue()).breakRAM;
         }
-        //else it was a something that we don't care about
+        if (newStateWrapper.getState() == Machine.State.BREAK) {
+            this.breakRAM = ((BreakException) newStateWrapper.getValue()).breakRAM;
+            this.breakAddress = ((BreakException) newStateWrapper.getValue()).breakAddress;
+            this.startBreak = true;
+            this.endBreak = false;
+        }
+        else if (this.startBreak && newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
+            this.startBreak = false;
+            this.endBreak = true;
+        }
+        // else we don't care about the machine state
     }
-
 }
