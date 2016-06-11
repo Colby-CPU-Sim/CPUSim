@@ -45,6 +45,7 @@ public class UpdateDisplayManager
         }
         else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
+                newStateWrapper.getState() == Machine.State.BREAK ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED) {
             Platform.runLater(() -> {
                 updateDesktop(false);

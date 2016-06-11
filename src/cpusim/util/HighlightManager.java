@@ -134,9 +134,13 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
      * is highlighted in both RAM and text.
      */
     public void highlightCellsAndText() {
+
+        //System.out.println("\t\tIn highlightCells, startBreak=" + startBreak + ", endBreak=" + endBreak);
+
         ObservableList<RamTableController> ramTableControllers = desktop.getRAMControllers();
 
         // highlight RAM cells and text for RegisterRAM pairs
+        // and highlight break point if a break occurred
         for (RamTableController controller : ramTableControllers) {
             RAM ram = controller.getRam();
             int[] addresses = getAddressesToHighlight(ram);
@@ -153,6 +157,8 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
                 // and change the icon in the left column to an orange block
                 controller.highlightBreakInRAM(breakAddress, true);
                 highlightBreakInText(breakRAM, breakAddress);
+                startBreak = false;
+                endBreak = true;
             }
             else if (endBreak && ram == breakRAM) {
                 // unhighlight the break line in RAM
@@ -191,7 +197,8 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
             text.selectRange(start, end);
 
             // now change the background of the label in left column to orange
-            LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
+            LineNumAndBreakpointFactory lFactory =
+                    (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
             lFactory.setCurrentBreakPointLineNumber(line);
         }
     }
@@ -204,12 +211,11 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
             if (!file.canRead()) {
                 return;
             }
-            Tab newTabForFile = desktop.getTabForFile(file);
-            InlineStyleTextArea text = (InlineStyleTextArea) newTabForFile.getContent();
-//            text.selectRange(0, 0); // unselect everything else
-
-            // now change the background of the label in left column to orange
-            LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
+            Tab tabForFile = desktop.getTabForFile(file);
+            InlineStyleTextArea text = (InlineStyleTextArea) tabForFile.getContent();
+            LineNumAndBreakpointFactory lFactory =
+                    (LineNumAndBreakpointFactory) text.getParagraphGraphicFactory();
+            // change the background of the label in left column back to the original color
             lFactory.setCurrentBreakPointLineNumber(-1);
         }
     }
@@ -230,7 +236,9 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
             if (sourceLine != null) {
                 File file = new File(sourceLine.getFileName());
                 if (!file.canRead()) {
-                    Dialogs.createErrorDialog(desktop.getStage(), "File Not Found", "CPU Sim could not find the file to open and highlight:  " + file.getAbsolutePath()).showAndWait();
+                    Dialogs.createErrorDialog(desktop.getStage(), "File Not Found",
+                            "CPU Sim could not find the file to open and highlight:  " +
+                                    file.getAbsolutePath()).showAndWait();
                     return;
                 }
                 Tab newTabForFile = desktop.getTabForFile(file);
@@ -357,20 +365,31 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
      */
     public void changed(ObservableValue<? extends Machine.StateWrapper> stateWrapper,
                 Machine.StateWrapper oldStateWrapper, Machine.StateWrapper newStateWrapper) {
+
+        //System.out.println(newStateWrapper + "; startBreak=" + startBreak + "; endBreak=" + endBreak);
+
         if (newStateWrapper.getState() == Machine.State.START_OF_MACHINE_CYCLE) {
             //save values of all the registers
             saveStartOfCycleValues();
         }
-        if (newStateWrapper.getState() == Machine.State.BREAK) {
+
+        // update the break state
+        if ( ! this.startBreak && newStateWrapper.getState() == Machine.State.BREAK) {
+            // in the next update of the display, turn on the break highlighting
             this.breakRAM = ((BreakException) newStateWrapper.getValue()).breakRAM;
             this.breakAddress = ((BreakException) newStateWrapper.getValue()).breakAddress;
             this.startBreak = true;
             this.endBreak = false;
         }
-        else if (this.startBreak && newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
-            this.startBreak = false;
-            this.endBreak = true;
-        }
-        // else we don't care about the machine state
+//        else if ( ! this.startBreak && newStateWrapper.getState() != Machine.State.BREAK) {
+//            this.startBreak = false;
+//            this.endBreak = false;
+//        }
+//        else if (this.startBreak && newStateWrapper.getState() != Machine.State.BREAK) {
+//            // in the next update of the display, turn off the break highlighting
+//            this.startBreak = false;
+//            this.endBreak = true;
+//        }
+        // do nothing if startBreak && state == BREAK
     }
 }

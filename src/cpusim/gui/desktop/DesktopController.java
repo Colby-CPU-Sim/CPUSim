@@ -1945,6 +1945,8 @@ public class DesktopController implements Initializable
             debugToolBarController.clearAllOutlines();
             mediator.getBackupManager().flushBackups();
             mediator.getMachine().getControlUnit().setMicroIndex(0);
+            mediator.getMachine().setState(Machine.State.EXECUTION_HALTED,false);
+            debugToolBarController.updateDisplay();
         }
         RAM codeStore = mediator.getMachine().getCodeStore();
         if (codeStore != null) {

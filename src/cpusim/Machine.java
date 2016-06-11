@@ -43,8 +43,10 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     private static final long serialVersionUID = 1L;
 
 
-    // constants for different running modes
-    public static enum RunModes {
+    /**
+     * constants for different running modes
+     */
+    public enum RunModes {
         RUN,
         STEP_BY_MICRO,
         STEP_BY_INSTR,
@@ -52,6 +54,21 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         STOP,
         ABORT,
         COMMAND_LINE
+    }
+
+    /**
+     * constants for the current state of the Machine.
+     */
+    public enum State {
+        NEVER_RUN, //initial state when machine is first loaded
+        START_OF_EXECUTE_THREAD, //called once at the start of execution
+        EXCEPTION_THROWN,
+        EXECUTION_ABORTED,
+        EXECUTION_HALTED,
+        START_OF_MACHINE_CYCLE,
+        START_OF_MICROINSTRUCTION,
+        BREAK,
+        HALTED_STEP_BY_MICRO
     }
 
     /**
@@ -150,21 +167,6 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     public Machine(String name, boolean indexFromLeft) {
         this(name);
         indexFromRight.set(!indexFromLeft);
-    }
-
-    /**
-     * The enum for the State of the Machine.
-     */
-    public static enum State {
-        NEVER_RUN, //initial state when machine is first loaded
-        START_OF_EXECUTE_THREAD, //called once at the start of execution
-        EXCEPTION_THROWN,
-        EXECUTION_ABORTED,
-        EXECUTION_HALTED,
-        START_OF_MACHINE_CYCLE,
-        START_OF_MICROINSTRUCTION,
-        BREAK,
-        HALTED_STEP_BY_MICRO
     }
 
     /**
@@ -924,19 +926,27 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                     }
 
                     // fire a property change that execution halted or aborted
-                    setState(
-                            runMode == RunModes.ABORT ? Machine.State.EXECUTION_ABORTED :
-                                       mode == RunModes.STEP_BY_MICRO ?
-                                               Machine.State.HALTED_STEP_BY_MICRO :
-                                       /* else */ Machine.State.EXECUTION_HALTED,
-                            haltBitsThatAreSet().size() > 0);
+                    if(runMode == RunModes.ABORT)
+                        setState(Machine.State.EXECUTION_ABORTED,haltBitsThatAreSet().size()>0);
+                    else if(mode == RunModes.STEP_BY_MICRO)
+                        setState(Machine.State.HALTED_STEP_BY_MICRO,haltBitsThatAreSet().size()>0);
+                    else if(getStateWrapper().getState() != Machine.State.BREAK)
+                        setState(Machine.State.EXECUTION_HALTED,haltBitsThatAreSet().size()>0);
+                    // else if in BREAK state, leave it in that state to allow highlighting the
+                    // line of text containing the break by the HighlightManager.
+
+//                    setState(
+//                            runMode == RunModes.ABORT ? Machine.State.EXECUTION_ABORTED :
+//                                       mode == RunModes.STEP_BY_MICRO ?
+//                                               Machine.State.HALTED_STEP_BY_MICRO :
+//                                       /* else */ Machine.State.EXECUTION_HALTED,
+//                            haltBitsThatAreSet().size() > 0);
 
                     // write buf to output file channel
                     if ((getStateWrapper().getState() == Machine.State.EXECUTION_HALTED &&
                             ((boolean) getStateWrapper().getValue()) == true) ||
                             getStateWrapper().getState() == Machine.State
                                     .EXCEPTION_THROWN) {
-                        //added by Ben Borchard on 2/23
                         ObservableList<Microinstruction> ios = getMicros("io");
                         for (int i = 0; i < ios.size(); i++) {
                             IOChannel channel = ((IO) ios.get(i)).getConnection();

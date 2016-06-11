@@ -175,6 +175,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
         // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMachineInstruction();
         machine.getControlUnit().reset();
+        machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();
         enableForwardButtons();
     }
@@ -188,6 +189,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
     public void onBackupMicroInstrClick(ActionEvent e) {
         // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMicroInstruction();
+        machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();
         outlineChangesManager.updateOutlines();
         enableForwardButtons();
@@ -335,6 +337,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
             }
             else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN ||
                     newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
+                    newStateWrapper.getState() == Machine.State.BREAK ||
                     newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED ||
                     newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
                 //enable all buttons after execution finished
