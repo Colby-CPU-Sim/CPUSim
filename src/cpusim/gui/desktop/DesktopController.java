@@ -245,8 +245,8 @@ import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -1681,27 +1681,47 @@ public class DesktopController implements Initializable
         newTab.setText(title);
         addContextMenu(newTab);
 
-        // add a listener to the codeArea's set of breakpoints
-        // so that breakpoints can be added dynamically as the code is being stepped
-        // through when in debug mode
+        textTabPane.getTabs().add(newTab);
+        textTabPane.getSelectionModel().selectLast();
+
         ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory())
                 .getBreakPoints().
-                addListener((SetChangeListener<Paragraph>) change -> {
+                addListener((ListChangeListener<Paragraph>) change -> {
                     if (newTab.getFile() != null) {
-                        boolean set = change.wasAdded();
-                        String fileName = newTab.getFile().getAbsolutePath();
-                        Paragraph paragraph = set ? change.getElementAdded() : change
-                                .getElementRemoved();
-                        int line = codeArea.getParagraphs().indexOf(paragraph);
-                        SourceLine sourceLine = new SourceLine(line, fileName);
-                        mediator.setBreakPointInRAM(sourceLine, set);
+                        while (change.next()) {
+                            boolean set = change.wasAdded();
+                            String fileName = newTab.getFile().getAbsolutePath();
+                            Paragraph paragraph = set ? change.getAddedSubList().get(0) :
+                                    change.getRemoved().get(0);
+                            int line = indexOfUsingIdentity(codeArea.getParagraphs(), paragraph);
+                            if (line >= 0) {
+                                SourceLine sourceLine = new SourceLine(line, fileName);
+                                mediator.setBreakPointInRAM(sourceLine, set);
+                            }
+                        }
                     }
                 });
 
-        textTabPane.getTabs().add(newTab);
-        textTabPane.getSelectionModel().selectLast();
     }
 
+    /**
+     * returns the index of the given item in the given list using ==.  It returns -1
+     * if the item is not in the list.
+     * NOTE: We can't just use list.indexOf(item) because we
+     * want to test equality using == not equals().
+     * @param list The list to be searched
+     * @param item the value to be found
+     * @return the index of the item in the list or -1 if not found
+     */
+    private int indexOfUsingIdentity(List list, Object item ) {
+        for (int i = 0; i < list.size(); i++) {
+            Object p = list.get(i);
+            if (p == item) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public Set<Integer> getAllBreakPointLineNumbersForFile(String fileName) {
         return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) getTabForFile(new
