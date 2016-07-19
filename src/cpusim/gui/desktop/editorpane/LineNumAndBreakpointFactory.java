@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -24,6 +24,7 @@ import org.reactfx.EventStream;
 import org.reactfx.EventStreams;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.IntFunction;
 
@@ -37,15 +38,20 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
     private final String stylesheet;
     private SimpleObjectProperty<IntFunction<String>> format;
     private StyledTextArea<?> area;
-    private ObservableSet<Paragraph> breakPoints;
-    /** set when program stops at a break point */
+    private ObservableList<Paragraph> breakPoints;
+    /**
+     * set when program stops at a break point
+     */
     private SimpleIntegerProperty currentBreakPointLineNumber;
 
-    private static final String STYLESHEET = LineNumAndBreakpointFactory.class.getResource
-            ("/cpusim/gui/css/LineNumbers.css").toExternalForm();
-    private static final IntFunction<String> DEFAULT_FORMAT = (digits -> "%0" + digits + "d");
+    private static final String STYLESHEET = LineNumAndBreakpointFactory.class
+            .getResource("/cpusim/gui/css/LineNumbers.css").toExternalForm();
+    private static final IntFunction<String> DEFAULT_FORMAT = (digits -> "%0" + digits
+            + "d");
 
-    /** factory methods for generating IntFunctions */
+    /**
+     * factory methods for generating IntFunctions
+     */
     public static IntFunction<Node> get(StyledTextArea<?> area, String customStylesheet) {
         return new LineNumAndBreakpointFactory(area, DEFAULT_FORMAT, customStylesheet);
     }
@@ -64,15 +70,37 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         return new LineNumAndBreakpointFactory(area, format, customStylesheet);
     }
 
-    /** Private constructor */
+    /**
+     * Private constructor
+     */
     private LineNumAndBreakpointFactory(StyledTextArea<?> area, IntFunction<String>
             format, String stylesheet) {
         this.nParagraphs = EventStreams.sizeOf(area.getParagraphs());
         this.area = area;
         this.format = new SimpleObjectProperty<>(format);
         this.stylesheet = stylesheet;
-        this.breakPoints = FXCollections.observableSet();
+        this.breakPoints = FXCollections.observableArrayList();
         this.currentBreakPointLineNumber = new SimpleIntegerProperty(-1);
+
+        // add a listener to the codeArea's set of breakpoints
+        // so that breakpoints can be added dynamically as the code is being stepped
+        // through when in debug mode
+//        ((LineNumAndBreakpointFactory) area.getParagraphGraphicFactory())
+//                .getBreakPoints().
+//                addListener((SetChangeListener<Paragraph>) change -> {
+//                    if (newTab.getFile() != null) {
+//                        boolean set = change.wasAdded();
+//                        String fileName = newTab.getFile().getAbsolutePath();
+//                        Paragraph paragraph = set ? change.getElementAdded() : change
+//                                .getElementRemoved();
+//                        int line = getIndexOf(codeArea, paragraph);
+//                        if (line >= 0) {
+//                            SourceLine sourceLine = new SourceLine(line, fileName);
+//                            mediator.setBreakPointInRAM(sourceLine, set);
+//                        }
+//                    }
+//                });
+
     }
 
     public void setFormat(IntFunction<String> format) {
@@ -83,29 +111,48 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         return this.format;
     }
 
-    public void setCurrentBreakPointLineNumber(int n) { this.currentBreakPointLineNumber.set(n); }
+    public void setCurrentBreakPointLineNumber(int n) { this
+            .currentBreakPointLineNumber.set(n); }
 
     public SimpleIntegerProperty currentBreakPointLineNumberProperty() {
         return this.currentBreakPointLineNumber;
     }
 
     /**
-     * @return the set of Paragraphs with breakpoints set so that changes to the set can
-     * be observed.
-     */
-    public ObservableSet<Paragraph> getBreakPoints() {
-        return breakPoints;
-    }
-
-    /**
-     * @return the Set of line numbers with break points so that corresponding RAM breakpoints
+     * @return the Set of line numbers with break points so that corresponding RAM
+     * breakpoints
      * can be set when the code is loaded.
      */
     public Set<Integer> getAllBreakPointLineNumbers() {
         Set<Integer> breakPointLineNumbers = new HashSet<>();
-        for(Paragraph p : breakPoints)
-            breakPointLineNumbers.add(area.getParagraphs().indexOf(p));
+        for (Paragraph p : breakPoints) {
+            int indexOfP = indexOfUsingIdentity(area.getParagraphs(),p);
+            if (indexOfP < 0) {
+                throw new RuntimeException("There was a paragraph in breakpoints but "
+                        + "not" + " in the text area");
+            }
+            breakPointLineNumbers.add(indexOfP);
+        }
         return breakPointLineNumbers;
+    }
+
+    /**
+     * returns the index of the given item in the given list using ==.  It returns -1
+     * if the item is not in the list.
+     * NOTE: We can't just use list.indexOf(item) because we
+     * want to test equality using == not equals().
+     * @param list The list to be searched
+     * @param item the value to be found
+     * @return the index of the item in the list or -1 if not found
+     */
+    private int indexOfUsingIdentity(List list, Object item ) {
+        for (int i = 0; i < list.size(); i++) {
+            Object p = list.get(i);
+            if (p == item) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -113,8 +160,8 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         Label label = new Label();
         Paragraph paragraph = area.getParagraphs().get(idx);
         boolean breakPoint = getAllBreakPointLineNumbers().contains(idx);
-        Circle icon = new Circle(4, breakPoint ? Color.RED :
-                        Color.web("#eee")); // same color as background and so invisible
+        Circle icon = new Circle(4, breakPoint ? Color.RED : Color.web("#eee")); //
+        // same color as background and so invisible
         label.setGraphic(icon);
         label.getStyleClass().add("lineno");
         label.getStylesheets().add(stylesheet);
@@ -123,8 +170,8 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         // circle to toggle on and off
         label.setOnMouseClicked(event -> {
             Circle circle = (Circle) label.getGraphic();
-            if (breakPoints.contains(paragraph)) {
-                breakPoints.remove(paragraph);
+            if (breakPoints.removeIf(x -> x == paragraph)) {
+                // if the paragraph was already a breakpoint, remove it and its circle
                 circle.setFill(Color.web("#eee"));
             }
             else {
@@ -141,33 +188,34 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
 
         // When code stops due to a break point, change the background to orange
         // instead of light grey
-        currentBreakPointLineNumber.addListener((observable,oldValue,newValue) -> {
+        currentBreakPointLineNumber.addListener((observable, oldValue, newValue) -> {
             if ((int) newValue == idx) { // break at given line
                 label.setBackground(new Background(new BackgroundFill(Color.ORANGE,
                         CornerRadii.EMPTY, Insets.EMPTY)));
             }
             else if ((int) oldValue == idx) { // resumed after breaking at given line
-                label.setBackground(new Background(new BackgroundFill(Color.web("#eee"),
-                        CornerRadii.EMPTY, Insets.EMPTY)));
+                label.setBackground(new Background(new BackgroundFill(Color.web("#eee")
+                        , CornerRadii.EMPTY, Insets.EMPTY)));
             }
         });
 
-        // when removed from the scene, be sure the paragraph is removed from
-        // the set of breakpoints
+        // when a paragraph is removed from the text area, be sure the
+        // paragraph is removed from the set of breakpoints
         area.getParagraphs().addListener((ListChangeListener<Paragraph<?>>) c -> {
-            if( ! area.getParagraphs().contains(paragraph))
-                breakPoints.remove(paragraph);
+            if (indexOfUsingIdentity(breakPoints, paragraph) == -1) {
+                breakPoints.removeIf(x -> x == paragraph);
+            }
+            //we can't just say breakPoints.remove(paragraph) because we need
+            //to compare paragraphs withh ==, not Paragraph.equals()
         });
 
         // reformat the line numbers when the number of lines changes.
         // When removed from the scene, stay subscribed to never(), which is
         // a fake subscription that consumes no resources, instead of staying
         // subscribed to area's paragraphs.
-        EventStreams.valuesOf(label.sceneProperty())
-                .flatMap(scene -> scene != null
-                        ? nParagraphs.map(n -> formatTheLineNumber(idx + 1, n))
-                        : EventStreams.<String>never())
-                .feedTo(label.textProperty());
+        EventStreams.valuesOf(label.sceneProperty()).flatMap(scene -> scene != null ?
+                nParagraphs.map(n -> formatTheLineNumber(idx + 1, n)) : EventStreams
+                .<String>never()).feedTo(label.textProperty());
         return label;
     }
 
@@ -176,9 +224,20 @@ public class LineNumAndBreakpointFactory implements IntFunction<Node>
         return String.format(format.get().apply(digits), x);
     }
 
+    /**
+     * set all the breakpoints to be the paragraphs that have the given indices
+     *
+     * @param allBreakPointLineNumbers the set of indices of the paragraphs to
+     *                                 be set as breakpoints
+     */
     public void setAllBreakPoints(Set<Integer> allBreakPointLineNumbers) {
+        breakPoints.clear();
         for (int idx : allBreakPointLineNumbers) {
             breakPoints.add(area.getParagraph(idx));
         }
+    }
+
+    public ObservableList<Paragraph> getBreakPoints() {
+        return breakPoints;
     }
 }
