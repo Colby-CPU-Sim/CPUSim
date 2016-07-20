@@ -135,8 +135,6 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
      */
     public void highlightCellsAndText() {
 
-        //System.out.println("\t\tIn highlightCells, startBreak=" + startBreak + ", endBreak=" + endBreak);
-
         ObservableList<RamTableController> ramTableControllers = desktop.getRAMControllers();
 
         // highlight RAM cells and text for RegisterRAM pairs

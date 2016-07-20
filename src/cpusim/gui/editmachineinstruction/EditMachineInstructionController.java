@@ -1105,8 +1105,8 @@ public class EditMachineInstructionController {
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
             if (micro instanceof Comment){
-                microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
-                        "--fx-font-style:italic;");
+                microLabel.setStyle("-fx-font-family:Monaco; -fx-text-fill:gray; " +
+                        "-fx-font-style:italic;");
                 commentLabel = true;
             }
             else {

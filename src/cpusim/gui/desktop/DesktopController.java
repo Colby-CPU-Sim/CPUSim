@@ -919,68 +919,7 @@ public class DesktopController implements Initializable
     private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node) {
         VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) node.lookup(".virtual-flow");
         return vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
-
-        //        // attempt 1 (failed)
-        //        Text text = new Text(
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO\n" +
-        //                "HELLO");
-        //        text.setFont(new Font(assmFontData.font,
-        //                Double.valueOf(assmFontData.fontSize)));
-        //        TextFlow flow = new TextFlow(text);
-        //        flow.setStyle("-fx-font-weight:bold");
-        //        new Scene(new Group(flow));  // to get it to layout the Text
-        ////        Bounds layoutBounds = flow.getLayoutBounds();
-        ////        Bounds localBounds = flow.getBoundsInLocal();
-        ////        double layoutHeight = layoutBounds.getHeight();
-        ////        double localHeight = localBounds.getHeight();
-        //        Bounds parentBounds = flow.getBoundsInParent();
-        //        double parentHeight = parentBounds.getHeight();
-        //        return parentHeight/20;
-
-        //        // attempt 2 (failed)
-        //        int numParagraphs = node.getParagraphs().size();
-        //        double height = node.getHeight();
-        //        double paragraphHeight = height/numParagraphs;
-        //        return paragraphHeight;
-
-        //        // attempt 3 (failed)
-        //        Paragraph<StyleInfo> p = node.getParagraph(0);
-        //        InlineStyleTextArea<StyleInfo> page =
-        //                new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
-        //        assmFontData.setFontAndBackground(page);
-        //        page.setWrapText(false); // can't print wrapped text
-        //        page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
-        //                0, 1, otherSettings.showLineNumbers.get() ?
-        //                        (digits -> "%" + digits + "d") : (digits -> "")));
-        //        final InlineStyleTextArea<StyleInfo> immutablePage = page;
-        //        page.textProperty().addListener((obs, oldText, newText) -> {
-        //            immutablePage.setStyleSpans(0, codePaneController.computeStyleSpans
-        //                    (newText));
-        //        });
-        //        page.appendText(p.toString()); // skip newline char
-        //        mainPane.getChildren().add(1, page);
-        //        double lineHeight = page.getBoundsInParent().getHeight();
-        //        mainPane.getChildren().remove(1);
-        //        return lineHeight;
-    }
+   }
 
     /**
      * Exits the program
@@ -1600,16 +1539,20 @@ public class DesktopController implements Initializable
         if (t == null) {
             return;
         }
+        // update the codeArea's font data
         InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
         assmFontData.setFontAndBackground(codeArea);
+        // redraw the codeArea with the new data, including breakpoints and
+        // selected text
         String text = codeArea.getText();
+        IndexRange selectedRange = codeArea.getSelection();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeStyleSpans(text);
         Set<Integer> breakLineNumbers = ((LineNumAndBreakpointFactory)
                 codeArea.getParagraphGraphicFactory()).getAllBreakPointLineNumbers();
         codeArea.setStyleSpans(0, styleSpans);
         ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory()).
                 setAllBreakPoints(breakLineNumbers);
-        codeArea.moveTo(0);
+        codeArea.selectRange(selectedRange.getStart(),selectedRange.getEnd());
     }
 
     /**
@@ -3199,14 +3142,17 @@ public class DesktopController implements Initializable
         prefs.put("assmFontSize", assmFontData.fontSize);
         prefs.put("assmFont", assmFontData.font);
         prefs.put("assmBackground", assmFontData.background);
+        prefs.put("assmSelection", assmFontData.selection);
 
         prefs.put("registerTableFontSize", registerTableFontData.fontSize);
         prefs.put("registerTableFont", registerTableFontData.font);
         prefs.put("registerTableBackground", registerTableFontData.background);
+        prefs.put("registerTableSelection", registerTableFontData.selection);
 
         prefs.put("ramTableFontSize", ramTableFontData.fontSize);
         prefs.put("ramTableFont", ramTableFontData.font);
         prefs.put("ramTableBackground", ramTableFontData.background);
+        prefs.put("ramTableSelection", ramTableFontData.selection);
 
         for (Map.Entry<String, KeyCodeInfo> binding : keyBindings.entrySet()) {
             prefs.put(binding.getKey(), binding.getValue().getKeyCode());
@@ -3253,14 +3199,17 @@ public class DesktopController implements Initializable
         assmFontData.fontSize = prefs.get("assmFontSize", "12");
         assmFontData.font = prefs.get("assmFont", "Courier New");
         assmFontData.background = prefs.get("assmBackground", "#fff");
+        assmFontData.selection = prefs.get("assmSelection", "#ddd");
 
         registerTableFontData.fontSize = prefs.get("registerTableFontSize", "12");
         registerTableFontData.font = prefs.get("registerTableFont", "Courier New");
         registerTableFontData.background = prefs.get("registerTableBackground", "#fff");
+        registerTableFontData.selection = prefs.get("registerTableSelection", "#ddd");
 
         ramTableFontData.fontSize = prefs.get("ramTableFontSize", "12");
         ramTableFontData.font = prefs.get("ramTableFont", "Courier New");
         ramTableFontData.background = prefs.get("ramTableBackground", "#fff");
+        ramTableFontData.selection = prefs.get("ramTableSelection", "#ddd");
 
         for (String[] defaultBinding : DEFAULT_KEY_BINDINGS) {
             String menuName = defaultBinding[0];
