@@ -29,6 +29,8 @@
                                                            minWidth="10.0"/>
                                         <ColumnConstraints hgrow="SOMETIMES"
                                                            minWidth="10.0"/>
+                                        <ColumnConstraints hgrow="SOMETIMES"
+                                                           minWidth="10.0"/>
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="10.0"
@@ -57,6 +59,10 @@
                                                GridPane.columnIndex="3"
                                                GridPane.halignment="CENTER">
                                         </Label>
+                                        <Label text="Selection" underline="true"
+                                               GridPane.columnIndex="4"
+                                               GridPane.halignment="CENTER">
+                                        </Label>
                                         <Label text="Assembly" GridPane.rowIndex="1">
                                         </Label>
                                         <Label text="Registers" GridPane.rowIndex="2">
@@ -75,6 +81,21 @@
                                         </ColorPicker>
                                         <ColorPicker fx:id="ramsBackground"
                                                      GridPane.columnIndex="3"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="3">
+                                        </ColorPicker>
+                                        <ColorPicker fx:id="assmSelection"
+                                                     GridPane.columnIndex="4"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="1">
+                                        </ColorPicker>
+                                        <ColorPicker fx:id="registersSelection"
+                                                     GridPane.columnIndex="4"
+                                                     GridPane.halignment="CENTER"
+                                                     GridPane.rowIndex="2">
+                                        </ColorPicker>
+                                        <ColorPicker fx:id="ramsSelection"
+                                                     GridPane.columnIndex="4"
                                                      GridPane.halignment="CENTER"
                                                      GridPane.rowIndex="3">
                                         </ColorPicker>

@@ -3,12 +3,12 @@ package cpusim.gui.desktop.editorpane;
 import cpusim.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.assembler.PunctChar;
-import javafx.event.EventHandler;
-import javafx.scene.input.KeyEvent;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

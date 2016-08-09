@@ -1,7 +1,167 @@
 /**
  * File: DesktopController
+ *
  * @author: Ben Borchard
  * Modified: 6/4/13
+ * <p>
+ * File: DesktopController
+ * Author: Pratap Luitel, Scott Franchi, Stephen Webel
+ * Date: 10/27/13
+ * <p>
+ * Fields removed:
+ * private SimpleBooleanProperty machineDirty
+ * private File machineFile
+ * private SimpleStringProperty machineDirtyString
+ * private String currentMachineDirectory
+ * <p>
+ * Methods added:
+ * public ArrayDeque<String> getReopenMachineFiles()
+ * public void setReopenMachineFiles()
+ * public ConsoleManager getConsoleManager()
+ * <p>
+ * Methods removed:
+ * public void machineChanged()
+ * public SimpleStringProperty getMachineDirtyProperty()
+ * private void addMachineStateListeners()
+ * private void saveMachine()
+ * private void saveAsMachine()
+ * public void newMachine()
+ * public void openMachine(File fileToOpen)
+ * <p>
+ * Methods modified:
+ * protected void handleNewMachine(ActionEvent event)
+ * protected void handleOpenMachine(ActionEvent event)
+ * public void updateReopenMachineMenu()
+ * public void updateReopenMachineFiles()
+ * private boolean confirmClosing()
+ * public void clearTables()
+ * public void loadPreferences()
+ * public void storePreferences()
+ * protected void handleSaveMachine(ActionEvent event)
+ * protected void handleSaveAsMachine(ActionEvent event)
+ * public void initFileChooser(FileChooser fileChooser, String title, boolean text)
+ * <p>
+ * <p>
+ * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
+ * with the following changes:
+ * <p>
+ * 1.) added capability for the register and ram tables to handle the Unsigned Decimal
+ * and Ascii bases except in the ram address column
+ * <p>
+ * on 11/25:
+ * <p>
+ * 1.) Changed saveAsHTMLMachine() method so that the fileChooser dialog has the .html
+ * file extenstion
+ * filter
+ * 2.) Changed saveAs() method so that the fileChooser dialog has the .a file
+ * extenstion filter
+ * extension
+ * <p>
+ * File: DesktopController
+ * Author: Pratap Luitel, Scott Franchi, Stephen Webel
+ * Date: 10/27/13
+ * <p>
+ * Fields removed:
+ * private SimpleBooleanProperty machineDirty
+ * private File machineFile
+ * private SimpleStringProperty machineDirtyString
+ * private String currentMachineDirectory
+ * <p>
+ * Methods added:
+ * public ArrayDeque<String> getReopenMachineFiles()
+ * public void setReopenMachineFiles()
+ * public ConsoleManager getConsoleManager()
+ * <p>
+ * Methods removed:
+ * public void machineChanged()
+ * public SimpleStringProperty getMachineDirtyProperty()
+ * private void addMachineStateListeners()
+ * private void saveMachine()
+ * private void saveAsMachine()
+ * public void newMachine()
+ * public void openMachine(File fileToOpen)
+ * <p>
+ * Methods modified:
+ * protected void handleNewMachine(ActionEvent event)
+ * protected void handleOpenMachine(ActionEvent event)
+ * public void updateReopenMachineMenu()
+ * public void updateReopenMachineFiles()
+ * private boolean confirmClosing()
+ * public void clearTables()
+ * public void loadPreferences()
+ * public void storePreferences()
+ * protected void handleSaveMachine(ActionEvent event)
+ * protected void handleSaveAsMachine(ActionEvent event)
+ * public void initFileChooser(FileChooser fileChooser, String title, boolean text)
+ * <p>
+ * <p>
+ * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
+ * with the following changes:
+ * <p>
+ * 1.) added capability for the register and ram tables to handle the Unsigned Decimal
+ * and Ascii bases except in the ram address column
+ * <p>
+ * on 11/25:
+ * <p>
+ * 1.) Changed saveAsHTMLMachine() method so that the fileChooser dialog has the .html
+ * file extenstion
+ * filter
+ * 2.) Changed saveAs() method so that the fileChooser dialog has the .a file
+ * extenstion filter
+ * extension
+ * <p>
+ * File: DesktopController
+ * Author: Pratap Luitel, Scott Franchi, Stephen Webel
+ * Date: 10/27/13
+ * <p>
+ * Fields removed:
+ * private SimpleBooleanProperty machineDirty
+ * private File machineFile
+ * private SimpleStringProperty machineDirtyString
+ * private String currentMachineDirectory
+ * <p>
+ * Methods added:
+ * public ArrayDeque<String> getReopenMachineFiles()
+ * public void setReopenMachineFiles()
+ * public ConsoleManager getConsoleManager()
+ * <p>
+ * Methods removed:
+ * public void machineChanged()
+ * public SimpleStringProperty getMachineDirtyProperty()
+ * private void addMachineStateListeners()
+ * private void saveMachine()
+ * private void saveAsMachine()
+ * public void newMachine()
+ * public void openMachine(File fileToOpen)
+ * <p>
+ * Methods modified:
+ * protected void handleNewMachine(ActionEvent event)
+ * protected void handleOpenMachine(ActionEvent event)
+ * public void updateReopenMachineMenu()
+ * public void updateReopenMachineFiles()
+ * private boolean confirmClosing()
+ * public void clearTables()
+ * public void loadPreferences()
+ * public void storePreferences()
+ * protected void handleSaveMachine(ActionEvent event)
+ * protected void handleSaveAsMachine(ActionEvent event)
+ * public void initFileChooser(FileChooser fileChooser, String title, boolean text)
+ * <p>
+ * <p>
+ * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
+ * with the following changes:
+ * <p>
+ * 1.) added capability for the register and ram tables to handle the Unsigned Decimal
+ * and Ascii bases except in the ram address column
+ * <p>
+ * on 11/25:
+ * <p>
+ * 1.) Changed saveAsHTMLMachine() method so that the fileChooser dialog has the .html
+ * file extenstion
+ * filter
+ * 2.) Changed saveAs() method so that the fileChooser dialog has the .a file
+ * extenstion filter
+ * extension
  */
 
 /**
@@ -48,7 +208,7 @@
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 11/7/13
  * with the following changes:
  *
- * 1.) added capability for the register and ram tables to handle the Unsigned Decimal 
+ * 1.) added capability for the register and ram tables to handle the Unsigned Decimal
  * and Ascii bases except in the ram address column
  *
  * on 11/25:
@@ -85,11 +245,9 @@ import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.SetChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -129,52 +287,38 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 /**
  * @author Ben Borchard
  */
-public class DesktopController implements Initializable {
+public class DesktopController implements Initializable
+{
 
     public static final String SHORTCUT = System.getProperty("os.name").startsWith
             ("Windows") ? "Ctrl" : "Cmd";
     public static final String[][] DEFAULT_KEY_BINDINGS = {
             /* quit, undo, redo, cut, copy, paste, delete, select all are not editable */
-            {"New text", SHORTCUT + "-N"},
-            {"Open text...", SHORTCUT + "-O"},
-            {"Close text", SHORTCUT + "-W"},
-            {"Save text", SHORTCUT + "-S"},
-            {"Save text as...", SHORTCUT + "-Shift-S"},
-            {"New machine", SHORTCUT + "-Shift-N"},
-            {"Open machine...", SHORTCUT + "-Shift-O"},
-            {"Save machine", SHORTCUT + "-B"},
-            {"Save machine as...", SHORTCUT + "-Shift-B"},
-            {"Save machine in HTML...", SHORTCUT + "-Alt-B"},
-            {"Print setup...", SHORTCUT + "-Shift-P"},
-            {"Print...", SHORTCUT + "-P"},
-            {"Toggle Comment", SHORTCUT + "-Slash"},
-            {"Find...", SHORTCUT + "-F"},
-            {"Preferences...", SHORTCUT + "-Comma"},
-            {"Machine instructions...", SHORTCUT + "-M"},
-            {"Microinstructions...", SHORTCUT + "-Shift-M"},
-            {"Hardware Modules...", SHORTCUT + "-K"},
-            {"EQUs...", SHORTCUT + "-E"},
-            {"Fetch Sequence...", SHORTCUT + "-Y"},
-            {"Debug Mode", SHORTCUT + "-D"},
-            {"Assemble", SHORTCUT + "-1"},
-            {"Assemble & load", SHORTCUT + "-2"},
-            {"Assemble, load & run", SHORTCUT + "-3"},
-            {"Clear, assemble, load & run", SHORTCUT + "-G"},
-            {"Run", SHORTCUT + "-R"},
-            {"Stop", SHORTCUT + "-Period"},
-            {"Reset everything", SHORTCUT + "-Shift-R"},
-            {"Clear console", SHORTCUT + "-L"},
-            {"Options...", SHORTCUT + "-I"},
-            {"General CPUSim Help", SHORTCUT + "-Shift-H"},
-            {"About CPUSim", SHORTCUT + "-Shift-A"}
-    };
+            {"New text", SHORTCUT + "-N"}, {"Open text...", SHORTCUT + "-O"}, {"Close "
+            + "text", SHORTCUT + "-W"}, {"Save text", SHORTCUT + "-S"}, {"Save text " +
+            "as...", SHORTCUT + "-Shift-S"}, {"New machine", SHORTCUT + "-Shift-N"},
+            {"Open machine...", SHORTCUT + "-Shift-O"}, {"Save machine", SHORTCUT +
+            "-B"}, {"Save machine as...", SHORTCUT + "-Shift-B"}, {"Save machine in " +
+            "HTML...", SHORTCUT + "-Alt-B"}, {"Print setup...", SHORTCUT + "-Shift-P"},
+            {"Print...", SHORTCUT + "-P"}, {"Toggle Comment", SHORTCUT + "-Slash"},
+            {"Find...", SHORTCUT + "-F"}, {"Preferences...", SHORTCUT + "-Comma"},
+            {"Machine instructions...", SHORTCUT + "-M"}, {"Microinstructions...",
+            SHORTCUT + "-Shift-M"}, {"Hardware Modules...", SHORTCUT + "-K"},
+            {"EQUs...", SHORTCUT + "-E"}, {"Fetch Sequence...", SHORTCUT + "-T"},
+            {"Debug Mode", SHORTCUT + "-D"}, {"Assemble", SHORTCUT + "-1"}, {"Assemble " +
+            "" + "& load", SHORTCUT + "-2"}, {"Assemble, load & run", SHORTCUT + "-3"},
+            {"Clear, assemble, load & run", SHORTCUT + "-G"}, {"Run", SHORTCUT + "-R"},
+            {"Stop", SHORTCUT + "-Period"}, {"Reset everything", SHORTCUT +
+            "-Shift-R"}, {"Clear console", SHORTCUT + "-L"}, {"Options...", SHORTCUT +
+            "-I"}, {"General CPUSim Help", SHORTCUT + "-Shift-H"}, {"About CPUSim",
+            SHORTCUT + "-Shift-A"}};
     // System.getProperty("line.separator") doesn't work
     // on PCs. TextArea class may just use "\n".
     static final String NEWLINE = "\n";
     private final ButtonType buttonTypeYes = new ButtonType("Yes");
     private final ButtonType buttonTypeNo = new ButtonType("No");
-    private final ButtonType buttonTypeCancel = new ButtonType("Cancel",
-            ButtonBar.ButtonData.CANCEL_CLOSE);
+    private final ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar
+            .ButtonData.CANCEL_CLOSE);
     @FXML
     protected MenuBar menuBar;
     @FXML
@@ -281,7 +425,10 @@ public class DesktopController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // prep the menu bar for Mac apps
-        menuBar.setUseSystemMenuBar(true);
+        // TODO:  uncomment the next line when RichTextFX is fixed
+        //        Right now, it causes undo/redo/cut/copy/paste to be
+        //        executed twice when you choose the keyboard shortcut
+        //menuBar.setUseSystemMenuBar(true);
 
         // add the ioConsole to the ioConsolePane
         ioConsolePane.getChildren().add(ioConsole);
@@ -307,7 +454,8 @@ public class DesktopController implements Initializable {
                     findReplaceController.getStage().close();
                 }
                 storePreferences();
-            } else {
+            }
+            else {
                 t.consume();
             }
 
@@ -357,14 +505,15 @@ public class DesktopController implements Initializable {
 
         // For disabling/enabling
         noTabSelected = new SimpleBooleanProperty();
-        textTabPane.getSelectionModel().selectedItemProperty().addListener(
-                (arg0, oldTab, newTab) -> {
-                    noTabSelected.set(newTab == null);
-                    if (newTab != null) {
-                        final Node node = newTab.getContent();
-                        Platform.runLater(node::requestFocus);
-                    }
-                });
+        textTabPane.getSelectionModel().selectedItemProperty().addListener((arg0,
+                                                                            oldTab,
+                                                                            newTab) -> {
+            noTabSelected.set(newTab == null);
+            if (newTab != null) {
+                final Node node = newTab.getContent();
+                Platform.runLater(node::requestFocus);
+            }
+        });
 
         // initialize simpleBooleanProperties and disables
         inDebugMode = new SimpleBooleanProperty(false);
@@ -385,22 +534,24 @@ public class DesktopController implements Initializable {
 
         // whenever a new tab in the code text area is selected,
         // set the line numbers and line wrap and style according to the settings
-        this.textTabPane.getSelectionModel().selectedItemProperty().addListener(
-                (obs, oldTab, newTab) -> {
-                    if (newTab == null) return; // there are no tabs left
-                    StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
-                    codeArea.setWrapText(otherSettings.lineWrap.get());
-                    LineNumAndBreakpointFactory lFactory =
-                            (LineNumAndBreakpointFactory) codeArea
-                                    .getParagraphGraphicFactory();
-                    if (otherSettings.showLineNumbers.get()) {
-                        lFactory.setFormat(digits -> "%" + digits + "d");
-                    }
-                    else {
-                        lFactory.setFormat(digits -> "");
-                    }
-                    refreshTopTabPane();
-                });
+        this.textTabPane.getSelectionModel().selectedItemProperty().addListener((obs,
+                                                                                 oldTab, newTab) -> {
+
+            if (newTab == null) {
+                return; // there are no tabs left
+            }
+            StyledTextArea codeArea = (StyledTextArea) newTab.getContent();
+            codeArea.setWrapText(otherSettings.lineWrap.get());
+            LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory)
+                    codeArea.getParagraphGraphicFactory();
+            if (otherSettings.showLineNumbers.get()) {
+                lFactory.setFormat(digits -> "%" + digits + "d");
+            }
+            else {
+                lFactory.setFormat(digits -> "");
+            }
+            refreshTopTabPane();
+        });
     }
 
     //================ handlers for FILE menu ==================================
@@ -500,14 +651,15 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
-                    "The machine you are currently working on is unsaved.  " +
-                            "Would you like to save it before you open a new machine?");
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+                    "Machine", "The machine you are currently working on is unsaved.  "
+                    + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
-            } else if (result.get() == buttonTypeCancel) {
+            }
+            else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -532,14 +684,15 @@ public class DesktopController implements Initializable {
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
 
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
-                    "The machine you are currently working on is unsaved.  " +
-                            "Would you like to save it before you open a new machine?");
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+                    "Machine", "The machine you are currently working on is unsaved.  "
+                    + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 handleSaveMachine(event);
-            } else if (result.get() == buttonTypeCancel) {
+            }
+            else if (result.get() == buttonTypeCancel) {
                 return;
             }
         }
@@ -601,9 +754,8 @@ public class DesktopController implements Initializable {
             FileNotFoundException {
         FileChooser fileChooser = new FileChooser();
         initFileChooser(fileChooser, "Save Machine", false);
-        fileChooser.getExtensionFilters().add(new ExtensionFilter("Hyper Text Markup " +
-                "Language file (.html)",
-                "*.html"));
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("Hyper Text Markup "
+                + "Language file (.html)", "*.html"));
         fileChooser.setInitialFileName(mediator.getMachine().getName());
 
         File fileToSave = fileChooser.showSaveDialog(stage);
@@ -624,8 +776,9 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handlePrintSetup(ActionEvent event) {
 
-        if(currentPrinterJob == null)
+        if (currentPrinterJob == null) {
             currentPrinterJob = PrinterJob.createPrinterJob();
+        }
         currentPrinterJob.showPageSetupDialog(stage);
     }
 
@@ -637,23 +790,27 @@ public class DesktopController implements Initializable {
     @FXML
     protected void handlePrint(ActionEvent event) {
         // the current job may have been set in the page setup dialog
-        if (currentPrinterJob == null)
+        if (currentPrinterJob == null) {
             currentPrinterJob = PrinterJob.createPrinterJob();
+        }
         boolean print = currentPrinterJob.showPrintDialog(stage);
         if (print) {
-            Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem().getContent();
+            Node nodeToBePrinted = textTabPane.getSelectionModel().getSelectedItem()
+                    .getContent();
 
             // break the node into pages and print them
-            final List<Node> pages =
-                    getPagesForPrinting((InlineStyleTextArea<StyleInfo>) nodeToBePrinted);
+            final List<Node> pages = getPagesForPrinting(
+                    (InlineStyleTextArea<StyleInfo>) nodeToBePrinted);
             PageRange[] ranges = currentPrinterJob.getJobSettings().getPageRanges();
-            if( ranges != null && ranges.length > 0)
-                for(PageRange range : ranges) {
-                    for(int i = range.getStartPage(); i <= range.getEndPage(); i++)
+            if (ranges != null && ranges.length > 0) {
+                for (PageRange range : ranges) {
+                    for (int i = range.getStartPage(); i <= range.getEndPage(); i++)
                         currentPrinterJob.printPage(pages.get(i));
                 }
-            else
+            }
+            else {
                 pages.forEach(currentPrinterJob::printPage);
+            }
             currentPrinterJob.endJob();
             currentPrinterJob = null;
         }
@@ -701,17 +858,20 @@ public class DesktopController implements Initializable {
      * @param nodeToBePrinted the StyledTextArea that has all the data to be printed
      * @return a List of the StyledTextAreas each constituting one page to be printed.
      */
-    private List<Node> getPagesForPrinting(InlineStyleTextArea<StyleInfo> nodeToBePrinted) {
+    private List<Node> getPagesForPrinting(InlineStyleTextArea<StyleInfo>
+                                                   nodeToBePrinted) {
         PageLayout layout = currentPrinterJob.getJobSettings().getPageLayout();
         LinkedList<Node> result = new LinkedList<>();
-        double scale = layout.getPrintableWidth() /
-                                        nodeToBePrinted.getBoundsInParent().getWidth();
-        if(scale > 1)  scale = 1;
+        double scale = layout.getPrintableWidth() / nodeToBePrinted.getBoundsInParent()
+                .getWidth();
+        if (scale > 1) {
+            scale = 1;
+        }
         double lineHeight = scale * computeParagraphHeight(nodeToBePrinted);
         double printableHeight = layout.getPrintableHeight();
         // HACK:  the next line subtracts one because computeParagraphHeight() returns
         //        a little less than it should.  Subtracting 1 seems to fix it.
-        int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight)-1;
+        int numLinesPerPage = (int) Math.floor(printableHeight / lineHeight) - 1;
         int lineCount = Integer.MAX_VALUE;  // the number of lines so far on current page
         int pageCount = 0; // the number of pages so far
         int totalNumLines = nodeToBePrinted.getParagraphs().size();
@@ -723,9 +883,9 @@ public class DesktopController implements Initializable {
                 assmFontData.setFontAndBackground(page);
                 page.setWrapText(false); // can't print wrapped text
                 page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
-                        numLinesPerPage * pageCount, totalNumLines,
-                        otherSettings.showLineNumbers.get() ?
-                                (digits -> "%" + digits + "d") : (digits -> "")));
+                        numLinesPerPage * pageCount, totalNumLines, otherSettings
+                                .showLineNumbers.get() ? (digits -> "%" + digits + "d")
+                                : (digits -> "")));
                 final InlineStyleTextArea<StyleInfo> immutablePage = page;
                 page.textProperty().addListener((obs, oldText, newText) -> {
                     immutablePage.setStyleSpans(0, codePaneController.computeStyleSpans
@@ -740,11 +900,14 @@ public class DesktopController implements Initializable {
             }
             lineCount++;
             if (page != null) // added to stop a compiler warning: possibly uninitialized
-                if (lineCount == numLinesPerPage)
+            {
+                if (lineCount == numLinesPerPage) {
                     page.appendText(p.toString()); // skip newline char for the last line
-                else
-                    page.appendText(p.toString()); // text plus newline
-
+                }
+                else {
+                    page.appendText(p.toString() + System.getProperty("line.separator"));
+                }
+            }
         }
         return result;
     }
@@ -754,72 +917,10 @@ public class DesktopController implements Initializable {
      *
      * @return the number of points in height of each line
      */
-    private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node)
-    {
+    private double computeParagraphHeight(InlineStyleTextArea<StyleInfo> node) {
         VirtualFlow<?, ?> vf = (VirtualFlow<?, ?>) node.lookup(".virtual-flow");
         return vf.visibleCells().get(0).getNode().getLayoutBounds().getHeight();
-
-//        // attempt 1 (failed)
-//        Text text = new Text(
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO\n" +
-//                "HELLO");
-//        text.setFont(new Font(assmFontData.font,
-//                Double.valueOf(assmFontData.fontSize)));
-//        TextFlow flow = new TextFlow(text);
-//        flow.setStyle("-fx-font-weight:bold");
-//        new Scene(new Group(flow));  // to get it to layout the Text
-////        Bounds layoutBounds = flow.getLayoutBounds();
-////        Bounds localBounds = flow.getBoundsInLocal();
-////        double layoutHeight = layoutBounds.getHeight();
-////        double localHeight = localBounds.getHeight();
-//        Bounds parentBounds = flow.getBoundsInParent();
-//        double parentHeight = parentBounds.getHeight();
-//        return parentHeight/20;
-
-//        // attempt 2 (failed)
-//        int numParagraphs = node.getParagraphs().size();
-//        double height = node.getHeight();
-//        double paragraphHeight = height/numParagraphs;
-//        return paragraphHeight;
-
-//        // attempt 3 (failed)
-//        Paragraph<StyleInfo> p = node.getParagraph(0);
-//        InlineStyleTextArea<StyleInfo> page =
-//                new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
-//        assmFontData.setFontAndBackground(page);
-//        page.setWrapText(false); // can't print wrapped text
-//        page.setParagraphGraphicFactory(LineNumPrintingFactory.get(page,
-//                0, 1, otherSettings.showLineNumbers.get() ?
-//                        (digits -> "%" + digits + "d") : (digits -> "")));
-//        final InlineStyleTextArea<StyleInfo> immutablePage = page;
-//        page.textProperty().addListener((obs, oldText, newText) -> {
-//            immutablePage.setStyleSpans(0, codePaneController.computeStyleSpans
-//                    (newText));
-//        });
-//        page.appendText(p.toString()); // skip newline char
-//        mainPane.getChildren().add(1, page);
-//        double lineHeight = page.getBoundsInParent().getHeight();
-//        mainPane.getChildren().remove(1);
-//        return lineHeight;
-    }
+   }
 
     /**
      * Exits the program
@@ -855,17 +956,18 @@ public class DesktopController implements Initializable {
             {
                 DesktopController.this.handleFetchSequence(null);
             }
-            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown() &&
-                    event.isShiftDown())
-            // ctrl-shift-Z is redo
-            {
-                handleRedo(null);
-            }
-            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown())
-            // ctrl-Z is undo
-            {
-                handleUndo(null);
-            }
+//  // these next ones are already taken care of in StyleTextAreaBehavior
+//            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown() &&
+//                    event.isShiftDown())
+//            // ctrl-shift-Z is redo
+//            {
+//                handleRedo(null);
+//            }
+//            else if (event.getCode().equals(KeyCode.Z) && event.isShortcutDown())
+//            // ctrl-Z is undo
+//            {
+//                handleUndo(null);
+//            }
         });
     }
 
@@ -875,9 +977,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleUndo(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
-        codeArea.undo();
+//        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+//                .getSelectionModel().getSelectedItem().getContent();
+//        codeArea.undo();
     }
 
     /**
@@ -886,9 +988,9 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleRedo(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
-        codeArea.redo();
+//        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+//                .getSelectionModel().getSelectedItem().getContent();
+//        codeArea.redo();
     }
 
     /**
@@ -898,8 +1000,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCut(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+                .getSelectionModel().getSelectedItem().getContent();
         codeArea.cut();
     }
 
@@ -910,8 +1012,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleCopy(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+                .getSelectionModel().getSelectedItem().getContent();
         codeArea.copy();
     }
 
@@ -922,8 +1024,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handlePaste(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+                .getSelectionModel().getSelectedItem().getContent();
         codeArea.paste();
     }
 
@@ -934,8 +1036,8 @@ public class DesktopController implements Initializable {
      */
     @FXML
     protected void handleSelectAll(ActionEvent event) {
-        InlineStyleTextArea codeArea = (InlineStyleTextArea)
-                textTabPane.getSelectionModel().getSelectedItem().getContent();
+        InlineStyleTextArea codeArea = (InlineStyleTextArea) textTabPane
+                .getSelectionModel().getSelectedItem().getContent();
         codeArea.selectAll();
     }
 
@@ -973,7 +1075,7 @@ public class DesktopController implements Initializable {
             return;
         }
 
-        int lineStart = -1;
+        int lineStart;
         int lineEnd = -1;
 
         //index of the line on which the highlighting begins
@@ -1036,12 +1138,14 @@ public class DesktopController implements Initializable {
                 //character
                 else if (origLine.startsWith(commentChar)) {
                     editedLine = (origLine.substring(1));
-                } else {
+                }
+                else {
                     editedLine = origLine;
                 }
                 newText += editedLine;
                 numIncreasedChars += editedLine.length() - origLine.length();
-            } else {
+            }
+            else {
                 newText += origLine;
             }
             //add a newline character unless we are on the last line
@@ -1056,33 +1160,34 @@ public class DesktopController implements Initializable {
         // contents in to replace, then return the Clipboard to
         // its original state. This way the actions can be un-done
         // and re-done.
-//        codeArea.selectAll();
-//        Clipboard clipboard = Clipboard.getSystemClipboard();
-//
-//        boolean setBack = true;
-//        DataFormat df = null;
-//        Object oldVal = null;
-//        try {
-//            df = (DataFormat) (clipboard.getContentTypes().toArray()[0]);
-//            oldVal = (clipboard.getContent(df));
-//        } catch (Exception e) {
-//            setBack = false;
-//        }
-//
-//        ClipboardContent content = new ClipboardContent();
-//        content.putString(newText);
-//        clipboard.setContent(content);
-//        codeArea.paste();
-//
-//        if (setBack) {
-//            ClipboardContent oldContent = new ClipboardContent();
-//            oldContent.put(df, oldVal);
-//            clipboard.setContent(oldContent);
-//        }
-//
+        //        codeArea.selectAll();
+        //        Clipboard clipboard = Clipboard.getSystemClipboard();
+        //
+        //        boolean setBack = true;
+        //        DataFormat df = null;
+        //        Object oldVal = null;
+        //        try {
+        //            df = (DataFormat) (clipboard.getContentTypes().toArray()[0]);
+        //            oldVal = (clipboard.getContent(df));
+        //        } catch (Exception e) {
+        //            setBack = false;
+        //        }
+        //
+        //        ClipboardContent content = new ClipboardContent();
+        //        content.putString(newText);
+        //        clipboard.setContent(content);
+        //        codeArea.paste();
+        //
+        //        if (setBack) {
+        //            ClipboardContent oldContent = new ClipboardContent();
+        //            oldContent.put(df, oldVal);
+        //            clipboard.setContent(oldContent);
+        //        }
+        //
         if (commenting) {
             codeArea.selectRange(lower + 1, upper + numIncreasedChars);
-        } else {
+        }
+        else {
             codeArea.selectRange(lower - 1, upper + numIncreasedChars);
         }
     }
@@ -1097,7 +1202,8 @@ public class DesktopController implements Initializable {
         if (findReplaceController == null) {
             findReplaceController = FindReplaceController.openFindReplaceDialog
                     (mediator, ioConsole.isFocused());
-        } else {
+        }
+        else {
             findReplaceController.setUseConsole(ioConsole.isFocused());
             findReplaceController.getStage().toFront();
             findReplaceController.getStage().requestFocus();
@@ -1120,7 +1226,7 @@ public class DesktopController implements Initializable {
     /**
      * Opens the machine instructions dialog.
      *
-     * @param event
+     * @param event unused action event
      */
     @FXML
     protected void handleMachineInstructions(ActionEvent event) {
@@ -1314,7 +1420,8 @@ public class DesktopController implements Initializable {
     protected void handleGeneralCPUSimHelp(ActionEvent event) {
         if (helpController == null) {
             helpController = HelpController.openHelpDialog(this);
-        } else {
+        }
+        else {
             helpController.selectTreeItem("Introduction");
             helpController.getStage().toFront();
         }
@@ -1359,26 +1466,29 @@ public class DesktopController implements Initializable {
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save File",
-                    "Would you like to save your work before you close this " +
-                            "tab?");
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+                    "File", "Would you like to save your work before you close this " +
+                    "tab?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 if (save(tab) && close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            } else if (result.get() == buttonTypeNo) {
+            }
+            else if (result.get() == buttonTypeNo) {
                 if (close) {
                     textTabPane.getTabs().remove(tab);
                 }
-            } else {
+            }
+            else {
                 if (!close) {
                     textTabPane.getTabs().add(tab);
                     textTabPane.getSelectionModel().selectLast();
                 }
             }
-        } else {
+        }
+        else {
             if (close) {
                 textTabPane.getTabs().remove(tab);
             }
@@ -1400,15 +1510,17 @@ public class DesktopController implements Initializable {
                 .getSelectedItem();
         if (currTab.getFile() != null && !currTab.getDirty()) {
             return currTab.getFile();
-        } else if (otherSettings.autoSave) {
+        }
+        else if (otherSettings.autoSave) {
             boolean savedSuccessfully = save(currTab);
             if (savedSuccessfully) {
                 return currTab.getFile();
             }
-        } else {  //there is no file or there is a file but the tab is dirty.
+        }
+        else {  //there is no file or there is a file but the tab is dirty.
             Alert dialog = Dialogs.createConfirmationDialog(stage, "Save File?",
-                    "Current Tab is not saved. It needs to be saved"
-                            + " before assembly. Save and continue?");
+                    "Current Tab is not saved. It needs to be saved" + " before " +
+                    "assembly. Save and continue?");
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == ButtonType.OK) {
                 boolean savedSuccessfully = save(currTab);
@@ -1429,12 +1541,20 @@ public class DesktopController implements Initializable {
         if (t == null) {
             return;
         }
+        // update the codeArea's font data
         InlineStyleTextArea codeArea = (InlineStyleTextArea) t.getContent();
         assmFontData.setFontAndBackground(codeArea);
+        // redraw the codeArea with the new data, including breakpoints and
+        // selected text
         String text = codeArea.getText();
+        IndexRange selectedRange = codeArea.getSelection();
         StyleSpans<StyleInfo> styleSpans = codePaneController.computeStyleSpans(text);
+        Set<Integer> breakLineNumbers = ((LineNumAndBreakpointFactory)
+                codeArea.getParagraphGraphicFactory()).getAllBreakPointLineNumbers();
         codeArea.setStyleSpans(0, styleSpans);
-        codeArea.moveTo(0);
+        ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory()).
+                setAllBreakPoints(breakLineNumbers);
+        codeArea.selectRange(selectedRange.getStart(),selectedRange.getEnd());
     }
 
     /**
@@ -1449,8 +1569,8 @@ public class DesktopController implements Initializable {
 
         // fromRootController the new tab and text area
         CodePaneTab newTab = new CodePaneTab();
-        InlineStyleTextArea<StyleInfo> codeArea =
-                new InlineStyleTextArea<>(new StyleInfo(), StyleInfo::toCss);
+        InlineStyleTextArea<StyleInfo> codeArea = new InlineStyleTextArea<>(new
+                StyleInfo(), StyleInfo::toCss);
         codeArea.setWrapText(otherSettings.lineWrap.get());
         assmFontData.setFontAndBackground(codeArea);
         codeArea.setParagraphGraphicFactory(LineNumAndBreakpointFactory.get(codeArea,
@@ -1459,28 +1579,30 @@ public class DesktopController implements Initializable {
         addMenuKeyboardShortcuts(codeArea);
 
         // replace tabs with 4 or fewer spaces
-        EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper
-                .on(keyPressed(TAB)).act(event -> {
-                    String spaces = "";
-                    int numSpaces = 4 - codeArea.getCaretColumn() % 4;
-                    for (int i = 0; i < numSpaces; i++) {
-                        spaces += " ";
-                    }
-                    codeArea.replaceSelection(spaces);
-                })
-                .create();
+        EventHandler<? super KeyEvent> tabHandler = EventHandlerHelper.on(keyPressed
+                (TAB)).act(event -> {
+            String spaces = "";
+            int numSpaces = 4 - codeArea.getCaretColumn() % 4;
+            for (int i = 0; i < numSpaces; i++) {
+                spaces += " ";
+            }
+            codeArea.replaceSelection(spaces);
+        }).create();
         EventHandlerHelper.install(codeArea.onKeyPressedProperty(), tabHandler);
 
         newTab.setContent(codeArea);
 
-        // whenever the text is changed, recompute the highlighting and set it dirty
+        // add InvalidationListener so that whenever the text is changed,
+        // we recompute the highlighting and set the file to dirty
         codeArea.textProperty().addListener(obs -> {
-            codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea.getText()));
+            codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea
+                    .getText()));
             newTab.setDirty(true);
         });
         // these next two approaches didn't work quite right
         // codeArea.richChanges().subscribe(change -> {
-        //     codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea.getText()));
+        //     codeArea.setStyleSpans(0, codePaneController.computeStyleSpans(codeArea
+        // .getText()));
         //     newTab.setDirty(true);
         // });
         // codeArea.textProperty().addListener((obs, oldText, newText) -> {
@@ -1494,7 +1616,8 @@ public class DesktopController implements Initializable {
         newTab.setOnClosed(this::handleTabClosed);
         if (file != null) {
             newTab.setTooltip(new Tooltip(file.getAbsolutePath()));
-        } else {
+        }
+        else {
             newTab.setTooltip(new Tooltip("File has not been saved."));
         }
 
@@ -1503,31 +1626,52 @@ public class DesktopController implements Initializable {
         newTab.setText(title);
         addContextMenu(newTab);
 
-        // add a listener to the codeArea's set of breakpoints
-        // so that breakpoints can be added dynamically as the code is being stepped through
-        // when in debug mode
-        ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory()).getBreakPoints().
-                addListener((SetChangeListener<Paragraph>) change -> {
+        textTabPane.getTabs().add(newTab);
+        textTabPane.getSelectionModel().selectLast();
+
+        ((LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory())
+                .getBreakPoints().
+                addListener((ListChangeListener<Paragraph>) change -> {
                     if (newTab.getFile() != null) {
-                        boolean set = change.wasAdded();
-                        String fileName = newTab.getFile().getAbsolutePath();
-                        Paragraph paragraph = set ? change
-                                .getElementAdded() : change.getElementRemoved();
-                        int line = codeArea.getParagraphs().indexOf(paragraph);
-                        SourceLine sourceLine = new SourceLine(line, fileName);
-                        mediator.setBreakPointInRAM(sourceLine, set);
+                        while (change.next()) {
+                            boolean set = change.wasAdded();
+                            String fileName = newTab.getFile().getAbsolutePath();
+                            Paragraph paragraph = set ? change.getAddedSubList().get(0) :
+                                    change.getRemoved().get(0);
+                            int line = indexOfUsingIdentity(codeArea.getParagraphs(), paragraph);
+                            if (line >= 0) {
+                                SourceLine sourceLine = new SourceLine(line, fileName);
+                                mediator.setBreakPointInRAM(sourceLine, set);
+                            }
+                        }
                     }
                 });
 
-        textTabPane.getTabs().add(newTab);
-        textTabPane.getSelectionModel().selectLast();
     }
 
+    /**
+     * returns the index of the given item in the given list using ==.  It returns -1
+     * if the item is not in the list.
+     * NOTE: We can't just use list.indexOf(item) because we
+     * want to test equality using == not equals().
+     * @param list The list to be searched
+     * @param item the value to be found
+     * @return the index of the item in the list or -1 if not found
+     */
+    private int indexOfUsingIdentity(List list, Object item ) {
+        for (int i = 0; i < list.size(); i++) {
+            Object p = list.get(i);
+            if (p == item) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
-    public Set<Integer> getAllBreakPointsForFile(String fileName) {
-        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea)
-                getTabForFile(new File(fileName)).getContent())
-                .getParagraphGraphicFactory()).getAllBreakPointLineNumbers();
+    public Set<Integer> getAllBreakPointLineNumbersForFile(String fileName) {
+        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) getTabForFile(new
+                File(fileName)).getContent()).getParagraphGraphicFactory())
+                .getAllBreakPointLineNumbers();
     }
 
 
@@ -1543,7 +1687,7 @@ public class DesktopController implements Initializable {
 
         MenuItem closeAll = new MenuItem("Close All");
         closeAll.setOnAction(e -> {
-            ArrayList<Tab> tabs = new ArrayList<Tab>();
+            ArrayList<Tab> tabs = new ArrayList<>();
             for (Tab tab : textTabPane.getTabs()) {
                 tabs.add(tab);
             }
@@ -1574,9 +1718,8 @@ public class DesktopController implements Initializable {
                 clipboard.setContent(content1);
             }
         });
-        copyPath.disableProperty().bind(
-                newTab.tooltipProperty().get().textProperty().isEqualTo("File has not " +
-                        "been saved."));
+        copyPath.disableProperty().bind(newTab.tooltipProperty().get().textProperty()
+                .isEqualTo("File has not " + "been saved."));
 
         ContextMenu cm = new ContextMenu();
         cm.getItems().addAll(close, closeAll, closeOthers, copyPath);
@@ -1592,14 +1735,14 @@ public class DesktopController implements Initializable {
      */
     public Tab getTabForFile(File file) {
         assert file != null : "Null passed as parameter to getTabForFile";
-        Optional<Tab> existingTab = textTabPane.getTabs().stream()
-                .filter(t -> file.equals(((CodePaneTab) t).getFile()))
-                .findFirst();
+        Optional<Tab> existingTab = textTabPane.getTabs().stream().filter(t -> file
+                .equals(((CodePaneTab) t).getFile())).findFirst();
         if (existingTab.isPresent()) {
             Tab currentTab = existingTab.get();
             textTabPane.getSelectionModel().select(currentTab);
             return currentTab;
-        } else {
+        }
+        else {
             open(file);
             return textTabPane.getTabs().get(textTabPane.getTabs().size() - 1);
         }
@@ -1700,8 +1843,8 @@ public class DesktopController implements Initializable {
     public void setFindReplaceController(FindReplaceController frc) {
         this.findReplaceController = frc;
     }
-//------------------------------------------------------------------------------
-//Added methods by Pratap, Scott, and Stephen
+    //------------------------------------------------------------------------------
+    //Added methods by Pratap, Scott, and Stephen
 
     /**
      * Gives the current reopenMachineFiles value.
@@ -1729,7 +1872,7 @@ public class DesktopController implements Initializable {
     public ConsoleManager getConsoleManager() {
         return this.consoleManager;
     }
-//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 
     /**
      * Returns the boolean describing whether or not
@@ -1760,12 +1903,15 @@ public class DesktopController implements Initializable {
             mainPane.getChildren().add(1, debugToolBarController);
             debugToolBarController.prefWidthProperty().bind(mainPane.widthProperty());
             debugToolBarController.addButtonAccelerators();
-        } else {
+        }
+        else {
             debugToolBarController.removeButtonAccelerators();
             mainPane.getChildren().remove(1);
             debugToolBarController.clearAllOutlines();
             mediator.getBackupManager().flushBackups();
             mediator.getMachine().getControlUnit().setMicroIndex(0);
+            mediator.getMachine().setState(Machine.State.EXECUTION_HALTED,false);
+            debugToolBarController.updateDisplay();
         }
         RAM codeStore = mediator.getMachine().getCodeStore();
         if (codeStore != null) {
@@ -1828,12 +1974,9 @@ public class DesktopController implements Initializable {
     public void bindItemDisablesToSimpleBooleanProperties() {
 
         // File Menu
-        fileMenu.setOnMenuValidation(new EventHandler<Event>() {
-            @Override
-            public void handle(Event event) {
-                for (int i = 7; i < 9; i++) {
-                    fileMenu.getItems().get(i).setDisable(ramControllers.isEmpty());
-                }
+        fileMenu.setOnMenuValidation(event -> {
+            for (int i = 7; i < 9; i++) {
+                fileMenu.getItems().get(i).setDisable(ramControllers.isEmpty());
             }
         });
         // Close Text
@@ -1843,11 +1986,11 @@ public class DesktopController implements Initializable {
         // Save Text As
         fileMenu.getItems().get(5).disableProperty().bind(noTabSelected);
         // New Machine
-        fileMenu.getItems().get(10).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(10).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Open Machine
-        fileMenu.getItems().get(11).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(11).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Reopen Machine
-        fileMenu.getItems().get(12).disableProperty().bind(inRunningMode);
+        fileMenu.getItems().get(12).disableProperty().bind(inRunningMode.or(inDebugMode));
         // Print
         fileMenu.getItems().get(19).disableProperty().bind(noTabSelected);
 
@@ -1869,11 +2012,11 @@ public class DesktopController implements Initializable {
             anchorEqualsCarret.set(ancEqCar);
         });
         // Undo
-        editMenu.getItems().get(0).disableProperty().bind(
-                noTabSelected.or(canUndoProperty.not()));
+        editMenu.getItems().get(0).disableProperty().bind(noTabSelected.or
+                (canUndoProperty.not()));
         // Redo
-        editMenu.getItems().get(1).disableProperty().bind(
-                noTabSelected.or(canRedoProperty.not()));
+        editMenu.getItems().get(1).disableProperty().bind(noTabSelected.or
+                (canRedoProperty.not()));
         // Cut
         editMenu.getItems().get(3).disableProperty().bind(noTabSelected.or
                 (anchorEqualsCarret));
@@ -1899,56 +2042,51 @@ public class DesktopController implements Initializable {
         // Execute Menu
         // Debug Mode
         executeMenu.getItems().get(0).disableProperty().bind((inRunningMode.or
-                (noTabSelected)).or(
-                codeStoreIsNull));
+                (noTabSelected)).or(codeStoreIsNull));
         // Assemble
-        executeMenu.getItems().get(2).disableProperty().bind(noTabSelected.or(
-                codeStoreIsNull));
+        executeMenu.getItems().get(2).disableProperty().bind(noTabSelected.or
+                (codeStoreIsNull));
         // Assemble & Load
-        executeMenu.getItems().get(3).disableProperty().bind(noTabSelected.or(
-                codeStoreIsNull));
+        executeMenu.getItems().get(3).disableProperty().bind(noTabSelected.or
+                (codeStoreIsNull));
         // Assemble Load & Run
-        executeMenu.getItems().get(4).disableProperty().bind((inDebugOrRunningMode
-                .or(noTabSelected)).or(codeStoreIsNull));
+        executeMenu.getItems().get(4).disableProperty().bind((inDebugOrRunningMode.or
+                (noTabSelected)).or(codeStoreIsNull));
         // Clear, assemble, load & run
-        executeMenu.getItems().get(5).disableProperty().bind((inDebugOrRunningMode
-                .or(noTabSelected)).or(codeStoreIsNull));
+        executeMenu.getItems().get(5).disableProperty().bind((inDebugOrRunningMode.or
+                (noTabSelected)).or(codeStoreIsNull));
         // Run
-        executeMenu.getItems().get(6).disableProperty().bind((inDebugOrRunningMode
-                .or(noTabSelected)).or(codeStoreIsNull));
+        executeMenu.getItems().get(6).disableProperty().bind((inDebugOrRunningMode.or
+                (noTabSelected)).or(codeStoreIsNull));
         // Stop
         executeMenu.getItems().get(7).disableProperty().bind(inRunningMode.not());
         // Reset Everything
         executeMenu.getItems().get(8).disableProperty().bind(inDebugOrRunningMode);
         // IO Options
-        executeMenu.getItems().get(10).disableProperty().bind(inDebugOrRunningMode.or(
-                codeStoreIsNull));
+        executeMenu.getItems().get(10).disableProperty().bind(inDebugOrRunningMode.or
+                (codeStoreIsNull));
         // Update codeStoreIsNull
-        executeMenu.setOnMenuValidation(event ->
-                codeStoreIsNull.set(mediator.getMachine().getCodeStore() == null));
+        executeMenu.setOnMenuValidation(event -> codeStoreIsNull.set(mediator
+                .getMachine().getCodeStore() == null));
 
         // if using the console for IO, then set the console's background to yellow
         // during input and set it to white during output and at the end.
-        inRunningMode.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean wasDebugMode, Boolean nowDebugMode) {
-                ObservableList<Microinstruction> ios = mediator.getMachine().getMicros
-                        ("io");
-                boolean consoleIsInputOrOutputChannel = false;
-                for (Microinstruction micro : ios) {
-                    IO io = (IO) micro;
-                    if (io.getConnection().equals(CPUSimConstants.CONSOLE_CHANNEL)) {
-                        consoleIsInputOrOutputChannel = true;
-                    }
+        inRunningMode.addListener((arg0, wasDebugMode, nowDebugMode) -> {
+            ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
+            boolean consoleIsInputOrOutputChannel = false;
+            for (Microinstruction micro : ios) {
+                IO io = (IO) micro;
+                if (io.getConnection().equals(CPUSimConstants.CONSOLE_CHANNEL)) {
+                    consoleIsInputOrOutputChannel = true;
                 }
-                if (consoleIsInputOrOutputChannel) {
-                    if (nowDebugMode) {
-                        ioConsole.setStyle("-fx-background-color: yellow");
-                        ioConsole.requestFocus();
-                    } else {
-                        ioConsole.setStyle("-fx-background-color: white");
-                    }
+            }
+            if (consoleIsInputOrOutputChannel) {
+                if (nowDebugMode) {
+                    ioConsole.setStyle("-fx-background-color: yellow");
+                    ioConsole.requestFocus();
+                }
+                else {
+                    ioConsole.setStyle("-fx-background-color: white");
                 }
             }
         });
@@ -1964,58 +2102,64 @@ public class DesktopController implements Initializable {
      */
     public void addBaseChangeListener(ChoiceBox<String> choiceBox, String type) {
         final String finalType = type;
-        choiceBox.getSelectionModel().selectedIndexProperty().addListener(
-                new ChangeListener<Number>() {
-                    @Override
-                    public void changed(ObservableValue ov, Number value, Number
-                            new_value) {
-                        if (finalType.equals("registerData")) {
-                            if (new_value.equals(0)) {
-                                regDataBase = "Dec";
-                            } else if (new_value.equals(1)) {
-                                regDataBase = "Bin";
-                            } else if (new_value.equals(2)) {
-                                regDataBase = "Hex";
-                            } else if (new_value.equals(3)) {
-                                regDataBase = "Unsigned Dec";
-                            } else {
-                                regDataBase = "Ascii";
-                            }
-                            for (RegisterTableController registerTableController
-                                    : registerControllers) {
-                                registerTableController.setDataBase(regDataBase);
-                            }
-                        } else if (finalType.equals("ramAddress")) {
-                            if (new_value.equals(0)) {
-                                ramAddressBase = "Dec";
-                            } else if (new_value.equals(1)) {
-                                ramAddressBase = "Bin";
-                            } else {
-                                ramAddressBase = "Hex";
-                            }
-                            for (RamTableController ramTableController
-                                    : ramControllers) {
-                                ramTableController.setAddressBase(ramAddressBase);
-                            }
-                        } else {  //type == "ramData"
-                            if (new_value.equals(0)) {
-                                ramDataBase = "Dec";
-                            } else if (new_value.equals(1)) {
-                                ramDataBase = "Bin";
-                            } else if (new_value.equals(2)) {
-                                ramDataBase = "Hex";
-                            } else if (new_value.equals(3)) {
-                                ramDataBase = "Unsigned Dec";
-                            } else {
-                                ramDataBase = "Ascii";
-                            }
-                            for (RamTableController ramTableController
-                                    : ramControllers) {
-                                ramTableController.setDataBase(ramDataBase);
-                            }
-                        }
-                    }
-                });
+        choiceBox.getSelectionModel().selectedIndexProperty().addListener((ov, value,
+                                                                           new_value) -> {
+            if (finalType.equals("registerData")) {
+                if (new_value.equals(0)) {
+                    regDataBase = "Dec";
+                }
+                else if (new_value.equals(1)) {
+                    regDataBase = "Bin";
+                }
+                else if (new_value.equals(2)) {
+                    regDataBase = "Hex";
+                }
+                else if (new_value.equals(3)) {
+                    regDataBase = "Unsigned Dec";
+                }
+                else {
+                    regDataBase = "Ascii";
+                }
+                for (RegisterTableController registerTableController :
+                        registerControllers) {
+                    registerTableController.setDataBase(regDataBase);
+                }
+            }
+            else if (finalType.equals("ramAddress")) {
+                if (new_value.equals(0)) {
+                    ramAddressBase = "Dec";
+                }
+                else if (new_value.equals(1)) {
+                    ramAddressBase = "Bin";
+                }
+                else {
+                    ramAddressBase = "Hex";
+                }
+                for (RamTableController ramTableController : ramControllers) {
+                    ramTableController.setAddressBase(ramAddressBase);
+                }
+            }
+            else {  //type == "ramData"
+                if (new_value.equals(0)) {
+                    ramDataBase = "Dec";
+                }
+                else if (new_value.equals(1)) {
+                    ramDataBase = "Bin";
+                }
+                else if (new_value.equals(2)) {
+                    ramDataBase = "Hex";
+                }
+                else if (new_value.equals(3)) {
+                    ramDataBase = "Unsigned Dec";
+                }
+                else {
+                    ramDataBase = "Ascii";
+                }
+                for (RamTableController ramTableController : ramControllers) {
+                    ramTableController.setDataBase(ramDataBase);
+                }
+            }
+        });
     }
 
     /**
@@ -2066,7 +2210,8 @@ public class DesktopController implements Initializable {
             openModalDialog("Edit Modules",
                     "EditModules.fxml", controller);
             controller.selectSection(initialSection);
-        } else {
+        }
+        else {
             openHardwareModulesDialog(0);
         }
     }
@@ -2083,7 +2228,8 @@ public class DesktopController implements Initializable {
             openModalDialog("Options", "OptionsFXML.fxml",
                     controller);
             controller.selectTab(initialSection);
-        } else {
+        }
+        else {
             openOptionsDialog(0);
         }
     }
@@ -2219,14 +2365,13 @@ public class DesktopController implements Initializable {
             dialogStage.setY(stage.getY() + y);
         }
         // pressing escape key causes the dialog to close without saving changes
-        dialogScene.addEventFilter(
-                KeyEvent.KEY_RELEASED, event -> {
-                    if (event.getCode().equals(KeyCode.ESCAPE)) {
-                        if (dialogStage.isFocused()) {
-                            dialogStage.close();
-                        }
-                    }
-                });
+        dialogScene.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+            if (event.getCode().equals(KeyCode.ESCAPE)) {
+                if (dialogStage.isFocused()) {
+                    dialogStage.close();
+                }
+            }
+        });
         dialogStage.show();
     }
 
@@ -2235,13 +2380,15 @@ public class DesktopController implements Initializable {
      *
      * @param fileChooser fileChooser to be modified
      * @param title       title of fileChooser window
-     * @param text        true for saving an assembly language program, false for a machine
+     * @param text        true for saving an assembly language program, false for a
+     *                    machine
      */
     public void initFileChooser(FileChooser fileChooser, String title, boolean text) {
         fileChooser.setTitle(title);
         if (text) {
             fileChooser.setInitialDirectory(new File(currentTextDirectory));
-        } else {
+        }
+        else {
             fileChooser.setInitialDirectory(new File(mediator
                     .getCurrentMachineDirectory()));
         }
@@ -2294,7 +2441,8 @@ public class DesktopController implements Initializable {
             bwriter.close();
             return true;
         } catch (IOException ioe) {
-            Dialogs.createErrorDialog(stage, "Error", "Unable to save the text to a file.").showAndWait();
+            Dialogs.createErrorDialog(stage, "Error", "Unable to save the text to a " +
+                    "file.").showAndWait();
             return false;
         }
     }
@@ -2314,15 +2462,15 @@ public class DesktopController implements Initializable {
 
         InlineStyleTextArea textToSave = (InlineStyleTextArea) theTab.getContent();
         if (theTab.getDirty()) {
-            boolean successfulSave = saveTextFile(theTab.getFile(), textToSave.getText
-                    ());
+            boolean successfulSave = saveTextFile(theTab.getFile(), textToSave.getText());
 
             if (successfulSave) {
                 theTab.setDirty(false);
                 return true;
             }
             return false;
-        } else {
+        }
+        else {
             return true;
         }
     }
@@ -2387,8 +2535,8 @@ public class DesktopController implements Initializable {
         currentTextDirectory = fileToOpen.getParent();
         String content = extractTextFromFile(fileToOpen);
         if (content == null) {
-            Dialogs.createErrorDialog(stage, "Nonexistant File", "There is no longer a file at the path " +
-                    fileToOpen.getAbsolutePath()).showAndWait();
+            Dialogs.createErrorDialog(stage, "Nonexistant File", "There is no longer a " +
+                    "file at the path " + fileToOpen.getAbsolutePath()).showAndWait();
 
             if (reopenTextFiles.contains(fileToOpen.getAbsolutePath())) {
                 reopenTextFiles.remove(fileToOpen.getAbsolutePath());
@@ -2400,15 +2548,15 @@ public class DesktopController implements Initializable {
         updateReopenTextFiles(fileToOpen);
 
         //if text is already open, just select the proper tab else open a new tab
-        Optional<Tab> existingTab = textTabPane.getTabs().stream()
-                .filter(t -> ((CodePaneTab) t).getFile() != null)
-                .filter(t -> fileToOpen.getAbsolutePath().equals(
-                        ((CodePaneTab) t).getFile().getAbsolutePath()))
-                .findFirst();
+        Optional<Tab> existingTab = textTabPane.getTabs().stream().filter(t -> (
+                (CodePaneTab) t).getFile() != null).filter(t -> fileToOpen
+                .getAbsolutePath().equals(((CodePaneTab) t).getFile().getAbsolutePath()
+                )).findFirst();
         if (existingTab.isPresent()) {
             textTabPane.getSelectionModel().select(existingTab.get());
             currentTextDirectory = fileToOpen.getParent();
-        } else {
+        }
+        else {
             addTab(content, fileToOpen.getName(), fileToOpen);
         }
     }
@@ -2477,14 +2625,17 @@ public class DesktopController implements Initializable {
             MenuItem menuItem = new MenuItem(filePath);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
-                    Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
-                            "The machine you are currently working on is unsaved.  " +
-                                    "Would you like to save it before you open a new machine?");
-                    dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
+                    Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage,
+                            "Save Machine", "The machine you are currently working on " +
+                            "is unsaved.  " + "Would you like to save it before" +
+                            " you open a new machine?");
+                    dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
+                            buttonTypeCancel);
                     Optional<ButtonType> result = dialog.showAndWait();
                     if (result.get() == buttonTypeYes) {
                         handleSaveMachine(e);
-                    } else if (result.get() == buttonTypeCancel) {
+                    }
+                    else if (result.get() == buttonTypeCancel) {
                         return;
                     }
                 }
@@ -2506,8 +2657,8 @@ public class DesktopController implements Initializable {
      * for each RAM in the current machine
      */
     private void updateRamMenus() {
-        ObservableList<RAM> rams = (ObservableList<RAM>)
-                mediator.getMachine().getModule("rams");
+        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
+                .getModule("rams");
         saveRamMenu.getItems().clear();
         openRamMenu.getItems().clear();
 
@@ -2526,32 +2677,35 @@ public class DesktopController implements Initializable {
     /**
      * opens data from a mif or hex file chosen by the user into a certain RAM
      *
-     * @param ram
+     * @param ram the RAM to be loaded from a file
      */
     private void openRam(RAM ram) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(currentTextDirectory));
 
         fileChooser.setTitle("Open RAM");
-        fileChooser.getExtensionFilters().add(
-                new ExtensionFilter("Memory Text Files (.mif), (.hex)", "*.mif", "*" +
-                        ".hex"));
+        fileChooser.getExtensionFilters().add(new ExtensionFilter("Memory Text Files ("
+                + ".mif), (.hex)", "*.mif", "*" + ".hex"));
 
         File fileToOpen = fileChooser.showOpenDialog(stage);
-        if( fileToOpen == null) // user cancelled
+        if (fileToOpen == null) // user cancelled
+        {
             return;
+        }
 
         if (fileToOpen.getName().lastIndexOf(".mif") == fileToOpen.getName().length() -
                 4) {
             try {
-                mediator.parseMIFFile(extractTextFromFile(fileToOpen), ram,
-                        fileToOpen.getAbsolutePath());
+                mediator.parseMIFFile(extractTextFromFile(fileToOpen), ram, fileToOpen
+                        .getAbsolutePath());
             } catch (MIFReaderException e) {
-                Dialogs.createErrorDialog(stage, "MIF Parse Error", e.getMessage()).showAndWait();
+                Dialogs.createErrorDialog(stage, "MIF Parse Error", e.getMessage())
+                        .showAndWait();
             }
-        } else {
-            mediator.parseIntelHexFile(extractTextFromFile(fileToOpen), ram,
-                    fileToOpen.getAbsolutePath());
+        }
+        else {
+            mediator.parseIntelHexFile(extractTextFromFile(fileToOpen), ram, fileToOpen
+                    .getAbsolutePath());
         }
 
         for (RamTableController rc : ramControllers) {
@@ -2564,11 +2718,11 @@ public class DesktopController implements Initializable {
      * saves the contents of a particular ram to an mif or hex file (as dictated by the
      * user)
      *
-     * @param ram
+     * @param ram the RAM to be saved
      */
     private void saveRam(RAM ram) {
 
-        List<String> choices = new ArrayList<String>();
+        List<String> choices = new ArrayList<>();
 
         choices.add("Machine Instruction File (.mif)");
         choices.add("Intel Hex Format (.hex)");
@@ -2580,9 +2734,9 @@ public class DesktopController implements Initializable {
         // choosing something else the fileFormat string that will be returned
         // will be null.  This would be fine except that we can tell that the
         // user canceled the dialog only by checking if the string is null
-        ChoiceDialog<String> dialog = Dialogs.createChoiceDialog(stage, "File Format Choice",
-                "In what file format should your ram information be saved?",
-                "Machine Instruction File (.mif)", choices);
+        ChoiceDialog<String> dialog = Dialogs.createChoiceDialog(stage, "File Format "
+                + "Choice", "In what file format should your ram information be " +
+                "saved?", "Machine Instruction File (.mif)", choices);
         Optional<String> fileFormat = dialog.showAndWait();
 
         if (!fileFormat.isPresent()) {
@@ -2591,13 +2745,13 @@ public class DesktopController implements Initializable {
 
         ExtensionFilter extensionFilter;
         boolean asMIF;
-        if (fileFormat.equals("Machine Instruction File (.mif)")) {
-            extensionFilter = new ExtensionFilter(
-                    "Machine Instruction Files (.mif)", "*.mif");
+        if (fileFormat.get().equals("Machine Instruction File (.mif)")) {
+            extensionFilter = new ExtensionFilter("Machine Instruction Files (.mif)",
+                    "*.mif");
             asMIF = true;
-        } else {
-            extensionFilter = new ExtensionFilter(
-                    "Intel Hex Format (.hex)", "*.hex");
+        }
+        else {
+            extensionFilter = new ExtensionFilter("Intel Hex Format (.hex)", "*.hex");
             asMIF = false;
         }
 
@@ -2617,8 +2771,8 @@ public class DesktopController implements Initializable {
 
         if (asMIF) {
 
-            if (fileToSave.getAbsolutePath().lastIndexOf(".mif") !=
-                    fileToSave.getAbsolutePath().length() - 4) {
+            if (fileToSave.getAbsolutePath().lastIndexOf(".mif") != fileToSave
+                    .getAbsolutePath().length() - 4) {
                 fileToSave = new File(fileToSave.getAbsolutePath() + ".mif");
             }
 
@@ -2631,12 +2785,14 @@ public class DesktopController implements Initializable {
                 fwriter.close();
                 bwriter.close();
             } catch (IOException ioe) {
-                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a file.").showAndWait();
+                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a " +
+                        "" + "file.").showAndWait();
             }
 
-        } else {
-            if (fileToSave.getAbsolutePath().lastIndexOf(".hex") !=
-                    fileToSave.getAbsolutePath().length() - 4) {
+        }
+        else {
+            if (fileToSave.getAbsolutePath().lastIndexOf(".hex") != fileToSave
+                    .getAbsolutePath().length() - 4) {
                 fileToSave = new File(fileToSave.getAbsolutePath() + ".hex");
             }
 
@@ -2649,7 +2805,8 @@ public class DesktopController implements Initializable {
                 fwriter.close();
                 bwriter.close();
             } catch (IOException ioe) {
-                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a file.").showAndWait();
+                Dialogs.createErrorDialog(stage, "Error", "Unable to save the ram to a " +
+                        "" + "file.").showAndWait();
             }
         }
 
@@ -2665,8 +2822,8 @@ public class DesktopController implements Initializable {
 
         updateStyleOfTables();
 
-        ObservableList<Register> registers =
-                (ObservableList<Register>) mediator.getMachine().getModule("registers");
+        ObservableList<Register> registers = (ObservableList<Register>) mediator
+                .getMachine().getModule("registers");
 
         RegisterTableController registerTableController =
                 new RegisterTableController(this, registers, "Registers");
@@ -2708,7 +2865,7 @@ public class DesktopController implements Initializable {
                 registerControllers.add(registerArrayTableController);
 
                 try {
-                    registerArrayTableRoot = (Pane) registerArrayFxmlLoader.load();
+                    registerArrayTableRoot = registerArrayFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
                     assert false : "Unable to load file: fxml/desktop/RegisterTable.fxml";
@@ -2726,8 +2883,8 @@ public class DesktopController implements Initializable {
             regSplitPane.setDividerPosition(i, regdpos);
         }
 
-        ObservableList<RAM> rams =
-                (ObservableList<RAM>) mediator.getMachine().getModule("rams");
+        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
+                .getModule("rams");
 
         if (!rams.isEmpty()) {
             ramVbox.getChildren().remove(noRAMLabel);
@@ -2762,13 +2919,14 @@ public class DesktopController implements Initializable {
             }
 
             for (int i = 0; i < ramSplitPane.getDividers().size(); i++) {
-                ramSplitPane.setDividerPosition(i,
-                        1.0 / (ramSplitPane.getDividers().size() + 1) * (i + 1));
+                ramSplitPane.setDividerPosition(i, 1.0 / (ramSplitPane.getDividers()
+                        .size() + 1) * (i + 1));
             }
 
             updateRamMenus();
             ramVbox.getChildren().addAll();
-        } else {
+        }
+        else {
             if (!ramVbox.getChildren().contains(noRAMLabel)) {
                 ramVbox.getChildren().add(1, noRAMLabel);
             }
@@ -2836,8 +2994,8 @@ public class DesktopController implements Initializable {
         }
 
         ramSplitPane.getItems().clear();
-        ObservableList<RAM> rams =
-                (ObservableList<RAM>) mediator.getMachine().getModule("rams");
+        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
+                .getModule("rams");
         ramControllers.clear();
 
         if (!rams.isEmpty()) {
@@ -2858,7 +3016,7 @@ public class DesktopController implements Initializable {
                 ramControllers.add(ramTableController);
 
                 try {
-                    ramTableRoot = (Pane) ramFxmlLoader.load();
+                    ramTableRoot = ramFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
                     assert false : "Unable to load file: fxml/desktop/RamTable.fxml";
@@ -2873,7 +3031,8 @@ public class DesktopController implements Initializable {
 
             updateRamMenus();
             ramVbox.getChildren().addAll();
-        } else {
+        }
+        else {
             if (!ramVbox.getChildren().contains(noRAMLabel)) {
                 ramVbox.getChildren().add(0, noRAMLabel);
             }
@@ -2905,10 +3064,10 @@ public class DesktopController implements Initializable {
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Running Program",
-                    "There is a program running. " +
-                            "Closing the application will also quit the program. " +
-                            "Do you want to quit the running program?");
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Running "
+                    + "Program", "There is a program running. " +
+                    "Closing the application will also quit the program. " +
+                    "Do you want to quit the running program?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeNo || result.get() == buttonTypeCancel) {
@@ -2916,27 +3075,31 @@ public class DesktopController implements Initializable {
             }
         }
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Machine",
-                    "The machine you are currently working on is unsaved.  " +
-                            "Would you like to save it before you close?");
+            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+                    "Machine", "The machine you are currently working on is unsaved.  "
+                    + "Would you like to save it before you close?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
                 mediator.saveMachine();
-            } else if (result.get() == buttonTypeCancel) {
+            }
+            else if (result.get() == buttonTypeCancel) {
                 return false;
             }
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save Text",
-                        "Would you like to save your work before you "
-                                + "close " + tab.getText().substring(1) + "?");
-                dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
+                Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+                        "" + "Text", "Would you like to save your work before you " +
+                        "close" +
+                        " " + tab.getText().substring(1) + "?");
+                dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
+                        buttonTypeCancel);
                 Optional<ButtonType> result = dialog.showAndWait();
                 if (result.get() == buttonTypeYes) {
                     save(tab);
-                } else if (result.get() == buttonTypeCancel) {
+                }
+                else if (result.get() == buttonTypeCancel) {
                     return false;
                 }
             }
@@ -2978,14 +3141,17 @@ public class DesktopController implements Initializable {
         prefs.put("assmFontSize", assmFontData.fontSize);
         prefs.put("assmFont", assmFontData.font);
         prefs.put("assmBackground", assmFontData.background);
+        prefs.put("assmSelection", assmFontData.selection);
 
         prefs.put("registerTableFontSize", registerTableFontData.fontSize);
         prefs.put("registerTableFont", registerTableFontData.font);
         prefs.put("registerTableBackground", registerTableFontData.background);
+        prefs.put("registerTableSelection", registerTableFontData.selection);
 
         prefs.put("ramTableFontSize", ramTableFontData.fontSize);
         prefs.put("ramTableFont", ramTableFontData.font);
         prefs.put("ramTableBackground", ramTableFontData.background);
+        prefs.put("ramTableSelection", ramTableFontData.selection);
 
         for (Map.Entry<String, KeyCodeInfo> binding : keyBindings.entrySet()) {
             prefs.put(binding.getKey(), binding.getValue().getKeyCode());
@@ -3032,14 +3198,17 @@ public class DesktopController implements Initializable {
         assmFontData.fontSize = prefs.get("assmFontSize", "12");
         assmFontData.font = prefs.get("assmFont", "Courier New");
         assmFontData.background = prefs.get("assmBackground", "#fff");
+        assmFontData.selection = prefs.get("assmSelection", "#ddd");
 
         registerTableFontData.fontSize = prefs.get("registerTableFontSize", "12");
         registerTableFontData.font = prefs.get("registerTableFont", "Courier New");
         registerTableFontData.background = prefs.get("registerTableBackground", "#fff");
+        registerTableFontData.selection = prefs.get("registerTableSelection", "#ddd");
 
         ramTableFontData.fontSize = prefs.get("ramTableFontSize", "12");
         ramTableFontData.font = prefs.get("ramTableFont", "Courier New");
         ramTableFontData.background = prefs.get("ramTableBackground", "#fff");
+        ramTableFontData.selection = prefs.get("ramTableSelection", "#ddd");
 
         for (String[] defaultBinding : DEFAULT_KEY_BINDINGS) {
             String menuName = defaultBinding[0];
@@ -3059,16 +3228,18 @@ public class DesktopController implements Initializable {
     public void updateStyleOfTables() {
         //  WHAT IS THIS CODE FOR?????
         //  I COULDN'T TELL SO I COMMENTED IT OUT.
-//        if (mainPane.getStyleClass().size() > 1) {
-//            mainPane.getStyleClass().remove(1);
-//        }
+        //        if (mainPane.getStyleClass().size() > 1) {
+        //            mainPane.getStyleClass().remove(1);
+        //        }
 
         // old code from when background was a choicebox instead of colorpicker
-//        if (!backgroundSetting.keySet().contains(registerTableFontData.background)) {
-//            registerTableFontData.background = "#fff";
-//        }
-//
-//        mainPane.getStylesheets().add(backgroundSetting.get(registerTableFontData.background));
+        //        if (!backgroundSetting.keySet().contains(registerTableFontData
+        // .background)) {
+        //            registerTableFontData.background = "#fff";
+        //        }
+        //
+        //        mainPane.getStylesheets().add(backgroundSetting.get
+        // (registerTableFontData.background));
 
         updateRegisterAndRAMDisplays();
     }
@@ -3113,17 +3284,20 @@ public class DesktopController implements Initializable {
         for (MenuItem menuItem : fileMenu.getItems()) {
             if (menuItem.getText() == null) {
                 // it's just a separator line
-            } else if (menuItem.getText().equals("Quit")) {
+            }
+            else if (menuItem.getText().equals("Quit")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Q,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.DOWN));
+                        ModifierValue.DOWN));
 
-            } else
+            }
+            else {
                 menuItems.add(menuItem);
+            }
         }
 
         //put appropriate menu items from the edit menu into the array and
@@ -3136,82 +3310,91 @@ public class DesktopController implements Initializable {
             else if (menuItem.getText().equals("Delete")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.DELETE,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP));
+                        ModifierValue.UP));
             }
             // Undo: SHORTCUT-Z
             else if (menuItem.getText().equals("Undo")) {
-                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
-                        KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
-                        KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
-                        KeyCodeCombination.
-                                ModifierValue.DOWN));
+                menuItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+Z"));
+
+//                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN));
             }
             // Redo: SHORTCUT-Shift-Z
             else if (menuItem.getText().equals("Redo")) {
-                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
-                        KeyCodeCombination.
-                                ModifierValue.DOWN, KeyCodeCombination.ModifierValue.UP,
-                        KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
-                        KeyCodeCombination.
-                                ModifierValue.DOWN));
+                menuItem.setAccelerator(KeyCombination.valueOf("SHORTCUT+SHIFT+Z"));
+
+//                menuItem.setAccelerator(new KeyCodeCombination(KeyCode.Z,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+//                        KeyCodeCombination.
+//                        ModifierValue.DOWN));
             }
             // Cut: SHORTCUT-X
             else if (menuItem.getText().equals("Cut")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.X,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.DOWN));
+                        ModifierValue.DOWN));
             }
             // Copy: SHORTCUT-C
             else if (menuItem.getText().equals("Copy")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.C,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.DOWN));
+                        ModifierValue.DOWN));
             }
-            // Paste: SHORTCUT-Y
+            // Paste: SHORTCUT-V
             else if (menuItem.getText().equals("Paste")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.V,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.DOWN));
-            } else if (menuItem.getText().equals("Select All")) {
+                        ModifierValue.DOWN));
+            }
+            else if (menuItem.getText().equals("Select All")) {
                 menuItem.setAccelerator(new KeyCodeCombination(KeyCode.A,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
+                        ModifierValue.UP, KeyCodeCombination.ModifierValue.UP,
                         KeyCodeCombination.
-                                ModifierValue.DOWN));
-            } else
+                        ModifierValue.DOWN));
+            }
+            else {
                 menuItems.add(menuItem);
+            }
         }
 
         //get appropriate menu items (all fo them) from the rest of the menu items
         for (MenuItem menuItem : modifyMenu.getItems()) {
-            if (menuItem.getText() != null)
+            if (menuItem.getText() != null) {
                 menuItems.add(menuItem);
+            }
         }
 
         for (MenuItem menuItem : executeMenu.getItems()) {
-            if (menuItem.getText() != null)
+            if (menuItem.getText() != null) {
                 menuItems.add(menuItem);
+            }
         }
 
         for (MenuItem menuItem : helpMenu.getItems()) {
@@ -3220,8 +3403,9 @@ public class DesktopController implements Initializable {
 
         //bind the key proper keycode to the every menu item
         for (MenuItem menuItem : menuItems) {
-            if (keyBindings.containsKey(menuItem.getText()))
+            if (keyBindings.containsKey(menuItem.getText())) {
                 keyBindings.get(menuItem.getText()).bindToMenuItem(menuItem);
+            }
         }
     }
 
@@ -3229,7 +3413,7 @@ public class DesktopController implements Initializable {
     /**
      * returns the current key bindings for the menu items
      *
-     * @returns the current key bindings for the menu items
+     * @return the current key bindings for the menu items
      */
     public Map<String, KeyCodeInfo> getKeyBindings() {
         return keyBindings;
@@ -3254,8 +3438,9 @@ public class DesktopController implements Initializable {
     public void highlightToken(Token token) {
         File file = new File(token.filename);
         if (!file.canRead()) {
-            Dialogs.createErrorDialog(stage, "IO Error", "CPU Sim could not find the file to open and "
-                    + "highlight: " + file.getAbsolutePath()).showAndWait();
+            Dialogs.createErrorDialog(stage, "IO Error", "CPU Sim could not find the " +
+                    "file to open and " + "highlight: " + file.getAbsolutePath())
+                    .showAndWait();
             return;
         }
         InlineStyleTextArea textArea = (InlineStyleTextArea) getTabForFile(file)
@@ -3272,11 +3457,11 @@ public class DesktopController implements Initializable {
     }
 
 
-
     /**
      * A class to hold all other preference settings
      */
-    public class OtherSettings {
+    public class OtherSettings
+    {
         public boolean autoSave;
         public SimpleBooleanProperty showLineNumbers;
         public boolean clearConsoleOnRun;
@@ -3292,12 +3477,13 @@ public class DesktopController implements Initializable {
                     return;
                 }
                 StyledTextArea codeArea = (StyledTextArea) t.getContent();
-                LineNumAndBreakpointFactory lFactory =
-                        (LineNumAndBreakpointFactory) codeArea.getParagraphGraphicFactory();
+                LineNumAndBreakpointFactory lFactory = (LineNumAndBreakpointFactory)
+                        codeArea.getParagraphGraphicFactory();
 
                 if (newVal) { // show line numbers
                     lFactory.setFormat(digits -> "%" + digits + "d");
-                } else { // hide line numbers
+                }
+                else { // hide line numbers
                     lFactory.setFormat(digits -> "");
                 }
             });

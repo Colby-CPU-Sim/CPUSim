@@ -35,7 +35,6 @@ public class Main {
     
 	// Main entry point
     public static void main(String[] argv) {
-
         // deal with the command line params first
         String machineFileName = "";
         String textFileName = "";
@@ -77,8 +76,8 @@ public class Main {
      * @param machineFileName the name of the file containing the machine
      * @param textFileName the name of the file containing the program
      */
-    public static void loadAndRunInCommandLineMode(
-    		String machineFileName, String textFileName) {
+    private static void loadAndRunInCommandLineMode(String machineFileName, String
+            textFileName) {
     	
     	// Give error when appropriate
         if(machineFileName.equals("") || textFileName.equals("")) {

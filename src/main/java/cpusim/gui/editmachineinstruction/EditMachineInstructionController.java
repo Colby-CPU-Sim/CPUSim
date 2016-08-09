@@ -370,6 +370,7 @@ public class EditMachineInstructionController {
                     }
                 }
                 if (className.equals("comment")) {
+                    // we want Comment micros used in only one place so create a new one
                     micro = new Comment();
                     micro.setName(microName);
                 }
@@ -611,6 +612,12 @@ public class EditMachineInstructionController {
         ObservableList<Microinstruction> microCopies = FXCollections
                 .observableArrayList();
         for (Microinstruction micro : currentInstr.getMicros()) {
+            if( micro instanceof Comment) {
+                // create a clone of it since we want each Comment used only one place
+                String contents = micro.getName();
+                micro = new Comment();
+                micro.setName(contents);
+            }
             microCopies.add(micro);
         }
         newMI.setMicros(microCopies);
@@ -1098,8 +1105,8 @@ public class EditMachineInstructionController {
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
             if (micro instanceof Comment){
-                microLabel.setStyle("-fx-font-family:Courier; -fx-text-fill:gray; " +
-                        "--fx-font-style:italic;");
+                microLabel.setStyle("-fx-font-family:Monaco; -fx-text-fill:gray; " +
+                        "-fx-font-style:italic;");
                 commentLabel = true;
             }
             else {

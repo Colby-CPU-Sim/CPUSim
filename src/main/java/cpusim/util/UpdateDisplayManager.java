@@ -2,10 +2,7 @@ package cpusim.util;
 
 import cpusim.Machine;
 import cpusim.Mediator;
-import cpusim.Microinstruction;
 import cpusim.gui.desktop.DesktopController;
-import cpusim.microinstruction.IO;
-import cpusim.module.ControlUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -48,6 +45,7 @@ public class UpdateDisplayManager
         }
         else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
+                newStateWrapper.getState() == Machine.State.BREAK ||
                 newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED) {
             Platform.runLater(() -> {
                 updateDesktop(false);

@@ -8,11 +8,7 @@ import cpusim.gui.util.Base;
 import cpusim.gui.util.EditingMultiBaseStyleLongCell;
 import cpusim.module.RAM;
 import cpusim.module.RAMLocation;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -41,15 +37,13 @@ public class RamTableController implements Initializable {
     @FXML TableColumn<RAMLocation,Long> address;
     @FXML TableColumn<RAMLocation,Long> data;
     
-    RAM ram;
-    ObservableList<RAMLocation> ramLocations;
+    private RAM ram;
+    private ObservableList<RAMLocation> ramLocations;
 
-    String title;
+    private String title;
     
-    Base valBase;
-    Base addrBase;
-
-    int breakRow;
+    private Base valBase;
+    private Base addrBase;
 
     private DesktopController desktop;
 
@@ -58,7 +52,6 @@ public class RamTableController implements Initializable {
         this.ram = ram;
         this.ramLocations = ram.data();
         this.title = title;
-        breakRow = -1;
     }
 
     /**
@@ -211,16 +204,6 @@ public class RamTableController implements Initializable {
         return this.ram;
     }
 
-    public void setBreakRow(int row)
-    {
-        breakRow = row;
-    }
-
-    public void clearBreakRow()
-    {
-        breakRow = -1;
-    }
-
     //------------------------------
     //	highlights the rows with the given addresses
     //  If an address is out of range, it does nothing with that value.
@@ -238,16 +221,23 @@ public class RamTableController implements Initializable {
             if (address >= 0 && address < length) {
                 table.getSelectionModel().select(address);
                 table.scrollTo(address-4>=0? address-4 : 0);
-
             }
     }
-    
-    public void highlightBreak(int breakAddress)
-    {
+
+    /**
+     * highlights or unhighlights the row at the given breakAddress.
+     * @param breakAddress the address of the cell to be highlighted or unhighlighted
+     * @param select if true, select the cell otherwise unselect the cell
+     */
+    public void highlightBreakInRAM(int breakAddress, boolean select) {
         if(breakAddress >= 0 && breakAddress < ram.getLength()) {
-            int row = breakAddress;
-            setBreakRow(row);
-            table.scrollTo(row);
+            if( select) {
+                table.getSelectionModel().select(breakAddress);
+                table.scrollTo(breakAddress);
+            }
+            else {
+                table.getSelectionModel().clearSelection(breakAddress);
+            }
         }
     }
     

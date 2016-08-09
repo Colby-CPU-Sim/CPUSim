@@ -7,13 +7,11 @@ package cpusim.util;
 
 import cpusim.Machine;
 import cpusim.Microinstruction;
-import cpusim.gui.desktop.DesktopController;
 import cpusim.microinstruction.IO;
 import cpusim.module.ControlUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.control.TextArea;
 import org.fxmisc.richtext.StyledTextArea;
 
 /**
@@ -65,7 +63,8 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
                 }
             }
         }
-        else if (newStateWrapper.getState() == Machine.State.EXECUTION_HALTED) {
+        else if (newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
+                newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
             Platform.runLater(() -> ioConsole.setStyle("-fx-background-color: white"));
             if (((boolean) newStateWrapper.getValue())) {
                 // halt bits are set so the halt is normal
@@ -77,7 +76,6 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
         //   "never run" --initial state when machine is loaded
         //	 "start of machine cycle"
         //   "break"
-        //   "halted step by micro"
     }
 
 

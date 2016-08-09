@@ -14,18 +14,17 @@ import cpusim.gui.util.StyledListCell;
 import cpusim.util.BackupManager;
 import cpusim.util.CPUSimConstants;
 import cpusim.util.OutlineChangesManager;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -33,34 +32,43 @@ import javafx.scene.input.KeyCombination;
 /**
  * A tool bar used for debug mode.
  */
-public class DebugToolBarController extends ToolBar
-        implements Initializable, CPUSimConstants, ChangeListener<Machine.StateWrapper> {
-    @FXML Button goButton;
-    @FXML Button stepByInstrButton;
-    @FXML Button stepByMicroButton;
-    @FXML Button backupMachineInstrButton;
-    @FXML Button backupMicroInstrButton;
-    @FXML Button startOverButton;
-    @FXML Label currentInstrLabel;
-    @FXML ListView<Microinstruction> currentMicrosList;
+public class DebugToolBarController extends ToolBar implements Initializable,
+        CPUSimConstants, ChangeListener<Machine.StateWrapper>
+{
+    @FXML
+    Button goButton;
+    @FXML
+    Button stepByInstrButton;
+    @FXML
+    Button stepByMicroButton;
+    @FXML
+    Button backupMachineInstrButton;
+    @FXML
+    Button backupMicroInstrButton;
+    @FXML
+    Button startOverButton;
+    @FXML
+    Label currentInstrLabel;
+    @FXML
+    ListView<Microinstruction> currentMicrosList;
 
-    private static final KeyCodeCombination GO_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.G, KeyCombination.ALT_DOWN, KeyCombination
-                    .SHORTCUT_DOWN);
-    private static final KeyCodeCombination STEP_BY_INSTR_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.I, KeyCombination.ALT_DOWN, KeyCombination
-                    .SHORTCUT_DOWN);
-    private static final KeyCodeCombination STEP_BY_MICRO_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.M, KeyCombination.ALT_DOWN, KeyCombination
-                    .SHORTCUT_DOWN);
-    private static final KeyCodeCombination BACKUP_BY_INSTR_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.B, KeyCombination.ALT_DOWN, KeyCombination
-                    .SHORTCUT_DOWN);
-    private static final KeyCodeCombination BACKUP_BY_MICRO_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN, KeyCombination
-                    .SHORTCUT_DOWN);
-    private static final KeyCodeCombination START_OVER_ACCELERATOR =
-            new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCodeCombination GO_ACCELERATOR = new KeyCodeCombination
+            (KeyCode.G, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN);
+    private static final KeyCodeCombination STEP_BY_INSTR_ACCELERATOR = new
+            KeyCodeCombination(KeyCode.I, KeyCombination.ALT_DOWN, KeyCombination
+            .SHORTCUT_DOWN);
+    private static final KeyCodeCombination STEP_BY_MICRO_ACCELERATOR = new
+            KeyCodeCombination(KeyCode.M, KeyCombination.ALT_DOWN, KeyCombination
+            .SHORTCUT_DOWN);
+    private static final KeyCodeCombination BACKUP_BY_INSTR_ACCELERATOR = new
+            KeyCodeCombination(KeyCode.B, KeyCombination.ALT_DOWN, KeyCombination
+            .SHORTCUT_DOWN);
+    private static final KeyCodeCombination BACKUP_BY_MICRO_ACCELERATOR = new
+            KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN, KeyCombination
+            .SHORTCUT_DOWN);
+    private static final KeyCodeCombination START_OVER_ACCELERATOR = new
+            KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN, KeyCombination
+            .SHORTCUT_DOWN);
 
 
     private Machine machine;
@@ -70,10 +78,11 @@ public class DebugToolBarController extends ToolBar
 
     /**
      * Constructor
+     *
      * @param mediator mediator with the current machine
-     * @param desktop the desktop controller
+     * @param desktop  the desktop controller
      */
-    public DebugToolBarController(Mediator mediator, DesktopController desktop){
+    public DebugToolBarController(Mediator mediator, DesktopController desktop) {
         this.machine = mediator.getMachine();
         this.backupManager = mediator.getBackupManager();
         this.outlineChangesManager = new OutlineChangesManager(backupManager, desktop);
@@ -91,6 +100,7 @@ public class DebugToolBarController extends ToolBar
 
     /**
      * initialize the tool bar
+     *
      * @param url the location used to resolve relative paths for the root
      *            object, or null if the location is not known.
      * @param rb  the resources used to localize the root object, or null if the root
@@ -105,12 +115,12 @@ public class DebugToolBarController extends ToolBar
      * enable or disable any buttons to continue execution.
      * While the current execute thread is executing, we don't want the user
      * to start another new thread executing before the first finishes, so we
-     * disable the two buttons until the thread finishes.
+     * disable the buttons until the thread finishes.
      *
      * @param disable true if we want to disable the buttons.
      */
-    public void setDisableAllButtons(boolean disable)
-    {
+    public void setDisableAllButtons(boolean disable) {
+        // this method is called only in the changed method
         goButton.setDisable(disable);
         stepByInstrButton.setDisable(disable);
         stepByMicroButton.setDisable(disable);
@@ -121,52 +131,59 @@ public class DebugToolBarController extends ToolBar
 
     /**
      * run the program that is assembled.
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onGoButtonClick(ActionEvent e){
+    public void onGoButtonClick(ActionEvent e) {
         machine.execute(Machine.RunModes.RUN_AND_FIRE_CYCLES);
     }
 
     /**
      * steps by one machine instruction
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onStepByInstrClick(ActionEvent e){
+    public void onStepByInstrClick(ActionEvent e) {
         machine.execute(Machine.RunModes.STEP_BY_INSTR);
     }
 
     /**
      * steps by one micro instruction
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onStepByMicroClick(ActionEvent e){
+    public void onStepByMicroClick(ActionEvent e) {
         machine.execute(Machine.RunModes.STEP_BY_MICRO);
     }
 
     /**
      * back up one machine instruction
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onBackupMachineInstrClick(ActionEvent e){
+    public void onBackupMachineInstrClick(ActionEvent e) {
         // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMachineInstruction();
         machine.getControlUnit().reset();
+        machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();
         enableForwardButtons();
     }
 
     /**
      * back up one micro instruction
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onBackupMicroInstrClick(ActionEvent e){
+    public void onBackupMicroInstrClick(ActionEvent e) {
         // Can't back up the IO Channels--this is mentioned in user manual.
         backupManager.backupOneMicroInstruction();
+        machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();
         outlineChangesManager.updateOutlines();
         enableForwardButtons();
@@ -174,21 +191,24 @@ public class DebugToolBarController extends ToolBar
 
     /**
      * start over the running program
+     *
      * @param e a type of action when a button is clicked.
      */
     @FXML
-    public void onStartOverClick(ActionEvent e){
+    public void onStartOverClick(ActionEvent e) {
         backupManager.backupAllTheWay();
         machine.getControlUnit().reset();
         machine.resetAllChannels();
         updateDisplay();
         enableForwardButtons();
     }
-    
+
     /**
      * enable all debug buttons that go forward in the program
      */
-    private void enableForwardButtons(){
+    private void enableForwardButtons() {
+        // this method is used only by the backup by instr, backup by micro and
+        // start over buttons when they've been clicked
         this.goButton.setDisable(false);
         this.stepByInstrButton.setDisable(false);
         this.stepByMicroButton.setDisable(false);
@@ -197,18 +217,20 @@ public class DebugToolBarController extends ToolBar
     /**
      * included for backward compatability
      */
-    public void updateDisplay()
-    {
+    public void updateDisplay() {
         updateDisplay(false, false);
     }
-    
+
     /**
-     * This method exists if the machine needs to be updated before the display gets updated
-     * @param newToolbar true if opening a new toolbar
+     * This method exists if the machine needs to be updated before the display gets
+     * updated
+     *
+     * @param newToolbar     true if opening a new toolbar
      * @param outlineChanges true of the outline has been changed
-     * @param mediator new mediator containing the new machine
+     * @param mediator       new mediator containing the new machine
      */
-    public void updateDisplay(boolean newToolbar, boolean outlineChanges, Mediator mediator){
+    public void updateDisplay(boolean newToolbar, boolean outlineChanges, Mediator
+            mediator) {
         this.machine = mediator.getMachine();
         updateDisplay(newToolbar, outlineChanges);
     }
@@ -218,13 +240,13 @@ public class DebugToolBarController extends ToolBar
      * and enables or disables the appropriate buttons and tells the
      * desktop to highlight the appropriate RAM cells if at the start of
      * the fetch sequence.
-     * @param newToolbar whether opening a new tool bar
+     *
+     * @param newToolbar     whether opening a new tool bar
      * @param outlineChanges whether the outline has changed
      */
-    public void updateDisplay(boolean newToolbar, boolean outlineChanges)
-    {
-        MachineInstruction currentInstruction =
-                machine.getControlUnit().getCurrentInstruction();
+    public void updateDisplay(boolean newToolbar, boolean outlineChanges) {
+        MachineInstruction currentInstruction = machine.getControlUnit()
+                .getCurrentInstruction();
         currentMicrosList.setItems(currentInstruction.getMicros());
         currentInstrLabel.setText(currentInstruction.getName() + ": ");
 
@@ -233,10 +255,10 @@ public class DebugToolBarController extends ToolBar
         if (index == currentMicrosList.getItems().size() - 1) {
             currentMicrosList.scrollTo(index + 1);
         }
-        else if (index == 0){
-            if (newToolbar == false){
+        else if (index == 0) {
+            if (newToolbar == false) {
                 currentMicrosList.scrollTo(-1);
-        }
+            }
         }
         else {
             //ensure that index row is the middle one of the three visible rows
@@ -256,12 +278,13 @@ public class DebugToolBarController extends ToolBar
             backupMachineInstrButton.setDisable(true);
             startOverButton.setDisable(true);
         }
-
-        if (index == 0 &&
-                machine.getFetchSequence() == currentInstruction)
+        // Can this next if stmt be commented out because the start of cycle values are already saved
+        // whenever the machine state is START_OF_MACHINE_CYCLE in HighlightManager.changed()?
+        if (index == 0 && machine.getFetchSequence() == currentInstruction) {
             desktop.getHighlightManager().saveStartOfCycleValues();
+        }
         desktop.getHighlightManager().highlightCellsAndText();
-        if( outlineChanges) {
+        if (outlineChanges) {
             outlineChangesManager.updateOutlines();
         }
         else {
@@ -271,77 +294,48 @@ public class DebugToolBarController extends ToolBar
     }
 
     /**
-     *  clear all the outlines in both tables
+     * clear all the outlines in both tables
      */
-    public void clearAllOutlines(){
+    public void clearAllOutlines() {
         outlineChangesManager.clearAllOutlines();
     }
 
-    
-    //added in by Ben Borchard on 2/25/14 to make sure that the execution is halted by a halt bit even
+
+    //added in by Ben Borchard on 2/25/14 to make sure that the execution is halted by
+    // a halt bit even
     //when stepping by Micro (and therefore halting after every micro)
-    
+
     /**
      * Receive notifications that a module
      * has modified a property. This method is called within the
      * run thread and so any GUI events it generates need to be called
      * using invokeLater
-     * @param stateWrapper the variable that is being listened
+     *
+     * @param machineState    the variable that is being listened
      * @param oldStateWrapper the value of the state before changed
      * @param newStateWrapper the new state object
      */
     @Override
-    public void changed(ObservableValue<? extends Machine.StateWrapper> stateWrapper,
-                        Machine.StateWrapper oldStateWrapper, Machine.StateWrapper newStateWrapper) {
-        
-        //don't do any of these things unless we are in debug mode
-        if(this.desktop.getInDebugMode()){
-        
-            if ((newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
-                    newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO)
-                    && ((boolean) newStateWrapper.getValue())) {    
+    public void changed(ObservableValue<? extends Machine.StateWrapper> machineState,
+                        Machine.StateWrapper oldStateWrapper, Machine.StateWrapper
+                                    newStateWrapper) {
 
-                    //enable all buttons except for the forward buttons because we have
-                    //reached the end of execution
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDisableAllButtons(false);
-                            stepByInstrButton.setDisable(true);
-                            stepByMicroButton.setDisable(true);
-                            goButton.setDisable(true);
-                        }
-                    });
-            }
-            else if (newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
+        //don't do any of these things unless we are in debug mode
+        if (this.desktop.getInDebugMode()) {
+
+            //System.out.println("new: " + newStateWrapper);
+
+            if (newStateWrapper.getState() == Machine.State.START_OF_EXECUTE_THREAD) {
                 //disable all buttons after at the start of execution
-                Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDisableAllButtons(true);
-                        }
-                    });
+                Platform.runLater(() -> setDisableAllButtons(true));
             }
             else if (newStateWrapper.getState() == Machine.State.EXCEPTION_THROWN ||
                     newStateWrapper.getState() == Machine.State.EXECUTION_HALTED ||
-                    newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED) {
-                //enable all buttons after a execution finished
-                Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDisableAllButtons(false);
-                        }
-                    });
-            }
-
-            else if (newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
-                //enable all buttons after a execution finished
-                Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDisableAllButtons(false);
-                        }
-                    });
+                    newStateWrapper.getState() == Machine.State.BREAK ||
+                    newStateWrapper.getState() == Machine.State.EXECUTION_ABORTED ||
+                    newStateWrapper.getState() == Machine.State.HALTED_STEP_BY_MICRO) {
+                //enable all buttons after execution finished
+                Platform.runLater(() -> setDisableAllButtons(false));
             }
         }
     }

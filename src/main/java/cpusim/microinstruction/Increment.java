@@ -151,7 +151,7 @@ public class Increment extends Microinstruction{
     {
         BigInteger bigValue = BigInteger.valueOf(register.get().getValue());
         BigInteger bigDelta = BigInteger.valueOf(delta.get());
-        BigInteger bigResult = null;
+        BigInteger bigResult;
 
         bigResult = bigValue.add(bigDelta);
 
@@ -163,8 +163,8 @@ public class Increment extends Microinstruction{
             overflowBit.get().set(1);
 
         if ((bigValue.intValue() < 0 && bigDelta.intValue() < 0) ||
-                        (bigValue.intValue() < 0 && bigDelta.intValue() > bigValue.intValue()) ||
-                        (bigDelta.intValue() < 0 && bigValue.intValue() > bigDelta.intValue()))
+                        (bigValue.intValue() < 0 && bigDelta.intValue() >= -bigValue.intValue()) ||
+                        (bigDelta.intValue() < 0 && bigValue.intValue() >= -bigDelta.intValue()))
             carryBit.get().set(1);
 
         //set destination's value to the result

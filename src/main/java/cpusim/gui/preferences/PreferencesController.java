@@ -41,14 +41,11 @@ import cpusim.gui.desktop.editorpane.CodePaneController;
 import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.help.HelpController;
 import cpusim.util.Dialogs;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -80,6 +77,12 @@ public class PreferencesController implements Initializable {
     ColorPicker registersBackground;
     @FXML
     ColorPicker ramsBackground;
+    @FXML
+    ColorPicker assmSelection;
+    @FXML
+    ColorPicker registersSelection;
+    @FXML
+    ColorPicker ramsSelection;
 
     @FXML
     CheckBox instrsBold;
@@ -209,7 +212,8 @@ public class PreferencesController implements Initializable {
      * in the desktopController
      */
     private void initializeFontTab() {
-        // initialize the font family, font size, and background color for all panes
+        // initialize the font family, font size, background color and
+        // selection color for all panes
         FontData assmFontData =
                 desktopController.getAssemblyPaneFontData();
         FontData registerTableFontData =
@@ -220,14 +224,17 @@ public class PreferencesController implements Initializable {
         assmFont.setValue(assmFontData.font);
         assmFontSize.setValue(assmFontData.fontSize);
         assmBackground.setValue(Color.web(assmFontData.background));
+        assmSelection.setValue(Color.web(assmFontData.selection));
 
         registersFont.setValue(registerTableFontData.font);
         registersFontSize.setValue(registerTableFontData.fontSize);
         registersBackground.setValue(Color.web(registerTableFontData.background));
+        registersSelection.setValue(Color.web(registerTableFontData.selection));
 
         ramsFont.setValue(ramTableFontData.font);
         ramsFontSize.setValue(ramTableFontData.fontSize);
         ramsBackground.setValue(Color.web(ramTableFontData.background));
+        ramsSelection.setValue(Color.web(ramTableFontData.selection));
 
         // initialize the settings for styles for the parts of an assembly language
         // program
@@ -350,12 +357,17 @@ public class PreferencesController implements Initializable {
         assmFontData.font = assmFont.getValue();
         assmFontData.fontSize = assmFontSize.getValue();
         assmFontData.background = toRGBCode(assmBackground.getValue());
+        assmFontData.selection = toRGBCode(assmSelection.getValue());
+
         registerTableFontData.font = registersFont.getValue();
         registerTableFontData.fontSize = registersFontSize.getValue();
         registerTableFontData.background = toRGBCode(registersBackground.getValue());
+        registerTableFontData.selection = toRGBCode(registersSelection.getValue());
+
         ramTableFontData.font = ramsFont.getValue();
         ramTableFontData.fontSize = ramsFontSize.getValue();
         ramTableFontData.background = toRGBCode(ramsBackground.getValue());
+        ramTableFontData.selection = toRGBCode(ramsSelection.getValue());
 
         // save the assembly language styles
         saveAssemblyLanguageStyles();

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.collections.FXCollections?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import java.lang.*?>
 <?import java.net.URL?>
 
 <BorderPane fx:id="mainBorderPane" prefHeight="550.0" prefWidth="600.0" styleClass="root"
@@ -186,7 +186,7 @@
                                 onAction="#onApplyButtonClicked"
                                 styleClass="roundButton" text="      Apply      ">
                         </Button>
-                        <Button fx:id="okayButton" defaultButton="true" minHeight="30"
+                        <Button fx:id="OKButton" defaultButton="true" minHeight="30"
                                 mnemonicParsing="false" onAction="#onOKButtonClicked"
                                 styleClass="roundBlueButton" text="         OK         ">
                         </Button>

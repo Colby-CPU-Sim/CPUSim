@@ -21,6 +21,10 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.net.URL;
+import java.util.List;
+
 /**
  * A class to start the GUI. This is used every time 
  * the application is used unless it is run in command line mode.
@@ -33,7 +37,7 @@ public class GUIMain extends Application {
 	@Override
 	public void start(Stage stage)
     {
-		List<String> params = getParameters().getRaw();
+        List<String> params = getParameters().getRaw();
 		
         //netbeans has an issue with running CPUSim from the command line
         // so if you use netbeans, you may need to set the the variables
@@ -82,6 +86,13 @@ public class GUIMain extends Application {
         else {
             deskController.open(new File(textFileName));
         }
+
+        // Fixes crash on Windows 10 systems with Intel Chips
+        // See http://stackoverflow.com/questions/31786980/javafx-windows-10-combobox-error
+        // Setting this property will prevent automatic screen readers from working wth the application
+        // and may disable other similar accessibility features
+        System.setProperty("glass.accessible.force", "false");
+
 
         stage.show();
 	}
