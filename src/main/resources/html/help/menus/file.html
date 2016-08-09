@@ -1,0 +1,240 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type"
+	CONTENT="text/html; charset=windows-1252">
+
+<TITLE>The File Menu</TITLE>
+
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080" BGCOLOR="#FFFFFF">
+
+	<h3 ALIGN="CENTER">
+		<B><FONT FACE="Arial" COLOR="#0000ff">The File Menu</font></B>
+	</h3>
+	<P>
+		<FONT FACE="Palatino">The <B>File</B> menu (see Figure 10)
+			provides the usual items for loading new or existing machines,
+			opening or closing text windows containing assembly language
+			programs, printing and displaying information about the machine or
+			programs, and exiting CPU Sim.
+		</FONT>
+	</P>
+	<P class="p3" ALIGN="CENTER">
+		<FONT FACE="Palatino"><IMG border="1px" src="./FileMenu.png"
+			HEIGHT="467" WIDTH="220"></FONT><FONT FACE="Palatino"><BR>
+			<br> Figure 10. The File menu.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Note:</FONT>
+	</P>
+	<OL>
+
+		<LI><FONT FACE="Palatino">When a CPU Sim machine is saved
+				to a file, all the parts are saved, including the hardware
+				components (registers, register arrays, condition bits, RAMs), the
+				microinstructions, the fetch sequence, and the machine instructions.
+				The file also saves the global EQUs, the highlighting, loading, and IO
+				connection options chosen by the user (from the <B>Options</B>
+				submenu under the <B>Execute</B> menu), and the user preferences for
+				punctuation characters, such as the comment, label, and
+				pseudoinstruction characters. However, the state of the machine is
+				not saved; in particular, the current contents of the registers and
+				RAMs are not saved.
+		</FONT></LI>
+		<LI><FONT FACE="Palatino">CPU Sim machines are saved in a
+				text file in XML format, which means that you can edit the saved
+				machine from any text editor (including CPU Sim's built-in text
+				editor). But you must be careful that the edited file still fulfills
+				the data type definition (DTD) of a CPU Sim machine file or CPU Sim
+				will not be able to load your edited machine. (Note: the DTD is
+				included as part of the XML file.)</FONT></LI>
+		<LI><font face="Palatino">On Macintoshes, the &quot;Exit
+				CPU Sim&quot; menu item is not in the File menu and instead is moved
+				to the Application menu (the leftmost menu, entitled &quot;CPU
+				Sim&quot;).</font></LI>
+	</OL>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">New text</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;New text&quot; menu item causes CPU Sim
+			to create and open an empty text window in which the user can type a
+			new assembly language program. </FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The text window is like any basic text
+			editor window, including the usual cutting, copying, and pasting and an
+			arbitrary number of undo's and redo's.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The text window that appears can be
+			changed (font, font size, background color, etc.) by editing the
+			preferences in the <A HREF="../windows/preferences.html">Preferences
+				dialog</A> from the <A HREF="l">Edit menu</A>.
+		</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Open text...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Open text...&quot; menu item displays a
+			dialog box asking you to choose a file. You will normally select a text
+			file in which you had previously saved an assembly language program.</FONT>
+	</P>
+	<P>
+		<I><B><FONT FACE="Arial" COLOR="#0000ff">Reopen text</FONT></B></I>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Reopen text&quot; menu contains a list of
+			the 10 most recently opened text files. This list is saved on your computer between
+			sessions, so that when you quit CPU Sim and restart it later, the
+			&quotReopen text&quot; menu will be populated with the same list as it had
+			when you quit CPU Sim.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Close text</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Close text&quot; menu item closes the
+			selected text tab. If the contents of the window have been changed
+			since the window was last saved, the user is presented with a dialog
+			box asking whether you wish to save the contents first.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Save text</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Save text&quot; menu item saves the
+			contents of the selected tab to a text file. If the user has not
+			already saved the contents to a file, a dialog box is displayed
+			asking the user to select a name and location for the file.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Save text
+					as...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Save text as...&quot; menu item displays
+			a dialog box asking you to choose a file into which the contents of
+			the selected tab will be saved.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Open/Save RAM</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Open RAM&quot; and &quot;Save RAM&quot; menu items
+			open submenus, which each have items for opening/saving (whichever is
+			applicable) from each of the RAMs in the current machine. If there is
+			only one RAM in your machine, there will only be one option for
+			opening/saving in each submenu. Opening into a certain RAM will
+			allow the user to pick a .mif or .hex file to open into the specified
+			RAM. Saving from a specified RAM will pop up a Dialog asking the user
+			to choose how they would like the RAM saved. It can be saved in 
+			either .mif or .hex format.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">New machine</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;New machine&quot; menu item causes CPU
+			Sim to create a new machine with no hardware (registers, register
+			arrays, condition bits, or RAMs), no machine instructions, and only
+			one microinstruction ("End"). </FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Open
+					machine...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Open machine...&quot; menu item displays
+			a dialog box asking you to choose a file. You should select a file in
+			which you had previously saved a machine through the use of the &quot;Save
+			machine&quot; or &quot;Save machine as...&quot; menu items. </FONT>
+	</P>
+	<P>
+		<I><B><FONT FACE="Arial" COLOR="#0000ff">Reopen machine</FONT></B></I>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Reopen machine&quot; menu contains a list
+			of the 10 most recently opened machine files. This list is saved
+            on your computer
+			between sessions, so that when you quit CPU Sim and restart it later,
+			the &quot;Reopen machine&quot; menu will be populated with the same
+			list as it had when you quit CPU Sim.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Save machine</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Save machine&quot; menu item saves the
+			current machine in a text file in XML format. If the current machine
+			has never been saved to a file before, a dialog box appears asking
+			you to type in the name of the file into which the machine will be
+			saved.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Save machine
+					as...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Save machine as...&quot; menu item
+			presents you with a dialog box asking you to type in the name of the
+			file into which the machine will be saved.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Save machine
+					in HTML...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Save machine in HTML...&quot; menu item
+			creates a new HTML document containing a user-friendly description of
+			the current machine, including all its details. The HTML document can
+			be opened and viewed using any web browser.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Page setup...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Print Setup...&quot; menu item brings up
+			the usual page setup dialog, from which you can set the page size,
+			reduction or enlargement, and other printing options.  Currently,
+		only the page orientation (portrait vs landscape) feature works.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Print...</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Print...&quot; menu item brings up the
+			usual print dialog for printing the contents of the selected
+			assembly language window in the center of the main desktop.  To print
+			the contents in a smaller or larger font, change the font used by
+			the assembly language window using the
+			<a href="../windows/preferences.html">Preferences dialog</a>.
+			Note that
+		the printer does not wrap the text, regardless of whether the window wraps
+		the text.  Therefore, if a line is too long, the characters at the end of
+		the line will not be printed.  To indicate that such truncation has
+		occurred, a small rectangle will appear in the upper left corner of the
+		printout over the first few line numbers if you are printing the line
+		numbers.</FONT>
+	</P>
+	<P>
+		<B><I><FONT FACE="Arial" COLOR="#0000ff">Quit</FONT></I></B>
+	</P>
+	<P>
+		<FONT FACE="Palatino">The &quot;Quit&quot; menu item causes CPU
+			Sim to quit. If changes have been made to the currently loaded
+			machine since the last time you saved it, CPU Sim asks you whether
+			you want to save the current machine before quitting. Similarly, if
+			changes have been made to any open assembly language window since the last time
+			you saved it, CPU Sim asks you whether you want to save the contents
+			before quitting.</FONT>
+	</P>
+	<P>
+		<FONT FACE="Palatino">Note that on Macintoshes, the &quot;Quit&quot;
+            menu item is not in the File menu and instead is moved
+			to the Application menu (the leftmost menu, entitled &quot;CPU
+			Sim&quot;).</FONT>
+	</P>
+</BODY>
+</HTML>

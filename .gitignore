@@ -1,29 +1,26 @@
+# Java
+
+*.jar
+*.class
+*.war
+
+*.bak
+
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 
 *.iml
+*.ipr
+*.iws
 
 ## Directory-based project format:
 .idea/
-# if you remove the above rule, at least ignore the following:
+.gradle/
 
-# User-specific stuff:
-# .idea/workspace.xml
-# .idea/tasks.xml
-# .idea/dictionaries
+## Binary directories:
 
-# Sensitive or high-churn files:
-# .idea/dataSources.ids
-# .idea/dataSources.xml
-# .idea/sqlDataSources.xml
-# .idea/dynamic.xml
-# .idea/uiDesigner.xml
-
-# Gradle:
-# .idea/gradle.xml
-# .idea/libraries
-
-# Mongo Explorer plugin:
-# .idea/mongoSettings.xml
+build/
+bin/
+out/
 
 ## File-based project format:
 *.ipr
@@ -38,9 +35,9 @@ out/
 .idea_modules/
 
 # JIRA plugin
-atlassian-ide-plugin.xml
+atlassian-ide-plugin.cpusim.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
+com_crashlytics_export_strings.cpusim.xml
 crashlytics.properties
 crashlytics-build.properties

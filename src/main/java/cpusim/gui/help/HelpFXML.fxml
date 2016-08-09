@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 in the following ways:
+
+1.) put in a globalInstr TreeItem under specifications under assembly language
+-->
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.web.WebView?>
+<?import java.lang.*?>
+<?import java.net.URL?>
+
+<BorderPane fx:id="helpPane" prefHeight="750.0" prefWidth="950.0" styleClass="root"
+            xmlns:fx="http://javafx.com/fxml">
+    <center>
+        <SplitPane dividerPositions="0.3" focusTraversable="true">
+            <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE">
+                <Tab fx:id="treeTab"  text="Files">
+                    <TreeView fx:id="treeView" >
+                        <TreeItem expanded="true" value="CPU Sim Help">
+                            <children>
+                                <TreeItem expanded="true"
+                                          value="General Help">
+                                    <children>
+                                        <TreeItem value="Using Help">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Introduction">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="A Tour of CPU Sim">
+                                            <children>
+                                                <TreeItem
+                                                        value="Part 1: Running CPU Sim">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Part 2: Creating New Machines">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Part 3: Modifying Existing Machines">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                            </children>
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                    </children>
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
+                                                   preserveRatio="false"
+                                                   smooth="false"/>
+                                        </ImageView>
+                                    </graphic>
+                                </TreeItem>
+                                <TreeItem value="Menus">
+                                    <children>
+                                        <TreeItem value="File Menu">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Edit Menu">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Modify Menu">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Execute Menu">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Help Menu">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                    </children>
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
+                                                   preserveRatio="false"
+                                                   smooth="false"/>
+                                        </ImageView>
+                                    </graphic>
+                                </TreeItem>
+                                <TreeItem value="Windows">
+                                    <children>
+                                        <TreeItem value="Desktop Window">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Machine Instruction Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Machine Instruction Fields Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Fetch Sequence Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Hardware Modules Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Hardware Modules Register Arrays Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Microinstructions Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="EQU Editor">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Preferences Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Options Dialog">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                    </children>
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
+                                                   preserveRatio="false"
+                                                   smooth="false"/>
+                                        </ImageView>
+                                    </graphic>
+                                </TreeItem>
+                                <TreeItem value="Other Features">
+                                    <children>
+                                        <TreeItem value="Global EQUs">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Debug Mode">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Keyboard Shortcuts">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                    </children>
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
+                                                   preserveRatio="false"
+                                                   smooth="false"/>
+                                        </ImageView>
+                                    </graphic>
+                                </TreeItem>
+                                <TreeItem value="Machine Specifications">
+                                    <children>
+                                        <TreeItem value="Names">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Fetch Sequence">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Machine Instructions">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem value="Fields">
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FileIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Hardware Modules">
+                                            <children>
+                                                <TreeItem
+                                                        value="Registers">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Register Arrays">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="RAMs">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Condition Bits">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                            </children>
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Microinstructions">
+                                            <children>
+                                                <TreeItem
+                                                        value="Arithmetic">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Branch">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Decode">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="End">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Increment">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="IO">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Logical">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="MemoryAccess">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Set">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="SetCondBit">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Shift">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Test">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Transfer">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                            </children>
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                        <TreeItem
+                                                value="Assembly Language">
+                                            <children>
+                                                <TreeItem value="Syntax">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value="Regular Instructions">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value=".data Statements">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value=".include Statements">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value=".ascii Statements">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem
+                                                        value=".global Statements">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="Macros">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                                <TreeItem value="EQUs">
+                                                    <graphic>
+                                                        <ImageView>
+                                                            <Image url="@/images/icons/FileIcon16x16.png"
+                                                                   preserveRatio="false"
+                                                                   smooth="false"/>
+                                                        </ImageView>
+                                                    </graphic>
+                                                </TreeItem>
+                                            </children>
+                                            <graphic>
+                                                <ImageView>
+                                                    <Image url="@/images/icons/FolderIcon16x16.png"
+                                                           preserveRatio="false"
+                                                           smooth="false"/>
+                                                </ImageView>
+                                            </graphic>
+                                        </TreeItem>
+                                    </children>
+                                    <graphic>
+                                        <ImageView>
+                                            <Image url="@/images/icons/FolderIcon16x16.png"
+                                                   preserveRatio="false"
+                                                   smooth="false"/>
+                                        </ImageView>
+                                    </graphic>
+                                </TreeItem>
+                            </children>
+                            <graphic>
+                                <ImageView>
+                                    <Image url="@/images/icons/FolderIcon16x16.png"
+                                           preserveRatio="false"
+                                           smooth="false"/>
+                                </ImageView>
+                            </graphic>
+                        </TreeItem>
+                    </TreeView>
+                </Tab>
+                <Tab fx:id="searchTab" text="Search">
+                    <GridPane fx:id="searchPane" styleClass="root">
+                        <HBox fx:id="searchBox" spacing="3"
+                              GridPane.rowIndex="0"
+                              GridPane.hgrow="ALWAYS" alignment="TOP_CENTER">
+                            <TextField fx:id="searchTF"
+                                       HBox.hgrow="ALWAYS" promptText="Search"
+                                       editable="true"
+                                       focusTraversable="true"/>
+                            <ComboBox fx:id="searchModeCB" value="Normal"
+                                      GridPane.halignment="RIGHT"
+                                      GridPane.valignment="CENTER">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Normal"/>
+                                        <String fx:value="Reg Expr"/>
+                                        <String fx:value="Whole Words"/>
+                                        <String fx:value="Match Case"/>
+                                        <String fx:value="Both"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                            <padding>
+                                <Insets top="3" right="3" left="3" bottom="3" />
+                            </padding>
+                        </HBox>
+                        <Label text=" Occurrence Count:  File Name" GridPane.hgrow="ALWAYS"
+                               alignment="CENTER" GridPane.rowIndex="1"/>
+                        <ListView fx:id="searchList" GridPane.rowIndex="2"
+                                GridPane.vgrow="ALWAYS" >
+                            <placeholder>
+                                <Label alignment="CENTER" text="No files found." />
+                            </placeholder>
+                        </ListView>
+                    </GridPane>
+                </Tab>
+            </TabPane>
+            <WebView fx:id="webView" />
+        </SplitPane>
+    </center>
+    <stylesheets>
+        <URL value="@../css/Dialogs.css"/>
+    </stylesheets>
+    <top>
+        <HBox id="HBox" alignment="CENTER"
+              spacing="10.0">
+            <padding>
+                <Insets top="5" bottom="5" left="5" right="5" />
+            </padding>
+            <Button id="previous" fx:id="backButton"  mnemonicParsing="false"
+                    onAction="#onBackButtonClicked" text="Back"/>
+            <Button id="nextButton" fx:id="forwardButton"  mnemonicParsing="false"
+                    onAction="#onForwardButtonClicked"  text="Forward"/>
+            <Button fx:id="closeButton"
+                    mnemonicParsing="false" onAction="#onCloseButtonClicked" text="Close"/>
+        </HBox>
+    </top>
+</BorderPane>
