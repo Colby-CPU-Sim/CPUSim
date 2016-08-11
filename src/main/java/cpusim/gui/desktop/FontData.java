@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import org.fxmisc.richtext.StyledTextArea;
 
 /**
- * Just a class to hold all the data for the font and background color
+ * A class to hold all the data for the font and background color
  * so that it can be passed around to different regions
  */
 public class FontData {
