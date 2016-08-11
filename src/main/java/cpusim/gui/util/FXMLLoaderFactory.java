@@ -16,7 +16,7 @@ public abstract class FXMLLoaderFactory {
 
     /**
      * Get's the resource URL for a file based on the controller's package.
-     * @param controller Controller class
+     * @param clazz Controller class
      * @param name Name of the file
      * @return Optional with an URL present if found, otherwise it will be empty
      */
@@ -39,17 +39,17 @@ public abstract class FXMLLoaderFactory {
     }
 
     /**
-     * Creates a new {@link FXMLLoader} instance. Setting {@link FXMLLoader#setRoot(Object)} and
-     * {@link FXMLLoader#setController(Object)}.
+     * Creates a new {@link FXMLLoader} instance. Setting
+     * {@link FXMLLoader#setRoot(Object)} and {@link FXMLLoader#setController(Object)}.
      * @param controller The root for the new loader
-     * @param name The name of the fxml file, it must be located in the same package as the root
-     *             controller passed in is (as described by {@link Class#getPackage})
+     * @param name The name of the fxml file, it must be located in the same package as the
+     *             root controller passed in is (as described by {@link Class#getPackage})
      * @return new FXMLLoader instance
      *
      * @throws IllegalStateException if the resource is not found
      * @throws NullPointerException if the root is {@code null}
      */
-    public static FXMLLoader fromRootController(final Object controller, final String name) {
+    public static FXMLLoader fromRootController(Object controller, String name) {
         if (null == controller) {
             throw new NullPointerException("root == null");
         }
@@ -61,12 +61,12 @@ public abstract class FXMLLoaderFactory {
     }
 
     /**
-     * Creates a new {@link FXMLLoader} instance. Sets {@link FXMLLoader#setController(Object)} to
-     * the passed controller.
+     * Creates a new {@link FXMLLoader} instance. Sets
+     * {@link FXMLLoader#setController(Object)} to the passed controller.
      *
      * @param controller The root for the new loader
-     * @param name The name of the fxml file, it must be located in the same package as the root
-     *             controller passed in is (as described by {@link Class#getPackage})
+     * @param name The name of the fxml file, it must be located in the same package as the
+     *             root controller passed in is (as described by {@link Class#getPackage})
      * @return new FXMLLoader instance
      *
      * @throws IllegalStateException if the resource is not found

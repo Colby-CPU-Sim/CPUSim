@@ -29,6 +29,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+
 /**
  * A tool bar used for debug mode.
  */
@@ -97,6 +101,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
             assert false : "Unable to load file: DebugToolBar.fxml";
         }
     }
+
 
     /**
      * initialize the tool bar

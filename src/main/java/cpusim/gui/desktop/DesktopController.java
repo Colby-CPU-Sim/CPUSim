@@ -1217,7 +1217,7 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handlePreferences(ActionEvent event) {
-        openModalDialog("Preferences", "/fxml/preferences/Preferences.fxml",
+        openModalDialog("Preferences", "Preferences.fxml",
                 new PreferencesController(mediator, this));
     }
 

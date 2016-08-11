@@ -107,7 +107,7 @@ public class HelpController implements Initializable {
     private SearchController searchController;
     private final SimpleStringProperty lastViewedFileName;
 
-    public static final String pref = "/cpusim/gui/help/helpHTML";
+    public static final String pref = "/html/help";
     public static final String[][] nameURLPairs = {
             {"CPU Sim Help", pref + "/CPUSimHelpBlank.html"},
 
@@ -443,8 +443,7 @@ public class HelpController implements Initializable {
                     }
                 });
 
-        URL url = getClass().getResource
-                ("/html/help/generalHelp/introduction.html");
+        URL url = getClass().getResource("/html/help/generalHelp/introduction.html");
         if (startingPage != null) {
             url = getClass().getResource(urls.get(startingPage));
         }
