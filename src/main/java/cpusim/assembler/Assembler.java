@@ -45,8 +45,8 @@ public class Assembler
         parser = new Parser(scanner, machine);
         normalizer = new Normalizer(machine);
         generator = new CodeGenerator(machine);
-        assembledInstructions = new ArrayList<AssembledInstructionCall>();
-        //in case the user calls getAssembledInstructions before calling assemble
+        assembledInstructions = new ArrayList<>();
+        // in case the user calls getAssembledInstructions before calling assemble
     }
 
     //-------------------------------

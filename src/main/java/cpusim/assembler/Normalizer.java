@@ -90,9 +90,7 @@ public class Normalizer
             Token tokenKey = new Token(null, Token.Type.VAR, -1, -1, -1, key, true);
             Token tokenValue = new Token(null, Token.Type.CONSTANT, -1, -1, -1,
                     value + "", true);
-            if (equs.get(tokenKey) == null) {
-                equs.put(tokenKey, tokenValue);
-            }
+            equs.putIfAbsent(tokenKey, tokenValue);
         }
 
         //now replace any EQU values in the EQU hashtable that might actually

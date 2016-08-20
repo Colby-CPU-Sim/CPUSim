@@ -36,30 +36,29 @@ public class CodeGenerator
 
     //-------------------------------
     // constructor
-    public CodeGenerator(Machine machine)
-    {
+    public CodeGenerator(Machine machine) {
         this.machine = machine;
     }
 
     /**
      * This method converts InstructionCalls into AssembledInstructionCalls.
+     *
      * @param instructionsWithNoVars List of InstructionCalls
      * @return List of AssembledInstructionCalls
-     * @throws AssemblyException 
+     * @throws AssemblyException if something is illegal
      */
-    public List<AssembledInstructionCall> generateCode(
-                                List<InstructionCall> instructionsWithNoVars) throws AssemblyException
-    {
-        List<AssembledInstructionCall> assembledInstrCalls =
-                                    new ArrayList<AssembledInstructionCall>();
+    public List<AssembledInstructionCall> generateCode(List<InstructionCall>
+                                                               instructionsWithNoVars)
+            throws AssemblyException {
+        List<AssembledInstructionCall> assembledInstrCalls = new ArrayList<>();
 
-        for(InstructionCall instrCall : instructionsWithNoVars) {
+        for (InstructionCall instrCall : instructionsWithNoVars) {
             //only need to look at the MachineInstruction and Operands parts
             //of the InstructionCall
             if (instrCall.machineInstruction != null) {
                 handleNormalInstruction(instrCall, assembledInstrCalls);
             }
-            else  { //.data or .ascii pseudoinstruction
+            else { //.data or .ascii pseudo-instruction
                 handleData(instrCall, assembledInstrCalls);
             }
         }
@@ -88,30 +87,30 @@ public class CodeGenerator
     //			 .data 3 1 [4 2 7] ; same thing as above
     //			 .data 6 2 [4 2 7] ; three 2-cell values of 4, 2, 7
     private void handleData(InstructionCall instructionCall,
-                            List<AssembledInstructionCall> instructionCallList) throws AssemblyException.InvalidOperandError, 
-                            AssemblyException.MemoryError, AssemblyException.SyntaxError, AssemblyException.ValueError
-    {
+                            List<AssembledInstructionCall> instructionCallList) throws
+            AssemblyException.InvalidOperandError, AssemblyException.MemoryError,
+            AssemblyException.SyntaxError, AssemblyException.ValueError {
         int cellSize = machine.getCodeStore().getCellSize(); //num bits per cell
         List operands = instructionCall.operands;
         int numberOfCells = (int) getLong((Token) operands.get(0));
 
         if (numberOfCells <= 0) {
             throw new AssemblyException.InvalidOperandError("The first operand must be " +
-                    "greater than 0 for the data pseudoinstruction",
-                    (Token) operands.get(0));
+                    "" + "" + "greater than 0 for the data pseudo-instruction", (Token)
+                    operands.get(0));
         }
 
         if (operands.size() == 2) {
-            if (numberOfCells*cellSize > 64) {
-                throw new AssemblyException.MemoryError("A data pseudoinstruction" +
-                        " can use at most 64 bits to store one value",
-                        (Token) operands.get(0));
+            if (numberOfCells * cellSize > 64) {
+                throw new AssemblyException.MemoryError("A data pseudo-instruction" +
+                        "" + " can use at most 64 bits to store one value", (Token)
+                        operands.get(0));
             }
             long valueToStore = getLong((Token) operands.get(1));
             //test size of value and throw exception if it won't fit.
             //allow the bits as unsigned or signed.
-            toBinary(valueToStore, numberOfCells * cellSize, false, true,
-                    (Token) operands.get(1), false);
+            toBinary(valueToStore, numberOfCells * cellSize, false, true, (Token)
+                    operands.get(1), false);
             /*
             //NOTE: The follow code was removed when the RAM cell size was
             //      allowed to be other than 8 bits.  Now, any data
@@ -125,63 +124,87 @@ public class CodeGenerator
                         (i == 0 ? instructionCall.comment : ""),
                         instructionCall.sourceLine));
             */
-            instructionCallList.add(
-                    new AssembledInstructionCall(
-                           numberOfCells * cellSize,
-                           valueToStore,
-                           instructionCall.comment,
-                           instructionCall.sourceLine));
+            instructionCallList.add(new AssembledInstructionCall(numberOfCells *
+                    cellSize, valueToStore, instructionCall.comment, instructionCall
+                    .sourceLine));
         }
-        else {
+        else { // the pseudo-instruction had some values inside brackets
             int numCellsPerValue = (int) getLong((Token) operands.get(1));
-            if (numCellsPerValue*cellSize > 64) {
-                throw new AssemblyException.MemoryError("A data pseudoinstruction" +
-                        " can use at most 64 bits to store one value",
+            if (numCellsPerValue * cellSize > 64) {
+                throw new AssemblyException.MemoryError("A data pseudo-instruction" +
+                        " can use at most 64 bits to store one value", (Token)
+                        operands.get(1));
+            }
+            if (numCellsPerValue <= 0) {
+                throw new AssemblyException.InvalidOperandError("The second operand " +
+                        "must be greater than 0 for this data pseudo-instruction",
                         (Token) operands.get(1));
             }
-            if (numCellsPerValue <= 0)
-                throw new AssemblyException.InvalidOperandError("The second operand must be " +
-                        "greater than 0 for this data pseudoinstruction",
-                        (Token) operands.get(1));
-            else if (numberOfCells % numCellsPerValue != 0)
-                throw new AssemblyException.InvalidOperandError("The number of cells (the" +
-                        " first operand) must be divisible by the number" +
-                        " of cells per integer (the second operand)",
-                        (Token) operands.get(0));
-            else if (numberOfCells / numCellsPerValue != operands.size()-2)
-                throw new AssemblyException.InvalidOperandError("Error: The number of cells (the" +
-                        " first operand) must equal the number of cells per integer" +
-                        " (the second operand) times the number of integers" +
-                        " inside the brackets", (Token) operands.get(0));
-            for (int i = 2; i < operands.size(); i++) {
-                long specificValue = getLong((Token) operands.get(i));
+            else if (numberOfCells % numCellsPerValue != 0) {
+                throw new AssemblyException.InvalidOperandError("The number of cells "
+                        + "(the first operand) must be divisible by the number of " +
+                        "cells per integer (the second operand if provided, " +
+                        "otherwise 1)", (Token) operands.get(0));
+            }
+            //            else if (numberOfCells / numCellsPerValue != operands.size()
+            // - 2) {
+            //                throw new AssemblyException.InvalidOperandError("Error:
+            // The number of "
+            //                        + "cells (the first operand) must equal the
+            // number of " +
+            //                        "cells per integer (the second operand) times the
+            // number of " +
+            //                        "integers inside the brackets", (Token) operands
+            // .get(0));
+            //            }
+            int numValuesGenerated = 0;
+            int nextIndex = 2;
+            while (numValuesGenerated < numberOfCells / numCellsPerValue) {
+                long specificValue = getLong((Token) operands.get(nextIndex));
                 //test that the value fits in cell size otherwise throw exception
                 //allow the bits as unsigned or signed.
-                toBinary(specificValue, cellSize*numCellsPerValue, false, true,
-                        (Token) operands.get(i), false);
-                instructionCallList.add(
-                    new AssembledInstructionCall(
-                        numCellsPerValue * cellSize,
-                        specificValue,
-                        (i == 2 ? instructionCall.comment : ""),
-                        instructionCall.sourceLine));
+                toBinary(specificValue, cellSize * numCellsPerValue, false, true,
+                        (Token) operands.get(nextIndex), false);
+
+                instructionCallList.add(new AssembledInstructionCall(numCellsPerValue *
+                        cellSize, specificValue, (numValuesGenerated == 0 ?
+                        instructionCall.comment : ""), instructionCall.sourceLine));
+                nextIndex++;
+                if( nextIndex >= operands.size())
+                    nextIndex = 2;
+                numValuesGenerated++;
             }
+            //            for (int i = 2; i < operands.size(); i++) {
+            //                long specificValue = getLong((Token) operands.get(i));
+            //                //test that the value fits in cell size otherwise throw
+            // exception
+            //                //allow the bits as unsigned or signed.
+            //                toBinary(specificValue, cellSize * numCellsPerValue,
+            // false, true,
+            //                        (Token) operands.get(i), false);
+            //                instructionCallList.add(new AssembledInstructionCall
+            // (numCellsPerValue *
+            //                        cellSize, specificValue, (i == 2 ?
+            // instructionCall.comment :
+            //                        ""), instructionCall.sourceLine));
+            //            }
         }
     }
 
 
-   /**
-    * adds to the aics list a new assembled instruction call corresponding
-    * to the given instructionCall.
-    * Along the way it checks to see that each operand value is legal,
-    * based on the sign and size of the value
-    * and the sign and number of bits devoted to that field. If not, it
-    * throws an AssemblyException.
-    * @throws AssemblyException 
-    */
+    /**
+     * adds to the aics list a new assembled instruction call corresponding
+     * to the given instructionCall.
+     * Along the way it checks to see that each operand value is legal,
+     * based on the sign and size of the value
+     * and the sign and number of bits devoted to that field. If not, it
+     * throws an AssemblyException.
+     *
+     * @throws AssemblyException if something is illegal
+     */
     private void handleNormalInstruction(InstructionCall instructionCall,
-                                         List<AssembledInstructionCall> aics) throws AssemblyException
-    {
+                                         List<AssembledInstructionCall> aics) throws
+            AssemblyException {
         MachineInstruction machineInstruction = instructionCall.machineInstruction;
         int[] posFieldLengths = machineInstruction.getPositiveFieldLengths();
         boolean[] posLenFieldSigns = machineInstruction.getPosLenFieldSigns();
@@ -198,12 +221,12 @@ public class CodeGenerator
         String[] instrParts = new String[posFieldLengths.length];
         instrParts[0] = opcodePart;
         for (int i = 1; i < instrParts.length; i++) {
-            int actualIndex = machineInstruction.getRelativeOrderOfFields()[i-1] + 1;
+            int actualIndex = machineInstruction.getRelativeOrderOfFields()[i - 1] + 1;
             int currentFieldLength = posFieldLengths[actualIndex];
             boolean currentFieldSign = posLenFieldSigns[actualIndex];
-            long op = getLong(operands.get(i-1)); //operand index = field index -1
-            instrParts[actualIndex] = toBinary(op, currentFieldLength, currentFieldSign,
-                                           true, operands.get(i-1), false);
+            long op = getLong(operands.get(i - 1)); //operand index = field index -1
+            instrParts[actualIndex] = toBinary(op, currentFieldLength,
+                    currentFieldSign, true, operands.get(i - 1), false);
         }
 
         String combinedFields = "";
@@ -229,9 +252,8 @@ public class CodeGenerator
         }
         */
 
-        aics.add(new AssembledInstructionCall(
-                machineInstruction.length(), longVal,
-                instructionCall.comment,instructionCall.sourceLine));
+        aics.add(new AssembledInstructionCall(machineInstruction.length(), longVal,
+                instructionCall.comment, instructionCall.sourceLine));
     }
 
 
@@ -239,40 +261,39 @@ public class CodeGenerator
      * converts the decimal integer into a string of 0's and 1's.
      * Opcodes don't get checked here because they get checked by
      * parser and when the machine instruction was first created.
-     * @param decimal the long integer to be converted to a string of 0's and 1's
-     * @param bits the number of bits (0's and 1's) (i.e., the length of the string)
-     * @param signed true if the number must fit in the bits as a 2's complement
-     *                    signed value and false if the number must fit as an
-     *                    unsigned integer.
+     *
+     * @param decimal    the long integer to be converted to a string of 0's and 1's
+     * @param bits       the number of bits (0's and 1's) (i.e., the length of the string)
+     * @param signed     true if the number must fit in the bits as a 2's complement
+     *                   signed value and false if the number must fit as an
+     *                   unsigned integer.
      * @param ignoreSign true if the preceding 'signed' parameter should be
      *                   ignored and any unsigned or unsigned decimal that fits
      *                   in the given number of bits is legal.
-     * @param t The Token from which the decimal was obtained-used for error messages
-     * @param isOpcode true if this decimal is an opcode
+     * @param t          The Token from which the decimal was obtained-used for error
+     *                   messages
+     * @param isOpcode   true if this decimal is an opcode
      * @return the string of 0's and 1's representing the decimal value
-     * @throws AssemblyException.ValueError
+     * @throws AssemblyException.ValueError if the value doesn't fit
      */
-    private String toBinary(long decimal, int bits, boolean signed,
-                            boolean ignoreSign, Token t,
-                            boolean isOpcode) throws AssemblyException.ValueError
-    {
+    private String toBinary(long decimal, int bits, boolean signed, boolean ignoreSign,
+                            Token t, boolean isOpcode) throws AssemblyException
+            .ValueError {
         String result;
-        long maxUnsignedValue = Long.rotateLeft(1,bits) - 1;
-        long maxSignedValue = Long.rotateLeft(1,bits-1) - 1;
+        long maxUnsignedValue = Long.rotateLeft(1, bits) - 1;
+        long maxSignedValue = Long.rotateLeft(1, bits - 1) - 1;
         long minSignedValue = -(maxSignedValue + 1);
 
         if (decimal >= 0) {
-            if (decimal > maxSignedValue && signed && ! ignoreSign && ! isOpcode) {
-                throw new AssemblyException.ValueError("Value " + decimal +
-                        " is greater than the maximum allowed value for " +
-                        "this signed " + bits + "-bit field, which is " +
-                        maxSignedValue, t);
+            if (decimal > maxSignedValue && signed && !ignoreSign && !isOpcode) {
+                throw new AssemblyException.ValueError("Value " + decimal + " is " +
+                        "greater than the maximum allowed value for " + "this signed "
+                        + bits + "-bit field, which is " + maxSignedValue, t);
             }
             if (decimal > maxUnsignedValue && !isOpcode) {
-                throw new AssemblyException.ValueError("Value " + decimal +
-                        " is greater than the maximum allowed value for " +
-                        "this " + bits + "-bit field, which is " + 
-                        maxUnsignedValue, t);
+                throw new AssemblyException.ValueError("Value " + decimal + " is " +
+                        "greater than the maximum allowed value for " + "this " + bits
+                        + "-bit field, which is " + maxUnsignedValue, t);
             }
             result = Long.toBinaryString(decimal);
             //stick zeros in front of the number if necessary
@@ -281,15 +302,15 @@ public class CodeGenerator
             }
         }
         else {
-            if(! signed && ! ignoreSign && ! isOpcode) {
-                throw new AssemblyException.ValueError("Value " + decimal +
-                        " is a negative value in a field that allows " +
-                        "only nonnegative values", t);
+            if (!signed && !ignoreSign && !isOpcode) {
+                throw new AssemblyException.ValueError("Value " + decimal + " is a " +
+                        "negative value in a field that allows " + "only nonnegative "
+                        + "values", t);
             }
             if (decimal < minSignedValue && !isOpcode) {
-                throw new AssemblyException.ValueError("Value " + decimal +
-                        " is less than the least allowed " +
-                        "value for this field, which is " + minSignedValue, t);
+                throw new AssemblyException.ValueError("Value " + decimal + " is less "
+                        + "than the least allowed " + "value for this field, which is "
+                        + minSignedValue, t);
             }
 
             result = Long.toBinaryString(maxUnsignedValue + decimal + 1);
@@ -302,17 +323,15 @@ public class CodeGenerator
     //-------------------------------
     //gets the string in the token's contents and converts it to a long,
     //which it returns.
-    private long getLong(Token token) throws AssemblyException.SyntaxError
-    {
+    private long getLong(Token token) throws AssemblyException.SyntaxError {
         String string = token.contents;
         long answer;
         try {
             answer = Convert.fromAnyBaseStringToLong(string);
         } catch (NumberFormatException e) {
-            throw new AssemblyException.SyntaxError("The number " + token.contents +
-                    " could not be parsed as a long." +
-                    "\n    It might have illegal characters or be too large",
-                    token);
+            throw new AssemblyException.SyntaxError("The number " + token.contents + " " +
+                    "" + "could not be parsed as a long." + "\n    It might have " +
+                    "illegal " + "characters or be too large", token);
         }
         return answer;
     }
