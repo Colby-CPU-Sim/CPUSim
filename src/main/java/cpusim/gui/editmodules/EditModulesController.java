@@ -13,7 +13,6 @@ import cpusim.Module;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
-import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.module.RAM;
 import cpusim.module.Register;
 import cpusim.module.RegisterArray;
@@ -315,7 +314,9 @@ public class EditModulesController implements Initializable {
         }
 
         //controller
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(controller, "EditRegisters.fxml");
+        FXMLLoader fxmlLoader = new FXMLLoader(mediator.getClass().getResource(
+                "gui/editmodules/arrayregisters/EditRegisters.fxml"));
+        fxmlLoader.setController(controller);
 
         final Stage dialogStage = new Stage();
         Pane dialogRoot = null;

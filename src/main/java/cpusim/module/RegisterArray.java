@@ -131,8 +131,8 @@ public class RegisterArray extends Module
     public void setWidth(int width)
     {
         this.width.set(width);
-        for (int i = 0; i < registers.size(); i++)
-            registers.get(i).setWidth(width);
+        for (Register register : registers)
+            register.setWidth(width);
     }
 
     /**

@@ -140,15 +140,15 @@ public class RegistersTableController
                     @Override
                     public TableCell<Register, Boolean> call(
                             TableColumn<Register, Boolean> registerBooleanTableColumn) {
-                        return new CheckBoxTableCell<Register,Boolean>();
+                        return new CheckBoxTableCell<>();
                     }
                 };
 
 
-        name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
-        width.setCellValueFactory(new PropertyValueFactory<Register, Integer>("width"));
-        initialValue.setCellValueFactory(new PropertyValueFactory<Register, Long>("initialValue"));
-        readOnly.setCellValueFactory(new PropertyValueFactory<Register, Boolean>("readOnly"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        width.setCellValueFactory(new PropertyValueFactory<>("width"));
+        initialValue.setCellValueFactory(new PropertyValueFactory<>("initialValue"));
+        readOnly.setCellValueFactory(new PropertyValueFactory<>("readOnly"));
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
@@ -310,18 +310,16 @@ public class RegistersTableController
         Register[] registers = new Register[table.getItems().size()];
 
         for (int i = 0; i < table.getItems().size(); i++) {
-            registers[i] = (Register) table.getItems().get(i);
+            registers[i] = table.getItems().get(i);
         }
 
         //build up a HashMap of old registers and new widths
-        HashMap table = new HashMap();
-        for (int i = 0; i < registers.length; i++) {
-            Register oldRegister =
-                    (Register) getCurrentFromClone(registers[i]);
-            if (oldRegister != null && oldRegister.getWidth() !=
-                    registers[i].getWidth())
-                table.put(oldRegister,
-                        new Integer(registers[i].getWidth()));
+        HashMap<Register,Integer> table = new HashMap<>();
+        for (Register register : registers) {
+            Register oldRegister = (Register) getCurrentFromClone(register);
+            if (oldRegister != null && oldRegister.getWidth() != register.getWidth()) {
+                table.put(oldRegister, register.getWidth());
+            }
         }
 
         // check that all names are unique and nonempty

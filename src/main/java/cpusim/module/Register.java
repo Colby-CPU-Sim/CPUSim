@@ -51,6 +51,9 @@ public class Register extends Module
     private SimpleLongProperty initialValue; // the initial value stored in the register
     private SimpleBooleanProperty readOnly;
     private boolean nameDirty;
+    private boolean programCounter; // if true, program breaks when this register's value
+                                    // matches the address of an instruction where a break
+                                    // point has been set
 
     /**
      * Constructor
@@ -66,6 +69,9 @@ public class Register extends Module
      * Constructor
      * @param name name of the register
      * @param width a positive integer that specifies the number of bits in the register.
+     * @param initialValue the initial value stored in the register
+     * @param readOnly the read only status of the register (if true, the value in
+     *                 the register cannot be changed)
      */
     public Register(String name, int width, long initialValue, boolean readOnly)
     {
@@ -76,6 +82,10 @@ public class Register extends Module
      * Constructor
      * @param name name of the register
      * @param width a positive integer that specifies the number of bits in the register.
+     * @param initialValue the initial value stored in the register
+     * @param readOnly the read only status of the register (if true, the value in
+     *                 the register cannot be changed)
+     * @param dirty  whether the Register's name has changed since last displayed
      */
     public Register(String name, int width, long initialValue, boolean readOnly, boolean dirty)
     {
