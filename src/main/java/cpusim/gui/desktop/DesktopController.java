@@ -2418,7 +2418,10 @@ public class DesktopController implements Initializable
 
             return content;
         } catch (IOException ioe) {
-            throw new IllegalStateException(ioe);
+            // We should throw new IllegalStateException(ioe) and then have the
+            // caller catch it, but instead, we'll just return null to indicate
+            // an error
+            return null;
         }
     }
 
@@ -2535,7 +2538,7 @@ public class DesktopController implements Initializable
         currentTextDirectory = fileToOpen.getParent();
         String content = extractTextFromFile(fileToOpen);
         if (content == null) {
-            Dialogs.createErrorDialog(stage, "Nonexistant File", "There is no longer a " +
+            Dialogs.createErrorDialog(stage, "Nonexistent File", "There is no " +
                     "file at the path " + fileToOpen.getAbsolutePath()).showAndWait();
 
             if (reopenTextFiles.contains(fileToOpen.getAbsolutePath())) {
