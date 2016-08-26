@@ -161,11 +161,15 @@ public class Increment extends Microinstruction{
         if (bigResult.compareTo(twoToWidthMinusOne) >= 0 ||
                 bigResult.compareTo(twoToWidthMinusOne.negate()) < 0)
             overflowBit.get().set(1);
+        else
+            overflowBit.get().set(0);
 
         if ((bigValue.intValue() < 0 && bigDelta.intValue() < 0) ||
                         (bigValue.intValue() < 0 && bigDelta.intValue() >= -bigValue.intValue()) ||
                         (bigDelta.intValue() < 0 && bigValue.intValue() >= -bigDelta.intValue()))
             carryBit.get().set(1);
+        else
+            carryBit.get().set(0);
 
         //set destination's value to the result
         long result = bigResult.longValue();

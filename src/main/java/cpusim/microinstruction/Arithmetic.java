@@ -182,6 +182,8 @@ public class Arithmetic extends Microinstruction {
         if (result.compareTo(twoToWidthMinusOne) >= 0 ||
                 result.compareTo(twoToWidthMinusOne.negate()) < 0)
             overflowBit.get().set(1);
+        else
+            overflowBit.get().set(0);
 
         //set the carry bit if necessary
         if (type.get().equals("ADD") &&
@@ -189,6 +191,8 @@ public class Arithmetic extends Microinstruction {
                         (value1 < 0 && value2 >= -value1) ||
                         (value2 < 0 && value1 >= -value2)))
             carryBit.get().set(1);
+        else
+            carryBit.get().set(0);
 
         //save the result
         long longResult = result.longValue();
