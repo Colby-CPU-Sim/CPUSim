@@ -598,7 +598,6 @@ public class Mediator {
      * Stops the currently running program.
      * Called from the Execute menu.
      */
-    //CHANGE: stop() code replaced body
     public void Stop() {
         machine.get().setRunMode(Machine.RunModes.ABORT);
     }
