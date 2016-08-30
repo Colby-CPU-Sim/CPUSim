@@ -95,7 +95,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
@@ -115,8 +114,8 @@ import java.util.Set;
  * This class is the repository of global data, such as the current machine.
  */
 public class Mediator {
-    static final String NEWLINE = System.getProperty("line.separator");
-    static final String SPACES = "              ";
+    private static final String NEWLINE = System.lineSeparator();
+    private static final String SPACES = "              ";
 
     private SimpleObjectProperty<Machine> machine;
     private BackupManager backupManager;
@@ -136,13 +135,9 @@ public class Mediator {
         this.machineFile = null;
         String d = machineDirty.get() ? "*" : "";
         this.machineDirtyString = new SimpleStringProperty(d);
-        machineDirty.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean oldVal, Boolean newVal) {
-                String d = newVal ? "*" : "";
-                machineDirtyString.set(d);
-            }
+        machineDirty.addListener((arg0, oldVal, newVal) -> {
+            String d1 = newVal ? "*" : "";
+            machineDirtyString.set(d1);
         });
         setMachine(new Machine("New"));
     }
@@ -783,7 +778,7 @@ public class Mediator {
      * @param pathName the pathname of the file being parsed
      */
     public void parseMIFFile(String fileText, RAM ram, String pathName) {
-        String[] lines = fileText.split(NEWLINE);
+        String[] lines = fileText.split("/\r\n|\n|\r/");
 
         MIFScanner scanner = new MIFScanner(lines);
 
@@ -1064,7 +1059,7 @@ public class Mediator {
     }
 
     public void parseIntelHexFile(String fileText, RAM ram, String pathName) {
-        String[] lines = fileText.split(NEWLINE);
+        String[] lines = fileText.split("/\r\n|\n|\r/");
 
         ObservableList<RAMLocation> ramToBe = FXCollections.observableArrayList();
 
