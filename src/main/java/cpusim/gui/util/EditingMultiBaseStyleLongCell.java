@@ -364,7 +364,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         return getItem() == null ? "" : getItem().toString();
     }
 
-    /*public void setOutlineRows(Set<Integer> rowSet){
+    /*public void setOutlineDataRows(Set<Integer> rowSet){
         if (rowSet.contains(getIndex())){
             setStyle("-fx-border-color: forestgreen; -fx-border-width: 1px;");
         }

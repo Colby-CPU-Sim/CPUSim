@@ -5,14 +5,14 @@
  */
 package cpusim.gui.desktop;
 
-import cpusim.gui.util.*;
+import cpusim.gui.util.Base;
+import cpusim.gui.util.EditingIntStyleCell;
+import cpusim.gui.util.EditingMultiBaseStyleLongCell;
+import cpusim.gui.util.EditingStrStyleCell;
 import cpusim.module.Register;
-import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -28,7 +28,8 @@ import java.util.Set;
  * There is one such controller for the default registers pane and one controller for
  * each of the register array panes.
  */
-public class RegisterTableController implements Initializable {
+public class RegisterTableController implements Initializable
+{
 
     /**
      * Initializes the controller class.
@@ -50,17 +51,22 @@ public class RegisterTableController implements Initializable {
     private DesktopController desktop;
     String title;
     Base base;
+    private Set<Register> registersChanged; // the registers to be outlined when
+    // stepping by micro
 
-    public RegisterTableController(DesktopController d, ObservableList<Register> regs, String t) {
-    	desktop = d;
-        registers = regs;
+    public RegisterTableController(DesktopController d, ObservableList<Register> regs,
+                                   String t) {
+        this.desktop = d;
+        this.registers = regs;
+        this.registersChanged = new HashSet<>();
         this.title = t;
     }
 
     /**
      * Initializes all of the various gui properties and variables
+     *
      * @param url unused
-     * @param rb unused
+     * @param rb  unused
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -71,26 +77,40 @@ public class RegisterTableController implements Initializable {
         AnchorPane.setRightAnchor(titledPane, 2.0);
         AnchorPane.setLeftAnchor(titledPane, 0.0);
         AnchorPane.setBottomAnchor(titledPane, 0.0);
-        
+
         base = new Base("Dec");
         FontData styleInfo = desktop.getRegisterTableFontData();
 
         table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
             updateTable();
         });
-        
-        Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellMultiBaseLongFactory =
-                column -> {
-                    final EditingMultiBaseStyleLongCell<Register> a =
-                            new EditingMultiBaseStyleLongCell<>(base, styleInfo);
-                    return a;
-                };
-        
-        Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStringFactory =
-                column -> new EditingStrStyleCell<>(styleInfo);
-        
-        Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntegerFactory =
-                column -> new EditingIntStyleCell<>(styleInfo);
+
+        Callback<TableColumn<Register, Long>, TableCell<Register, Long>>
+                cellMultiBaseLongFactory = column -> {
+            final EditingMultiBaseStyleLongCell<Register> a = new
+                    EditingMultiBaseStyleLongCell<Register>(base, styleInfo)
+            {
+                @Override
+                public void updateItem(Long item, boolean empty) {
+                    super.updateItem(item, empty);
+                    TableRow<Register> row = this.getTableRow();
+                    Register register = row.getItem();
+                    if (register != null && registersChanged.contains(register)) {
+                        this.getStyleClass().add("Outline");
+                    }
+                    else {
+                        this.getStyleClass().remove("Outline");
+                    }
+                }
+            };
+            return a;
+        };
+
+        Callback<TableColumn<Register, String>, TableCell<Register, String>>
+                cellStringFactory = column -> new EditingStrStyleCell<>(styleInfo);
+
+        Callback<TableColumn<Register, Integer>, TableCell<Register, Integer>>
+                cellIntegerFactory = column -> new EditingIntStyleCell<>(styleInfo);
         data.setCellFactory(cellMultiBaseLongFactory);
         name.setCellFactory(cellStringFactory);
         width.setCellFactory(cellIntegerFactory);
@@ -104,16 +124,12 @@ public class RegisterTableController implements Initializable {
         width.setCellValueFactory(new PropertyValueFactory<>("width"));
         data.setCellValueFactory(new PropertyValueFactory<>("value"));
 
-        data.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Register,
-                                     Long>>() {
-                                 @Override
-                                 public void handle(TableColumn.CellEditEvent<Register, Long> text) {
-                                     Register register = text.getRowValue();
-                                     if (!register.getReadOnly())
-                                         register.setValue(text.getNewValue());
-                                 }
-                             }
-        );
+        data.setOnEditCommit(text -> {
+            Register register = text.getRowValue();
+            if (!register.getReadOnly()) {
+                register.setValue(text.getNewValue());
+            }
+        });
 
         table.setItems(registers);
 
@@ -121,8 +137,8 @@ public class RegisterTableController implements Initializable {
         ContextMenu cm = new ContextMenu();
         MenuItem edit = new MenuItem("Edit Hardware");
         edit.setOnAction(e -> {
-            ObservableList<RegisterTableController> RTCs =
-                    desktop.getRegisterControllers();
+            ObservableList<RegisterTableController> RTCs = desktop
+                    .getRegisterControllers();
             for (RegisterTableController RTC : RTCs) {
                 if (RTC == RegisterTableController.this) {
                     if (RTC.title.equals("Registers")) {
@@ -141,6 +157,7 @@ public class RegisterTableController implements Initializable {
 
     /**
      * sets the base in which the data is represented
+     *
      * @param newBase the new base (decimal, hex, binary)
      */
     void setDataBase(String newBase) {
@@ -149,35 +166,38 @@ public class RegisterTableController implements Initializable {
         updateTable();
     }
 
-    public void outlineRows(Set<Register> registerSet) {
-        HashSet<Integer> rowSet = new HashSet<Integer>();
-
-        for (int i = 0; i < registers.size(); i++) {
-            if (registerSet.contains(registers.get(i)))
-                rowSet.add(i);
-        }
-        setOutlineRows(rowSet);
+    public void outlineRows(Set<Register> registersChanged) {
+        this.registersChanged = registersChanged;
     }
+    //        HashSet<Integer> rowSet = new HashSet<Integer>();
+    //
+    //        for (int i = 0; i < registers.size(); i++) {
+    //            if (registersChanged.contains(registers.get(i)))
+    //                rowSet.add(i);
+    //        }
+    //        setOutlineRows(rowSet);
+    //    }
 
-    public void setOutlineRows(Set<Integer> rowSet){
-        for (Node n : table.lookupAll("EditingMultiBaseStyleLongCell")){
-            if (n instanceof EditingMultiBaseStyleLongCell){
-                EditingMultiBaseStyleLongCell cell = (EditingMultiBaseStyleLongCell) n;
-                if (rowSet.contains(cell.getIndex()) ){
-                    cell.getStyleClass().add("Outline");
-                }
-                else {
-                    cell.getStyleClass().remove("Outline");
-                }
-            }
-        }
-    }
-    
+    //    public void setOutlineRows(Set<Integer> rowSet){
+    //        for (Node n : table.lookupAll("EditingMultiBaseStyleLongCell")){
+    //            if (n instanceof EditingMultiBaseStyleLongCell){
+    //                EditingMultiBaseStyleLongCell cell =
+    // (EditingMultiBaseStyleLongCell) n;
+    //                if (rowSet.contains(cell.getIndex()) ){
+    //                    cell.getStyleClass().add("Outline");
+    //                }
+    //                else {
+    //                    cell.getStyleClass().remove("Outline");
+    //                }
+    //            }
+    //        }
+    //    }
+
     /**
      * updates the values in the table.
      * This is using a hack.
      */
-    public void updateTable(){
+    public void updateTable() {
         data.setVisible(false);
         data.setVisible(true);
     }

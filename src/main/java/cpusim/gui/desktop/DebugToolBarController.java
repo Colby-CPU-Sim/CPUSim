@@ -247,7 +247,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
      * the fetch sequence.
      *
      * @param newToolbar     whether opening a new tool bar
-     * @param outlineChanges whether the outline has changed
+     * @param outlineChanges true if the outlines of changed register and ram cells should be displayed
      */
     public void updateDisplay(boolean newToolbar, boolean outlineChanges) {
         MachineInstruction currentInstruction = machine.getControlUnit()

@@ -70,7 +70,7 @@ public class UpdateDisplayManager
 
     /**
      * updates the display setting of elements in desktop
-     * @param outlineChanges state if the outline has changed
+     * @param outlineChanges state if we stepped by a micro and so need to update the outlines
      */
     private void updateDesktop(boolean outlineChanges) {
         desktop.updateRegisterAndRAMDisplays();
