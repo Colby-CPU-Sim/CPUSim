@@ -7,15 +7,15 @@
  */
 package cpusim.gui.editmodules;
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.Module;
+import cpusim.model.Module;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
-import cpusim.module.RAM;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidationException;
 import javafx.beans.value.ChangeListener;

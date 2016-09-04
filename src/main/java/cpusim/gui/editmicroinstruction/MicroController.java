@@ -13,9 +13,9 @@
 
 package cpusim.gui.editmicroinstruction;
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;

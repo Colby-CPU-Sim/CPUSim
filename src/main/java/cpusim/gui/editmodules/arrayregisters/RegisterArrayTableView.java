@@ -8,11 +8,11 @@
 
 package cpusim.gui.editmodules.arrayregisters;
 
-import cpusim.Module;
+import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
-import cpusim.module.Register;
+import cpusim.model.module.Register;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.ObservableList;

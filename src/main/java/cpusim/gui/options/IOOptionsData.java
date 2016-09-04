@@ -1,8 +1,8 @@
 package cpusim.gui.options;
 
 import javafx.beans.property.SimpleObjectProperty;
-import cpusim.IOChannel;
-import cpusim.microinstruction.IO;
+import cpusim.iochannel.IOChannel;
+import cpusim.model.microinstruction.IO;
 
 public class IOOptionsData {
 	private SimpleObjectProperty<IO> io;
@@ -73,7 +73,7 @@ public class IOOptionsData {
 	/**
      * Sets the current IOChannel.
      * 
-     * @param n - the new IOChannel.
+     * @param cb - the new IOChannel.
      */
 	public void setChannel(IOChannel cb) {
 		channel.set(cb);

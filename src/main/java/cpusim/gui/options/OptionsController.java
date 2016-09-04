@@ -26,14 +26,20 @@
 
 package cpusim.gui.options;
 
-import cpusim.BufferedChannel;
-
-import java.io.File;
-import java.net.URL;
-import java.util.Optional;
-import java.util.ResourceBundle;
-
+import cpusim.Mediator;
+import cpusim.assembler.PunctChar;
+import cpusim.assembler.PunctChar.Use;
+import cpusim.gui.help.HelpController;
+import cpusim.gui.util.EditingStrCell;
+import cpusim.iochannel.BufferedChannel;
+import cpusim.iochannel.FileChannel;
+import cpusim.iochannel.IOChannel;
+import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.IO;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
 import cpusim.util.*;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -46,24 +52,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import cpusim.FileChannel;
-import cpusim.IOChannel;
-import cpusim.Mediator;
-import cpusim.Microinstruction;
-import cpusim.assembler.PunctChar;
-import cpusim.assembler.PunctChar.Use;
-import cpusim.gui.help.HelpController;
-import cpusim.gui.util.EditingStrCell;
-import cpusim.microinstruction.IO;
-import cpusim.module.RAM;
-import cpusim.module.Register;
-import javafx.application.Platform;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class OptionsController implements Initializable {
 

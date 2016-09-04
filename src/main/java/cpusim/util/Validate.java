@@ -90,17 +90,17 @@ package cpusim.util;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.*;
-import cpusim.Field.Type;
+import cpusim.model.*;
+import cpusim.model.Field.Type;
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
 import cpusim.gui.editmodules.ConditionBitTableController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
-import cpusim.microinstruction.*;
-import cpusim.module.ConditionBit;
-import cpusim.module.RAM;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.microinstruction.*;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;

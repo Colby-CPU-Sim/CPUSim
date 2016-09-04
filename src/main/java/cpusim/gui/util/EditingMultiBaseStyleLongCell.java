@@ -14,8 +14,8 @@ package cpusim.gui.util;
 
 import cpusim.assembler.EQU;
 import cpusim.gui.desktop.FontData;
-import cpusim.module.RAMLocation;
-import cpusim.module.Register;
+import cpusim.model.module.RAMLocation;
+import cpusim.model.module.Register;
 import cpusim.util.Convert;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

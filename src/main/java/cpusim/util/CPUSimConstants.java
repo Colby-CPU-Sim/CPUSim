@@ -10,9 +10,13 @@
 
 package cpusim.util;
 
-import cpusim.*;
-import cpusim.module.ConditionBit;
-import cpusim.module.Register;
+import cpusim.iochannel.BufferedChannel;
+import cpusim.iochannel.ConsoleChannel;
+import cpusim.iochannel.DialogChannel;
+import cpusim.iochannel.IOChannel;
+import cpusim.model.Machine;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.Register;
 
 public interface CPUSimConstants {
     //is this a Macintosh?  This constant might be used to set up the menus

@@ -7,13 +7,11 @@
 package cpusim.gui.editmodules.arrayregisters;
 
 import cpusim.Mediator;
-import cpusim.Module;
-import cpusim.gui.editmodules.ModuleController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
 import cpusim.gui.editmodules.RegistersTableController;
 import cpusim.gui.help.HelpController;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -31,7 +29,6 @@ import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.net.URL;
 import java.util.*;

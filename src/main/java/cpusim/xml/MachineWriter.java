@@ -32,11 +32,13 @@ package cpusim.xml;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.*;
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
 //import cpusim.gui.*;
-import cpusim.microinstruction.*;
+import cpusim.iochannel.FileChannel;
+import cpusim.iochannel.IOChannel;
+import cpusim.model.*;
+import cpusim.model.microinstruction.*;
 //import cpusim.scrollabledesktop.BaseInternalFrame;
 import cpusim.util.*;
 

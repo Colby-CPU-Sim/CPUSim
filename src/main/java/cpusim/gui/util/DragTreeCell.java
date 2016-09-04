@@ -14,9 +14,9 @@
 package cpusim.gui.util;
 
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.fetchsequence.EditFetchSequenceController;

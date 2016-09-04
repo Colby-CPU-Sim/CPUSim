@@ -12,11 +12,11 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.Module;
+import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.module.RAM;
+import cpusim.model.module.RAM;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.ObservableList;

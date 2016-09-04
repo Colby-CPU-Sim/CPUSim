@@ -9,7 +9,7 @@ import cpusim.gui.util.Base;
 import cpusim.gui.util.EditingIntStyleCell;
 import cpusim.gui.util.EditingMultiBaseStyleLongCell;
 import cpusim.gui.util.EditingStrStyleCell;
-import cpusim.module.Register;
+import cpusim.model.module.Register;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

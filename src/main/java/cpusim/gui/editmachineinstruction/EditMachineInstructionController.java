@@ -27,11 +27,12 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.*;
-import cpusim.Field.Type;
+import cpusim.model.*;
+import cpusim.model.Field.Type;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
-import cpusim.microinstruction.Comment;
+import cpusim.model.microinstruction.Comment;
 import cpusim.util.Convert;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;

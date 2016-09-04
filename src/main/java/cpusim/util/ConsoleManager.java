@@ -5,10 +5,10 @@
  */
 package cpusim.util;
 
-import cpusim.Machine;
-import cpusim.Microinstruction;
-import cpusim.microinstruction.IO;
-import cpusim.module.ControlUnit;
+import cpusim.model.Machine;
+import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.IO;
+import cpusim.model.module.ControlUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

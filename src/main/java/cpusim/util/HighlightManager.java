@@ -15,13 +15,13 @@
 package cpusim.util;
 
 import cpusim.BreakException;
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
-import cpusim.module.RAM;
-import cpusim.module.Register;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

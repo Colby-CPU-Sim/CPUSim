@@ -20,8 +20,8 @@
 
 package cpusim.assembler;
 
-import cpusim.Machine;
-import cpusim.MachineInstruction;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 import cpusim.util.Convert;
 
 import java.util.ArrayList;

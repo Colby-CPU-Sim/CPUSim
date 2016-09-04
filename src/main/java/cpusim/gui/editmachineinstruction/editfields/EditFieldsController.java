@@ -20,10 +20,10 @@
 
 package cpusim.gui.editmachineinstruction.editfields;
 
-import cpusim.Field;
-import cpusim.Field.Type;
-import cpusim.FieldValue;
-import cpusim.MachineInstruction;
+import cpusim.model.Field;
+import cpusim.model.Field.Type;
+import cpusim.model.FieldValue;
+import cpusim.model.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
@@ -41,7 +41,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;

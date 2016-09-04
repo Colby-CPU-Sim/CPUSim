@@ -38,11 +38,11 @@ package cpusim.assembler;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.Field;
-import cpusim.Field.Type;
-import cpusim.FieldValue;
-import cpusim.Machine;
-import cpusim.MachineInstruction;
+import cpusim.model.Field;
+import cpusim.model.Field.Type;
+import cpusim.model.FieldValue;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 import cpusim.assembler.AssemblyException.*;
 import cpusim.util.Convert;
 import cpusim.util.SourceLine;

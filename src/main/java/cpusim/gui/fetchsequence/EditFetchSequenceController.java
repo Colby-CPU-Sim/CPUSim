@@ -20,12 +20,12 @@
  */
 package cpusim.gui.fetchsequence;
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
-import cpusim.microinstruction.Comment;
+import cpusim.model.microinstruction.Comment;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;

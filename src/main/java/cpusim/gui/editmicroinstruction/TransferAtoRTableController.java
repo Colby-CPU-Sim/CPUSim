@@ -18,12 +18,12 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.microinstruction.TransferAtoR;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.microinstruction.TransferAtoR;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.ObservableList;

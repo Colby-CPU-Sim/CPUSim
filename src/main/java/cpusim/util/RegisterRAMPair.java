@@ -17,8 +17,8 @@ package cpusim.util;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import cpusim.module.RAM;
-import cpusim.module.Register;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
 
 
 /**

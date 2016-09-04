@@ -18,14 +18,12 @@
  */
 package cpusim.gui.editmachineinstruction.editfields;
 
-import cpusim.Field;
-import cpusim.FieldValue;
+import cpusim.model.Field;
+import cpusim.model.FieldValue;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.util.Dialogs;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -36,7 +34,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;

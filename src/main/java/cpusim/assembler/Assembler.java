@@ -19,7 +19,7 @@ package cpusim.assembler;
 ///////////////////////////////////////////////////////////////////////////////
 // the packages we need to import
 
-import cpusim.*;
+import cpusim.model.Machine;
 
 import java.util.List;
 import java.util.ArrayList;

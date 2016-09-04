@@ -12,11 +12,11 @@
  */
 package cpusim.gui.editmodules;
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.Module;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.Module;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;

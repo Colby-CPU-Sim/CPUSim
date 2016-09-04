@@ -31,13 +31,12 @@ package cpusim.xml;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.*;
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
+import cpusim.model.*;
 import javafx.collections.ObservableList;
 
 import java.io.PrintWriter;
-import java.util.Vector;
 import java.util.List;
 
 ///////////////////////////////////////////////////////////////////////////////

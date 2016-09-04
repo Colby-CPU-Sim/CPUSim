@@ -16,11 +16,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.microinstruction.Arithmetic;
-import cpusim.module.ConditionBit;
-import cpusim.module.Register;
+import cpusim.model.microinstruction.Arithmetic;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.Register;
 import cpusim.util.CPUSimConstants;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;

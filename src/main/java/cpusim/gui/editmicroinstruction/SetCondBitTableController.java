@@ -19,10 +19,10 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.microinstruction.SetCondBit;
-import cpusim.module.ConditionBit;
+import cpusim.model.microinstruction.SetCondBit;
+import cpusim.model.module.ConditionBit;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.FXCollections;

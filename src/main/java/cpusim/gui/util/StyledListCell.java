@@ -5,8 +5,8 @@
  */
 package cpusim.gui.util;
 
-import cpusim.Microinstruction;
-import cpusim.microinstruction.Comment;
+import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Comment;
 import javafx.scene.control.ListCell;
 
 public class StyledListCell<T> extends ListCell<T> {

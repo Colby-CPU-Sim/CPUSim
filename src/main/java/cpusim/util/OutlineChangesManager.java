@@ -3,8 +3,8 @@ package cpusim.util;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
 import cpusim.gui.desktop.RegisterTableController;
-import cpusim.module.RAM;
-import cpusim.module.Register;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
 
 import java.util.HashMap;
 import java.util.HashSet;

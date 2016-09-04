@@ -42,15 +42,17 @@ package cpusim.xml;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.*;
-import cpusim.Field.Type;
+import cpusim.iochannel.FileChannel;
+import cpusim.iochannel.IOChannel;
+import cpusim.model.*;
+import cpusim.model.Field.Type;
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
-import cpusim.microinstruction.*;
-import cpusim.module.ConditionBit;
-import cpusim.module.RAM;
-import cpusim.module.Register;
-import cpusim.module.RegisterArray;
+import cpusim.model.microinstruction.*;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.RAM;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import cpusim.util.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

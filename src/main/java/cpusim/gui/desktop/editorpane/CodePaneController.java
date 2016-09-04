@@ -1,6 +1,6 @@
 package cpusim.gui.desktop.editorpane;
 
-import cpusim.MachineInstruction;
+import cpusim.model.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.assembler.PunctChar;
 import org.fxmisc.richtext.StyleSpans;

@@ -13,7 +13,7 @@
 
 package cpusim.util;
 
-import cpusim.module.*;
+import cpusim.model.module.*;
 import cpusim.assembler.AssembledInstructionCall;
 
 import java.util.List;

@@ -20,8 +20,8 @@ package cpusim.assembler;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.Field;
-import cpusim.Machine;
+import cpusim.model.Field;
+import cpusim.model.Machine;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;

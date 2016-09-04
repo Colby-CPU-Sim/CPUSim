@@ -26,14 +26,13 @@
  */
 package cpusim.util;
 
-import cpusim.FileChannel;
-import cpusim.Machine;
-import cpusim.Microinstruction;
-import cpusim.microinstruction.IO;
-import cpusim.module.ControlUnit;
-import cpusim.module.RAM;
-import cpusim.module.RAMLocation;
-import cpusim.module.Register;
+import cpusim.model.Machine;
+import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.IO;
+import cpusim.model.module.ControlUnit;
+import cpusim.model.module.RAM;
+import cpusim.model.module.RAMLocation;
+import cpusim.model.module.Register;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

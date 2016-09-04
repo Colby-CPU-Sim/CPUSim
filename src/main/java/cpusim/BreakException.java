@@ -5,7 +5,7 @@
  */
 package cpusim;
 
-import cpusim.module.RAM;
+import cpusim.model.module.RAM;
 
 public class BreakException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

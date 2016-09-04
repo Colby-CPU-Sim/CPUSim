@@ -1,6 +1,6 @@
 package cpusim.util;
 
-import cpusim.Machine;
+import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import javafx.application.Platform;

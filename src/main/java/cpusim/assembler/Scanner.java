@@ -28,9 +28,8 @@ package cpusim.assembler;
  * 
  */
 
-import cpusim.Machine;
-import cpusim.MachineInstruction;
-import cpusim.util.Convert;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 
 import java.io.File;
 import java.io.IOException;

@@ -49,8 +49,8 @@
 
 package cpusim.util;
 
-import cpusim.Field;
-import cpusim.Machine;
+import cpusim.model.Field;
+import cpusim.model.Machine;
 import cpusim.assembler.AssemblyException;
 import cpusim.assembler.Token;
 import javafx.scene.input.KeyCode;

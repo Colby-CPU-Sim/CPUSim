@@ -10,11 +10,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.Microinstruction;
+import cpusim.model.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.microinstruction.Branch;
+import cpusim.model.microinstruction.Branch;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
 import javafx.collections.ObservableList;

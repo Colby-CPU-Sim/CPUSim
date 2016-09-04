@@ -14,11 +14,10 @@
 // the package in which our project resides
 package cpusim.assembler;
 
-import cpusim.MachineInstruction;
+import cpusim.model.MachineInstruction;
 import cpusim.util.SourceLine;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 ///////////////////////////////////////////////////////////////////////////////
