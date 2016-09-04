@@ -272,6 +272,7 @@ public class Arithmetic extends Microinstruction {
      * @return boolean value true if this micro used the module
      */
     public boolean uses(Module m){
-        return false;
+        return (m == getSource1() || m == getSource2() || m == getDestination()
+                || m == getCarryBit() || m == getOverflowBit());
     }
 }
