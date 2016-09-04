@@ -209,6 +209,8 @@ public class Increment extends Microinstruction{
      * @return boolean value true if this micro used the module
      */
     public boolean uses(Module m){
-        return (m == register.get() || m == overflowBit.get());
+        return (m == register.get() ||
+                m == overflowBit.get() ||
+                m == carryBit.get());
     }
 }
