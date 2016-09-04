@@ -1770,6 +1770,20 @@ public class MachineReader implements CPUSimConstants
     }
 
     //--------------------------
+    public void startProgramCounterInfo(Attributes attrs)
+    {
+        String pcID = attrs.getValue("programCounter");
+        Object object = components.get(pcID);
+        if (object == null || !(object instanceof Register)) {
+            throw new MachineReaderException(getCurrentLine() + "The program counter" +
+                    " attribute \"" + pcID +
+                    "\" of a ProgramCounterInfo element is not a valid Register ID.");
+        }
+        Register pc = (Register) object;
+        machine.setProgramCounter(pc);
+    }
+
+    //--------------------------
     //    public void startRegisterWindowInfo(Attributes attrs) {
     //        windowInfo.put("Registers", getRectangle(attrs));
     //

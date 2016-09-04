@@ -34,17 +34,20 @@ package cpusim.xml;
 
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
-//import cpusim.gui.*;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
 import cpusim.model.*;
-import cpusim.model.microinstruction.*;
-//import cpusim.scrollabledesktop.BaseInternalFrame;
-import cpusim.util.*;
-
-import java.io.*;
-import java.util.*;
+import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.IO;
+import cpusim.util.RegisterRAMPair;
 import javafx.collections.ObservableList;
+
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.List;
+
+//import cpusim.gui.*;
+//import cpusim.scrollabledesktop.BaseInternalFrame;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineWriter class
@@ -60,7 +63,7 @@ public class MachineWriter
             " Arithmetic*, Branch*, TransferRtoR*, TransferRtoA*, TransferAtoR*," +
             " Decode*, SetCondBit*, IO*, MemoryAccess*, End, Comment*, EQU*, FetchSequence," +
             " MachineInstruction*, HighlightingInfo?, LoadingInfo?, IndexingInfo?," +
-            " ModuleWindowsInfo?) >" + ls +
+            " ProgramCounterInfo?, ModuleWindowsInfo?) >" + ls +
             "<!ATTLIST Machine name CDATA \"unnamed\">" + ls +
             "<!ELEMENT PunctChar EMPTY>" + ls +
             "<!ATTLIST PunctChar char CDATA #REQUIRED use " +
@@ -175,6 +178,8 @@ public class MachineWriter
             "<!ATTLIST LoadingInfo ram IDREF #IMPLIED startingAddress CDATA \"0\">" + ls +
             "<!ELEMENT IndexingInfo EMPTY>" + ls +
             "<!ATTLIST IndexingInfo indexFromRight CDATA \"false\">" + ls +
+            "<!ELEMENT ProgramCounterInfo EMPTY>" + ls +
+            "<!ATTLIST ProgramCounterInfo programCounter IDREF #REQUIRED>" + ls +
             "<!ELEMENT ModuleWindowsInfo ((RegisterWindowInfo |" +
             " RegisterArrayWindowInfo | RAMWindowInfo)*) >" + ls +
             "<!ELEMENT RegisterWindowInfo EMPTY>" + ls +
@@ -398,6 +403,14 @@ public class MachineWriter
         out.println("\t<IndexingInfo indexFromRight=\"" +
                     machine.getIndexFromRight() +
                     "\" />");
+
+        //print the program counter info
+        out.println();
+        out.println("\t<!--............. program counter info ..................-->");
+        if (machine.getProgramCounter() != Machine.PLACE_HOLDER_REGISTER) {
+            out.println("\t<ProgramCounterInfo programCounter=\"" +
+                    machine.getProgramCounter().getID() + "\" />");
+        }
 
         out.println();
         out.println("</Machine>");

@@ -34,6 +34,7 @@ import cpusim.gui.util.EditingStrCell;
 import cpusim.iochannel.BufferedChannel;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
+import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
@@ -323,7 +324,7 @@ public class OptionsController implements Initializable {
 
     /////////////// Saving Tabs ///////////////
 
-    public boolean saveHighlightingTab() {
+    private boolean saveHighlightingTab() {
         if (!highlightingTab.isDisabled()) {
             ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
             Validate.allRegisterRAMPairAreUnique(data);
@@ -332,7 +333,7 @@ public class OptionsController implements Initializable {
         return true;
     }
 
-    public boolean saveIOOptionsTab() {
+    private boolean saveIOOptionsTab() {
         if (!IOOptionsTab.isDisabled()) {
             ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
             ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
@@ -861,12 +862,7 @@ public class OptionsController implements Initializable {
         } else {
             ObservableList<Register> registers =
                                   FXCollections.observableArrayList(this.registers);
-            Register pc = mediator.getMachine().getProgramCounter();
-            if (pc.getName().equals("(none)") && pc.getReadOnly() &&
-                    pc.getWidth() == 64 && pc.getValue() == Long.MAX_VALUE)
-                registers.add(0, pc); // it's a placeholder register
-            else
-                registers.add(0, new Register("(none)",64, Long.MAX_VALUE,true));
+            registers.add(0, Machine.PLACE_HOLDER_REGISTER);
             programCounterChoice.setItems(registers);
             programCounterChoice.setValue(mediator.getMachine().getProgramCounter());
         }

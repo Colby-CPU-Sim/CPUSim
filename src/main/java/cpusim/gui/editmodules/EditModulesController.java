@@ -203,6 +203,7 @@ public class EditModulesController implements Initializable {
     @FXML
     public void onDeleteButtonClick(ActionEvent e) {
         int selected = activeTable.getSelectionModel().getSelectedIndex();
+
         //first see if it is a register used for a ConditionBit and,
         //if so, warn the user and return.
         if ((selectedSet instanceof Register) ||

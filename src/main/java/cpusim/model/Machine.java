@@ -45,6 +45,8 @@ import java.util.*;
 public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private static final long serialVersionUID = 1L;
+    public static final Register PLACE_HOLDER_REGISTER =
+                               new Register("(none)",64,Long.MAX_VALUE,true);;
 
 
     /**
@@ -153,7 +155,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
-        programCounter = new Register("(none)",64,Long.MAX_VALUE,true); // placeholder
+        programCounter = PLACE_HOLDER_REGISTER;
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
         initializeModuleMap();
@@ -569,6 +571,12 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         //in the moduleWindows hashtable.
         registers.clear();
         registers.addAll(newRegisters);
+
+
+        // test whether the program counter that was deleted and, if so,
+        // set the program counter to the place holder register
+        if(newRegisters.contains(programCounter))
+            setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
     }
 
     //-------------------------------
@@ -595,6 +603,14 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         //reuse the old Vector in case in the future some other objects use it.
         registerArrays.clear();
         registerArrays.addAll(newRegisterArrays);
+
+        // test whether the program counter was deleted and, if so,
+        // set the program counter to the place holder register
+        for(RegisterArray array : newRegisterArrays) {
+            if (array.registers().contains(programCounter))
+                return;
+        }
+        setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
     }
 
     //--------------------------------
