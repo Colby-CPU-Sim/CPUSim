@@ -238,6 +238,15 @@ public class MachineHTMLWriter
                 " left to right") + "</TD></TR>");
         out.println("</TABLE><P></P>");
 
+        //print the register chosen as the program counter
+        out.println();
+        out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
+                " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
+        out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Program Counter Register"
+                + HEADER_SUFFIX);
+        out.println("<TR><TD>" + machine.getProgramCounter() + "</TD></TR>");
+        out.println("</TABLE><P></P>");
+
         //print the micros except for End
         for (int i = 0; i < microVectors.length; i++) {
             out.println();

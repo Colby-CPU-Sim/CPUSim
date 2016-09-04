@@ -123,6 +123,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     private SimpleObjectProperty<RAM> codeStore;
     // True if bit indexing starts of the right side, false if on the left
     private SimpleBooleanProperty indexFromRight;
+    // Register used for stopping at break points--initially null
+    private Register programCounter;
 
     /**
      * Creates a new machine.
@@ -151,6 +153,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
+        programCounter = new Register("(none)",64,Long.MAX_VALUE,true); // placeholder
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
         initializeModuleMap();
@@ -199,7 +202,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
          * @param newValue any additional information needed by listeners who are
          *                 listening to state changes.
          */
-        public StateWrapper(State newState, Object newValue) {
+        StateWrapper(State newState, Object newValue) {
             this.state = newState;
             this.value = newValue;
         }
@@ -262,7 +265,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      *
      * @return - the wrapped state of the machine.
      */
-    public StateWrapper getStateWrapper() {
+    private StateWrapper getStateWrapper() {
         return wrappedState.get();
     }
 
@@ -436,6 +439,13 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         startingAddressForLoading = add;
     }
 
+    public Register getProgramCounter() {
+        return programCounter;
+    }
+
+    public void setProgramCounter(Register programCounter) {
+        this.programCounter = programCounter;
+    }
 
     private void initializeModuleMap() {
         moduleMap.put("registers", registers);
@@ -447,8 +457,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private void initializeMicroMap() {
         for (String aMicroClass : MICRO_CLASSES)
-            microMap.put(aMicroClass, FXCollections.observableArrayList(new
-                    ArrayList<Microinstruction>()));
+            microMap.put(aMicroClass, FXCollections.observableArrayList(new ArrayList<>()));
         microMap.get("end").add(new End(this));
         microMap.get("comment").add(new Comment());
     }
