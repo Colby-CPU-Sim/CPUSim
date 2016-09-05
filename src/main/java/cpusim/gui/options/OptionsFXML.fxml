@@ -160,6 +160,22 @@
                         </ChoiceBox>
                 </HBox>
             </Tab>
+           <Tab fx:id="breakPointsTab" closable="false"
+                 onSelectionChanged="#onSelectionChanged" text="Breakpoints">
+                <HBox alignment="CENTER" spacing="5">
+                        <Label contentDisplay="CENTER"
+                               text="Program counter:" />
+                        <ChoiceBox id="pcChoiceBox" fx:id="programCounterChoice" >
+                             <items>
+                                <FXCollections
+                                        fx:factory="observableArrayList">
+                                    <String fx:value="register1"/>
+                                    <String fx:value="register2"/>
+                                </FXCollections>
+                            </items>
+                        </ChoiceBox>
+                </HBox>
+            </Tab>
         </TabPane>
     </center>
     <bottom>

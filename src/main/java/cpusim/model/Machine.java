@@ -12,7 +12,6 @@
  */
 package cpusim.model;
 
-import cpusim.BreakException;
 import cpusim.ExecutionException;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
@@ -45,6 +44,8 @@ import java.util.*;
 public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private static final long serialVersionUID = 1L;
+    public static final Register PLACE_HOLDER_REGISTER =
+                               new Register("(none)",64,Long.MAX_VALUE,true);;
 
 
     /**
@@ -123,6 +124,11 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     private SimpleObjectProperty<RAM> codeStore;
     // True if bit indexing starts of the right side, false if on the left
     private SimpleBooleanProperty indexFromRight;
+    // Register used for stopping at break points--initially null
+    private Register programCounter;
+    // true if the machine just halted due to a breakpoint.  It is used to turn off the
+    // break point temporarily to allow continuing past the breakpoint.
+    private boolean justBroke;
 
     /**
      * Creates a new machine.
@@ -151,8 +157,10 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
+        programCounter = PLACE_HOLDER_REGISTER;
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
+        justBroke = false;
         initializeModuleMap();
         initializeMicroMap();
 
@@ -199,7 +207,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
          * @param newValue any additional information needed by listeners who are
          *                 listening to state changes.
          */
-        public StateWrapper(State newState, Object newValue) {
+        StateWrapper(State newState, Object newValue) {
             this.state = newState;
             this.value = newValue;
         }
@@ -262,7 +270,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
      *
      * @return - the wrapped state of the machine.
      */
-    public StateWrapper getStateWrapper() {
+    private StateWrapper getStateWrapper() {
         return wrappedState.get();
     }
 
@@ -436,6 +444,13 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         startingAddressForLoading = add;
     }
 
+    public Register getProgramCounter() {
+        return programCounter;
+    }
+
+    public void setProgramCounter(Register programCounter) {
+        this.programCounter = programCounter;
+    }
 
     private void initializeModuleMap() {
         moduleMap.put("registers", registers);
@@ -447,8 +462,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private void initializeMicroMap() {
         for (String aMicroClass : MICRO_CLASSES)
-            microMap.put(aMicroClass, FXCollections.observableArrayList(new
-                    ArrayList<Microinstruction>()));
+            microMap.put(aMicroClass, FXCollections.observableArrayList(new ArrayList<>()));
         microMap.get("end").add(new End(this));
         microMap.get("comment").add(new Comment());
     }
@@ -560,6 +574,12 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         //in the moduleWindows hashtable.
         registers.clear();
         registers.addAll(newRegisters);
+
+
+        // test whether the program counter that was deleted and, if so,
+        // set the program counter to the place holder register
+        if(newRegisters.contains(programCounter))
+            setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
     }
 
     //-------------------------------
@@ -586,6 +606,14 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         //reuse the old Vector in case in the future some other objects use it.
         registerArrays.clear();
         registerArrays.addAll(newRegisterArrays);
+
+        // test whether the program counter was deleted and, if so,
+        // set the program counter to the place holder register
+        for(RegisterArray array : newRegisterArrays) {
+            if (array.registers().contains(programCounter))
+                return;
+        }
+        setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
     }
 
     //--------------------------------
@@ -893,9 +921,21 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                         else if (runMode != RunModes.RUN &&
                                 currentIndex == 0 &&
                                 currentInstruction == getFetchSequence()) {
-                            //fire property change for start of a machine cycle
-                            setState(Machine.State.START_OF_MACHINE_CYCLE, false);
-                            //false is unused
+                            // it's the start of a machine cycle
+                            if (getCodeStore().breakAtAddress((int)programCounter.getValue())
+                                    && ! justBroke) {
+                                RAMLocation breakLocation = codeStore.get().data().get((int)
+                                        programCounter.getValue());
+                                setState(Machine.State.BREAK, breakLocation);
+                                runMode = RunModes.STOP;
+                                justBroke = true;
+                                break;
+                            }
+                            else {
+                                justBroke = false;
+                                setState(Machine.State.START_OF_MACHINE_CYCLE, false);
+                                //false is unused
+                            }
                         }
                         Microinstruction currentMicro = microInstructions.get
                                 (currentIndex);
@@ -914,10 +954,6 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                             setState(Machine.State.EXCEPTION_THROWN, e.getMessage());
                             controlUnit.setMicroIndex(currentIndex);
                             return null;
-                        } catch (BreakException e) {
-                            //fire property change indicating an exception and quit
-                            setState(Machine.State.BREAK, e);
-                            runMode = RunModes.STOP;
                         }
 
                         if (runMode == RunModes.STEP_BY_MICRO) {
@@ -932,7 +968,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                     // fire a property change that execution halted or aborted
                     if(runMode == RunModes.ABORT)
                         setState(Machine.State.EXECUTION_ABORTED,haltBitsThatAreSet().size()>0);
-                    else if(mode == RunModes.STEP_BY_MICRO)
+                    else if(mode == RunModes.STEP_BY_MICRO
+                            && getStateWrapper().getState() != Machine.State.BREAK)
                         setState(Machine.State.HALTED_STEP_BY_MICRO,haltBitsThatAreSet().size()>0);
                     else if(getStateWrapper().getState() != Machine.State.BREAK)
                         setState(Machine.State.EXECUTION_HALTED,haltBitsThatAreSet().size()>0);

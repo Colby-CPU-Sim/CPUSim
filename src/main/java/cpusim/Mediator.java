@@ -413,6 +413,7 @@ public class Mediator {
         setMachine(machine);
         ObservableList<RegisterRAMPair> newPairs = FXCollections.observableArrayList();
         this.desktopController.getHighlightManager().setRegisterRAMPairs(newPairs);
+        setMachineDirty(true);
 
         addMachineStateListeners();
 

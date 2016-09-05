@@ -34,6 +34,7 @@ import cpusim.gui.util.EditingStrCell;
 import cpusim.iochannel.BufferedChannel;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
+import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
@@ -44,7 +45,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -95,6 +95,8 @@ public class OptionsController implements Initializable {
     private Tab punctuationTab;
     @FXML
     private Tab indexingTab;
+    @FXML
+    private Tab breakPointsTab;
 
     @FXML
     private TableView<IOOptionsData> IOOptionsTable;
@@ -120,6 +122,9 @@ public class OptionsController implements Initializable {
 
     @FXML
     private ChoiceBox<String> indexChoice;
+
+    @FXML
+    private ChoiceBox<Register> programCounterChoice;
 
     @FXML
     private TableView<PunctChar> leftPunctuationTable;
@@ -170,6 +175,7 @@ public class OptionsController implements Initializable {
         initializeLoadingTab();
         initializePunctuationTab();
         initializeIndexingTab();
+        initializeBreakPointsTab();
     }
 
     /////////////// Buttons ///////////////
@@ -215,6 +221,10 @@ public class OptionsController implements Initializable {
             saveLoadingTab();
         } else if (punctuationTab.isSelected()) {
             savePunctuationTab();
+        } else if (breakPointsTab.isSelected()) {
+            saveBreakPointsTab();
+        } else if (indexingTab.isSelected()) {
+            saveIndexingTab();
         }
     }
 
@@ -225,16 +235,16 @@ public class OptionsController implements Initializable {
     public void onOKButtonClicked() {
         // Save individual tabs
 
-        boolean canClose = saveIndexingTab();
-        saveHighlightingTab();
-        saveIOOptionsTab();
+        boolean canClose = true;
+        canClose &= saveIndexingTab();
+        canClose &= saveHighlightingTab();
+        canClose &= saveIOOptionsTab();
+        canClose &= saveBreakPointsTab();
         canClose &= saveLoadingTab();
         canClose &= savePunctuationTab();
 
         if (canClose) {
             // Machine changed & close window.
-            //changed to avoid reference to DesktopController object
-            //previously mediator.getDesktopController.changedMachine()
             mediator.setMachineDirty(true);
             Stage stage = (Stage) OKButton.getScene().getWindow();
             //close window.
@@ -314,15 +324,16 @@ public class OptionsController implements Initializable {
 
     /////////////// Saving Tabs ///////////////
 
-    public void saveHighlightingTab() {
+    private boolean saveHighlightingTab() {
         if (!highlightingTab.isDisabled()) {
             ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
             Validate.allRegisterRAMPairAreUnique(data);
             mediator.setRegisterRamPairs(data);
         }
+        return true;
     }
 
-    public void saveIOOptionsTab() {
+    private boolean saveIOOptionsTab() {
         if (!IOOptionsTab.isDisabled()) {
             ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
             ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
@@ -332,9 +343,10 @@ public class OptionsController implements Initializable {
             }
             mediator.getMachine().setMicros("io", ios);
         }
+        return true;
     }
 
-    public boolean saveLoadingTab() {
+    private boolean saveLoadingTab() {
         if (!loadingTab.isDisabled()) {
             // save the ram used for storing instructions
             mediator.getMachine().setCodeStore(codeStore.getValue());
@@ -342,7 +354,6 @@ public class OptionsController implements Initializable {
             // Save starting address
             int ramLength = codeStore.getValue().getLength();
             String startString = startingAddress.getText();
-            int startInt;
 
             try {
                 Validate.startingAddressIsValid(startString, ramLength);
@@ -361,7 +372,7 @@ public class OptionsController implements Initializable {
         return true;
     }
 
-    public boolean savePunctuationTab() {
+    private boolean savePunctuationTab() {
         if (!punctuationTab.isDisabled()) {
             ObservableList<PunctChar> punctChars = FXCollections.observableArrayList();
             punctChars.addAll(leftPunctuationTable.getItems());
@@ -386,7 +397,7 @@ public class OptionsController implements Initializable {
         return false;
     }
 
-    public boolean saveIndexingTab() {
+    private boolean saveIndexingTab() {
         if (!indexingTab.isDisabled()) {
             if (changeIndexingDirection) {
                 Optional<ButtonType> result =
@@ -412,6 +423,13 @@ public class OptionsController implements Initializable {
         return true;
     }
 
+    private boolean saveBreakPointsTab() {
+        if (!breakPointsTab.isDisabled()) {
+             mediator.getMachine().setProgramCounter(programCounterChoice.getValue());
+        }
+        return true;
+    }
+
     /////////////// Button Disable/Enablers ///////////////
 
     /**
@@ -421,7 +439,7 @@ public class OptionsController implements Initializable {
      * the New, Delete, and Duplicate buttons according to the state of the
      * window.
      */
-    public void updateHighlightingClickables() {
+    private void updateHighlightingClickables() {
         if (highlightingTable.getItems().isEmpty()) {
             deleteButton.setDisable(true);
             duplicateButton.setDisable(true);
@@ -447,7 +465,7 @@ public class OptionsController implements Initializable {
      * Calling this method should update the Apply, Cancel,
      * and OK buttons according to the state of the window.
      */
-    public void updateGlobalClickables() {
+    private void updateGlobalClickables() {
         // update apply
     }
 
@@ -530,63 +548,33 @@ public class OptionsController implements Initializable {
                 };
 
         Callback<TableColumn<RegisterRAMPair, RAM>, TableCell<RegisterRAMPair, RAM>>
-                cellComboRAMFactory =
-                new Callback<TableColumn<RegisterRAMPair, RAM>, TableCell<RegisterRAMPair, RAM>>() {
-                    @Override
-                    public TableCell<RegisterRAMPair, RAM> call(
-                            TableColumn<RegisterRAMPair, RAM> setStringTableColumn) {
-                        return new ComboBoxTableCell<RegisterRAMPair, RAM>(RAMs);
-                    }
-                };
+                cellComboRAMFactory = setStringTableColumn -> new ComboBoxTableCell<>(RAMs);
 
         Callback<TableColumn<RegisterRAMPair, Boolean>, TableCell<RegisterRAMPair, Boolean>>
-                cellCheckBoxFactory =
-                new Callback<TableColumn<RegisterRAMPair, Boolean>, TableCell<RegisterRAMPair, Boolean>>() {
-                    @Override
-                    public TableCell<RegisterRAMPair, Boolean> call(
-                            TableColumn<RegisterRAMPair, Boolean> setStringTableColumn) {
-                        CheckBoxTableCell<RegisterRAMPair, Boolean> cbtc =
-                                new CheckBoxTableCell<RegisterRAMPair, Boolean>();
-                        cbtc.setAlignment(Pos.CENTER);
-                        return cbtc;
-                    }
+                cellCheckBoxFactory = setStringTableColumn -> {
+                    CheckBoxTableCell<RegisterRAMPair, Boolean> cbtc =
+                            new CheckBoxTableCell<>();
+                    cbtc.setAlignment(Pos.CENTER);
+                    return cbtc;
                 };
 
         // SetCellValueFactories
-        registerColumn.setCellValueFactory(new PropertyValueFactory<RegisterRAMPair, Register>("register"));
-        RAMColumn.setCellValueFactory(new PropertyValueFactory<RegisterRAMPair, RAM>("ram"));
-        dynamicColumn.setCellValueFactory(new PropertyValueFactory<RegisterRAMPair, Boolean>("dynamic"));
+        registerColumn.setCellValueFactory(new PropertyValueFactory<>("register"));
+        RAMColumn.setCellValueFactory(new PropertyValueFactory<>("ram"));
+        dynamicColumn.setCellValueFactory(new PropertyValueFactory<>("dynamic"));
 
         // Register Factories and setOnEditCommits
         registerColumn.setCellFactory(cellComboRegisterFactory);
-        registerColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RegisterRAMPair, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RegisterRAMPair, Register> text) {
-                        ((RegisterRAMPair) text.getRowValue()).setRegister(
-                                text.getNewValue());
-                    }
-                });
+        registerColumn.setOnEditCommit(text -> text.getRowValue().setRegister(
+                text.getNewValue()));
 
         RAMColumn.setCellFactory(cellComboRAMFactory);
-        RAMColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RegisterRAMPair, RAM>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RegisterRAMPair, RAM> text) {
-                        text.getRowValue().setRam(
-                                text.getNewValue());
-                    }
-                });
+        RAMColumn.setOnEditCommit(text -> text.getRowValue().setRam(
+                text.getNewValue()));
 
         dynamicColumn.setCellFactory(cellCheckBoxFactory);
-        dynamicColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RegisterRAMPair, Boolean>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RegisterRAMPair, Boolean> text) {
-                        text.getRowValue().setDynamic(
-                                text.getNewValue());
-                    }
-                });
+        dynamicColumn.setOnEditCommit(text -> text.getRowValue().setDynamic(
+                text.getNewValue()));
 
         // Load in Rows
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
@@ -637,65 +625,38 @@ public class OptionsController implements Initializable {
         rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Callbacks
-        Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>> cellStrFactory =
-                new Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>>() {
-                    @Override
-                    public TableCell<PunctChar, String> call(
-                            TableColumn<PunctChar, String> setStringTableColumn) {
-                        EditingStrCell<PunctChar> esc = new EditingStrCell<PunctChar>();
-                        esc.setAlignment(Pos.CENTER);
-                        esc.setFont(new Font("Courier", 18));
-                        return esc;
-                    }
-                };
+        Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>>
+                cellStrFactory = setStringTableColumn -> {
+            EditingStrCell<PunctChar> esc = new EditingStrCell<>();
+            esc.setAlignment(Pos.CENTER);
+            esc.setFont(new Font("Courier", 18));
+            return esc;
+        };
 
-        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory1 =
-                new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
-                    @Override
-                    public TableCell<PunctChar, Use> call(
-                            TableColumn<PunctChar, Use> setStringTableColumn) {
-                        return new ComboBoxTableCell<PunctChar, Use>(Use.values());
-                    }
-                };
+        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory1
+                = setStringTableColumn -> new ComboBoxTableCell<>(Use.values());
 
-        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory2 =
-                new Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>() {
-                    @Override
-                    public TableCell<PunctChar, Use> call(
-                            TableColumn<PunctChar, Use> setStringTableColumn) {
-                        return new ComboBoxTableCell<PunctChar, Use>(Use.values());
-                    }
-                };
+        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>
+            cellComboFactory2 =
+                setStringTableColumn -> new ComboBoxTableCell<>(Use.values());
 
         // Set cellValue Factory
-        leftASCIIColumn.setCellValueFactory(new PropertyValueFactory<PunctChar, String>("Char"));
-        leftTypeColumn.setCellValueFactory(new PropertyValueFactory<PunctChar, Use>("Use"));
-        rightASCIIColumn.setCellValueFactory(new PropertyValueFactory<PunctChar, String>("Char"));
-        rightTypeColumn.setCellValueFactory(new PropertyValueFactory<PunctChar, Use>("Use"));
+        leftASCIIColumn.setCellValueFactory(new PropertyValueFactory<>("Char"));
+        leftTypeColumn.setCellValueFactory(new PropertyValueFactory<>("Use"));
+        rightASCIIColumn.setCellValueFactory(new PropertyValueFactory<>("Char"));
+        rightTypeColumn.setCellValueFactory(new PropertyValueFactory<>("Use"));
 
         // Set cell factory and onEditCommit
         leftASCIIColumn.setCellFactory(cellStrFactory);
         rightASCIIColumn.setCellFactory(cellStrFactory);
-        // no on edit necessry
+        // no on edit necessary
 
         leftTypeColumn.setCellFactory(cellComboFactory1);
-        leftTypeColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<PunctChar, Use>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<PunctChar, Use> text) {
-                        ((PunctChar) text.getRowValue()).setUse(
-                                text.getNewValue());
-                    }
-                });
+        leftTypeColumn.setOnEditCommit(text -> text.getRowValue().setUse(
+                text.getNewValue()));
         rightTypeColumn.setCellFactory(cellComboFactory2);
-        rightTypeColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<PunctChar, Use>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<PunctChar, Use> text) {
-                        ((PunctChar) text.getRowValue()).setUse(
-                                text.getNewValue());
-                    }
-                });
+        rightTypeColumn.setOnEditCommit(text -> text.getRowValue().setUse(
+                text.getNewValue()));
 
         // Put values into table
         ObservableList<PunctChar> leftData = leftPunctuationTable.getItems();
@@ -743,48 +704,31 @@ public class OptionsController implements Initializable {
 
        // updates selectedSet
         IOOptionsTable.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<IOOptionsData>() {
-                    @Override
-                    public void changed(ObservableValue<? extends IOOptionsData> selected,
-                                        IOOptionsData oldSet, IOOptionsData newSet) {
-                        IOOptionsSelectedSet = newSet;
-                        updateIOTableDisplay();
-                    }
-                });
+                (selected, oldSet, newSet) -> {
+            IOOptionsSelectedSet = newSet;
+            updateIOTableDisplay();
+        });
 
         // a cellFactory for the IOChannel column
         Callback<TableColumn<IOOptionsData, IOChannel>, TableCell<IOOptionsData, IOChannel>>
                 cellComboIOChannelFactory =
-                new Callback<TableColumn<IOOptionsData, IOChannel>,
-                        TableCell<IOOptionsData, IOChannel>>() {
-                    @Override
-                    public TableCell<IOOptionsData, IOChannel> call(
-                            TableColumn<IOOptionsData, IOChannel> setStringTableColumn) {
-                        return new IOComboBoxTableCell<IOOptionsData, IOChannel>(
-                                allChannels);
-                    }
-                };
+                setStringTableColumn -> new IOComboBoxTableCell<>(allChannels);
 
         // Set cellValue Factory
-        nameColumn.setCellValueFactory(new PropertyValueFactory<IOOptionsData, IO>("io"));
-        connectionColumn.setCellValueFactory(
-                new PropertyValueFactory<IOOptionsData, IOChannel>("channel"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("io"));
+        connectionColumn.setCellValueFactory(new PropertyValueFactory<>("channel"));
 
         // Set cell factory and onEditCommit, only for connection column because
         // IO column is not editable.
         connectionColumn.setCellFactory(cellComboIOChannelFactory);
-        connectionColumn.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<IOOptionsData, IOChannel>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<IOOptionsData, IOChannel> text) {
-                        if (!text.getNewValue().equals(CPUSimConstants.FILE_CHANNEL)) {
-                            text.getRowValue().setChannel(text.getNewValue());
-                        } else {
-                            IOChannel newChannel = getFileChannelFromChooser(text.getOldValue());
-                            IOOptionsSelectedSet.setChannel(newChannel);
-                        }
-                    }
-                });
+        connectionColumn.setOnEditCommit(text -> {
+            if (!text.getNewValue().equals(CPUSimConstants.FILE_CHANNEL)) {
+                text.getRowValue().setChannel(text.getNewValue());
+            } else {
+                IOChannel newChannel = getFileChannelFromChooser(text.getOldValue());
+                IOOptionsSelectedSet.setChannel(newChannel);
+            }
+        });
 
         // Load in rows
         ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
@@ -795,7 +739,8 @@ public class OptionsController implements Initializable {
         IOOptionsTable.setItems(data);
 
         // for disabling appropriately
-        IOOptionsTab.disableProperty().bind(mediator.getDesktopController().inDebugOrRunningModeProperty());
+        IOOptionsTab.disableProperty().bind(
+                mediator.getDesktopController().inDebugOrRunningModeProperty());
         if (IOOptionsTab.isDisabled()) {
             for (Tab tab : tabPane.getTabs()) {
                 if (!tab.isDisabled()) {
@@ -909,9 +854,24 @@ public class OptionsController implements Initializable {
 
 
     /**
+     * Initializes the breakpoints tab.
+     */
+    private void initializeBreakPointsTab() {
+        if (registers.size() < 1) {
+            breakPointsTab.setDisable(true);
+        } else {
+            ObservableList<Register> registers =
+                                  FXCollections.observableArrayList(this.registers);
+            registers.add(0, Machine.PLACE_HOLDER_REGISTER);
+            programCounterChoice.setItems(registers);
+            programCounterChoice.setValue(mediator.getMachine().getProgramCounter());
+        }
+    }
+
+    /**
      * updates the values in the connection column using a hack
      */
-    public void updateIOTableDisplay() {
+    private void updateIOTableDisplay() {
         nameColumn.setVisible(false);
         nameColumn.setVisible(true);
         connectionColumn.setVisible(false);
