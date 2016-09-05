@@ -270,7 +270,7 @@ public class RAM extends Module
      * @return boolean value telling if it's break
      */
     public boolean breakAtAddress(int addr) {
-        return haltAtBreaks && data.get(addr).getBreak();
+        return haltAtBreaks && addr >= 0 && addr < data.size() && data.get(addr).getBreak();
     }
 
     /**

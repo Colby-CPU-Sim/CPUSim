@@ -45,7 +45,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
     private static final long serialVersionUID = 1L;
     public static final Register PLACE_HOLDER_REGISTER =
-                               new Register("(none)",64,Long.MAX_VALUE,true);;
+                               new Register("(none)",64,Long.MAX_VALUE,true);
 
 
     /**
@@ -576,9 +576,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         registers.addAll(newRegisters);
 
 
-        // test whether the program counter that was deleted and, if so,
+        // test whether the program counter was deleted and, if so,
         // set the program counter to the place holder register
-        if(newRegisters.contains(programCounter))
+        if(! newRegisters.contains(programCounter))
             setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
     }
 
@@ -918,7 +918,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                                     currentInstruction + ".\n");
                             break;
                         }
-                        else if (runMode != RunModes.RUN &&
+                        if (runMode != RunModes.RUN &&
                                 currentIndex == 0 &&
                                 currentInstruction == getFetchSequence()) {
                             // it's the start of a machine cycle
