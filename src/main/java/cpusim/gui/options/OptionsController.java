@@ -394,7 +394,7 @@ public class OptionsController implements Initializable {
                 return false;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean saveIndexingTab() {
