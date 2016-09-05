@@ -670,13 +670,6 @@ public class DesktopController implements Initializable
         }
 
         mediator.newMachine();
-
-//        Machine machine = new Machine("New");
-//        mediator.setMachine(machine);
-//        mediator.setMachineFile(null);
-//        mediator.setMachineDirty(true);
-//        clearTables();
-//        setUpTables();
     }
 
     /**

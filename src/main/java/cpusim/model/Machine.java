@@ -12,7 +12,6 @@
  */
 package cpusim.model;
 
-import cpusim.BreakException;
 import cpusim.ExecutionException;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
@@ -127,6 +126,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     private SimpleBooleanProperty indexFromRight;
     // Register used for stopping at break points--initially null
     private Register programCounter;
+    // true if the machine just halted due to a breakpoint.  It is used to turn off the
+    // break point temporarily to allow continuing past the breakpoint.
+    private boolean justBroke;
 
     /**
      * Creates a new machine.
@@ -158,6 +160,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         programCounter = PLACE_HOLDER_REGISTER;
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
+        justBroke = false;
         initializeModuleMap();
         initializeMicroMap();
 
@@ -918,9 +921,21 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                         else if (runMode != RunModes.RUN &&
                                 currentIndex == 0 &&
                                 currentInstruction == getFetchSequence()) {
-                            //fire property change for start of a machine cycle
-                            setState(Machine.State.START_OF_MACHINE_CYCLE, false);
-                            //false is unused
+                            // it's the start of a machine cycle
+                            if (getCodeStore().breakAtAddress((int)programCounter.getValue())
+                                    && ! justBroke) {
+                                RAMLocation breakLocation = codeStore.get().data().get((int)
+                                        programCounter.getValue());
+                                setState(Machine.State.BREAK, breakLocation);
+                                runMode = RunModes.STOP;
+                                justBroke = true;
+                                break;
+                            }
+                            else {
+                                justBroke = false;
+                                setState(Machine.State.START_OF_MACHINE_CYCLE, false);
+                                //false is unused
+                            }
                         }
                         Microinstruction currentMicro = microInstructions.get
                                 (currentIndex);
@@ -939,10 +954,6 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                             setState(Machine.State.EXCEPTION_THROWN, e.getMessage());
                             controlUnit.setMicroIndex(currentIndex);
                             return null;
-                        } catch (BreakException e) {
-                            //fire property change indicating an exception and quit
-                            setState(Machine.State.BREAK, e);
-                            runMode = RunModes.STOP;
                         }
 
                         if (runMode == RunModes.STEP_BY_MICRO) {
@@ -957,7 +968,8 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                     // fire a property change that execution halted or aborted
                     if(runMode == RunModes.ABORT)
                         setState(Machine.State.EXECUTION_ABORTED,haltBitsThatAreSet().size()>0);
-                    else if(mode == RunModes.STEP_BY_MICRO)
+                    else if(mode == RunModes.STEP_BY_MICRO
+                            && getStateWrapper().getState() != Machine.State.BREAK)
                         setState(Machine.State.HALTED_STEP_BY_MICRO,haltBitsThatAreSet().size()>0);
                     else if(getStateWrapper().getState() != Machine.State.BREAK)
                         setState(Machine.State.EXECUTION_HALTED,haltBitsThatAreSet().size()>0);

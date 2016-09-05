@@ -1,6 +1,5 @@
 package cpusim.model.microinstruction;
 
-import cpusim.BreakException;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
@@ -161,10 +160,10 @@ public class MemoryAccess extends Microinstruction {
         if (direction.get().equals("read")) {
             long value = memory.get().getData(addressValue, numBits);
             data.get().setValue(value);
-            if( memory.get().breakAtAddress(addressValue))
-                throw new BreakException("Break in " + memory.get().getName() +
-                        " read at address " + addressValue,
-                        addressValue, memory.get());
+//            if( memory.get().breakAtAddress(addressValue))
+//                throw new BreakException("Break in " + memory.get().getName() +
+//                        " read at address " + addressValue,
+//                        addressValue, memory.get());
         }
         else {
             assert direction.get().equals("write") : "Illegal direction " +
@@ -176,10 +175,10 @@ public class MemoryAccess extends Microinstruction {
             //manually edits the data in the RAM and we don't want a break
             //to be called in that case(?).  But there should be a better way
             //to do this.
-            if (memory.get().breakAtAddress(addressValue))
-                throw new BreakException("Break in " + memory.get().getName() +
-                        " write at address " + addressValue,
-                        addressValue, memory.get());
+//            if (memory.get().breakAtAddress(addressValue))
+//                throw new BreakException("Break in " + memory.get().getName() +
+//                        " write at address " + addressValue,
+//                        addressValue, memory.get());
         }
     }
 

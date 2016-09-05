@@ -14,13 +14,13 @@
 
 package cpusim.util;
 
-import cpusim.BreakException;
-import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
+import cpusim.model.Machine;
 import cpusim.model.module.RAM;
+import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -341,16 +341,6 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
         }
     }
 
-    // never used
-    //    public void clearHighlights() {
-    //        ObservableList ramTables = desktop.getRAMControllers();
-    //        for (Object key : ramTables) {
-    //            RamTableController table = (RamTableController) key;
-    //            table.getTable().getSelectionModel().clearSelection();
-    //        }
-    //
-    //    }
-
     /**
      * Receive notifications that a module
      * has modified a property.  This method is called in
@@ -364,8 +354,6 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
     public void changed(ObservableValue<? extends Machine.StateWrapper> stateWrapper,
                 Machine.StateWrapper oldStateWrapper, Machine.StateWrapper newStateWrapper) {
 
-        //System.out.println(newStateWrapper + "; startBreak=" + startBreak + "; endBreak=" + endBreak);
-
         if (newStateWrapper.getState() == Machine.State.START_OF_MACHINE_CYCLE) {
             //save values of all the registers
             saveStartOfCycleValues();
@@ -373,9 +361,10 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
 
         // update the break state
         if ( ! this.startBreak && newStateWrapper.getState() == Machine.State.BREAK) {
+            saveStartOfCycleValues();
             // in the next update of the display, turn on the break highlighting
-            this.breakRAM = ((BreakException) newStateWrapper.getValue()).breakRAM;
-            this.breakAddress = ((BreakException) newStateWrapper.getValue()).breakAddress;
+            this.breakRAM = ((RAMLocation) newStateWrapper.getValue()).getRam();
+            this.breakAddress = (int) ((RAMLocation) newStateWrapper.getValue()).getAddress();
             this.startBreak = true;
             this.endBreak = false;
         }
