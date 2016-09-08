@@ -665,7 +665,7 @@ public class HelpController implements Initializable {
     public static HelpController openHelpDialog(DesktopController d, String initialWindow,
                                                 String appendString) {
         final HelpController helpController = new HelpController(d, initialWindow, appendString);
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(helpController, "HelpFXML.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(helpController, "Help.fxml");
         final Stage dialogStage = new Stage();
 
         // Load in image
@@ -678,7 +678,7 @@ public class HelpController implements Initializable {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: HelpFXML.fxml";
+            throw new IllegalStateException("Unable to load file: Help.fxml", e);
         }
 
         Scene dialogScene = new Scene(dialogRoot);

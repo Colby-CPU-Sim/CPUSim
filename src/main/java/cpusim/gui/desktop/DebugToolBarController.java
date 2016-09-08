@@ -96,9 +96,8 @@ public class DebugToolBarController extends ToolBar implements Initializable,
 
         try {
             fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            assert false : "Unable to load file: DebugToolBar.fxml";
+        } catch (IOException ioe) {
+            throw new IllegalStateException("Unable to load file: DebugToolBar.fxml", ioe);
         }
     }
 

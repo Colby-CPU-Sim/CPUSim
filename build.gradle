@@ -1,39 +1,37 @@
 plugins {
-    id "edu.sc.seis.macAppBundle" version "2.1.1"
+    id "edu.sc.seis.macAppBundle" version "2.1.6"
+}
+
+repositories {
+    mavenCentral()
 }
 
 apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
 
 apply plugin: 'java'
 
-repositories {
-    mavenCentral()
-}
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+compileJava.options.encoding = 'UTF-8'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 version = '4.0.2'
 
-
 dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
     compile 'org.fxmisc.undo:undofx:1.1.1'
     compile 'org.fxmisc.richtext:richtextfx:0.6.9'
+    compile group: 'com.google.guava', name: 'guava', version: '19.0'
 }
 
 sourceSets {
     main {
-        resources {
-            srcDirs = ["src/main/java", 'src/main/resources']
-            excludes = ['**/*.java', '**/*.class']
-        }
+        java.srcDirs = ['src/main/java']
+        resources.srcDirs = ['src/main/resources']
     }
-}
-
-task getDeps(type: Copy) {
-    from sourceSets.main.compileClasspath
-    into 'build/libs/'
 }
 
 jar {
@@ -43,8 +41,4 @@ jar {
                     'Main-Class': 'cpusim.Main',
                     'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
     }
-}
-
-task dist(dependsOn: [compileJava, getDeps, jar]) {
-    println 'Packaging for distribution'
 }

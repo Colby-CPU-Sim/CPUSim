@@ -223,10 +223,40 @@
  */
 package cpusim.gui.desktop;
 
-import cpusim.*;
+import static com.google.common.base.Preconditions.*;
+import static javafx.scene.input.KeyCode.TAB;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.Vector;
+import java.util.prefs.Preferences;
+
+import cpusim.Mediator;
 import cpusim.assembler.Token;
 import cpusim.gui.about.AboutController;
-import cpusim.gui.desktop.editorpane.*;
+import cpusim.gui.desktop.editorpane.CodePaneController;
+import cpusim.gui.desktop.editorpane.CodePaneTab;
+import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
+import cpusim.gui.desktop.editorpane.LineNumPrintingFactory;
+import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.editmodules.EditModulesController;
@@ -246,8 +276,25 @@ import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.util.*;
+import cpusim.util.CPUSimConstants;
+import cpusim.util.ConsoleManager;
+import cpusim.util.Dialogs;
+import cpusim.util.HighlightManager;
+import cpusim.util.MIFReaderException;
+import cpusim.util.SourceLine;
+import cpusim.util.UpdateDisplayManager;
 import cpusim.xml.MachineHTMLWriter;
+
+import org.fxmisc.flowless.VirtualFlow;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.InlineStyleTextArea;
+import org.fxmisc.richtext.Paragraph;
+import org.fxmisc.richtext.StyleSpans;
+import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
+
+import com.google.common.base.Strings;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -264,9 +311,30 @@ import javafx.print.PageRange;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.IndexRange;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.ToolBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -277,17 +345,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import org.fxmisc.flowless.VirtualFlow;
-import org.fxmisc.richtext.*;
-import org.fxmisc.wellbehaved.event.EventHandlerHelper;
-
-import java.io.*;
-import java.net.URL;
-import java.util.*;
-import java.util.prefs.Preferences;
-
-import static javafx.scene.input.KeyCode.TAB;
-import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
 /**
  * @author Ben Borchard
@@ -1216,8 +1273,7 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handlePreferences(ActionEvent event) {
-        openModalDialog("Preferences", "Preferences.fxml",
-                new PreferencesController(mediator, this));
+        openModalDialog("Preferences", new PreferencesController(mediator, this), "Preferences.fxml");
     }
 
     //============== handlers for MODIFY menu ==================================
@@ -1232,7 +1288,7 @@ public class DesktopController implements Initializable
         EditMachineInstructionController controller = new
                 EditMachineInstructionController(mediator);
         openModalDialog("Edit Machine Instructions",
-                "editMachineInstruction.fxml", controller);
+        		 controller, "EditMachineInstruction.fxml");
     }
 
     /**
@@ -1244,8 +1300,7 @@ public class DesktopController implements Initializable
     protected void handleMicroinstructions(ActionEvent event) {
         EditMicroinstructionsController controller = new
                 EditMicroinstructionsController(mediator);
-        openModalDialog("Edit Microinstructions",
-                "EditMicroinstructions.fxml", controller);
+        openModalDialog("Edit Microinstructions", controller, "EditMicroinstructions.fxml");
     }
 
     /**
@@ -1265,8 +1320,7 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleEQUs(ActionEvent event) {
-        openModalDialog("EQUs", "EQUs.fxml",
-                new EQUsController(mediator));
+        openModalDialog("EQUs", new EQUsController(mediator), "EQUs.fxml");
     }
 
     /**
@@ -1276,10 +1330,8 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleFetchSequence(ActionEvent event) {
-        EditFetchSequenceController controller = new EditFetchSequenceController
-                (mediator);
-        openModalDialog("Edit Fetch Sequence",
-                "editFetchSequence.fxml", controller);
+        EditFetchSequenceController controller = new EditFetchSequenceController(mediator);
+        openModalDialog("Edit Fetch Sequence", controller, "EditFetchSequence.fxml");
     }
 
 
@@ -1433,8 +1485,7 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleAboutCPUSim(ActionEvent event) {
-        openModalDialog("About CPU Sim", "AboutFXML.fxml",
-                new AboutController());
+        openModalDialog("About CPU Sim", new AboutController(), "About.fxml");
     }
 
     //======================= auxiliary methods ================================
@@ -2206,8 +2257,7 @@ public class DesktopController implements Initializable
     public void openHardwareModulesDialog(int initialSection) {
         if (0 <= initialSection && initialSection <= 3) {
             EditModulesController controller = new EditModulesController(mediator, this);
-            openModalDialog("Edit Modules",
-                    "EditModules.fxml", controller);
+            openModalDialog("Edit Modules", controller, "EditModules.fxml");
             controller.selectSection(initialSection);
         }
         else {
@@ -2224,8 +2274,7 @@ public class DesktopController implements Initializable
     public void openOptionsDialog(int initialSection) {
         if (0 <= initialSection && initialSection <= 3) {
             OptionsController controller = new OptionsController(mediator);
-            openModalDialog("Options", "OptionsFXML.fxml",
-                    controller);
+            openModalDialog("Options", controller, "Options.fxml");
             controller.selectTab(initialSection);
         }
         else {
@@ -2239,39 +2288,40 @@ public class DesktopController implements Initializable
      * @param title    - desired title for the window to be created.
      * @param fxmlPath - path to the fxml file that contains the
      *                 formatting for the window to be opened.
+     * @deprecated Use {@link #openModalDialog(String, Object, String)}
      */
+    @Deprecated
     public void openModalDialog(String title, String fxmlPath) {
-        openModalDialog(title, fxmlPath, null);
+        openModalDialog(title, this, fxmlPath);
     }
 
     /**
      * Opens a dialog modal to the main window.
      *
      * @param title      - desired title for the window to be created.
+     * @param controller - The controller of the FXML.
      * @param fxmlPath   - path to the fxml file that contains the
      *                   formatting for the window to be opened.
-     * @param controller - The controller of the FXML.
      */
-    public void openModalDialog(String title, String fxmlPath, Object controller) {
-
-        openModalDialog(title, fxmlPath, controller, -1, -1);
+    public void openModalDialog(String title, Object controller, String fxmlPath) {
+    	
+        openModalDialog(title, controller, fxmlPath, -1, -1);
     }
 
     /**
      * Opens a dialog modal to the main window.
      *
      * @param title      - desired title for the window to be created.
+     * @param controller - The controller of the FXML.
      * @param fxmlPath   - path to the fxml file that contains the
      *                   formatting for the window to be opened.
-     * @param controller - The controller of the FXML.
      * @param x          - the horizonal distance from the left edge of the
      *                   desktop window to the left edge of the new window.
      * @param y          - the vertical distance from the top edge of the
      *                   desktop window to the top edge of the new window.
      */
-    public void openModalDialog(String title, String fxmlPath, Object controller, int
-            x, int y) {
-        openDialog(title, fxmlPath, controller, x, y, Modality.APPLICATION_MODAL);
+    public void openModalDialog(String title, Object controller, String fxmlPath, int x, int y) {
+        openDialog(title, controller, fxmlPath, x, y, Modality.APPLICATION_MODAL);
     }
 
     /**
@@ -2293,8 +2343,8 @@ public class DesktopController implements Initializable
      *                   formatting for the window to be opened.
      * @param controller - The controller of the FXML.
      */
-    public void openNonModalDialog(String title, String fxmlPath, Object controller) {
-        openNonModalDialog(title, fxmlPath, controller, -1, -1);
+    public void openNonModalDialog(String title, Object controller, String fxmlPath) {
+        openNonModalDialog(title, controller, fxmlPath, -1, -1);
     }
 
     /**
@@ -2309,37 +2359,28 @@ public class DesktopController implements Initializable
      * @param y          - the vertical distance from the top edge of the
      *                   desktop window to the top edge of the new window.
      */
-    public void openNonModalDialog(String title, String fxmlPath, Object controller,
+    public void openNonModalDialog(String title, Object controller, String fxmlPath, 
                                    int x, int y) {
-        openDialog(title, fxmlPath, controller, x, y, Modality.NONE);
+        openDialog(title, controller, fxmlPath, x, y, Modality.NONE);
     }
-
+    
     /**
      * Private generic method to open a new window.
      *
      * @param title      - desired title for the window to be created.
      * @param fxmlPath   - path to the fxml file that contains the
      *                   formatting for the window to be opened.
-     * @param controller - The controller of the FXML.
      * @param x          - the horizonal distance from the left edge of the
      *                   desktop window to the left edge of the new window.
      * @param y          - the vertical distance from the top edge of the
      *                   desktop window to the top edge of the new window.
      * @param modality   - The modality of the new window.
      */
-    private void openDialog(String title, String fxmlPath,
-                            Object controller, int x, int y, Modality modality) {
-
-
-
-
-        FXMLLoader fxmlLoader;
-        if (null == controller) {
-            final Optional<URL> uri = FXMLLoaderFactory.getURL(getClass(), fxmlPath);
-            fxmlLoader = new FXMLLoader(uri.get());
-        } else {
-            fxmlLoader = FXMLLoaderFactory.fromController(controller, fxmlPath);
-        }
+    private void openDialog(String title, Object controller, String fxmlPath, int x, int y, Modality modality) {
+    	checkNotNull(controller);
+    	checkArgument(!Strings.isNullOrEmpty(fxmlPath));
+    	
+        final FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(controller, fxmlPath);
 
         final Stage dialogStage = new Stage();
         // Load in icon for the new dialog
@@ -2352,7 +2393,7 @@ public class DesktopController implements Initializable
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: " + fxmlPath;
+            throw new IllegalArgumentException("Unable to load file: " + fxmlPath, e);
         }
         Scene dialogScene = new Scene(dialogRoot);
         dialogStage.setScene(dialogScene);

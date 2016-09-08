@@ -525,13 +525,13 @@ public class EditMachineInstructionController {
      */
     @FXML
     protected void handleEditFields(ActionEvent ae) {
-        FXMLLoader fxmlLoader = new FXMLLoader(mediator.getClass().getResource(
-                "gui/editmachineinstruction/editFields/editFields.fxml"));
-
         final Stage fieldStage = new Stage();
+        
+        final EditFieldsController controller = new EditFieldsController(this, fieldStage);
+        final FXMLLoader fxmlLoader = new FXMLLoader(controller.getClass().getResource("EditFields.fxml"));
+
         Pane dialogRoot = null;
 
-        EditFieldsController controller = new EditFieldsController(this, fieldStage);
         fxmlLoader.setController(controller);
 
         try {

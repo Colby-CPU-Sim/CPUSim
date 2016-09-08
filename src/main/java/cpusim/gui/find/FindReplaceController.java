@@ -559,7 +559,7 @@ public class FindReplaceController implements Initializable {
         final FindReplaceController frc = new FindReplaceController(m);
         frc.setUseConsole(useConsole);
         FXMLLoader fxmlLoader = new FXMLLoader(frc.getClass().getResource(
-                "FindReplaceFXML.fxml"));
+                "FindReplace.fxml"));
         fxmlLoader.setController(frc);
         final Stage dialogStage = new Stage();
         Pane dialogRoot = null;
@@ -567,7 +567,7 @@ public class FindReplaceController implements Initializable {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: FindReplaceFXML.fxml";
+            assert false : "Unable to load file: FindReplace.fxml";
         }
 
         Scene dialogScene = new Scene(dialogRoot);
@@ -586,13 +586,10 @@ public class FindReplaceController implements Initializable {
         });
 
         dialogStage.addEventFilter(
-                KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-                    @Override
-                    public void handle(KeyEvent event) {
-                        if (event.getCode().equals(KeyCode.ESCAPE)) {
-                            if (dialogStage.isFocused()) {
-                                dialogStage.close();
-                            }
+                KeyEvent.KEY_RELEASED, event -> {
+                    if (event.getCode().equals(KeyCode.ESCAPE)) {
+                        if (dialogStage.isFocused()) {
+                            dialogStage.close();
                         }
                     }
                 });
