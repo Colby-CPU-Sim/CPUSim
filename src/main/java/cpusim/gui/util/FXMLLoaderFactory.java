@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import java.net.URL;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.*;
+import com.google.common.base.Strings;
+
 /**
  * Factory for loading new instances of FXML files into an {@link javafx.fxml.FXMLLoader}.
  */
@@ -21,9 +24,8 @@ public abstract class FXMLLoaderFactory {
      * @return Optional with an URL present if found, otherwise it will be empty
      */
     public static Optional<URL> getURL(final Class<?> clazz, final String name) {
-        if (null == clazz) {
-            throw new NullPointerException("controller == null");
-        }
+        checkNotNull("controller == null");
+        checkArgument(!Strings.isNullOrEmpty(name));
 
         Optional<URL> uri = Optional.ofNullable(clazz.getResource(name));
 
@@ -50,9 +52,8 @@ public abstract class FXMLLoaderFactory {
      * @throws NullPointerException if the root is {@code null}
      */
     public static FXMLLoader fromRootController(Object controller, String name) {
-        if (null == controller) {
-            throw new NullPointerException("root == null");
-        }
+        checkNotNull(controller);
+        checkArgument(!Strings.isNullOrEmpty(name));
 
         final FXMLLoader loader = fromController(controller, name);
         loader.setRoot(controller);
@@ -73,9 +74,8 @@ public abstract class FXMLLoaderFactory {
      * @throws NullPointerException if the root is {@code null}
      */
     public static FXMLLoader fromController(final Object controller, final String name) {
-        if (null == controller) {
-            throw new NullPointerException("root == null");
-        }
+        checkNotNull(controller, "root == null");
+        checkArgument(!Strings.isNullOrEmpty(name));
 
         final Optional<URL> uri = getURL(controller.getClass(), name);
 

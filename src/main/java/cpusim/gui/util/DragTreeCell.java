@@ -77,9 +77,7 @@ public class DragTreeCell extends TreeCell<String> {
                 if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent
                         .getClickCount() == 2) {
                     FXMLLoader fxmlLoader = new FXMLLoader(
-                            mediator.getClass().getResource
-                                    ("/fxml/editmicroinstruction/EditMicroinstructions" +
-                                            ".fxml"));
+                            EditMicroinstructionsController.class.getResource("EditMicroinstructions.fxml"));
                     EditMicroinstructionsController controller = new
                             EditMicroinstructionsController(mediator, getClasses());
                     //controller
