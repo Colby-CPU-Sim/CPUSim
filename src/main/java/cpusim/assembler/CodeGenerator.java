@@ -330,8 +330,8 @@ public class CodeGenerator
             answer = Convert.fromAnyBaseStringToLong(string);
         } catch (NumberFormatException e) {
             throw new AssemblyException.SyntaxError("The number " + token.contents + " " +
-                    "" + "could not be parsed as a long." + "\n    It might have " +
-                    "illegal " + "characters or be too large", token);
+                    "" + "could not be parsed as a long (64-bit integer)." +
+                    "\n    It might have illegal characters or be too large", token);
         }
         return answer;
     }

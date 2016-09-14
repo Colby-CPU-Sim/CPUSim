@@ -15,6 +15,7 @@
 package cpusim.assembler;
 
 import cpusim.model.MachineInstruction;
+import cpusim.util.Convert;
 import cpusim.util.SourceLine;
 
 import java.util.ArrayList;
@@ -66,20 +67,20 @@ public class InstructionCall
     //returns the length of the call in bits
     //if the machineInstruction is null, it is assumed that the instruction call
     //is "data" which has its length in cells specified in its first operand
-    public int getLength() throws AssemblyException.InvalidOperandError
+    public long getLength() throws AssemblyException.InvalidOperandError
     {
         if (machineInstruction != null) {
             return machineInstruction.length();
         }
         else {  // .data pseudoinstruction
-            int length;
+            long length;
             try {
-                length = Integer.parseInt((operands.get(0)).contents);
+                length = Convert.fromAnyBaseStringToLong((operands.get(0)).contents);
             } catch (NumberFormatException e) {
                 throw new AssemblyException.InvalidOperandError("The number " +
                         (operands.get(0)).contents +
-                        " could not be parsed as an integer--" +
-                        "\n       It is probably too large",
+                        " could not be parsed as an integer." +
+                        "\n       It may be too large or have illegal characters.",
                         operands.get(0));
             }
             return length * cellSize;
