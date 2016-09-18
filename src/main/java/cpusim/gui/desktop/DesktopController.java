@@ -223,40 +223,11 @@
  */
 package cpusim.gui.desktop;
 
-import static com.google.common.base.Preconditions.*;
-import static javafx.scene.input.KeyCode.TAB;
-import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.Vector;
-import java.util.prefs.Preferences;
-
+import com.google.common.base.Strings;
 import cpusim.Mediator;
 import cpusim.assembler.Token;
 import cpusim.gui.about.AboutController;
-import cpusim.gui.desktop.editorpane.CodePaneController;
-import cpusim.gui.desktop.editorpane.CodePaneTab;
-import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
-import cpusim.gui.desktop.editorpane.LineNumPrintingFactory;
-import cpusim.gui.desktop.editorpane.StyleInfo;
+import cpusim.gui.desktop.editorpane.*;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.editmodules.EditModulesController;
@@ -276,25 +247,8 @@ import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.util.CPUSimConstants;
-import cpusim.util.ConsoleManager;
-import cpusim.util.Dialogs;
-import cpusim.util.HighlightManager;
-import cpusim.util.MIFReaderException;
-import cpusim.util.SourceLine;
-import cpusim.util.UpdateDisplayManager;
+import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
-
-import org.fxmisc.flowless.VirtualFlow;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.InlineStyleTextArea;
-import org.fxmisc.richtext.Paragraph;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyledTextArea;
-import org.fxmisc.wellbehaved.event.EventHandlerHelper;
-
-import com.google.common.base.Strings;
-
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -311,30 +265,9 @@ import javafx.print.PageRange;
 import javafx.print.PrinterJob;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckMenuItem;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ChoiceDialog;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.IndexRange;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -345,6 +278,19 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import org.fxmisc.flowless.VirtualFlow;
+import org.fxmisc.richtext.*;
+import org.fxmisc.wellbehaved.event.EventHandlerHelper;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
+import java.util.prefs.Preferences;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static javafx.scene.input.KeyCode.TAB;
+import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
 /**
  * @author Ben Borchard
@@ -2631,9 +2577,9 @@ public class DesktopController implements Initializable
 
         for (String filePath : reopenTextFiles) {
             //this is a workaround that may need to be changed...
-            final File finalFile = new File(filePath);
             MenuItem menuItem = new MenuItem(filePath);
-            menuItem.setOnAction(e -> open(finalFile));
+            menuItem.setMnemonicParsing(false);
+            menuItem.setOnAction(e -> open(new File(filePath)));
             reopenTextMenu.getItems().add(menuItem);
         }
     }
@@ -2666,6 +2612,7 @@ public class DesktopController implements Initializable
             //this is a workaround that may need to be changed...
             final File finalFile = new File(filePath);
             MenuItem menuItem = new MenuItem(filePath);
+            menuItem.setMnemonicParsing(false);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
                     Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage,
