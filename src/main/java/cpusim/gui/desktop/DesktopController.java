@@ -2455,6 +2455,8 @@ public class DesktopController implements Initializable
 
             if (successfulSave) {
                 theTab.setDirty(false);
+                //update the reopen menu
+                updateReopenTextFiles(theTab.getFile());
                 return true;
             }
             return false;
@@ -2499,8 +2501,10 @@ public class DesktopController implements Initializable
 
             ((CodePaneTab) tab).setFile(finalFileToSave);
             tab.getTooltip().setText(finalFileToSave.getAbsolutePath());
+            //update the reopen menu
+            updateReopenTextFiles(finalFileToSave);
 
-            // Update Menu
+            // Update popup Menu that appears when you right-click on the tab
             MenuItem copyPath = new MenuItem("Copy Path Name ");
             copyPath.setOnAction(e -> {
                 Clipboard clipboard = Clipboard.getSystemClipboard();
