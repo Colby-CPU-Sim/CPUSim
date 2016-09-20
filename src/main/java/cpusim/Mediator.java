@@ -355,6 +355,7 @@ public class Mediator {
                     getRegisterRAMPairs(),
                     new PrintWriter(new FileWriter(machineFile), true));
             setMachineDirty(false);
+            this.desktopController.updateReopenMachineFiles(machineFile);
         } catch (IOException IOe) {
             Dialogs.createErrorDialog(stage, "Save file error",
                     "Could not save file for unknown reason").showAndWait();
@@ -391,6 +392,7 @@ public class Mediator {
             setCurrentMachineDirectory(fileToSave.getParent());
             setMachineFile(fileToSave);
             setMachineDirty(false);
+            this.desktopController.updateReopenMachineFiles(fileToSave);
 
             // to get name without .cpu
             String newName = fileToSave.getName();
@@ -450,10 +452,14 @@ public class Mediator {
             Dialogs.createErrorDialog(stage, "Error reading machine file",
                     errorMessage).showAndWait();
 
-            if (this.desktopController.getReopenMachineFiles().contains(fileToOpen.getAbsolutePath())) {
-                this.desktopController.getReopenMachineFiles().remove(fileToOpen.getAbsolutePath());
-            }
-            this.desktopController.updateReopenMachineMenu();
+            // remove the file from the Reopen machine... menu item
+            //if (this.desktopController.getReopenMachineFiles().contains(
+            //       fileToOpen.getAbsolutePath())) {
+            //    this.desktopController.getReopenMachineFiles().remove(
+            //        fileToOpen.getAbsolutePath());
+            //}
+            //this.desktopController.updateReopenMachineMenu();
+
             return;
         }
 
@@ -464,7 +470,8 @@ public class Mediator {
 
         machine = reader.getMachine();
         setMachine(machine);
-        this.desktopController.getHighlightManager().setRegisterRAMPairs(FXCollections.observableList(reader.getRegisterRAMPairs()));
+        this.desktopController.getHighlightManager().setRegisterRAMPairs(
+                FXCollections.observableList(reader.getRegisterRAMPairs()));
 
         addMachineStateListeners();
 

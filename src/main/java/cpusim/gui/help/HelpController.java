@@ -411,7 +411,7 @@ public class HelpController implements Initializable {
      */
     public void initializeWebView() {
         WebEngine webEngine = webView.getEngine();
-        webView.setZoom(javafx.stage.Screen.getPrimary().getDpi() / 96);
+        //webView.setZoom(javafx.stage.Screen.getPrimary().getDpi() / 96);
 
         webEngine.getLoadWorker().stateProperty().addListener(
                 (arg0, oldState, newState) -> {
