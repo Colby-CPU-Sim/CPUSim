@@ -37,8 +37,8 @@
 package cpusim.model;
 
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.util.NamedObject;
 import cpusim.util.Convert;
-import cpusim.util.NamedObject;
 import cpusim.xml.HtmlEncoder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

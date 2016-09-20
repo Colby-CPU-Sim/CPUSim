@@ -1,0 +1,26 @@
+plugins {
+    id "edu.sc.seis.macAppBundle" version "2.1.6"
+}
+
+apply plugin: 'java'
+
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
+
+dependencies {
+    compile 'org.reactfx:reactfx:2.0-M4'
+    compile 'org.fxmisc.undo:undofx:1.1.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.6.9'
+    
+    compile project(':cpusim.model')
+    
+    testCompile 'junit:junit:4.12' 
+}
+
+jar {
+    manifest {
+        attributes  'Implementation-Title': 'CPU Sim',
+                    'Implementation-Version': version,
+                    'Main-Class': 'cpusim.Main',
+                    'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
+    }
+}

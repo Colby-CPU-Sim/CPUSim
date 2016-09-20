@@ -1,44 +1,63 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+}
+
 plugins {
-    id "edu.sc.seis.macAppBundle" version "2.1.6"
+    id "org.xtext.builder" version "1.0.12"
+  	id "org.xtext.xtend" version "1.0.12"
 }
-
-repositories {
-    mavenCentral()
-}
-
-apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
-
-apply plugin: 'java'
 
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
-compileJava.options.encoding = 'UTF-8'
+subprojects {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+    apply plugin: 'java'
 
-version = '4.0.2'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
 
-dependencies {
-    compile 'org.reactfx:reactfx:2.0-M4'
-    compile 'org.fxmisc.undo:undofx:1.1.1'
-    compile 'org.fxmisc.richtext:richtextfx:0.6.9'
-    compile group: 'com.google.guava', name: 'guava', version: '19.0'
-}
+    compileJava.options.encoding = 'UTF-8'
 
-sourceSets {
-    main {
-        java.srcDirs = ['src/main/java']
-        resources.srcDirs = ['src/main/resources']
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    group = 'cpusim'
+    version = '5.0.0-SNAPSHOT'
+
+    ext.guiceVersion = '4.1.0'
+    ext.xtextVersion = '2.10.0'
+
+    dependencies {
+        compile group: 'com.google.guava', name: 'guava', version: '19.0'   
+        
+        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+        
+        // https://mvnrepository.com/artifact/com.google.code.findbugs/findbugs
+        compile group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1'
+        
+        testCompile 'junit:junit:4.12'
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/java']
+            resources.srcDirs = ['src/main/resources']
+        }
+
+        test {
+            java.srcDirs = ['src/test/java']
+            resources.srcDirs = ['src/test/resources']
+        }
     }
 }
 
-jar {
-    manifest {
-        attributes  'Implementation-Title': 'CPU Sim',
-                    'Implementation-Version': version,
-                    'Main-Class': 'cpusim.Main',
-                    'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
-    }
-}
+

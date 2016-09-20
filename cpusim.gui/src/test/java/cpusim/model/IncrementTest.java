@@ -1,7 +1,9 @@
-import cpusim.model.Machine;
+package cpusim.model;
+
 import cpusim.model.microinstruction.Increment;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+
 import org.junit.Assert;
 import org.junit.Test;
 

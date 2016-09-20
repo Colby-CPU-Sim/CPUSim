@@ -25,6 +25,8 @@
 package cpusim.model;
 
 
+import cpusim.model.util.NamedObject;
+
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 

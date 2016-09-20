@@ -5,7 +5,7 @@
  */
 package cpusim.model;
 
-import cpusim.util.NamedObject;
+import cpusim.model.util.NamedObject;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -39,8 +39,6 @@ public class Field implements NamedObject, Cloneable {
     // If true, allows only signed 2's complement values
     // If false, allows only unsigned binary values
     private SimpleBooleanProperty signed; 
-
-    private String ID; //used for saving to XML
 
 
     /** 
@@ -88,23 +86,16 @@ public class Field implements NamedObject, Cloneable {
         this.values = values;
         this.defaultValue.set(defaultValue);
         this.signed.set(signed);
-
-        String s = super.toString();
-        int index = s.indexOf('@');
-        if (index == -1) {
-            ID = s;
-        }
-        else {
-            ID = s.substring(7, index) + s.substring(index + 1);
-        }
     }
 
     ////////////////// Setters and getters //////////////////
     
+    @Override
     public String getName() {
         return name.get();
     }
 
+    @Override
     public void setName(String name) {
         this.name.set(name);
     }

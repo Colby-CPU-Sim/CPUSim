@@ -1,5 +1,6 @@
 package cpusim.assembler;
 
+import cpusim.model.util.NamedObject;
 import cpusim.util.*;
 import cpusim.xml.*;
 

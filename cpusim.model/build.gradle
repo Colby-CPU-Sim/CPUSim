@@ -1,0 +1,73 @@
+apply plugin: 'org.xtext.xtend'
+
+apply plugin: 'findbugs'
+
+xtend {
+    debugger {
+        hideSyntheticVariables = true
+    }
+    
+    generator {
+        javaSourceLevel = 8
+    }
+}
+
+dependencies {
+    compile project(':cpusim.annotations')
+
+    compile group: 'com.cathive.fx', name: 'fx-guice', version: '8.0.0'
+    
+    // https://mvnrepository.com/artifact/com.google.inject/guice
+    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
+    
+    // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-assistedinject
+    compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.1.0'
+    
+    // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-multibindings
+    compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.1.0'
+
+	compile group: 'org.eclipse.xtend', name: 'org.eclipse.xtend.lib', version: '${xtextVersion}'
+	
+	// https://mvnrepository.com/artifact/com.github.oehme.xtend/xtend-contrib
+    compile group: 'com.github.oehme.xtend', name: 'xtend-contrib', version: '1.1.0'
+
+    // Declare the dependency for your favourite test framework you want to use in your tests.
+    // TestNG is also supported by the Gradle Test task. Just change the
+    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
+    // 'test.useTestNG()' to your build script.
+    
+    // Used because tests use xtend
+    testCompile "org.eclipse.xtext:org.eclipse.xtext.junit4:${xtextVersion}"
+    testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.junit:${xtextVersion}"
+    
+    // FIXME
+    //testCompile project(':cpusim.gui')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/xtend', 'src/main/java', 'src/main/xtend-gen']
+        }
+        xtendOutputDir = 'src/main/xtend-gen'
+    }
+
+    test {
+        java {
+            srcDirs = ['src/test/xtend', 'src/test/xtend-gen']
+        }
+        xtendOutputDir = 'src/test/xtend-gen'
+    }
+}
+
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    
+    dependencies {
+        classpath 'org.xtext:xtext-gradle-plugin:1.0.2'
+    }
+}

@@ -20,10 +20,7 @@
 package cpusim.model;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
-
-import cpusim.util.NamedObject;
+import cpusim.model.util.NamedObject;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
 
