@@ -36,21 +36,32 @@
 
 package cpusim.model;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.util.NamedObject;
-import cpusim.util.Convert;
+import cpusim.model.util.conversion.ConvertLongs;
+import cpusim.model.util.conversion.ConvertStrings;
+import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
+import cpusim.model.util.Convert;
+import cpusim.model.util.LegacyXMLSupported;
+import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
+
+import com.google.common.base.Joiner;
+import com.google.common.primitives.Ints;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.ArrayList;
-import java.util.List;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineInstruction class
 
 public class MachineInstruction
-        implements Cloneable, NamedObject
+        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable
 {
 
     private String name;				//the name of the machine instruction
@@ -58,10 +69,10 @@ public class MachineInstruction
     private long opcode;					//the opcode of the instruction
     private Machine machine;
     private String format; //the format String matching the list of fields
-    private ArrayList<String> instructionColors;
-    private ArrayList<Field> assemblyFields;
-    private ArrayList<Field> instructionFields;
-    private ArrayList<String> assemblyColors;
+    private List<String> instructionColors;
+    private List<Field> assemblyFields;
+    private List<Field> instructionFields;
+    private List<String> assemblyColors;
 
     /*
      * CLASS INVARIANT:  Except when the InstructionDialog is open,
@@ -77,14 +88,14 @@ public class MachineInstruction
     public MachineInstruction(String name, long opcode, int[] fieldLengths,
                               Machine machine)
     {
-        this(name, opcode, Convert.lengths2Format(fieldLengths), machine);
+        this(name, opcode, Joiner.on(' ').join(Ints.asList(fieldLengths)), machine);
     }
 
     public MachineInstruction(String name, long opcode, String format,
                               Machine machine)
     {
-        this(name, opcode, Convert.formatStringToFields(format, machine), 
-                Convert.formatStringToFields(format, machine),
+        this(name, opcode, ConvertStrings.formatStringToFields(format, machine), 
+                ConvertStrings.formatStringToFields(format, machine),
                 Convert.generateTwoListsOfRandomLightColors(format.split(" ").length), machine);
     }
     
@@ -95,18 +106,18 @@ public class MachineInstruction
                 machine);
     }
     
-    public MachineInstruction(String name, long opcode, ArrayList<Field> instructionFields,
-            ArrayList<Field> assemblyFields, ArrayList<String> instructionColor,
-            ArrayList<String> assemblyColor, Machine machine)
+    public MachineInstruction(String name, long opcode, List<Field> newInstrFields,
+            List<Field> newAssemblyFields, List<String> newInstrColors,
+            List<String> newAssemblyColors, Machine machine)
     {
         this.name = name;
         this.opcode = opcode;
         this.micros = FXCollections.observableArrayList();
         this.machine = machine;
-        this.assemblyFields = assemblyFields;
-        this.instructionFields = instructionFields;
-        this.assemblyColors = assemblyColor;
-        this.instructionColors = instructionColor;
+        this.assemblyFields = newAssemblyFields;
+        this.instructionFields = newInstrFields;
+        this.assemblyColors = newAssemblyColors;
+        this.instructionColors = newInstrColors;
         
         //for backwards compatibility
         ArrayList<Field> fieldsToRemove = new ArrayList<>();
@@ -133,7 +144,7 @@ public class MachineInstruction
         return format;
     }
 
-    public ArrayList<Field> getAssemblyFields(){
+    public List<Field> getAssemblyFields(){
         return assemblyFields;
     }
 
@@ -150,7 +161,7 @@ public class MachineInstruction
 
     }
     
-    public ArrayList<Field> getInstructionFields(){
+    public List<Field> getInstructionFields(){
         return instructionFields;
     }
     
@@ -158,7 +169,7 @@ public class MachineInstruction
         this.instructionColors = instructionColors;
     }
     
-    public ArrayList<String> getInstructionColors(){
+    public List<String> getInstructionColors(){
         return this.instructionColors;
     }
     
@@ -166,7 +177,7 @@ public class MachineInstruction
         this.assemblyColors = assemblyColors;
     }
     
-    public ArrayList<String> getAssemblyColors(){
+    public List<String> getAssemblyColors(){
         return this.assemblyColors;
     }
     
@@ -174,12 +185,13 @@ public class MachineInstruction
      * returns the number of bits in the machine instruction
      * @return the number of bits in the machine instruction
      */
-    public int getNumBits(){
+    public ArchValue getNumBits(){
         int numBits = 0;
         for (Field field : this.instructionFields){
-            numBits += field.getNumBits();
+            numBits += field.getNumBits().as();
         }
-        return numBits;
+        
+        return ArchType.Bit.of(numBits);
     }
 
     /**
@@ -190,13 +202,13 @@ public class MachineInstruction
         List<Field> fields = getInstructionFields();
         int size = 0;
         for(Field field : fields)
-            if(field.getNumBits() > 0)
+            if(field.getNumBits().as() > 0)
                 size++;
         int[] lengths = new int[size];
         int j = 0;
         for (Field field : fields)
-            if (field.getNumBits() > 0) {
-                lengths[j] = field.getNumBits();
+            if (field.getNumBits().as() > 0) {
+                lengths[j] = field.getNumBits().as();
                 j++;
             }
 
@@ -212,12 +224,12 @@ public class MachineInstruction
         List<Field> fields = getInstructionFields();
         int size = 0;
         for(Field field : fields)
-            if(field.getNumBits() > 0)
+            if(field.getNumBits().as() > 0)
                 size++;
         boolean[] isSigned = new boolean[size];
         int j = 0;
         for (Field field : fields)
-            if (field.getNumBits() > 0) {
+            if (field.getNumBits().as() > 0) {
                 isSigned[j] = field.isSigned();
                 j++;
             }
@@ -251,7 +263,7 @@ public class MachineInstruction
         List<String> aColors = new ArrayList<String>();
         i = 0;
         for(Field field : assemblyFields){
-            if(field.getNumBits() > 0){
+            if(field.getNumBits().as() > 0){
                 aColors.add(assemblyColors.get(i));
             }
             i++;
@@ -283,11 +295,13 @@ public class MachineInstruction
         this.assemblyFields = assemblyFields;
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
+    @Override
     public void setName(String newName)
     {
         name = newName;
@@ -353,7 +367,7 @@ public class MachineInstruction
     {
         int length = 0;
         for (Field field : getInstructionFields()) {
-            length += field.getNumBits();
+            length += field.getNumBits().as();
         }
         return length;
     }
@@ -390,8 +404,8 @@ public class MachineInstruction
         String result = indent + "<MachineInstruction name=\"" +
                 HtmlEncoder.sEncode(getName()) + "\" opcode=\"" +
                 Long.toHexString(getOpcode()) + "\" instructionFormat=\"" + 
-                Convert.fieldsToFormatString(instructionFields) + "\" assemblyFormat=\"" +
-                Convert.fieldsToFormatString(assemblyFields) + "\" instructionColors=\"" + 
+                ConvertStrings.fieldsToFormatString(instructionFields) + "\" assemblyFormat=\"" +
+                ConvertStrings.fieldsToFormatString(assemblyFields) + "\" instructionColors=\"" + 
                 Convert.colorsListToXML(instructionColors)+ "\" assemblyColors=\"" + 
                 Convert.colorsListToXML(assemblyColors)+ "\" >" + nl;
         for (Microinstruction micro : micros) {
@@ -411,12 +425,12 @@ public class MachineInstruction
         
         double length = 0.0;
         for(Field field : instructionFields){
-            length += (double)field.getNumBits();
+            length += (double)field.getNumBits().as();
         }
         
         for (int i=0; i<instructionFields.size(); i++){
             instrFormat += "<td align=\"center\" width=\""+Math.rint((((double)
-                    instructionFields.get(i).getNumBits())/length)*100)+"%\" bgcolor=\""
+                    instructionFields.get(i).getNumBits().as())/length)*100)+"%\" bgcolor=\""
                     +instructionColors.get(i)+
                     "\">"+ instructionFields.get(i).getName()+"</td>";
         }
@@ -433,8 +447,8 @@ public class MachineInstruction
         assembFormat += "</tr></table>";
         
         String result = "<TR><TD>" + HtmlEncoder.sEncode(getName()) +
-                "</TD><TD>" + Convert.fromLongToHexadecimalString(getOpcode(),
-                        getInstructionFields().get(0).getNumBits()) +
+                "</TD><TD>" + ConvertLongs.fromLongToHexadecimalString(getOpcode(),
+                        getInstructionFields().get(0).getNumBits().as()) +
                 "</TD><TD>" + instrFormat + "</TD><TD>" + assembFormat;
         result += "</TD><TD>";
         for (int i = 0; i < getMicros().size(); i++) {

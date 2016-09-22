@@ -20,10 +20,11 @@ package cpusim.gui.editmachineinstruction.editfields;
 
 import cpusim.model.Field;
 import cpusim.model.FieldValue;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.util.Dialogs;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;

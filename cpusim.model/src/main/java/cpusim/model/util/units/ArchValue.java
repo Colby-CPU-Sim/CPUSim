@@ -11,6 +11,8 @@ import javax.annotation.Generated;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 /**
@@ -34,15 +36,26 @@ public class ArchValue implements Comparable<ArchValue> {
 	/**
 	 * Value in {@link #type} units. 
 	 */
+	@JsonProperty("value") // manual spec for serialization, do not expose as getter
 	private final int value;
 	
 	/**
-	 * Creates a new ArchValue with `type` and `value`. This is meant to only be used by {@link ArchType#value(int)}.
+	 * Stores an {@link ArchValue} of <code>0</code> {@link ArchType#Bit}s.
+	 * 
+	 * @see ArchType#Bit
+	 * @see ArchType#of(int)
+	 */
+	public static final ArchValue ZERO = ArchType.Bit.of(0);
+	
+	/**
+	 * Creates a new ArchValue with `type` and `value`. This is meant to only be used by {@link ArchType#of(int)}.
 	 * 
 	 * @param type
 	 * @param value
 	 */
-	ArchValue(final ArchType type, final int value) {
+	@JsonCreator
+	ArchValue(@JsonProperty("type") final ArchType type, 
+			  @JsonProperty("value") final int value) {
 		checkArgument(value >= 0, "value must be a value >= 0");
 		this.type = checkNotNull(type);
 		this.value = value;
@@ -59,10 +72,46 @@ public class ArchValue implements Comparable<ArchValue> {
 	}
 	
 	/**
+	 * Short-cut method for bit values. Delegates to {@link ArchType#Bit}'s {@link ArchType#of(int)}.
+	 * 
+	 * @param bitValue
+	 * @return Non-<code>null</code> {@link ArchValue}
+	 * 
+	 * @see ArchType#of(int)
+	 */
+	public static ArchValue bits(final int bitValue) {
+		return ArchType.Bit.of(bitValue);
+	}
+		
+	/**
+	 * Converts the stored type into the new `other` type.
+	 * 
+	 * @param other {@link ArchType} to convert to.
+	 * @return `new` {@link ArchValue} of type `other`. 
+	 */
+	public ArchValue convert(final ArchType other) {
+		return new ArchValue(checkNotNull(other), this);
+	}
+	
+	
+	/**
+	 * Gets the value as <code>other</code> units. <code>other</code> defaults to {@link ArchType#Bit}.
+	 * 
+	 * @param other {@link ArchType} to convert to.
+	 * @return `new` {@link ArchValue} of type `other`. 
+	 */
+	public int as(final ArchType other) {
+		return convert(other).value;
+	}
+	
+
+	/**
 	 * The stored value as a bits value.
 	 * @return the stored value converted to bits.
+	 * 
+	 * @see #as(ArchType)
 	 */
-	public int asBits() {
+	public int as() {
 		return type.asBits(value);
 	}
 	
@@ -75,13 +124,11 @@ public class ArchValue implements Comparable<ArchValue> {
 	}
 	
 	/**
-	 * Converts the stored type into the new `other` type.
-	 * 
-	 * @param other {@link ArchType} to convert to.
-	 * @return `new` {@link ArchValue} of type `other`. 
+	 * Get the stored value in unit {@link #getType()}.
+	 * @return value in the base specified.
 	 */
-	public ArchValue as(final ArchType other) {
-		return new ArchValue(checkNotNull(other), this);
+	public int getValue() {
+		return value;
 	}
 	
 	/**
@@ -89,7 +136,16 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return newly allocated array of bytes
 	 */
 	public byte[] newByteArray() {
-	   return new byte[as(ArchType.Byte).value];
+	   return new byte[convert(ArchType.Byte).value];
+	}
+	
+	/**
+	 * Create a mask of <code>this</code> units wide. 
+	 * 
+	 * @return bit mask. 
+	 */
+	public long mask() {
+		return type.getMask(value);
 	}
 	
 	/**
@@ -99,7 +155,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue add(ArchValue other) {
-		return new ArchValue(type, checkNotNull(other).as(type).value + value);
+		return new ArchValue(type, checkNotNull(other).convert(type).value + value);
 	}
 	
 	/**
@@ -109,7 +165,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue sub(ArchValue other) {
-		return new ArchValue(type, value - checkNotNull(other).as(type).value);
+		return new ArchValue(type, value - checkNotNull(other).convert(type).value);
 	}
 	
 	/**
@@ -119,7 +175,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue mul(ArchValue other) {
-		return new ArchValue(type, value * checkNotNull(other).as(type).value);
+		return new ArchValue(type, value * checkNotNull(other).convert(type).value);
 	}
 	
 	/**
@@ -129,7 +185,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue div(ArchValue other) {
-		return new ArchValue(type, value / checkNotNull(other).as(type).value);
+		return new ArchValue(type, value / checkNotNull(other).convert(type).value);
 	}
 	
 	/**
@@ -139,7 +195,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue mod(ArchValue other) {
-		return new ArchValue(type, value % checkNotNull(other).as(type).value);
+		return new ArchValue(type, value % checkNotNull(other).convert(type).value);
 	}
 	
 	/**
@@ -149,7 +205,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue shl(ArchValue other) {
-		return new ArchValue(type, value << checkNotNull(other).asBits());
+		return new ArchValue(type, value << checkNotNull(other).as());
 	}
 	
 	/**
@@ -159,7 +215,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue shr(ArchValue other) {
-		return new ArchValue(type, value >> checkNotNull(other).asBits());
+		return new ArchValue(type, value >> checkNotNull(other).as());
 	}
 	
 	/**
@@ -169,7 +225,55 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return new {@link ArchValue} with type `this.type`
 	 */
 	public ArchValue ashr(ArchValue other) {
-		return new ArchValue(type, value >>> checkNotNull(other).asBits());
+		return new ArchValue(type, value >>> checkNotNull(other).as());
+	}
+	
+	/**
+	 * Check if a value is less than <code>other</code>.
+	 * 
+	 * @param other
+	 * @return True if <code>this &lt; other</code>
+	 * 
+	 * @throws NullPointerException if <code>other</code> is <code>null</code>
+	 */
+	public boolean lt(ArchValue other) {
+		return as() < checkNotNull(other).as();
+	}
+	
+	/**
+	 * Check if a value is less than or equal to <code>other</code>.
+	 * 
+	 * @param other
+	 * @return True if <code>this &lt;= other</code>
+	 * 
+	 * @throws NullPointerException if <code>other</code> is <code>null</code>
+	 */
+	public boolean lte(ArchValue other) {
+		return as() <= checkNotNull(other).as();
+	}
+	
+	/**
+	 * Check if a value is greater than <code>other</code>.
+	 * 
+	 * @param other
+	 * @return True if <code>this &gt; other</code>
+	 * 
+	 * @throws NullPointerException if <code>other</code> is <code>null</code>
+	 */
+	public boolean gt(ArchValue other) {
+		return as() > checkNotNull(other).as();
+	}
+	
+	/**
+	 * Check if a value is greater than or equal to <code>other</code>.
+	 * 
+	 * @param other
+	 * @return True if <code>this &gt;= other</code>
+	 * 
+	 * @throws NullPointerException if <code>other</code> is <code>null</code>
+	 */
+	public boolean gte(ArchValue other) {
+		return as() >= checkNotNull(other).as();
 	}
 	
 	/**
@@ -196,12 +300,12 @@ public class ArchValue implements Comparable<ArchValue> {
 
 	@Override
 	public int compareTo(ArchValue other) {
-		return this.value - checkNotNull(other).as(type).value;
+		return this.value - checkNotNull(other).convert(type).value;
 	}
 	
 	@Override
 	public int hashCode() {
-		return Integer.hashCode(asBits());
+		return Integer.hashCode(as());
 	}
 	
 	@Override

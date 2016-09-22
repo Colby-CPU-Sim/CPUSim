@@ -1,7 +1,8 @@
 package cpusim.gui.options;
 
 import javafx.beans.property.SimpleObjectProperty;
-import cpusim.iochannel.IOChannel;
+
+import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.IO;
 
 public class IOOptionsData {

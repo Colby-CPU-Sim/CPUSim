@@ -161,7 +161,7 @@ public class TransferRtoR extends Microinstruction {
      * copies the data from the current micro to a specific micro
      * @param oldMicro the micro instruction that will be updated
      */
-    public void copyDataTo(Microinstruction oldMicro)
+    public void copyTo(Microinstruction oldMicro)
     {
         assert oldMicro instanceof TransferRtoR :
                 "Passed non-TransferRtoR to TransferRtoR.copyDataTo()";

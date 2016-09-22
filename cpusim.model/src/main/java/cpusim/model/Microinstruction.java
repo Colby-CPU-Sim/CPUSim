@@ -25,18 +25,17 @@
 package cpusim.model;
 
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
+import cpusim.xml.HTMLEncodable;
+import cpusim.xml.HtmlEncoder;
 
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
+import com.google.common.base.Strings;
 
-import cpusim.util.*;  //for Assert
-import cpusim.xml.*;   //for HtmlEncoder
 import javafx.beans.property.SimpleStringProperty;
-
-import java.io.*;
-
-//for Serializable
 
 
 
@@ -44,11 +43,12 @@ import java.io.*;
 // the Microinstruction class
 
 public abstract class Microinstruction
-        implements Serializable, Cloneable, NamedObject
+        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable
 {
+	
     // name of the microinstruction
-    private SimpleStringProperty name = new SimpleStringProperty("");
-    private String ID;
+    private SimpleStringProperty name;
+    
     protected Machine machine;
 
     //------------------------------
@@ -56,18 +56,22 @@ public abstract class Microinstruction
 
     public Microinstruction(String name, Machine machine)
     {
-        setName(name);
-        
+    	checkNotNull(name);
+    	checkArgument(!Strings.isNullOrEmpty(name));
+    	
+    	this.name = new SimpleStringProperty(name);
         this.machine = machine;
-
-        String s = super.toString();
-        int index = s.indexOf('@');
-        if (index == -1)
-            ID = s;
-        else
-            ID = s.substring(7, index) + s.substring(index + 1);
-
-    }
+    }   
+    
+	/**
+	 * Copy constructor: copies data in <code>other</code>.
+	 * @param other Instance to copy from
+	 * 
+	 * @throws NullPointerException if <code>other</code> is <code>null</code>.
+	 */
+	public Microinstruction(final Microinstruction other) {
+		this(checkNotNull(other).getName(), other.machine);
+	}
 
     /**
      * returns the name of the set microinstruction as a string.
@@ -103,28 +107,11 @@ public abstract class Microinstruction
         return name.get();
     }
 
-    // the ID is a unique identifier for each microinstruction.  It is
-    // used in the XML machine file.
-    // if the Object.toString() method returns "cpusim.xxx.zzz@yyy",
-    // then this method returns "xxx.zzzyyy".
-    // This ID string is computed only once, in the Microinstruction
-    // constructor.
-    public String getID()
-    {
-        return ID;
-    }
-
     //------------------------------
     // abstract methods
     // These methods should be overridden by all subclasses
 
-    public void execute()
-    {
-        assert false : "The execute() method of the abstract " +
-                "Microinstruction class was called.";
-    }
-
-    public abstract void copyDataTo(Microinstruction oldMicro);
+    public abstract void execute();
 
     public abstract Object clone();
 
@@ -132,9 +119,14 @@ public abstract class Microinstruction
 
     public abstract String getHTMLDescription();
 
-    //------------------------------
-    // returns true if this microinstruction uses m
-    // (so if m is modified, this micro may need to be modified.
+    /**
+     * returns true if this microinstruction uses m (so if m is modified, this micro may need to be modified.
+     * 
+     * @param m
+     * @return
+     * 
+     * @throws NullPointerException if <code>m</code> is <code>null</code>.
+     */
     public abstract boolean uses(Module m);
 
 

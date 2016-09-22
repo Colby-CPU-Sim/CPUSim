@@ -17,8 +17,9 @@ import cpusim.gui.help.HelpController;
 import cpusim.gui.util.Base;
 import cpusim.gui.util.EditingMultiBaseStyleLongCell;
 import cpusim.gui.util.EditingStrCell;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

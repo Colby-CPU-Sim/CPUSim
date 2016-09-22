@@ -5,7 +5,8 @@
  */
 package cpusim.gui.desktop;
 
-import cpusim.util.Convert;
+import cpusim.model.util.Convert;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.MenuItem;

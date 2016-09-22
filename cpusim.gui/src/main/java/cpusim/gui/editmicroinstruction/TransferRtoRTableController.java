@@ -28,8 +28,9 @@ import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
+
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

@@ -57,7 +57,7 @@ public class End extends Microinstruction
      * copies the data from the current micro to a specific micro
      * @param newMicro the micro instruction that will be updated
      */
-    public void copyDataTo(Microinstruction newMicro)
+    public void copyTo(Microinstruction newMicro)
     {
         assert false : "End.copyDataTo() was called.";
     } // end copyDataTo()

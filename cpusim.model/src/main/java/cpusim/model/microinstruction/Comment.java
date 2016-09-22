@@ -54,7 +54,7 @@ public class Comment extends Microinstruction
      * copies the data from the current micro to a specific micro
      * @param newMicro the micro instruction that will be updated
      */
-    public void copyDataTo(Microinstruction newMicro)
+    public void copyTo(Microinstruction newMicro)
     {
         assert false : "Comment.copyDataTo() was called.";
     } // end copyDataTo()

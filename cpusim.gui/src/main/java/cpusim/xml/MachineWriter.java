@@ -34,9 +34,9 @@ package cpusim.xml;
 
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
-import cpusim.iochannel.FileChannel;
-import cpusim.iochannel.IOChannel;
 import cpusim.model.*;
+import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.IO;
 import cpusim.util.RegisterRAMPair;

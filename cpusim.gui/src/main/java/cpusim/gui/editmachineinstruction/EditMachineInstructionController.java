@@ -33,12 +33,15 @@ import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.model.microinstruction.Comment;
-import cpusim.util.Convert;
+import cpusim.model.util.Convert;
+import cpusim.model.util.MoreFXCollections;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -405,21 +408,13 @@ public class EditMachineInstructionController {
         allFields = FXCollections.observableArrayList();
 
         for (Field field : realAllFields) {
-            List<FieldValue> realFieldValues = field.getValues();
-            ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
-            for (FieldValue fieldValue : realFieldValues) {
-                fieldValues.add(new FieldValue(fieldValue.getName(), fieldValue
-                        .getValue()));
-            }
-            allFields.add(new Field(field.getName(), field.getType(), field.getNumBits(),
-                    field.getRelativity(), fieldValues, field.getDefaultValue(),
-                    field.isSigned()));
+            allFields.add(new Field(field));
         }
 
         for (MachineInstruction instr : realInstructions) {
 
-            ArrayList<Field> oldInstrFields = instr.getInstructionFields();
-            ArrayList<Field> newInstrFields = new ArrayList<>();
+            List<Field> oldInstrFields = instr.getInstructionFields();
+            List<Field> newInstrFields = new ArrayList<>();
             for (Field oldField : oldInstrFields) {
                 for (Field newField : allFields) {
                     if (oldField.getName().equals(newField.getName())) {
@@ -428,8 +423,8 @@ public class EditMachineInstructionController {
                 }
             }
 
-            ArrayList<Field> oldAssemblyFields = instr.getAssemblyFields();
-            ArrayList<Field> newAssemblyFields = new ArrayList<>();
+            List<Field> oldAssemblyFields = instr.getAssemblyFields();
+            List<Field> newAssemblyFields = new ArrayList<>();
             for (Field oldField : oldAssemblyFields) {
                 for (Field newField : allFields) {
                     if (oldField.getName().equals(newField.getName())) {
@@ -438,15 +433,14 @@ public class EditMachineInstructionController {
                 }
             }
 
-
-            ArrayList<String> oldInstrColors = instr.getInstructionColors();
-            ArrayList<String> newInstrColors = new ArrayList<>();
+            List<String> oldInstrColors = instr.getInstructionColors();
+            List<String> newInstrColors = new ArrayList<>();
             for (String colors : oldInstrColors) {
                 newInstrColors.add(colors);
             }
 
-            ArrayList<String> oldAssemblyColors = instr.getAssemblyColors();
-            ArrayList<String> newAssemblyColors = new ArrayList<>();
+            List<String> oldAssemblyColors = instr.getAssemblyColors();
+            List<String> newAssemblyColors = new ArrayList<>();
             for (String colors : oldAssemblyColors) {
                 newAssemblyColors.add(colors);
             }
@@ -456,9 +450,7 @@ public class EditMachineInstructionController {
                     newInstrFields, newAssemblyFields, newInstrColors, newAssemblyColors,
                     mediator.getMachine());
 
-            ObservableList<Microinstruction> newMicros = FXCollections
-                    .observableArrayList(
-                            new ArrayList<>());
+            ObservableList<Microinstruction> newMicros = FXCollections.observableArrayList(new ArrayList<>());
             ObservableList<Microinstruction> oldMicros = instr.getMicros();
             for (Microinstruction micro : oldMicros) {
                 newMicros.add(micro);

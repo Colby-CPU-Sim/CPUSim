@@ -6,8 +6,8 @@
 package cpusim.gui.util;
 
 import cpusim.gui.desktop.FontData;
+import cpusim.model.util.Convert;
 import cpusim.util.CPUSimConstants;
-import cpusim.util.Convert;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

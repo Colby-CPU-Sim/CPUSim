@@ -16,8 +16,9 @@ import cpusim.gui.help.HelpController;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import cpusim.util.ValidationException;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;

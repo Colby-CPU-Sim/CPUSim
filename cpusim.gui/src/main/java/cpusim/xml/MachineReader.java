@@ -39,13 +39,10 @@
 package cpusim.xml;
 
 
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
-
-import cpusim.iochannel.FileChannel;
-import cpusim.iochannel.IOChannel;
 import cpusim.model.*;
 import cpusim.model.Field.Type;
+import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.IOChannel;
 import cpusim.assembler.EQU;
 import cpusim.assembler.PunctChar;
 import cpusim.model.microinstruction.*;
@@ -53,6 +50,10 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.Convert;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -1587,8 +1588,8 @@ public class MachineReader implements CPUSimConstants
         }
         else {
             // version 3: separate formats for machine & assembly instructions
-            currentInstruction = new MachineInstruction(name, opcode, Convert
-                    .formatStringToFields(currentInstructionFormat, machine), Convert
+            currentInstruction = new MachineInstruction(name, opcode, ConvertStrings
+                    .formatStringToFields(currentInstructionFormat, machine), ConvertStrings
                     .formatStringToFields(currentAssemblyFormat, machine), Convert
                     .xmlToColorsList(instrColors), Convert.xmlToColorsList
                     (assemblyColors), machine);

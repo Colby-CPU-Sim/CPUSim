@@ -13,9 +13,16 @@ xtend {
 }
 
 dependencies {
-    compile project(':cpusim.annotations')
-
     compile group: 'com.cathive.fx', name: 'fx-guice', version: '8.0.0'
+    
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.3'
+    
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.3'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.3'
     
     // https://mvnrepository.com/artifact/com.google.inject/guice
     compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
@@ -47,14 +54,14 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/xtend', 'src/main/java', 'src/main/xtend-gen']
+            srcDirs = ['src/main/java']
         }
         xtendOutputDir = 'src/main/xtend-gen'
     }
 
     test {
         java {
-            srcDirs = ['src/test/xtend', 'src/test/xtend-gen']
+            srcDirs = ['src/test/java']
         }
         xtendOutputDir = 'src/test/xtend-gen'
     }

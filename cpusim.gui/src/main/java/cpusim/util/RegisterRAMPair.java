@@ -24,6 +24,8 @@ import cpusim.model.module.Register;
 /**
  * Holds a Register and a RAM for the purpose of highlighting.
  * The RAM cell whose address is in the register is highlighted when in Debug mode.
+ * 
+ * @since 2001-06-01
  */
 public class RegisterRAMPair implements Cloneable {
 	

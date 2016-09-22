@@ -21,9 +21,10 @@ import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.util.CPUSimConstants;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;

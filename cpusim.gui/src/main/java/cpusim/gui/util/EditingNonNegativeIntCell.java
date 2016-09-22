@@ -5,7 +5,7 @@
 
 package cpusim.gui.util;
 
-import cpusim.util.Convert;
+import cpusim.model.util.Convert;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

@@ -16,7 +16,9 @@ import cpusim.assembler.EQU;
 import cpusim.gui.desktop.FontData;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
-import cpusim.util.Convert;
+import cpusim.model.util.Convert;
+import cpusim.model.util.MoreStrings;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -205,7 +207,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     private String prepareString(String s) {
         switch (base.getBase()) {
             case "Bin": {
-                s = Convert.removeAllWhiteSpace(s);
+                s = MoreStrings.removeAllWhiteSpace(s);
                 int zeroesNeeded = cellSize - s.length();
                 String zeroString = "";
                 for (int i = 0; i < zeroesNeeded; i++) {
@@ -215,7 +217,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
                 break;
             }
             case "Hex": {
-                s = Convert.removeAllWhiteSpace(s);
+                s = MoreStrings.removeAllWhiteSpace(s);
                 int zeroesNeeded = cellSize / 4 - s.length() +
                                    cellSize % 4 == 0 ? 0 : 1;
                 String zeroString = "";
@@ -227,7 +229,7 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
             }
             case "Dec":
             case "Unsigned Dec":
-                s = Convert.removeAllWhiteSpace(s);
+                s = MoreStrings.removeAllWhiteSpace(s);
         }
 
         return s;

@@ -15,6 +15,7 @@
 package cpusim.util;
 
 import cpusim.Mediator;
+import cpusim.assembler.SourceLine;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;

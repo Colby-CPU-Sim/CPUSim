@@ -12,9 +12,10 @@ import cpusim.gui.editmodules.RegistersTableController;
 import cpusim.gui.help.HelpController;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import cpusim.util.Validate;
-import cpusim.util.ValidationException;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;

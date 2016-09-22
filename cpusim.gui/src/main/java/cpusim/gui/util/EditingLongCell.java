@@ -5,9 +5,10 @@
 
 package cpusim.gui.util;
 
-import cpusim.util.Convert;
+import cpusim.model.util.Convert;
+import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import cpusim.util.ValidationException;
+
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;

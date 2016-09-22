@@ -1,16 +1,17 @@
 package cpusim.gui.desktop.editorpane;
 
-import cpusim.model.MachineInstruction;
-import cpusim.Mediator;
-import cpusim.assembler.PunctChar;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyleSpansBuilder;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import cpusim.Mediator;
+import cpusim.assembler.PunctChar;
+import cpusim.model.MachineInstruction;
+
+import org.fxmisc.richtext.StyleSpans;
+import org.fxmisc.richtext.StyleSpansBuilder;
 
 /**
  * File: CodePaneController

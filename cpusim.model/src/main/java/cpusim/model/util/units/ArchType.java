@@ -71,7 +71,7 @@ public enum ArchType {
 	 * @return Converted value represented by `otherType`
 	 */
 	int convertTo(final ArchType otherType, final int value) {
-		final double conv = (value * (checkNotNull(otherType).bitFactor / bitFactor));
+		final double conv = (value * (bitFactor / checkNotNull(otherType).bitFactor));
 		return (int)Math.ceil(conv);
 	}
 	
@@ -91,7 +91,7 @@ public enum ArchType {
 	 * @param value value in the {@link ArchType} units.
 	 * @return new {@link ArchValue}.
 	 */
-	public ArchValue value(final int value) {
+	public ArchValue of(final int value) {
 		return new ArchValue(this, value);
 	}
 }

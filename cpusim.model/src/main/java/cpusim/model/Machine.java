@@ -12,11 +12,11 @@
  */
 package cpusim.model;
 
-import cpusim.ExecutionException;
+import cpusim.model.ExecutionException;
 import cpusim.iochannel.FileChannel;
 import cpusim.iochannel.IOChannel;
-import cpusim.assembler.EQU;
-import cpusim.assembler.PunctChar;
+import cpusim.model.assembler.EQU;
+import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
 import cpusim.util.CPUSimConstants;

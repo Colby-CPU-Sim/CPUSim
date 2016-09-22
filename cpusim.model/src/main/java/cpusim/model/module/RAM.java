@@ -21,7 +21,7 @@ package cpusim.model.module;
 
 import cpusim.ExecutionException;
 import cpusim.model.Module;
-import cpusim.assembler.AssembledInstructionCall;
+import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.util.LoadException;
 import cpusim.util.SourceLine;
 import javafx.beans.property.SimpleIntegerProperty;

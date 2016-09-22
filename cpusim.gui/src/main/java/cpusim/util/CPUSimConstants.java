@@ -10,11 +10,11 @@
 
 package cpusim.util;
 
-import cpusim.iochannel.BufferedChannel;
-import cpusim.iochannel.ConsoleChannel;
-import cpusim.iochannel.DialogChannel;
-import cpusim.iochannel.IOChannel;
 import cpusim.model.Machine;
+import cpusim.model.iochannel.BufferedChannel;
+import cpusim.model.iochannel.ConsoleChannel;
+import cpusim.model.iochannel.DialogChannel;
+import cpusim.model.iochannel.IOChannel;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 
