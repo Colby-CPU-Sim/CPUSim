@@ -39,7 +39,7 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.IO;
-import cpusim.util.RegisterRAMPair;
+import cpusim.model.module.RegisterRAMPair;
 import javafx.collections.ObservableList;
 
 import java.io.PrintWriter;

@@ -114,8 +114,9 @@ public class SetCondBit extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<SetCondBit name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<SetCondBit name=\"" + getHTMLName() +
                 "\" bit=\"" + getBit().getID() +
                 "\" value=\"" + getValue() +
                 "\" id=\"" + getID() + "\" />";
@@ -125,8 +126,9 @@ public class SetCondBit extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getBit().getHTMLName() +
                 "</TD><TD>" + getValue() +
                 "</TD></TR>";
@@ -138,7 +140,8 @@ public class SetCondBit extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == bit.get());
     }
 }

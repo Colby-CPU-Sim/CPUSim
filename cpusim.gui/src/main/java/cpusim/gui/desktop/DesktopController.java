@@ -555,7 +555,7 @@ public class DesktopController implements Initializable
         // Set up channels
         ((DialogChannel) (((BufferedChannel) (CPUSimConstants.DIALOG_CHANNEL))
                 .getChannel())).setStage(stage);
-        ((ConsoleChannel) (((BufferedChannel) (CPUSimConstants.CONSOLE_CHANNEL))
+        ((ConsoleChannel) (((BufferedChannel) (StreamChannel.console()))
                 .getChannel())).setMediator(mediator);
 
         // whenever a new tab in the code text area is selected,
@@ -2090,7 +2090,7 @@ public class DesktopController implements Initializable
             boolean consoleIsInputOrOutputChannel = false;
             for (Microinstruction micro : ios) {
                 IO io = (IO) micro;
-                if (io.getConnection().equals(CPUSimConstants.CONSOLE_CHANNEL)) {
+                if (io.getConnection().equals(StreamChannel.console())) {
                     consoleIsInputOrOutputChannel = true;
                 }
             }

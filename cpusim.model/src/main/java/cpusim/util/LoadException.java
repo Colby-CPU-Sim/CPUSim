@@ -13,20 +13,24 @@
 
 package cpusim.util;
 
-import cpusim.model.module.*;
-import cpusim.assembler.AssembledInstructionCall;
-
 import java.util.List;
+
+import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.module.RAM;
 
 /**
  * The class represents an exception that occurs when attempting to load a machine
  * language program into RAM and there isn't enough RAM for the program.
  */
-
 public class LoadException extends RuntimeException
 {
 
-    public RAM ram;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	public RAM ram;
     public List<AssembledInstructionCall> instructions;
 
     public LoadException(String message, RAM memory,

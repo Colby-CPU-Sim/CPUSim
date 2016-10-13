@@ -39,6 +39,7 @@ import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
+import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
@@ -688,7 +689,7 @@ public class OptionsController implements Initializable {
 
         // make initial Channels
         allChannels = FXCollections.observableArrayList(
-                CPUSimConstants.CONSOLE_CHANNEL,
+                StreamChannel.console(),
                 CPUSimConstants.DIALOG_CHANNEL,
                 CPUSimConstants.FILE_CHANNEL);
 
@@ -762,8 +763,8 @@ public class OptionsController implements Initializable {
                 "to " + CPUSimConstants.DIALOG_CHANNEL.toString(),
                 (BufferedChannel) CPUSimConstants.DIALOG_CHANNEL);
         ComboBoxChannel consoleCBChannel = new ComboBoxChannel(
-                "to " + CPUSimConstants.CONSOLE_CHANNEL.toString(),
-                (BufferedChannel) CPUSimConstants.CONSOLE_CHANNEL);
+                "to " + StreamChannel.console().toString(),
+                (BufferedChannel) StreamChannel.console());
         this.changeAllCombo.getItems().addAll(
                 nullChannel, dialogCBChannel, consoleCBChannel);
         this.changeAllCombo.setValue(nullChannel);

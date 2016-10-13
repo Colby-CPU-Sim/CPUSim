@@ -12,22 +12,47 @@
  */
 package cpusim.model;
 
-import cpusim.model.ExecutionException;
-import cpusim.iochannel.FileChannel;
-import cpusim.iochannel.IOChannel;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
-import cpusim.model.microinstruction.*;
-import cpusim.model.module.*;
-import cpusim.util.CPUSimConstants;
+import cpusim.model.assembler.PunctChar.Use;
+import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.IOChannel;
+import cpusim.model.iochannel.StreamChannel;
+import cpusim.model.microinstruction.Arithmetic;
+import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.CpusimSet;
+import cpusim.model.microinstruction.End;
+import cpusim.model.microinstruction.IO;
+import cpusim.model.microinstruction.Increment;
+import cpusim.model.microinstruction.MemoryAccess;
+import cpusim.model.microinstruction.SetCondBit;
+import cpusim.model.microinstruction.Test;
+import cpusim.model.microinstruction.TransferAtoR;
+import cpusim.model.microinstruction.TransferRtoA;
+import cpusim.model.microinstruction.TransferRtoR;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.ControlUnit;
+import cpusim.model.module.RAM;
+import cpusim.model.module.RAMLocation;
+import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
-
-import java.io.Serializable;
-import java.util.*;
 
 /**
  * This file contains the class for Machines created using CPU Sim
@@ -41,7 +66,7 @@ import java.util.*;
  * a new microInstructionStack of HashMaps as an element in the
  * machineInstructionStack.
  */
-public class Machine extends Module implements Serializable, CPUSimConstants {
+public class Machine extends Module<Machine> implements Serializable {
 
     private static final long serialVersionUID = 1L;
     public static final Register PLACE_HOLDER_REGISTER =
@@ -117,7 +142,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     // Fields of the machine instructions
     private List<Field> fields;
     // Array of PunctChars.
-    private PunctChar[] punctChars;
+    private List<PunctChar> punctChars;
     // Address to start when loading RAM with a program
     private int startingAddressForLoading;
     // RAM where the code store resides
@@ -150,7 +175,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         instructions = new ArrayList<>();
         EQUs = FXCollections.observableArrayList(new ArrayList<EQU>());
         fields = new ArrayList<>();
-        punctChars = getDefaultPunctChars();
+        punctChars = Lists.newArrayList(getDefaultPunctChars());
 
         fetchSequence =
                 new MachineInstruction("Fetch sequence", 0, "", this);
@@ -296,61 +321,64 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
     }
 
     /**
-     * Gives an Array of the default PunctChars and their
-     * Uses.
-     *
-     * @return - an Array of the default PunctChars and their
-     * Uses.
+     * for the punctuation characters:  !@$%^&*()_={}[]|\:;,.?/~#-+`
+     * creates the default uses.
+     * The other four punctuation characters: <>"'
+     *    already have special meanings and cannot be redefined.
+     *    <>"' are all quoting characters.
+     * The punctuation characters + and - can initiate numbers but
+     *    otherwise they can be symbol chars or
+     *    individual tokens or illegal.
      */
-    public static PunctChar[] getDefaultPunctChars() {
-        //for the punctuation characters:  !@$%^&*()_={}[]|\:;,.?/~#-+`
-        //    creates the default uses.
-        //The other four punctuation characters: <>"'
-        //    already have special meanings and cannot be redefined.
-        //    <>"' are all quoting characters.
-        // The punctuation characters + and - can initiate numbers but
-        //    otherwise they can be symbol chars or
-        //    individual tokens or illegal.
-        return new PunctChar[]{
-                new PunctChar('!', PunctChar.Use.symbol),
-                new PunctChar('#', PunctChar.Use.symbol),
-                new PunctChar('$', PunctChar.Use.symbol),
-                new PunctChar('%', PunctChar.Use.symbol),
-                new PunctChar('&', PunctChar.Use.symbol),
-                new PunctChar('^', PunctChar.Use.symbol),
-                new PunctChar('_', PunctChar.Use.symbol),
-                new PunctChar('`', PunctChar.Use.symbol),
-                new PunctChar('*', PunctChar.Use.symbol),
-                new PunctChar('?', PunctChar.Use.symbol),
-                new PunctChar('@', PunctChar.Use.symbol),
-                new PunctChar('~', PunctChar.Use.symbol),
-                new PunctChar('+', PunctChar.Use.symbol),
-                new PunctChar('-', PunctChar.Use.symbol),
-                new PunctChar('(', PunctChar.Use.token),
-                new PunctChar(')', PunctChar.Use.token),
-                new PunctChar(',', PunctChar.Use.token),
-                new PunctChar('/', PunctChar.Use.token),
-                new PunctChar('=', PunctChar.Use.token),
-                new PunctChar('[', PunctChar.Use.token),
-                new PunctChar('\\', PunctChar.Use.token),
-                new PunctChar(']', PunctChar.Use.token),
-                new PunctChar('{', PunctChar.Use.token),
-                new PunctChar('|', PunctChar.Use.token),
-                new PunctChar('}', PunctChar.Use.token),
-                new PunctChar('.', PunctChar.Use.pseudo),
-                new PunctChar(':', PunctChar.Use.label),
-                new PunctChar(';', PunctChar.Use.comment),
-        };
+    private static final ImmutableList<PunctChar> DEFAULT_PUNCT_CHARS = 
+    		ImmutableList.of(new PunctChar('!', PunctChar.Use.symbol),
+                    new PunctChar('#', PunctChar.Use.symbol),
+                    new PunctChar('$', PunctChar.Use.symbol),
+                    new PunctChar('%', PunctChar.Use.symbol),
+                    new PunctChar('&', PunctChar.Use.symbol),
+                    new PunctChar('^', PunctChar.Use.symbol),
+                    new PunctChar('_', PunctChar.Use.symbol),
+                    new PunctChar('`', PunctChar.Use.symbol),
+                    new PunctChar('*', PunctChar.Use.symbol),
+                    new PunctChar('?', PunctChar.Use.symbol),
+                    new PunctChar('@', PunctChar.Use.symbol),
+                    new PunctChar('~', PunctChar.Use.symbol),
+                    new PunctChar('+', PunctChar.Use.symbol),
+                    new PunctChar('-', PunctChar.Use.symbol),
+                    new PunctChar('(', PunctChar.Use.token),
+                    new PunctChar(')', PunctChar.Use.token),
+                    new PunctChar(',', PunctChar.Use.token),
+                    new PunctChar('/', PunctChar.Use.token),
+                    new PunctChar('=', PunctChar.Use.token),
+                    new PunctChar('[', PunctChar.Use.token),
+                    new PunctChar('\\', PunctChar.Use.token),
+                    new PunctChar(']', PunctChar.Use.token),
+                    new PunctChar('{', PunctChar.Use.token),
+                    new PunctChar('|', PunctChar.Use.token),
+                    new PunctChar('}', PunctChar.Use.token),
+                    new PunctChar('.', PunctChar.Use.pseudo),
+                    new PunctChar(':', PunctChar.Use.label),
+                    new PunctChar(';', PunctChar.Use.comment));
+    
+    /**
+     * Gives an {@link ImmutableList} of the default {@link PunctChar}s and their {@link Use}.
+     *
+     * @return - an {@link ImmutableList} of the default {@link PunctChar} and their {@link Use}
+     * 
+     * @see #DEFAULT_PUNCT_CHARS
+     */
+    public static ImmutableList<PunctChar> getDefaultPunctChars() {
+	    return DEFAULT_PUNCT_CHARS;
     }
 
     ////////////////// Setters and setters //////////////////
 
-    public PunctChar[] getPunctChars() {
+    public List<PunctChar> getPunctChars() {
         return punctChars;
     }
 
-    public void setPunctChars(PunctChar[] punctChars) {
-        this.punctChars = punctChars;
+    public void setPunctChars(List<PunctChar> punctChars) {
+        this.punctChars = checkNotNull(punctChars);
     }
 
     public char getLabelChar() {
@@ -655,9 +683,9 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         for (int i = getMicros("arithmetic").size() - 1; i >= 0; i--) {
             Arithmetic micro = (Arithmetic) getMicros("arithmetic").get(i);
             if (((!newConditionBits.contains(micro.getOverflowBit())) &&
-                    (micro.getOverflowBit() != NO_CONDITIONBIT)) ||
+                    (micro.getOverflowBit() != ConditionBit.none())) ||
                     ((!newConditionBits.contains(micro.getCarryBit())) &&
-                            (micro.getCarryBit() != NO_CONDITIONBIT))) {
+                            (micro.getCarryBit() != ConditionBit.none()))) {
                 removeAllOccurencesOf(micro);
                 getMicros("arithmetic").remove(micro);
             }
@@ -672,7 +700,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         for (int i = getMicros("increment").size() - 1; i >= 0; i--) {
             Increment micro = (Increment) getMicros("increment").get(i);
             if ((!newConditionBits.contains(micro.getOverflowBit())) &&
-                    (micro.getOverflowBit() != NO_CONDITIONBIT)) {
+                    (micro.getOverflowBit() != ConditionBit.none())) {
                 removeAllOccurencesOf(micro);
                 getMicros("increment").remove(micro);
             }
@@ -741,7 +769,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         ObservableList ios = getMicros("io");
         for (Object io : ios) {
             IOChannel channel = ((IO) io).getConnection();
-            if (channel != CONSOLE_CHANNEL) {
+            if (channel != StreamChannel.console()) {
                 channel.reset();
             }
         }
@@ -991,6 +1019,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
                         ObservableList<Microinstruction> ios = getMicros("io");
                         for (int i = 0; i < ios.size(); i++) {
                             IOChannel channel = ((IO) ios.get(i)).getConnection();
+                            // FIXME #95
                             if ((channel instanceof FileChannel) &&
                                     ((IO) ios.get(i)).getDirection().equals("output")) {
                                 ((FileChannel) channel).writeToFile();
@@ -1024,7 +1053,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
         for (Microinstruction micro : this.getMicros("transferRtoR")) {
             TransferRtoR tRtoR = (TransferRtoR) micro;
-            tRtoR.setDestStartBit(tRtoR.getDest().getWidth() - tRtoR.getNumBits() -
+            tRtoR.setDestStartBit(tRtoR.getDest().getWidth().sub(tRtoR.getNumBits()) -
                     tRtoR.getDestStartBit());
             tRtoR.setSrcStartBit(tRtoR.getSource().getWidth() - tRtoR.getNumBits() -
                     tRtoR.getSrcStartBit());
@@ -1058,8 +1087,7 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
 
         for (Microinstruction micro : this.getMicros("set")) {
             CpusimSet set = (CpusimSet) micro;
-            set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart
-                    ());
+            set.setStart(set.getRegister().getWidth() - set.getNumBits().sub(set.getStart()).as());
         }
     }
 
@@ -1109,20 +1137,26 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         // DJS Do more here?
     }
 
-    public void copyDataTo(Module newModule) {
+    @Deprecated
+    public void copyDataTo(Module<?> newModule) {
         assert newModule instanceof Machine : "Passed non-Machine to Machine.copyDataTo" +
                 "()";
         // DJS Do more here?
     }
 
-    public String getXMLDescription() {
-        return getHTMLName();
-        // DJS Do more here?
-    }
+	@Override
+	public String getXMLDescription(String indent) {
+		return getHTMLName();
+	}
 
-    public String getHTMLDescription() {
-        return getHTMLName();
-        // DJS Do more here?
-    }
+	@Override
+	public String getHTMLDescription(String indent) {
+		return getHTMLName();
+	}
+
+	@Override
+	public <U extends Machine> void copyTo(U other) {
+		throw new UnsupportedOperationException("Unimplemented.");
+	}
 
 }

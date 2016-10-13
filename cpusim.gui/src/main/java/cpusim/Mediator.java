@@ -90,6 +90,7 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
 import cpusim.util.*;
 import cpusim.xml.MachineReader;

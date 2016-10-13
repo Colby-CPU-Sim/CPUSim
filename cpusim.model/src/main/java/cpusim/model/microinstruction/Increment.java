@@ -5,16 +5,15 @@
 
 package cpusim.model.microinstruction;
 
+import java.math.BigInteger;
+
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import cpusim.util.CPUSimConstants;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.math.BigInteger;
 
 /**
  * The increment microinstrucion adds an integer constant to the contents of a register.
@@ -180,12 +179,12 @@ public class Increment extends Microinstruction{
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<Increment name=\"" + getHTMLName() +
+    public String getXMLDescription(String indent){
+        return indent + "<Increment name=\"" + getHTMLName() +
                 "\" register=\"" + getRegister().getID() +
-                (overflowBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
+                (overflowBit.get() != ConditionBit.none() ?
                         "\" overflowBit=\"" + getOverflowBit().getID() : "") +
-                (carryBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
+                (carryBit.get() != ConditionBit.none() ?
                 "\" carryBit=\"" + getCarryBit().getID() : "") +
                 "\" delta=\"" + getDelta() +
                 "\" id=\"" + getID() + "\" />";
@@ -195,8 +194,8 @@ public class Increment extends Microinstruction{
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getOverflowBit().getHTMLName() +
                 "</TD><TD>" + getCarryBit().getHTMLName() +
                 "</TD><TD>" + getDelta() + "</TD></TR>";
@@ -208,7 +207,7 @@ public class Increment extends Microinstruction{
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    public boolean uses(Module<?> m){
         return (m == register.get() ||
                 m == overflowBit.get() ||
                 m == carryBit.get());

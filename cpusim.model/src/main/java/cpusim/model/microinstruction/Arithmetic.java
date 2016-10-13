@@ -5,17 +5,16 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.ExecutionException;
+import java.math.BigInteger;
+
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import cpusim.util.CPUSimConstants;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-
-import java.math.BigInteger;
 
 /**
  * The arithmetic microinstruction use three registers and optionally two condition

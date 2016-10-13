@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // the package in which our project resides
 
-package cpusim.util;
+package cpusim.model.util;
 
 
 /**

@@ -5,14 +5,19 @@
 
 package cpusim.model.microinstruction;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.function.BiPredicate;
+
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 
 /**
  * The Test microinstruction allows the computer to jump to other microinstructions
@@ -20,12 +25,37 @@ import javafx.beans.property.SimpleStringProperty;
  */
 
 public class Test extends Microinstruction {
-    private SimpleObjectProperty<Register> register;
-    private SimpleIntegerProperty start;
-    private SimpleIntegerProperty numBits;
-    private SimpleStringProperty comparison;
-    private SimpleLongProperty value;
-    private SimpleIntegerProperty omission;
+	
+	public enum Operation {
+		
+		EQ(ArchValue::equals),
+		
+		NE(((BiPredicate<ArchValue, ArchValue>)ArchValue::equals).negate()),
+		LT(ArchValue::lt),
+		LE(ArchValue::lte),
+		GT(ArchValue::gt),
+		GE(ArchValue::gte);
+		
+		private final BiPredicate<ArchValue, ArchValue> checkFunc;
+		
+		private Operation(BiPredicate<ArchValue, ArchValue> checkFunc) {
+			this.checkFunc = checkNotNull(checkFunc);
+		}
+		
+		boolean check(long unsigned, long signed, ArchValue toCheck) {
+			checkNotNull(toCheck);
+			
+			return checkFunc.test(ArchType.Bit.of(unsigned), toCheck);
+		}
+	}
+	
+    private final SimpleObjectProperty<Register> register;
+    private final SimpleIntegerProperty start;
+    private final SimpleIntegerProperty numBits;
+    
+    private final SimpleObjectProperty<Operation> comparison;
+    private final SimpleLongProperty value;
+    private final SimpleIntegerProperty omission;
 
     /**
      * Constructor
@@ -42,16 +72,39 @@ public class Test extends Microinstruction {
      */
     public Test(String name, Machine machine,
                Register register,
-               Integer start,
-               Integer numBits,
+               int start,
+               int numBits,
                String comparison,
-               Long value,
-               Integer omission){
-        super(name, machine);
+               long value,
+               int omission) {
+    	this(name, machine, register, start, numBits, Operation.valueOf(comparison), value, omission);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Test object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param register the register whose value is to be tested.
+     * @param start an integer indicating the leftmost or rightmost bit to be tested.
+     * @param numBits a non-negative integer indicating the number of bits to be tested.
+     * @param comparison the type of comparison be done.
+     * @param value the integer to be compared with the part of the register.
+     * @param omission an integer indicating the size of the relative jump.
+     */
+    public Test(String name, Machine machine,
+               Register register,
+               int start,
+               int numBits,
+               Operation comparison,
+               long value,
+               int omission) {
+    	super(name, machine);
         this.register = new SimpleObjectProperty<>(register);
         this.start = new SimpleIntegerProperty(start);
         this.numBits = new SimpleIntegerProperty(numBits);
-        this.comparison = new SimpleStringProperty(comparison);
+        this.comparison = new SimpleObjectProperty<>(comparison);
         this.value = new SimpleLongProperty(value);
         this.omission = new SimpleIntegerProperty(omission);
     }
@@ -76,7 +129,7 @@ public class Test extends Microinstruction {
      * returns the index of the start bit of the microinstruction.
      * @return the integer value of the index.
      */
-    public Integer getStart(){
+    public int getStart(){
         return start.get();
     }
 
@@ -84,7 +137,7 @@ public class Test extends Microinstruction {
      * updates the index of the start bit of the microinstruction.
      * @param newStart the new index of the start bit for the set microinstruction.
      */
-    public void setStart(Integer newStart){
+    public void setStart(int newStart){
         start.set(newStart);
     }
 
@@ -92,7 +145,7 @@ public class Test extends Microinstruction {
      * returns the number of bits of the value.
      * @return the integer value of the number of bits.
      */
-    public Integer getNumBits(){
+    public int getNumBits(){
         return numBits.get();
     }
 
@@ -100,7 +153,7 @@ public class Test extends Microinstruction {
      * updates the number of bits of the value.
      * @param newNumbits the new value of the number of bits.
      */
-    public void setNumBits(Integer newNumbits){
+    public void setNumBits(int newNumbits){
         numBits.set(newNumbits);
     }
 
@@ -108,7 +161,7 @@ public class Test extends Microinstruction {
      * returns the type of comparison of the test instruction.
      * @return the type of comparison of the test instruction as string.
      */
-    public String getComparison(){
+    public Operation getComparison(){
         return comparison.get();
     }
 
@@ -116,7 +169,7 @@ public class Test extends Microinstruction {
      * updates the type of comparison.
      * @param newComparison the new type of the comparison.
      */
-    public void setComparison(String newComparison){
+    public void setComparison(Operation newComparison){
         comparison.set(newComparison);
     }
 
@@ -124,7 +177,7 @@ public class Test extends Microinstruction {
      * returns the fixed value stored in the set microinstruction.
      * @return the integer value of the field.
      */
-    public Long getValue(){
+    public long getValue(){
         return value.get();
     }
 
@@ -132,7 +185,7 @@ public class Test extends Microinstruction {
      * updates the fixed value stored in the set microinstruction.
      * @param newValue the new value for the field.
      */
-    public void setValue(Long newValue){
+    public void setValue(long newValue){
         value.set(newValue);
     }
 
@@ -140,7 +193,7 @@ public class Test extends Microinstruction {
      * returns the number of bits to jump.
      * @return the integer value of omission.
      */
-    public Integer getOmission(){
+    public int getOmission(){
         return omission.get();
     }
 
@@ -148,13 +201,15 @@ public class Test extends Microinstruction {
      * update the integer indicating the size of the relative jump.
      * @param newOmission the new number of bits to jump.
      */
-    public void setOmission(Integer newOmission){
+    public void setOmission(int newOmission){
         omission.set(newOmission);
     }
 
     /**
      * duplicate the set class and return a copy of the original Set class.
      * @return a copy of the Set class
+     * 
+     * @deprecated Use {@link #copyTo(Microinstruction)}
      */
     public Object clone(){
         return new Test(getName(),machine,getRegister(),getStart(),getNumBits(),
@@ -175,53 +230,61 @@ public class Test extends Microinstruction {
      */
     public void execute()
     {
-        String comparison = this.comparison.get();
+        Operation comparison = this.comparison.get();
         long registerValue = register.get().getValue();
-        int width = register.get().getWidth();
-        int leftShift;
-        int rightShift = 64 - numBits.get();
+        final ArchValue width = ArchValue.bits(register.get().getWidth());
+        final ArchValue numBits = ArchValue.bits(this.numBits.get());
+        final ArchValue start = ArchValue.bits(this.start.get());
+        
+        final ArchValue bits64 = ArchType.Bit.of(64);
+        ArchValue leftShift;
+        final ArchValue rightShift = bits64.sub(numBits);
         
         //set leftShift differently depending on whether we are indexing from the
         //right or the left
         if (!machine.getIndexFromRight()){
-            leftShift = 64 - width + start.get();
+            leftShift = bits64.sub(width).add(start);
         }
         else{
-            leftShift = 64 - start.get() - numBits.get();
+            leftShift = bits64.sub(start).sub(numBits);
         }
+        
         //compare both the signed and unsigned values of the segment
         //of the register?  Does that make sense for GT, LT, GE, LE?
         //Just use both values for EQ and NE?
-        long signedSegment =
-                (registerValue << leftShift) >> (rightShift);
+        long signedSegment = (registerValue << leftShift.as()) >> (rightShift.as());
         long unsignedSegment = signedSegment;
-        if (numBits.get() < 64 && signedSegment < 0)
-            unsignedSegment = signedSegment + (1L << numBits.get());
-        if (comparison.equals("EQ")) {
+        if (numBits.lt(bits64) && signedSegment < 0) {
+            unsignedSegment = signedSegment + (1L << numBits.as());
+        }
+        
+        // TODO Replace with Functional approach using Enum
+        if (comparison == Operation.EQ) {
             if (signedSegment == value.get() || unsignedSegment == value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
         }
-        else if (comparison.equals("NE")) {
+        else if (comparison == Operation.NE) {
             if (signedSegment != value.get() && unsignedSegment != value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
         }
-        else if (comparison.equals("LT")) {
+        else if (comparison == Operation.LT) {
             if (signedSegment < value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
         }
-        else if (comparison.equals("GT")) {
+        else if (comparison == Operation.GT) {
             if (signedSegment > value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
         }
-        else if (comparison.equals("LE")) {
+        else if (comparison == Operation.LE) {
             if (signedSegment <= value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
         }
-        else {
-            assert comparison.equals("GE") : "Illegal comparison in " +
-                    "Test microinstruction " + getName();
+        else if(comparison == Operation.GE) {
+            
             if (signedSegment >= value.get())
                 machine.getControlUnit().incrementMicroIndex(omission.get());
+        } else {
+        	throw new IllegalStateException("Illegal comparison in Test microinstruction " + getName());
         }
     }
 
@@ -244,11 +307,18 @@ public class Test extends Microinstruction {
     }
 
     /**
-     * returns the XML description
-     * @return the XML description
+     * returns true if this microinstruction uses m
+     * (so if m is modified, this micro may need to be modified.
+     * @param m the module that holds the microinstruction
+     * @return boolean value true if this micro used the module
      */
-    public String getXMLDescription(){
-        return "<Test name=\"" + getHTMLName() +
+    public boolean uses(Module<?> m){
+        return (m == register.get());
+    }
+
+	@Override
+	public String getXMLDescription(String indent) {
+		return indent + "<Test name=\"" + getHTMLName() +
                 "\" register=\"" + getRegister().getID() +
                 "\" start=\"" + getStart() +
                 "\" numBits=\"" + getNumBits() +
@@ -256,27 +326,14 @@ public class Test extends Microinstruction {
                 "\" value=\"" + getValue() +
                 "\" omission=\"" + getOmission() +
                 "\" id=\"" + getID() + "\" />";
-    }
+	}
 
-    /**
-     * returns the HTML description
-     * @return the HTML description
-     */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
+	@Override
+	public String getHTMLDescription(String indent) {
+		return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getStart() + "</TD><TD>" + getNumBits() +
                 "</TD><TD>" + getComparison() + "</TD><TD>" + getValue() +
                 "</TD><TD>" + getOmission() + "</TD></TR>";
-    }
-
-    /**
-     * returns true if this microinstruction uses m
-     * (so if m is modified, this micro may need to be modified.
-     * @param m the module that holds the microinstruction
-     * @return boolean value true if this micro used the module
-     */
-    public boolean uses(Module m){
-        return (m == register.get());
-    }
+	}
 
 }

@@ -37,31 +37,33 @@
 package cpusim.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.util.Colors;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.LegacyXMLSupported;
+import cpusim.model.util.MoreFXCollections;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
-import cpusim.model.util.Convert;
-import cpusim.model.util.LegacyXMLSupported;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
-
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Ints;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineInstruction class
 
-public class MachineInstruction
-        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable
+public abstract class MachineInstruction<T extends MachineInstruction<T>>
+        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>
 {
 
     private String name;				//the name of the machine instruction
@@ -94,13 +96,15 @@ public class MachineInstruction
     public MachineInstruction(String name, long opcode, String format,
                               Machine machine)
     {
-        this(name, opcode, ConvertStrings.formatStringToFields(format, machine), 
-                ConvertStrings.formatStringToFields(format, machine),
-                Convert.generateTwoListsOfRandomLightColors(format.split(" ").length), machine);
+        this(name, opcode, 
+        		Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)), 
+        		Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
+                Colors.generateTwoListsOfRandomLightColors(format.split(" ").length), 
+                machine);
     }
     
     public MachineInstruction(String name, long opcode, ArrayList<Field> instructionFields,
-            ArrayList<Field> assemblyFields, ArrayList<ArrayList<String>> colors,
+    		List<Field> assemblyFields, List<List<String>> colors,
             Machine machine){
         this(name, opcode, instructionFields, assemblyFields, colors.get(0), colors.get(1),
                 machine);
@@ -196,23 +200,17 @@ public class MachineInstruction
 
     /**
      * @return an array of all the field lengths that are positive.
+     * 
+     * @author Kevin Brightwell (Nava2)
      */
-    public int[] getPositiveFieldLengths()
+    public List<Integer> getPositiveFieldLengths()
     {
-        List<Field> fields = getInstructionFields();
-        int size = 0;
-        for(Field field : fields)
-            if(field.getNumBits().as() > 0)
-                size++;
-        int[] lengths = new int[size];
-        int j = 0;
-        for (Field field : fields)
-            if (field.getNumBits().as() > 0) {
-                lengths[j] = field.getNumBits().as();
-                j++;
-            }
-
-        return lengths;
+        return getInstructionFields().stream()
+        		.map(Field::getNumBits)
+        		.filter(len -> len.gt(ArchValue.ZERO))
+        		.map(ArchValue::as)
+        		.map(Long::intValue)
+        		.collect(Collectors.toList());
     }
 
     /**
@@ -250,20 +248,16 @@ public class MachineInstruction
         
         //get all instruction colors correponding to positive length fields that arent
         //the opcode
-        List<String> iColors = new ArrayList<>();
-        int i = 0;
-        for(Field field : instructionFields){
-            iColors.add(instructionColors.get(i));
-            i++;
-        }
+        List<String> iColors = new ArrayList<>(instructionColors);
         iColors.remove(0);
 
         //get all assembly colors correponding to positive length fields that arent
         //the opcode
-        List<String> aColors = new ArrayList<String>();
-        i = 0;
+        List<String> aColors = new ArrayList<>();
+        		
+        int i = 0;
         for(Field field : assemblyFields){
-            if(field.getNumBits().as() > 0){
+            if(field.getNumBits().gtZero()){
                 aColors.add(assemblyColors.get(i));
             }
             i++;
@@ -291,7 +285,7 @@ public class MachineInstruction
         return relativePositions;
     }
     
-    public void setAssemblyFields(ArrayList<Field> assemblyFields){
+    public void setAssemblyFields(List<Field> assemblyFields){
         this.assemblyFields = assemblyFields;
     }
 
@@ -341,15 +335,17 @@ public class MachineInstruction
     }
 
     //-----------------------------------
-    // clone:  returns a copy of this instruction that shares microinstructions
-    // but creates a new microList vector and a new fields list.
+    // clone:  
+    /**
+     * returns a copy of this instruction that shares microinstructions
+     * but creates a new microList vector and a new fields list.
+     * 
+     * @deprecated Use #copyTo
+     */
+    @Deprecated
     public Object clone()
     {
-        MachineInstruction theClone =
-                        new MachineInstruction(name, opcode, format, machine);
-        //noinspection unchecked
-        theClone.setMicros((ObservableList<Microinstruction>) ((ArrayList) micros).clone());
-        return theClone;
+        throw new UnsupportedOperationException("MachineInstruction is abstract, clone() does not make sense."); 
     }
 
     //-----------------------------------
@@ -398,6 +394,7 @@ public class MachineInstruction
     
 
     //-----------------------------------
+    @Override
     public String getXMLDescription(String indent)
     {
         String nl = System.getProperty("line.separator");
@@ -406,8 +403,8 @@ public class MachineInstruction
                 Long.toHexString(getOpcode()) + "\" instructionFormat=\"" + 
                 ConvertStrings.fieldsToFormatString(instructionFields) + "\" assemblyFormat=\"" +
                 ConvertStrings.fieldsToFormatString(assemblyFields) + "\" instructionColors=\"" + 
-                Convert.colorsListToXML(instructionColors)+ "\" assemblyColors=\"" + 
-                Convert.colorsListToXML(assemblyColors)+ "\" >" + nl;
+                Colors.toXML(instructionColors)+ "\" assemblyColors=\"" + 
+                Colors.toXML(assemblyColors)+ "\" >" + nl;
         for (Microinstruction micro : micros) {
             result += indent + "\t<Microinstruction microRef=\"" +
                     micro.getID() +
@@ -417,10 +414,9 @@ public class MachineInstruction
         return result;
     }
 
-    //--------------------------------------
-    public String getHTMLDescription()
-    {
-        String instrFormat = "<table width=\"100%\"><tr>";
+	@Override
+	public String getHTMLDescription(String indent) {
+		String instrFormat = "<table width=\"100%\"><tr>";
         String assembFormat = "<table width=\"100%\"><tr>";
         
         double length = 0.0;
@@ -447,8 +443,8 @@ public class MachineInstruction
         assembFormat += "</tr></table>";
         
         String result = "<TR><TD>" + HtmlEncoder.sEncode(getName()) +
-                "</TD><TD>" + ConvertLongs.fromLongToHexadecimalString(getOpcode(),
-                        getInstructionFields().get(0).getNumBits().as()) +
+                "</TD><TD>" + ConvertLongs.toHexString(getOpcode(),
+                        getInstructionFields().get(0).getNumBits()) +
                 "</TD><TD>" + instrFormat + "</TD><TD>" + assembFormat;
         result += "</TD><TD>";
         for (int i = 0; i < getMicros().size(); i++) {
@@ -458,6 +454,9 @@ public class MachineInstruction
                 htmlName = "<em><font color=gray>" + htmlName + "</em></font>";
             result += htmlName + "<BR>";
         }
-        return result + "</TD></TR>";
-    }
+        return indent + result + "</TD></TR>";
+	}
+
+	public abstract <U extends T> void copyTo(U other);
+	
 } // end class MachineInstruction

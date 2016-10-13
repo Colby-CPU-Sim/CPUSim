@@ -31,29 +31,92 @@
 */  
 package cpusim.model.module;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.EnumSet;
+
 import cpusim.model.Module;
-import javafx.beans.property.SimpleBooleanProperty;
+import cpusim.model.util.units.ArchType;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
-
-import java.math.BigInteger;
-
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * Edit the parameters associated with any register or fromRootController new or delete old registers.
  */
-public class Register extends Module
+public class Register extends Module<Register>
 {
+	/**
+	 * Memory Access specifier, usually used with an {@link EnumSet}.
+	 * 
+	 * @author Kevin Brightwell (Nava2)
+	 * @since 2016-10-12
+	 */
+	public enum Access {
+		/**
+		 * Designates something may be read.
+		 */
+		Read,
+		
+		/**
+		 * Designates something may be written to. 
+		 */
+		Write;
+		
+		/**
+		 * Helper for getting a set of Access data if it is read-only or not.
+		 * 
+		 * @param isReadOnly True if read-only
+		 * @return <code>EnumSet.of(Read)</code> if true, otherwise all.
+		 * 
+		 * @deprecated Use {@link #readOnly()} or create an {@link EnumSet} manually. 
+		 */
+		static EnumSet<Access> isReadOnly(boolean isReadOnly) {
+			return isReadOnly ? EnumSet.of(Read) : EnumSet.allOf(Access.class);
+		}
+		
+		/**
+		 * Helper to get an {@link EnumSet} of only {@link #Read}. 
+		 * 
+		 * @return
+		 */
+		public static EnumSet<Access> readOnly() {
+			return EnumSet.of(Read);
+		}
+		
+		/**
+		 * Helper to get an {@link EnumSet} of only {@link #Write}. 
+		 * 
+		 * @return
+		 */
+		public static EnumSet<Access> writeOnly() {
+			return EnumSet.of(Write);
+		}
+		
+		/**
+		 * Helper to get a {@link #Read}-{@link #Write} {@link EnumSet}. 
+		 * 
+		 * @return
+		 */
+		public static EnumSet<Access> readWrite() {
+			return EnumSet.of(Read, Write);
+		}
+	}
+	
     //------------------------
     //instance variables
     private SimpleLongProperty value;  //the current value stored in the register
     private SimpleIntegerProperty width;	 //the number of bits in the register
     private SimpleLongProperty initialValue; // the initial value stored in the register
-    private SimpleBooleanProperty readOnly;
+    private SimpleObjectProperty<EnumSet<Access>> access;
+   
     private boolean nameDirty;
-    private boolean programCounter; // if true, program breaks when this register's value
-                                    // matches the address of an instruction where a break
-                                    // point has been set
+    
+    // FIXME Why was this here?
+//    private boolean programCounter; // if true, program breaks when this register's value
+//                                    // matches the address of an instruction where a break
+//                                    // point has been set
 
     /**
      * Constructor
@@ -62,7 +125,7 @@ public class Register extends Module
      */
     public Register(String name, int width)
     {
-        this(name, width, 0, false);
+        this(name, width, 0, Access.readWrite(), false);
     }
 
     /**
@@ -75,7 +138,7 @@ public class Register extends Module
      */
     public Register(String name, int width, long initialValue, boolean readOnly)
     {
-        this(name, width, initialValue, readOnly, false);
+        this(name, width, initialValue, Access.isReadOnly(readOnly), false);
     }
 
     /**
@@ -86,14 +149,34 @@ public class Register extends Module
      * @param readOnly the read only status of the register (if true, the value in
      *                 the register cannot be changed)
      * @param dirty  whether the Register's name has changed since last displayed
+     * 
      */
     public Register(String name, int width, long initialValue, boolean readOnly, boolean dirty)
     {
+        this(name, width, initialValue, Access.isReadOnly(readOnly), dirty);
+    }
+    
+    /**
+     * Constructor
+     * @param name name of the register
+     * @param width a positive integer that specifies the number of bits in the register.
+     * @param initialValue the initial value stored in the register
+     * @param readOnly the read only status of the register (if true, the value in
+     *                 the register cannot be changed)
+     * @param dirty  whether the Register's name has changed since last displayed
+     * 
+     * @since 2016-10-12
+     */
+    public Register(String name, int width, long initialValue, EnumSet<Access> readOnly, boolean dirty)
+    {
         super(name);
+        checkNotNull(width);
+        checkNotNull(readOnly);
+        
         this.value = new SimpleLongProperty(this, "register value", 0);
         setWidth(width);
         this.initialValue = new SimpleLongProperty(initialValue);
-        this.readOnly = new SimpleBooleanProperty(readOnly);
+        this.access = new SimpleObjectProperty<>(readOnly);
         nameDirty = dirty;
         setValue(initialValue);
     }
@@ -128,10 +211,21 @@ public class Register extends Module
     /**
      * getter of the read only value
      * @return the read only value as a boolean
+     * 
+     * @deprecated Use {@link #getAccess()} and check if {@link Access#Read} is the only entry. 
      */
     public boolean getReadOnly()
     {
-        return readOnly.get();
+        return access.get() == Access.readOnly();
+    }
+    
+    /**
+     * Get the memory access for the {@link Register}.
+     * 
+     * @return 
+     */
+    public EnumSet<Access> getAccess() {
+    	return access.get();
     }
 
     /**
@@ -140,10 +234,13 @@ public class Register extends Module
      */
     public void setWidth(int w)
     {
-        assert w > 0 : "Register.setWidth() called with a parameter <= 0";
-        if (width != null && w < width.get())
+        checkArgument(w > 0, "Register.setWidth() called with a parameter <= 0");
+        
+        if (width != null && w < width.get()) {
             setValue(0); //narrowing of width causes the value to be cleared
-        this.width = new SimpleIntegerProperty(w);
+        }
+        
+        this.width.set(w);
     }
 
     /**
@@ -153,13 +250,13 @@ public class Register extends Module
     public void setValue(long newValue)
     {
         //check that newValue is between -(2^(width-1)) and (2^width)-1
-        BigInteger max = BigInteger.valueOf(2).pow(width.get() - 1);
-        BigInteger newBigValue = BigInteger.valueOf(newValue);
-        assert max.negate().compareTo(newBigValue) <= 0 &&
-                newBigValue.compareTo(max.shiftLeft(1).subtract(BigInteger.ONE)) <= 0 :
-                "Attempt to set value of register " + getName() +
-                " to value " + newValue + " which is out of range.";
-        final long oldValue = value.get();
+    	final int w = width.get();
+    	
+    	if (!ArchType.Bit.of(w).fitsWithin(newValue)) {
+    		throw new IllegalArgumentException("Attempt to set value of register " + getName() +
+                    " to value " + newValue + " which is out of range.");
+    	}
+        
         value.set(newValue);
     }
 
@@ -174,10 +271,21 @@ public class Register extends Module
     /**
      * set the read only value
      * @param  newReadOnly the new readonly value
+     * 
+     * @deprecated Use {@link #setAccess(EnumSet)} 
      */
     public void setReadOnly(boolean newReadOnly)
     {
-        readOnly.set(newReadOnly);
+        access.set(Access.isReadOnly(newReadOnly));
+    }
+    
+    /**
+     * Set the access for the machine. 
+     * 
+     * @param access New access values
+     */
+    public void setAccess(EnumSet<Access> access) {
+    	this.access.set(checkNotNull(access));
     }
 
     /**
@@ -192,42 +300,17 @@ public class Register extends Module
      * return the property object of readonly
      * @return property object of readonly
      */
-    public SimpleBooleanProperty readOnlyProperty(){
-        return readOnly;
+    public SimpleObjectProperty<EnumSet<Access>> accessProperty(){
+        return access;
     }
-    //------------------------
-    // module methods
-
-    /**
-     * returns the HTML description
-     * @return the HTML description
-     */
-    public String getHTMLDescription()
-    {
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getWidth() + "</TD><TD>"
-                + getInitialValue() + "</TD><TD>" + getReadOnly() + "</TD></TR>";
-    }
-
-    /**
-     * returns the XML description
-     * @return the XML description
-     */
-    public String getXMLDescription()
-    {
-        return "<Register name=\"" + getHTMLName() +
-                "\" width=\"" + getWidth() +
-                "\" initialValue=\"" + getInitialValue() +
-                "\" readOnly=\"" + getReadOnly()+ "\" id=\"" +
-                getID() + "\" />";
-    }
-
+    
     /**
      * clone the whole object
      * @return a clone of this object
      */
     public Object clone()
     {
-        return new Register(getName(), width.get(),initialValue.get(),readOnly.get(), nameDirty);
+        return new Register(getName(), width.get(),initialValue.get(),access.get(), nameDirty);
     }
 
     /**
@@ -241,17 +324,15 @@ public class Register extends Module
     /**
      * copies the data from the current module to a specific module
      * @param comp the micro instruction that will be updated
+     * 
+     * @deprecated Use {@link #copyTo(Register)} instead
      */
-    public void copyDataTo(Module comp)
+    public void copyDataTo(Module<?> comp)
     {
-        assert comp instanceof Register :
-                "Passed non-Register to Register.copyDataTo()";
+        checkArgument(comp instanceof Register, 
+                "Passed non-Register to Register.copyDataTo()");
         Register newRegister = (Register) comp;
-        newRegister.setName(getName());
-        newRegister.setWidth(width.get());  //if a narrower width, the value is cleared
-        newRegister.setInitialValue(initialValue.get());
-        newRegister.setReadOnly(readOnly.get());
-        newRegister.setNameDirty(nameDirty);
+        this.copyTo(newRegister);
     }
 
     /**
@@ -269,6 +350,32 @@ public class Register extends Module
     public boolean getNameDirty(){
         return nameDirty;
     }
+
+	@Override
+	public String getXMLDescription(String indent) {
+		return indent + "<Register name=\"" + getHTMLName() +
+                "\" width=\"" + getWidth() +
+                "\" initialValue=\"" + getInitialValue() +
+                "\" readOnly=\"" + getReadOnly()+ "\" id=\"" +
+                getID() + "\" />";
+	}
+
+	@Override
+	public String getHTMLDescription(String indent) {
+		return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getWidth() + "</TD><TD>"
+                + getInitialValue() + "</TD><TD>" + getReadOnly() + "</TD></TR>";
+	}
+
+	@Override
+	public <U extends Register> void copyTo(U newRegister) {
+		checkNotNull(newRegister);
+		
+		newRegister.setName(getName());
+        newRegister.setWidth(width.get());  //if a narrower width, the value is cleared
+        newRegister.setInitialValue(initialValue.get());
+        newRegister.setAccess(access.get());
+        newRegister.setNameDirty(nameDirty);
+	}
 
 
 } //end class Register

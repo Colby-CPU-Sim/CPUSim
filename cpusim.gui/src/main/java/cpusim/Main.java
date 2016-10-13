@@ -18,14 +18,14 @@
 
 package cpusim;
 
-import cpusim.assembler.AssembledInstructionCall;
-import cpusim.assembler.Assembler;
-import cpusim.assembler.AssemblyException;
-import cpusim.assembler.Token;
+import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.assembler.Assembler;
+import cpusim.model.assembler.AssemblyException;
+import cpusim.model.assembler.Token;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.iochannel.BufferedChannel;
-import cpusim.model.iochannel.CommandLineChannel;
+import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.util.LoadException;
@@ -147,7 +147,7 @@ public class Main {
         //update all io micros with non-file channels
         //to input/output to the command line
         ObservableList<Microinstruction> ioMicros = machine.getMicros("io");
-        BufferedChannel commandLineChannel = new BufferedChannel(new CommandLineChannel());
+        BufferedChannel commandLineChannel = new BufferedChannel(new StreamChannel());
         for(Microinstruction io : ioMicros) {
             if(! (((IO) io).getConnection() instanceof FileChannel))
                 ((IO) io).setConnection(commandLineChannel);

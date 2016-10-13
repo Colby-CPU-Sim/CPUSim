@@ -32,7 +32,7 @@ public interface CPUSimConstants {
             new ConditionBit("(none)", new Machine("None"), new Register("", 1), 0, false);
 
     // the three standard options available for io channels
-    IOChannel CONSOLE_CHANNEL =
+    IOChannel StreamChannel.console() =
             new BufferedChannel(new ConsoleChannel("[Console]"));
     IOChannel DIALOG_CHANNEL =
     		new BufferedChannel(new DialogChannel("[Dialog]"));

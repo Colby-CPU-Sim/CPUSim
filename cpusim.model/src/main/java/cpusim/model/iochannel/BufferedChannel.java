@@ -15,10 +15,10 @@ package cpusim.model.iochannel;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import cpusim.model.ExecutionException;
-import cpusim.model.util.Convert;
 import cpusim.model.util.MoreStrings;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchValue;
 
 /**
@@ -265,26 +265,27 @@ public class BufferedChannel implements IOChannel {
 	 */
 	private long getLongFromInputBuffer(ArchValue numBits) throws ExecutionException {
 
-		String inputString = this.inputBuffer.toString().trim();
+		CharSequence inputString = this.inputBuffer.toString().trim();
 		long nextLong = 0;
 		// Loops through input buffer, first checking if the entire 
 		// String can be converted to a long, then if not check all 
 		// but the last character until the string is empty n squared 
 		// algorithm, but only used for user input so that is OK
-		while (!inputString.isEmpty()) {
+		while (inputString.length() > 0) {
 			try {
-				nextLong = Convert.fromAnyBaseStringToLong(inputString);
+				nextLong = ConvertStrings.toLong(inputString);
 				break;
 			} catch (NumberFormatException e) {
-				inputString = inputString.substring(0,inputString.length()-1);
+				inputString = inputString.subSequence(0, inputString.length() - 1);
 			}
 		} 
 		//if the string is empty after the above loop 
 		//then the input cannot be converted to a long
-		if(inputString.isEmpty()) {
+		if(inputString.length() > 0) {
 			throw new ExecutionException("There are currently no predefined " +
 					"inputs from the user of type long.");
 		}
+		
 		try {
 			Validate.fitsInBits(nextLong, numBits);
 		} catch(ValidationException ve) {
@@ -292,8 +293,9 @@ public class BufferedChannel implements IOChannel {
 					inputString+". Number of bits = "+numBits+".");
 		}
 
-		String newInput = MoreStrings.removeLeadingWhitespace(inputString);
-		this.inputBuffer = new StringBuilder(newInput.substring(inputString.length()));
+		final CharSequence newInput = MoreStrings.removeLeadingWhitespace(inputString);
+		this.inputBuffer = new StringBuilder(newInput.subSequence(inputString.length(), newInput.length()));
+		
 		return nextLong;
 	}
 

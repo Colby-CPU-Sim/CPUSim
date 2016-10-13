@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.collect.ImmutableList;
+
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * 
@@ -62,15 +63,16 @@ public abstract class ConvertStrings {
      * @return the long value of the string
      * @throws NumberFormatException if the string cannot be parsed as a long
      */
-    public static long toLong(String string)
+    public static long toLong(CharSequence string)
             throws NumberFormatException
     {
-        String trimmedString = string.trim();
-        if (trimmedString.startsWith("'")) { //single Unicode character
+        String trimmedString = CharMatcher.WHITESPACE.trimFrom(string);
+        
+        if (trimmedString.codePointAt(0) == '\'') { //single Unicode character
             int c = trimmedString.codePointAt(1);
             return (long) c;
         }
-        if (trimmedString.startsWith("+")) {
+        if (trimmedString.codePointAt(0) == '+') {
         	trimmedString = trimmedString.substring(1); //start just after the + sign
         }
         

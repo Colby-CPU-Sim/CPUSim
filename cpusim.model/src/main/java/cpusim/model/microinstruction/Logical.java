@@ -12,6 +12,9 @@ import javafx.beans.property.SimpleStringProperty;
  * NOR, or XOR on the specified registers.
  */
 public class Logical extends Microinstruction {
+	
+	// FIXME replace type with Enum
+	
     private SimpleStringProperty type;
     private SimpleObjectProperty<Register> source1;
     private SimpleObjectProperty<Register> source2;
@@ -166,8 +169,9 @@ public class Logical extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<Logical name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<Logical name=\"" + getHTMLName() +
                 "\" type=\"" + getType() +
                 "\" source1=\"" + getSource1().getID() +
                 "\" source2=\"" + getSource2().getID() +
@@ -179,8 +183,9 @@ public class Logical extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getType() +
+    @Override
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getType() +
                 "</TD><TD>" + getSource1().getHTMLName() + "</TD><TD>" + getSource2().getHTMLName() +
                 "</TD><TD>" + getDestination().getHTMLName() + "</TD></TR>";
     }
@@ -191,7 +196,8 @@ public class Logical extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == source1.get() || m == source2.get() || m == destination.get());
     }
 

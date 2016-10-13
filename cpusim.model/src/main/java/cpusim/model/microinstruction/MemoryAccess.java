@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleStringProperty;
  * NOR, or XOR on the specified registers.
  */
 public class MemoryAccess extends Microinstruction {
+	
     private SimpleStringProperty direction;
     private SimpleObjectProperty<RAM> memory;
     private SimpleObjectProperty<Register> data;
@@ -186,8 +187,9 @@ public class MemoryAccess extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<MemoryAccess name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<MemoryAccess name=\"" + getHTMLName() +
                 "\" direction=\"" + getDirection() +
                 "\" memory=\"" + getMemory().getID() +
                 "\" data=\"" + getData().getID() +
@@ -199,8 +201,9 @@ public class MemoryAccess extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getDirection() +
                 "</TD><TD>" + getMemory().getHTMLName() +
                 "</TD><TD>" + getData().getHTMLName() +
@@ -214,7 +217,8 @@ public class MemoryAccess extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == memory.get() || m == data.get() || m == address.get());
     }
 }

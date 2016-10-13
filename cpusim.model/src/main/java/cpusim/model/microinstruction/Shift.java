@@ -25,7 +25,8 @@ import javafx.beans.property.SimpleStringProperty;
  * specified source register to either the left ot the right and places the result
  * in the destination register.
  */
-public class Shift extends Microinstruction{
+public class Shift extends Microinstruction {
+	
     private SimpleObjectProperty<Register> source;
     private SimpleObjectProperty<Register> destination;
     private SimpleStringProperty type;
@@ -221,8 +222,9 @@ public class Shift extends Microinstruction{
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<Shift name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent){
+        return indent + "<Shift name=\"" + getHTMLName() +
                 "\" type=\"" + getType() +
                 "\" source=\"" + getSource().getID() +
                 "\" destination=\"" + getDestination().getID() +
@@ -235,8 +237,9 @@ public class Shift extends Microinstruction{
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getSource().getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getSource().getHTMLName() +
                 "</TD><TD>" + getDestination().getHTMLName() + "</TD><TD>" + getType() +
                 "</TD><TD>" + getDirection() +
                 "</TD><TD>" + getDistance() + "</TD></TR>";
@@ -248,7 +251,7 @@ public class Shift extends Microinstruction{
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    public boolean uses(Module<?> m){
         return (m == source.get() || m == destination.get());
     }
 }

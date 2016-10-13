@@ -19,7 +19,9 @@
 
 package cpusim.model.module;
 
-import cpusim.ExecutionException;
+import java.util.List;
+
+import cpusim.model.ExecutionException;
 import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.util.LoadException;
@@ -29,14 +31,13 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.List;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class models RAM.  All addressable units ("cells") have the same
  * number of bits, but that number can be any value from 1 to 64.
  */
-public class RAM extends Module
-        implements cpusim.util.CPUSimConstants
+public class RAM extends Module<RAM>
 {
     /** the data stored in the ram cells */
     private ObservableList<RAMLocation> data;
@@ -201,7 +202,6 @@ public class RAM extends Module
      * @param value value of the data in long
      */
     public void setData(final int addr, long value) {
-        final long[] oldValue = {data.get(addr).getValue()};
         data.get(addr).setValue(value & cellMask);
     }
 
@@ -209,7 +209,7 @@ public class RAM extends Module
      * getter for the data simple list property object
      * @return the data simple list property object
      */
-    public SimpleListProperty dataProperty(){
+    public SimpleListProperty<RAMLocation> dataProperty(){
         return changedData;
     }
 
@@ -298,14 +298,19 @@ public class RAM extends Module
      * @param newSize the new number of bits per cell
      */
     public void setCellSize(int newSize) {
-        int oldCellSize = cellSize.get();
         cellSize.set(newSize);
-        cellMask = 0;
-        for (int i = 0; i < cellSize.get(); i++)
-            cellMask = (cellMask << 1) + 1;
+        
+        int newcellMask = 0;
+        for (int i = 0; i < cellSize.get(); i++) {
+        	newcellMask = (newcellMask << 1) + 1;
+        }
+        
+        cellMask = newcellMask;
+        
         // now update all the values in the data array
-        for (int i = 0; i < data.size(); i++)
+        for (int i = 0; i < data.size(); i++) {
             data.get(i).setValue(data.get(i).getValue() & cellMask);
+        }
     }
 
     public int getLength() {
@@ -403,6 +408,8 @@ public class RAM extends Module
     /**
      * clone the whole object
      * @return a clone of this object
+     * 
+     * @deprecated Use {@link #copyTo(RAM)} instead.
      */
     public Object clone() {
         return new RAM(getName(), data.size(), cellSize.get());
@@ -412,10 +419,10 @@ public class RAM extends Module
      * copies the data from the current module to a specific module
      * @param comp the micro instruction that will be updated
      */
-    public void copyDataTo(Module comp) {
-        assert comp instanceof RAM :
-                "Passed non-RAM to RAM.copyDataTo()";
-        RAM newRAM = (RAM) comp;
+    @Override
+    public void copyTo(RAM newRAM) {
+        checkNotNull(newRAM);
+        
         newRAM.setName(getName());
         newRAM.setLength(getLength());
         newRAM.setCellSize(getCellSize());
@@ -425,8 +432,9 @@ public class RAM extends Module
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription() {
-        return "<RAM name=\"" + getHTMLName() + "\" length=\"" + getLength()
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<RAM name=\"" + getHTMLName() + "\" length=\"" + getLength()
                 + "\" cellSize=\"" + getCellSize() + "\" id=\"" + getID()
                 + "\" />";
     }
@@ -435,8 +443,9 @@ public class RAM extends Module
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription() {
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getLength() +
+    @Override
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getLength() +
                 "</TD><TD>" + getCellSize() + "</TD></TR>";
     }
 

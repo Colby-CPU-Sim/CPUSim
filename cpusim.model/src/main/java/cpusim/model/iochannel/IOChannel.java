@@ -16,8 +16,7 @@
 package cpusim.model.iochannel;
 
 import cpusim.model.ExecutionException;
-import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
+
 /**
  * Interface that any channels we want to use for input or output
  * must implement.
@@ -39,20 +38,7 @@ public interface IOChannel {
      * @return the long value that was input
      * @throws ExecutionException if it cannot read a long.
      */
-	@Deprecated
-    default long readLong(int numBits) {
-    	return readLong(ArchType.Bit.of(numBits));
-    }
-    
-    /**
-     * returns the next integer from input as a long that fits in the given
-     * number of bits.  If it doesn't fit, a NumberFormatException is thrown.
-     *
-     * @param numBits the number of bits into which the long must fit
-     * @return the long value that was input
-     * @throws ExecutionException if it cannot read a long.
-     */
-    public long readLong(ArchValue numBits);
+    public long readLong(int numBits);
 
     /**
      * returns the next ASCII char from input.

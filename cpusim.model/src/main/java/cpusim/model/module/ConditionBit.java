@@ -14,6 +14,8 @@
 
 package cpusim.model.module;
 
+import java.util.Optional;
+
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -27,14 +29,30 @@ import javafx.beans.property.SimpleObjectProperty;
  * or it can be set to 1 if an overflow or carry out occurs in an
  * Arithmetic or Increment microinstruction.
  */
-public class ConditionBit extends Module
+public class ConditionBit extends Module<ConditionBit>
 {
-
+	
     private SimpleObjectProperty<Register> register;  //the register containing the bit
     private SimpleIntegerProperty bit;    //the index of the bit in the register, bit = 0
     //means the left-most or rightmost bit depending on the indexFromRight field in the machine.
     private SimpleBooleanProperty halt;  //should machine halt when this bit is set to 1?
 
+    private static final ConditionBit NONE_SET = new ConditionBit("(none)", new Machine("None"), new Register("", 1), 0, false);
+    
+    /**
+     * Get the {@link ConditionBit} referring to having no condition bit set. This replaces the old <code>CpuSimConstants.NO_CONDITIONBIT</code>
+     * field.
+     * 
+     * @return {@link #NONE_SET}
+     * 
+     * @since 2016-10-12
+     * @deprecated Use an {@link Optional} instead to store if there maybe none set. 
+     */
+    @Deprecated
+    public static ConditionBit none() {
+    	return NONE_SET;
+    }
+    
     /**
      * Constructor
      * @param name name of the condition bit
@@ -130,11 +148,9 @@ public class ConditionBit extends Module
      * copies the data from the current module to a specific module
      * @param newConditionBit the micro instruction that will be updated
      */
-    public void copyDataTo(Module newConditionBit)
+    @Override
+    public void copyTo(ConditionBit newBit)
     {
-        assert newConditionBit instanceof ConditionBit :
-                "Passed non-ConditionBit to ConditionBit.copyDataTo()";
-        ConditionBit newBit = (ConditionBit) newConditionBit;
         newBit.setName(getName());
         newBit.setRegister(getRegister());
         newBit.setBit(getBit());
@@ -191,9 +207,10 @@ public class ConditionBit extends Module
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription()
+    @Override
+    public String getXMLDescription(String indent)
     {
-        return "<ConditionBit name=\"" + getHTMLName() +
+        return indent + "<ConditionBit name=\"" + getHTMLName() +
                 "\" bit=\"" + getBit() +
                 "\" register=\"" + getRegister().getID() +
                 "\" halt=\"" + getHalt() +
@@ -204,9 +221,10 @@ public class ConditionBit extends Module
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getBit() + "</TD><TD>" + getHalt() + "</TD></TR>";
     }
 

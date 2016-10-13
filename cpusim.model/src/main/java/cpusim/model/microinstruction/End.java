@@ -69,7 +69,8 @@ public class End extends Microinstruction
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m)
+    @Override
+    public boolean uses(Module<?> m)
     {
         return false;
     }

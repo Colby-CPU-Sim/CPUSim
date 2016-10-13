@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cpusim.util;
+package cpusim.model.util;
 
 import java.util.List;
 import java.util.Random;
@@ -74,7 +74,7 @@ public abstract class Colors {
      * 
      * @author Kevin Brightwell (Nava2)
      */
-    public static String colorsListToXML(Iterable<? extends CharSequence> colors){
+    public static String toXML(Iterable<? extends CharSequence> colors){
         return Joiner.on(' ').join(colors);
     }
     

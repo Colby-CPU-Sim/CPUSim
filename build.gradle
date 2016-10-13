@@ -45,6 +45,7 @@ subprojects {
         compile group: 'com.google.code.findbugs', name: 'findbugs', version: '3.0.1'
         
         testCompile 'junit:junit:4.12'
+        testCompile "org.mockito:mockito-core:1.+"
     }
 
     sourceSets {
@@ -60,4 +61,6 @@ subprojects {
     }
 }
 
-
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.14'
+}

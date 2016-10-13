@@ -9,8 +9,6 @@ import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.MoreFXCollections;
 import cpusim.model.util.NamedObject;
-import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 
@@ -49,6 +47,19 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     public enum SignedType {
         Signed,
         Unsigned;
+    	
+    	/**
+    	 * Added for convenience
+    	 * 
+    	 * @param isSigned {@code true} if signed
+    	 * @return 
+    	 * 
+    	 * @deprecated Use {@link SignedType} directly instead of <code>boolean</code>s
+    	 */
+    	@Deprecated
+    	public static SignedType fromBool(boolean isSigned) {
+    		return isSigned ? Signed : Unsigned;
+    	}
     }
 
     /**
@@ -64,7 +75,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     /**
      * The number of bits of the field
      */
-    private SimpleObjectProperty<ArchValue> numBits;          	
+    private SimpleIntegerProperty numBits;          	
     
     /**
      *  Absolute or pc relative
@@ -101,7 +112,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * @param name - The name of the field.
      */
     public Field(String name) {
-        this(name, Type.required, ArchType.Bit.of(0), Relativity.absolute,
+        this(name, Type.required, 0, Relativity.absolute,
              FXCollections.emptyObservableMap(), 0, SignedType.Signed);
     }
     
@@ -116,7 +127,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     	
     	this.name = new SimpleStringProperty(other.name.getValue()); 
     	this.type = new SimpleObjectProperty<>(other.type.getValue());
-        this.numBits = new SimpleObjectProperty<>(other.numBits.getValue());
+        this.numBits = new SimpleIntegerProperty(other.numBits.getValue());
         this.relativity = new SimpleObjectProperty<>(other.relativity.getValue());
         this.defaultValue = new SimpleLongProperty(other.defaultValue.getValue().longValue());
         this.signed = new SimpleObjectProperty<>(other.signed.getValue());
@@ -133,18 +144,21 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * @param values - Map of name to {@link FieldValue}.
      * @param defaultValue - The default int value.
      * @param signed - Whether or not the Field is a signed int.
+     * 
+     * @since 2016-09-20
+     * @author Kevin Brightwell (Nava2)
      */
     @JsonCreator
     public Field(@JsonProperty("name") String name, 
     			 @JsonProperty("type") Type type, 
-    			 @JsonProperty("numBits") ArchValue length, 
+    			 @JsonProperty("numBits") int length, 
     			 @JsonProperty("relativity") Relativity relativity,
     			 @JsonProperty("values") ObservableMap<String, FieldValue> values, 
     			 @JsonProperty("defaultValue") long defaultValue, 
     			 @JsonProperty("signed") SignedType signed) {
         this.name = new SimpleStringProperty();
         this.type = new SimpleObjectProperty<>();
-        this.numBits = new SimpleObjectProperty<>();
+        this.numBits = new SimpleIntegerProperty();
         this.relativity = new SimpleObjectProperty<>();
         this.defaultValue = new SimpleLongProperty();
         this.signed = new SimpleObjectProperty<>();
@@ -169,13 +183,14 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * @param defaultValue - The default int value.
      * @param signed - Whether or not the Field is a signed int.
      * 
-     * @deprecated
+     * @deprecated Use {@link #Field(String, Type, int, Relativity, ObservableMap, long, SignedType)} instead.
+     * 
      * @since 2016-09-20
      */
     @Deprecated
     public Field(String name, 
     			 Type type, 
-    			 ArchValue length, 
+    			 int length, 
     			 Relativity relativity,
     			 ObservableList<FieldValue> values, 
     			 long defaultValue, 
@@ -208,11 +223,11 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     }
 
     @JsonProperty
-    public ArchValue getNumBits() {
+    public int getNumBits() {
         return numBits.get();
     }
 
-    public void setNumBits(ArchValue numBits) {
+    public void setNumBits(int numBits) {
         this.numBits.set(checkNotNull(numBits));
     }
 
@@ -318,7 +333,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     public String getXMLDescription(String indent) {
         String nl = System.getProperty("line.separator");
         String result = indent + "<Field name=\"" + HtmlEncoder.sEncode(getName()) +
-                "\" type=\"" + getType() + "\" numBits=\"" + getNumBits().as() +
+                "\" type=\"" + getType() + "\" numBits=\"" + getNumBits() +
                 "\" relativity=\"" + getRelativity() + "\" signed=\"" + isSigned()
                 + "\" defaultValue=\"" + getDefaultValue() +
                 "\" id=\"" + getID() + "\">" + nl;
@@ -334,7 +349,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * @return Gives an HTML description of this Field.
      */
     @Override
-    public String getHtmlDescription() {
+    public String getHTMLDescription(String indent) {
         String result = "<TR><TD>" + HtmlEncoder.sEncode(name.get()) +
                 "</TD><TD>" + getType() +
                 "</TD><TD>" + getNumBits() +

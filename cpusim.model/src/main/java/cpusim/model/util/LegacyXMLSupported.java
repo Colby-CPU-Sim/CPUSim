@@ -12,5 +12,23 @@ package cpusim.model.util;
  */
 public interface LegacyXMLSupported {
 
+	/**
+	 * Get an XML description of the element.
+	 * @param indent
+	 * @return
+	 */
 	public String getXMLDescription(String indent);
+	
+	/**
+	 * Added for legacy reasons. 
+	 * 
+	 * @return
+	 * 
+	 * @deprecated Use {@link #getXMLDescription(String)} instead.
+	 * 
+	 * @since 2016-10-12
+	 */
+	public default String getXMLDescription() {
+		return this.getXMLDescription("");
+	}
 }

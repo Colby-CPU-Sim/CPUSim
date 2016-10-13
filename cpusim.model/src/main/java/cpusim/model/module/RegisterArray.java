@@ -28,10 +28,12 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import static com.google.common.base.Preconditions.*;
+
 /**
  * A register array is an indexed list of any number of registers.
  */
-public class RegisterArray extends Module
+public class RegisterArray extends Module<RegisterArray>
 {
 
     //------------------------
@@ -232,15 +234,7 @@ public class RegisterArray extends Module
      */
     public String getXMLDescription()
     {
-        String nl = System.getProperty("line.separator");
-        String result = "<RegisterArray name=\"" + getHTMLName() + "\" length=\""
-                + getLength() + "\" width=\"" + getWidth() + "\" id=\""
-                + getID() + "\" >" + nl;
-        //write the descriptions of all the registers in the array
-        for(int i = 0; i < length.get(); i++)
-            result += "\t\t" + registers.get(i).getXMLDescription() + nl;
-        result += "\t</RegisterArray>";
-        return result;
+        
     }
 
     /**
@@ -269,16 +263,16 @@ public class RegisterArray extends Module
     /**
      * copies the data from the current module to a specific module
      * @param module the micro instruction that will be updated
+     * 
+     * @deprecated Use {@link #copyTo(RegisterArray)} instead.
      */
-    public void copyDataTo(Module module)
+    @Deprecated
+    public void copyDataTo(Module<?> module)
     {
-        assert module instanceof RegisterArray :
-                "Passed non-RegisterArray to RegisterArray.copyDataTo()";
+    	checkArgument(module instanceof RegisterArray, "Passed non-RegisterArray to RegisterArray.copyDataTo()");
+    	
         RegisterArray oldRegisterArray = (RegisterArray) module;
-        oldRegisterArray.setLength(length.get()); //causes the array length to change
-        oldRegisterArray.setName(getName());
-        oldRegisterArray.setWidth(width.get());  //causes all register widths to change
-        oldRegisterArray.setRegisters(registers);
+        this.copyTo(oldRegisterArray);
     }
 
     /**
@@ -295,6 +289,36 @@ public class RegisterArray extends Module
             result = " " + result;
         return result;
     }
+
+	@Override
+	public String getXMLDescription(String indent) {
+		String nl = System.getProperty("line.separator");
+        String result = "<RegisterArray name=\"" + getHTMLName() + "\" length=\""
+                + getLength() + "\" width=\"" + getWidth() + "\" id=\""
+                + getID() + "\" >" + nl;
+        //write the descriptions of all the registers in the array
+        for(int i = 0; i < length.get(); i++)
+            result += "\t\t" + registers.get(i).getXMLDescription() + nl;
+        result += "\t</RegisterArray>";
+        return indent + result;
+	}
+
+	@Override
+	public String getHTMLDescription(String indent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <U extends RegisterArray> void copyTo(U oldRegisterArray) {
+		checkNotNull(oldRegisterArray);
+		
+		oldRegisterArray.setLength(length.get()); //causes the array length to change
+        oldRegisterArray.setName(getName());
+        oldRegisterArray.setWidth(width.get());  //causes all register widths to change
+        oldRegisterArray.setRegisters(registers);
+		
+	}
 
 
 } //end class RegisterArray

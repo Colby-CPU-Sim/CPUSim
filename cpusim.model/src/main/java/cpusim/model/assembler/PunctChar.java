@@ -60,7 +60,7 @@ public class PunctChar implements HTMLEncodable, LegacyXMLSupported {
     }
 
     @Override
-    public String getHtmlDescription() {
+    public String getHTMLDescription(String indent) {
         return "<TR><TD>" + HtmlEncoder.sEncode(getChar() + "") + "</TD><TD>" +
                 use.get() + "</TD></TR>";
     }

@@ -7,13 +7,13 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.iochannel.FileChannel;
-import cpusim.iochannel.IOChannel;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
+import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.IOChannel;
+import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.module.Register;
-import cpusim.util.CPUSimConstants;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,7 +23,7 @@ import javafx.beans.property.SimpleStringProperty;
  * NOR, or XOR on the specified registers.
  */
 public class IO
-        extends Microinstruction implements CPUSimConstants{
+        extends Microinstruction {
     private SimpleStringProperty type;
     private SimpleObjectProperty<Register> buffer;
     private SimpleStringProperty direction;
@@ -67,7 +67,7 @@ public class IO
         this.type = new SimpleStringProperty(type);
         this.buffer = new SimpleObjectProperty<>(buffer);
         this.direction = new SimpleStringProperty(direction);
-        this.connection = CONSOLE_CHANNEL;
+        this.connection = new StreamChannel();
     }
 
     /**
@@ -229,40 +229,38 @@ public class IO
 
     }
 
-
-    /**
-     * returns the XML description
-     * @return the XML description
-     */
-    public String getXMLDescription(){
-        return "<IO name=\"" + getHTMLName() +
-                "\" direction=\"" + getDirection() +
-                "\" type=\"" + getType() +
-                "\" buffer=\"" + getBuffer().getID() +
-                "\" connection=\"" + getConnection() +
-                "\" id=\"" + getID() + "\" />";
-    }
-
-    /**
-     * returns the HTML description
-     * @return the HTML description
-     */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
-                "</TD><TD>" + getDirection() +
-                "</TD><TD>" + getType() +
-                "</TD><TD>" + getBuffer().getHTMLName() +
-                "</TD><TD>" + HtmlEncoder.sEncode(getConnection().toString()) +
-                "</TD></TR>";
-    }
-
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == buffer.get());
     }
+
+    /**
+     * returns the XML description
+     * @return the XML description
+     */
+	@Override
+	public String getXMLDescription(String indent) {
+		return indent + "<IO name=\"" + getHTMLName() +
+                "\" direction=\"" + getDirection() +
+                "\" type=\"" + getType() +
+                "\" buffer=\"" + getBuffer().getID() +
+                "\" connection=\"" + getConnection() +
+                "\" id=\"" + getID() + "\" />";
+	}
+
+	@Override
+	public String getHTMLDescription(String indent) {
+		return indent + "<TR><TD>" + getHTMLName() +
+                "</TD><TD>" + getDirection() +
+                "</TD><TD>" + getType() +
+                "</TD><TD>" + getBuffer().getHTMLName() +
+                "</TD><TD>" + HtmlEncoder.sEncode(getConnection().toString()) +
+                "</TD></TR>";
+	}
 }

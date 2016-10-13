@@ -19,15 +19,17 @@ import cpusim.model.MachineInstruction;
 import cpusim.model.Module;
 import java.io.Serializable;
 
+import static com.google.common.base.Preconditions.*;
+
 /**
  * The Control Unit class
  */
 @SuppressWarnings("serial")
-public class ControlUnit extends Module
+public class ControlUnit extends Module<ControlUnit>
         implements Serializable
 {
 
-    private MachineInstruction currentInstruction;
+    private MachineInstruction<?> currentInstruction;
     //the instr currently or about to be executed
     private int microIndex;
     //the index of the micro sequence
@@ -78,7 +80,7 @@ public class ControlUnit extends Module
      * getter for the current instruction
      * @return the current instruction
      */
-    public MachineInstruction getCurrentInstruction()
+    public MachineInstruction<?> getCurrentInstruction()
     {
         return this.currentInstruction;
     }
@@ -87,7 +89,7 @@ public class ControlUnit extends Module
      * setter for the current instruction
      * @param instr the new instruction to be set as the current one
      */
-    public void setCurrentInstruction(MachineInstruction instr)
+    public void setCurrentInstruction(MachineInstruction<?> instr)
     {
         this.currentInstruction = instr;
     }
@@ -121,11 +123,11 @@ public class ControlUnit extends Module
      * copies the data from the current module to a specific module
      * @param newModule the micro instruction that will be updated
      */
-    public void copyDataTo(Module newModule)
+    @Override
+    public void copyTo(ControlUnit newControl)
     {
-        assert newModule instanceof ControlUnit :
-                "Passed non-ControlUnit to ControlUnit.copyDataTo()";
-        ControlUnit newControl = (ControlUnit) newModule;
+    	checkNotNull(newControl);
+    	
         newControl.setMicroIndex(microIndex);
         newControl.setCurrentInstruction(currentInstruction);
         newControl.machine = machine;
@@ -135,7 +137,8 @@ public class ControlUnit extends Module
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription()
+    @Override
+    public String getXMLDescription(String indent)
     {
         return getHTMLName();
     }
@@ -144,7 +147,8 @@ public class ControlUnit extends Module
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
         return getHTMLName();
     }
@@ -174,10 +178,10 @@ public class ControlUnit extends Module
      */
     public class State
     {
-        private MachineInstruction instr;
+        private MachineInstruction<?> instr;
         private int microIndex;
 
-        public State(MachineInstruction instr, int microIndex)
+        public State(MachineInstruction<?> instr, int microIndex)
         {
             this.instr = instr;
             this.microIndex = microIndex;
@@ -191,7 +195,7 @@ public class ControlUnit extends Module
 
         public int getIndex() { return microIndex; }
 
-        public MachineInstruction getInstr() { return instr; }
+        public MachineInstruction<?> getInstr() { return instr; }
     }
 
 }

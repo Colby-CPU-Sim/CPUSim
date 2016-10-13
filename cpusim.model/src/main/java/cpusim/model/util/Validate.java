@@ -121,6 +121,7 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
+import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 
 import javafx.collections.ObservableList;
@@ -203,9 +204,11 @@ public class Validate
      */
     public static void punctChars(List<PunctChar> chars)
     {
-        assert chars.size() == Machine.getDefaultPunctChars().length :
-                "The size of the chars list when done with MachineReader does not match " +
-                        "the size of the default set of chars";
+        if (chars.size() != Machine.getDefaultPunctChars().size()) {
+        	// TODO Is this really necessary? why store them if they're never different - KB
+        	throw new ValidationException("The size of the chars list when done with MachineReader does not match " +
+                        "the size of the default set of chars");
+        }
 
         //check that there is exactly one each of usages of label, pseudo,
         //and comment
@@ -296,13 +299,13 @@ public class Validate
     {
         for (int i = 0; i < instrs.size() - 1; i++) {
             for (int j = i + 1; j < instrs.size(); j++) {
-                int opCodeFieldLength1 = instrs.get(i).getInstructionFields().get(0).getNumBits().as();
-                int opCodeFieldLength2 = instrs.get(j).getInstructionFields().get(0).getNumBits().as();
+                final ArchValue len1 = instrs.get(i).getInstructionFields().get(0).getNumBits();
+                final ArchValue len2 = instrs.get(j).getInstructionFields().get(0).getNumBits();
+                
                 if (instrs.get(i).getOpcode() == instrs.get(j).getOpcode()
-                        && opCodeFieldLength1 == opCodeFieldLength2) {
+                        && len1.equals(len2)) {
                     throw new ValidationException("The opcode \"" +
-                             ConvertLongs.fromLongToHexadecimalString(
-                                     instrs.get(i).getOpcode(), opCodeFieldLength1) +
+                             ConvertLongs.toHexString(instrs.get(i).getOpcode(), len1) +
                              "\" (hex) is used more than once.\nAll opcode " +
                              "fields must have unique sizes or values.");
                 }
@@ -436,7 +439,7 @@ public class Validate
      * @param name string to be checked
      * @param punctChars array of punctuation characters
      */
-    public static void nameIsValidAssembly(String name, PunctChar[] punctChars)
+    public static void nameIsValidAssembly(String name, List<PunctChar> punctChars)
     {
         nameIsNonEmpty(name);
 
@@ -500,13 +503,13 @@ public class Validate
     {
         for (IO io : ios) {
             if (io.getType().equals("ascii") &&
-                    io.getBuffer().getWidth() < 8) {
+                    io.getBuffer().getWidth().lt(ArchType.Byte.of(1))) {
                 throw new ValidationException("IO \"" + io + "\" is of type " +
                         "ascii and so needs a\nbuffer register at least " +
                         "8 bits wide.");
             }
             else if (io.getType().equals("unicode") &&
-                    io.getBuffer().getWidth() < 16) {
+                    io.getBuffer().getWidth().lt(ArchType.Byte.of(2))) {
                 throw new ValidationException("IO \"" + io + "\" is of type " +
                         "unicode and so needs a\nbuffer register at least " +
                         "16 bits wide.");
@@ -590,7 +593,7 @@ public class Validate
                         "in the instruction " + set.getName() + ".");
             }
             
-            final ArchValue regWidth = ArchValue.bits(register.getWidth());
+            final ArchValue regWidth = register.getWidth();
             
             if (start.gte(regWidth)) {
                 throw new ValidationException("Invalid start index for the specified register " +
@@ -647,35 +650,29 @@ public class Validate
      * @param tests an array of Sets to check
      * the objects with all ranges all in Bounds properly
      */
-    public static void rangeInBound(Test[] tests)
+    public static void rangeInBound(List<Test> tests)
     {
-
-        int start, numBits;
-        Test temp;
-
         for (Test test : tests) {
-            temp = test;
-            start = temp.getStart();
-            numBits = temp.getNumBits();
+        	final ArchValue start = test.getStart();
+        	final ArchValue numBits = test.getNumBits();
 
-            if (start < 0 || numBits < 0) {
+            if (start.lt(ArchValue.ZERO) || numBits.lt(ArchValue.ZERO)) {
                 throw new ValidationException("You cannot specify a negative value for the " +
                         "start bits,\nor the bitwise width of the test range\n" +
                         "in the microinstruction " + test.getName() + ".");
             }
-            else if (start >= temp.getRegister().getWidth()) {
+            else if (start.gte(test.getRegister().getWidth())) {
                 throw new ValidationException("The start bit in the microinstruction "
                         + test.getName() + " is out of range.\n" +
                         "It must be non-negative, and less than the " +
                         "register's length.");
             }
-            else if (start + numBits > temp.getRegister().getWidth()) {
+            else if ((start.add(numBits)).gt(test.getRegister().getWidth())) {
                 throw new ValidationException("The bits specified in the Test " +
                         "microinstruction " + test.getName() +
                         " are too large to fit in the register.");
             }
         }
-
     }
 
     /**
@@ -683,7 +680,7 @@ public class Validate
      * @param transferAtoRs an array of TransferRtoRs to check.
      * TransferRtoR objects with all ranges all in Bounds properly.
      */
-    public static void rangesAreInBound(TransferAtoR[] transferAtoRs)
+    public static void rangesAreInBound(List<TransferAtoR> transferAtoRs)
     {
         int srcStartBit, destStartBit, numBits, indexStart, indexNumBits;
         TransferAtoR temp;

@@ -1,6 +1,7 @@
 package cpusim.model.util.units;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Defines an architectural type.
@@ -56,8 +57,8 @@ public enum ArchType {
 	 * @param value int value to convert
 	 * @return Value as bits rounded after multiplying by {@link #getBitFactor()}.
 	 */
-	int asBits(final int value) {
-		return (int)(Math.round(value * bitFactor));
+	long asBits(final long value) {
+		return (long)(Math.round(value * bitFactor));
 	}
 	
 	/**
@@ -70,7 +71,7 @@ public enum ArchType {
 	 * @param value 
 	 * @return Converted value represented by `otherType`
 	 */
-	int convertTo(final ArchType otherType, final int value) {
+	long convertTo(final ArchType otherType, final long value) {
 		final double conv = (value * (bitFactor / checkNotNull(otherType).bitFactor));
 		return (int)Math.ceil(conv);
 	}
@@ -83,6 +84,8 @@ public enum ArchType {
 	 * @return long mask
 	 */
 	public long getMask(final int width) {
+		checkArgument(width >= 0 && width <= 64, "Invalid width specified, must be between 0 and 64 (width = " + width + ")");
+	
 		return (1l << asBits(width)) - 1l;
 	}
 	
@@ -91,7 +94,7 @@ public enum ArchType {
 	 * @param value value in the {@link ArchType} units.
 	 * @return new {@link ArchValue}.
 	 */
-	public ArchValue of(final int value) {
+	public ArchValue of(final long value) {
 		return new ArchValue(this, value);
 	}
 }

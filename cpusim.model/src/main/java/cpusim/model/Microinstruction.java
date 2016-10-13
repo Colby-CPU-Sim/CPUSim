@@ -115,10 +115,6 @@ public abstract class Microinstruction
 
     public abstract Object clone();
 
-    public abstract String getXMLDescription();
-
-    public abstract String getHTMLDescription();
-
     /**
      * returns true if this microinstruction uses m (so if m is modified, this micro may need to be modified.
      * 
@@ -127,7 +123,7 @@ public abstract class Microinstruction
      * 
      * @throws NullPointerException if <code>m</code> is <code>null</code>.
      */
-    public abstract boolean uses(Module m);
+    public abstract boolean uses(Module<?> m);
 
 
 }  // end of class Microinstruction

@@ -13,12 +13,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // the package in which our file resides
 
-package cpusim.util;
+package cpusim.model.module;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import cpusim.model.module.RAM;
-import cpusim.model.module.Register;
 
 
 /**

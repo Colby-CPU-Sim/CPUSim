@@ -20,18 +20,19 @@
 package cpusim.model;
 
 
+import cpusim.model.util.Copyable;
+import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
+import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
-
-import java.io.Serializable;
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Module class
 
-public abstract class Module
-        implements Cloneable, Serializable, NamedObject
+public abstract class Module<T extends Module<T>>
+        implements NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>
 {
     private SimpleStringProperty name;	//name of the module
     private String ID; //unique ID used when saving in XML
@@ -95,16 +96,6 @@ public abstract class Module
         return ID;
     }
 
-    //------------------------------
-    // abstract methods
-    // These methods should be overridden by all subclasses
-
-    public abstract void copyDataTo(Module oldModule);
-
     public abstract Object clone();
-
-    public abstract String getXMLDescription();
-
-    public abstract String getHTMLDescription();
 
 } //end of class Module

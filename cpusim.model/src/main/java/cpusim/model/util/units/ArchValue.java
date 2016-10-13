@@ -37,25 +37,25 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * Value in {@link #type} units. 
 	 */
 	@JsonProperty("value") // manual spec for serialization, do not expose as getter
-	private final int value;
+	private final long value;
 	
 	/**
 	 * Stores an {@link ArchValue} of <code>0</code> {@link ArchType#Bit}s.
 	 * 
 	 * @see ArchType#Bit
-	 * @see ArchType#of(int)
+	 * @see ArchType#of(long)
 	 */
 	public static final ArchValue ZERO = ArchType.Bit.of(0);
 	
 	/**
-	 * Creates a new ArchValue with `type` and `value`. This is meant to only be used by {@link ArchType#of(int)}.
+	 * Creates a new ArchValue with `type` and `value`. This is meant to only be used by {@link ArchType#of(long)}.
 	 * 
 	 * @param type
 	 * @param value
 	 */
 	@JsonCreator
 	ArchValue(@JsonProperty("type") final ArchType type, 
-			  @JsonProperty("value") final int value) {
+			  @JsonProperty("value") final long value) {
 		checkArgument(value >= 0, "value must be a value >= 0");
 		this.type = checkNotNull(type);
 		this.value = value;
@@ -72,12 +72,12 @@ public class ArchValue implements Comparable<ArchValue> {
 	}
 	
 	/**
-	 * Short-cut method for bit values. Delegates to {@link ArchType#Bit}'s {@link ArchType#of(int)}.
+	 * Short-cut method for bit values. Delegates to {@link ArchType#Bit}'s {@link ArchType#of(long)}.
 	 * 
 	 * @param bitValue
 	 * @return Non-<code>null</code> {@link ArchValue}
 	 * 
-	 * @see ArchType#of(int)
+	 * @see ArchType#of(long)
 	 */
 	public static ArchValue bits(final int bitValue) {
 		return ArchType.Bit.of(bitValue);
@@ -100,7 +100,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @param other {@link ArchType} to convert to.
 	 * @return `new` {@link ArchValue} of type `other`. 
 	 */
-	public int as(final ArchType other) {
+	public long as(final ArchType other) {
 		return convert(other).value;
 	}
 	
@@ -111,7 +111,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * 
 	 * @see #as(ArchType)
 	 */
-	public int as() {
+	public long as() {
 		return type.asBits(value);
 	}
 	
@@ -127,7 +127,7 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * Get the stored value in unit {@link #getType()}.
 	 * @return value in the base specified.
 	 */
-	public int getValue() {
+	public long getValue() {
 		return value;
 	}
 	
@@ -136,7 +136,12 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return newly allocated array of bytes
 	 */
 	public byte[] newByteArray() {
-	   return new byte[convert(ArchType.Byte).value];
+		final long length = convert(ArchType.Byte).value;
+		if (length > Integer.MAX_VALUE) {
+			throw new IllegalStateException("Can not create a byte[] with length: " + length);
+		}
+		
+		return new byte[(int)length];
 	}
 	
 	/**
@@ -145,7 +150,10 @@ public class ArchValue implements Comparable<ArchValue> {
 	 * @return bit mask. 
 	 */
 	public long mask() {
-		return type.getMask(value);
+		checkArgument(value >= 0 && value <= 64, 
+				"Can not create mask from ArchValue with content: " + value + ", must be between 0 <= value <= 64.");
+		
+		return type.getMask((int)value);
 	}
 	
 	/**
@@ -265,6 +273,18 @@ public class ArchValue implements Comparable<ArchValue> {
 	}
 	
 	/**
+	 * Convenience function roughly equivalent to {@link #gt(ArchValue)} with {@link #ZERO} as the argument. 
+	 * 
+	 * @return <code>true</code> if the value is greater than zero.
+	 * 
+	 * @see #gt(ArchValue)
+	 * @see #ZERO
+	 */
+	public boolean gtZero() {
+		return as() > 0;
+	}
+	
+	/**
 	 * Check if a value is greater than or equal to <code>other</code>.
 	 * 
 	 * @param other
@@ -292,20 +312,33 @@ public class ArchValue implements Comparable<ArchValue> {
 		if (value <= 63) {
 	       final double max = Math.pow(2, value);
 	       return checkValue <= max;
-	    } else {
-	    	final BigInteger max = BigInteger.valueOf(2).pow(value);
+	    } else if (value <= Integer.MAX_VALUE) {
+	    	final BigInteger max = BigInteger.valueOf(2).pow((int)value);
 	        return BigInteger.valueOf(checkValue).compareTo(max) <= 0;
+	    } else {
+	    	throw new IllegalStateException("Stored value is too large to be represented as an Integer: " + value);
 	    }
 	}
 
 	@Override
 	public int compareTo(ArchValue other) {
-		return this.value - checkNotNull(other).convert(type).value;
+		return Long.compare(this.value, checkNotNull(other).convert(type).value);
+	}
+	
+	/**
+	 * Delegates to {@link #compareTo(ArchValue)}.
+	 * 
+	 * @param left
+	 * @param right
+	 * @return
+	 */
+	public static int compare(ArchValue left, ArchValue right) {
+		return checkNotNull(left).compareTo(checkNotNull(right));
 	}
 	
 	@Override
 	public int hashCode() {
-		return Integer.hashCode(as());
+		return Long.hashCode(as());
 	}
 	
 	@Override

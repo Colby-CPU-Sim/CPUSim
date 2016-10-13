@@ -50,7 +50,9 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
+import cpusim.model.util.MachineReaderException;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
@@ -177,7 +179,7 @@ public class MachineReader implements CPUSimConstants
     }
 
     //--------------------------
-    public Vector<RegisterRAMPair> getRegisterRAMPairs()
+    public List<RegisterRAMPair> getRegisterRAMPairs()
     {
         return registerRAMPairs;
     }
@@ -1409,7 +1411,7 @@ public class MachineReader implements CPUSimConstants
         String channelID = attrs.getValue("connection");
         if (channelID == null || channelID.equals("") || channelID.equals("[console]")
                 || channelID.equals("[Console]")) {
-            connection = CONSOLE_CHANNEL;
+            connection = StreamChannel.console();
         }
         //the case of null and "" and "[console]" above are for backward compatibility
         else if (channelID.equals("[user]") || channelID.equals("[Dialog]")) {

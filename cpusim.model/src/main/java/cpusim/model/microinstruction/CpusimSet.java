@@ -27,8 +27,8 @@ import javafx.beans.property.SimpleObjectProperty;
 public class CpusimSet extends Microinstruction implements LegacyXMLSupported, NamedObject, HTMLEncodable, Copyable<CpusimSet> {
 
     private SimpleObjectProperty<Register> register;
-    private SimpleObjectProperty<ArchValue> start;
-    private SimpleObjectProperty<ArchValue> numBits;
+    private SimpleIntegerProperty start;
+    private SimpleIntegerProperty numBits;
     private SimpleLongProperty value;
 
     /**

@@ -57,7 +57,7 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
             if(currentMicro instanceof IO) {
                 IO micro = (IO) currentMicro;
                 if(micro.getDirection().equals("input") &&
-                        micro.getConnection().equals(CONSOLE_CHANNEL)) {
+                        micro.getConnection().equals(StreamChannel.console())) {
                     printToConsole("","yellow");
                     Platform.runLater(() -> ioConsole.requestFocus());
                 }

@@ -15,8 +15,21 @@ public interface HTMLEncodable {
 
 	/**
 	 * Gets the HTML description of a structure.
+	 * @param indent String of space characters
 	 * 
 	 * @return String with valid HTML
 	 */
-	public String getHtmlDescription();
+	public String getHTMLDescription(String indent);
+	
+	/**
+	 * Gets the HTML description of a structure.
+	 * 
+	 * @return String with valid HTML
+	 * 
+	 * @deprecated Use {@link #getHTMLDescription(String)} instead.
+	 */
+	@Deprecated
+	public default String getHTMLDescription() {
+		return this.getHTMLDescription("");
+	}
 }
