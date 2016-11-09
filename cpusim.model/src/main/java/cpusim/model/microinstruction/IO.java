@@ -14,6 +14,8 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.module.Register;
+import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -183,17 +185,17 @@ public class IO
             buffer.get().setValue((int) c);
         }
         else if (type.get().equals("unicode") && direction.get().equals("input")) {
-            char c = connection.readUnicode();
-            buffer.get().setValue((int) c);
+            int c = connection.readUnicode();
+            buffer.get().setValue(c);
         }
         else if (type.get().equals("integer") && direction.get().equals("output")) {
             connection.writeLong(buffer.get().getValue());
         }
         else if (type.get().equals("ascii") && direction.get().equals("output")) {
-            connection.writeAscii(buffer.get().getValue());
+            connection.writeAscii((char) (buffer.get().getValue() & ArchType.Byte.getMask(1)));
         }
         else if (type.get().equals("unicode") && direction.get().equals("output")) {
-            connection.writeUnicode(buffer.get().getValue());
+            connection.writeUnicode((int) buffer.get().getValue());
         }
         else
             assert false : "IO '" + getName() + "' has an illegal " +

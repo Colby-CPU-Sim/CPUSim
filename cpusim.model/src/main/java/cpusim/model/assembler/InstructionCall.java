@@ -14,12 +14,12 @@
 // the package in which our project resides
 package cpusim.model.assembler;
 
-import cpusim.model.MachineInstruction;
-import cpusim.util.Convert;
-import cpusim.util.SourceLine;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cpusim.model.MachineInstruction;
+import cpusim.model.util.conversion.ConvertStrings;
+import cpusim.util.SourceLine;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the InstructionCall class
@@ -75,7 +75,7 @@ public class InstructionCall
         else {  // .data pseudoinstruction
             long length;
             try {
-                length = Convert.fromAnyBaseStringToLong((operands.get(0)).contents);
+                length = ConvertStrings.toLong((operands.get(0)).contents);
             } catch (NumberFormatException e) {
                 throw new AssemblyException.InvalidOperandError("The number " +
                         (operands.get(0)).contents +

@@ -199,8 +199,8 @@ public class MachineHTMLWriter
         out.println(HEADER_PREFIX + "2" + HEADER_MIDDLE +
                 "Punctuation preferences" + HEADER_SUFFIX);
         out.println("<TR><TD><B>Character</B></TD><TD><B>Use</B></TD></TR>");
-        PunctChar[] chars = machine.getPunctChars();
-        if (chars.length == 0)
+        List<PunctChar> chars = machine.getPunctChars();
+        if (chars.size() == 0)
             out.println("<TR VALIGN=\"middle\"><TD COLSPAN=\"2\">" +
                     "<CENTER>(none)</CENTER></TD></TR>");
         else

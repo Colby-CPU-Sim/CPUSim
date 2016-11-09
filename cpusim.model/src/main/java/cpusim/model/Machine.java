@@ -18,8 +18,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -48,6 +50,8 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.Copyable;
+
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -129,9 +133,9 @@ public class Machine extends Module<Machine> implements Serializable {
     // EQUs
     private ObservableList<EQU> EQUs;
     // key = micro name, value = list of microinstructions
-    private HashMap<String, ObservableList<Microinstruction>> microMap;
+    private Map<String, ObservableList<Microinstruction>> microMap;
     // key = module name, value = list of modules
-    private HashMap<String, ObservableList<? extends Module>> moduleMap;
+    private Map<String, ObservableList<? extends Module<?>>> moduleMap;
     // Control unit for keeping track of index of micro within machine instruction
     private ControlUnit controlUnit;
     // The machine's fetch sequence
@@ -177,8 +181,7 @@ public class Machine extends Module<Machine> implements Serializable {
         fields = new ArrayList<>();
         punctChars = Lists.newArrayList(getDefaultPunctChars());
 
-        fetchSequence =
-                new MachineInstruction("Fetch sequence", 0, "", this);
+        fetchSequence = new MachineInstruction("Fetch sequence", 0, "", this);
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
@@ -417,8 +420,19 @@ public class Machine extends Module<Machine> implements Serializable {
      * @param moduleType a String that describes the type of module
      * @return a Vector object
      */
-    public ObservableList<? extends Module> getModule(String moduleType) {
+    public ObservableList<? extends Module<?>> getModule(String moduleType) {
         return moduleMap.get(moduleType);
+    }
+    
+    /**
+     * A getter method for all module objects
+     *
+     * @param moduleType a String that describes the type of module
+     * @return a Vector object
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Module<T>> ObservableList<T> getModule(String moduleType, Class<T> clazz) {
+        return (ObservableList<T>)moduleMap.get(moduleType);
     }
 
     /**
@@ -427,8 +441,20 @@ public class Machine extends Module<Machine> implements Serializable {
      * @param micro a String that describes the microinstruction type
      * @return a Vector object
      */
-    public ObservableList<Microinstruction> getMicros(String micro) {
+    public ObservableList<? extends Microinstruction> getMicros(String micro) {
         return microMap.get(micro);
+    }
+    
+    /**
+     * A getter method for all microinstructions
+     *
+     * @param micro a String that describes the microinstruction type
+     * @param clazz Denotes the type stored
+     * @return a Vector object
+     */
+    @SuppressWarnings("unchecked")
+    public <U extends Microinstruction> ObservableList<U> getMicros(String micro, Class<U> clazz) {
+        return (ObservableList<U>)microMap.get(micro);
     }
 
     public List<MachineInstruction> getInstructions() {
@@ -544,28 +570,21 @@ public class Machine extends Module<Machine> implements Serializable {
     // with the registers coming from register arrays at the end of the vector.
     public ObservableList<Register> getAllRegisters() {
         ObservableList<Register> allRegisters = FXCollections.observableArrayList();
-
-        //clones the registers into a different observable list
-        //this may cause an error when run (I'm not sure if it should be
-        //size() or size()-1
+        
         for (Register register1 : registers) {
             allRegisters.add(register1);
         }
 
         for (RegisterArray registerArray : registerArrays) {
-            ObservableList<Register> registers = registerArray.registers();
-            for (Register register : registers) {
-                allRegisters.add(register);
-            }
+            allRegisters.addAll(registerArray.registers());
         }
         return allRegisters;
     }
 
     //-----------------------------------
     // returns a new observable list containing all the RAMs of the machine.
-    @SuppressWarnings("unchecked")
     public ObservableList<RAM> getAllRAMs() {
-        return (ObservableList<RAM>) getModule("rams");
+        return getModule("rams", RAM.class);
     }
 
     //-------------------------------
@@ -582,19 +601,26 @@ public class Machine extends Module<Machine> implements Serializable {
 
     //-------------------------------
     // updates the registers
-    public void setRegisters(Vector<Register> newRegisters) {
+    
+    /**
+     * Removes a {@link Module} from the machine
+     * @param module
+     */
+    private void removeMicro(final Module<?> module) {
+        Map<Microinstruction, ObservableList<Microinstruction>> microsThatUseIt = getMicrosThatUse(module);
+        Set<Microinstruction> e = microsThatUseIt.keySet();
+        for (Microinstruction micro : e) {
+            //remove it from all machine instructions
+            removeAllOccurencesOf(micro);
+            //also remove the microinstruction from its list.
+            microsThatUseIt.get(micro).remove(micro);
+        }
+    }
+    
+    public void setRegisters(List<Register> newRegisters) {
         for (Register oldRegister : registers) {
             if (!newRegisters.contains(oldRegister)) {
-                HashMap microsThatUseIt = getMicrosThatUse(oldRegister);
-                Set e = microsThatUseIt.keySet();
-                for (Object anE : e) {
-                    //get next micro
-                    Microinstruction micro = (Microinstruction) anE;
-                    //remove it from all machine instructions
-                    removeAllOccurencesOf(micro);
-                    //also remove the microinstruction from its list.
-                    ((ObservableList) microsThatUseIt.get(micro)).remove(micro);
-                }
+                removeMicro(oldRegister);
             }
         }
 
@@ -615,19 +641,7 @@ public class Machine extends Module<Machine> implements Serializable {
     public void setRegisterArrays(Vector<RegisterArray> newRegisterArrays) {
         for (RegisterArray oldArray : registerArrays) {
             if (!newRegisterArrays.contains(oldArray)) {
-                HashMap<Microinstruction, ObservableList<Microinstruction>>
-                        microsThatUseIt
-                        = getMicrosThatUse(oldArray);
-                Set e = microsThatUseIt.keySet();
-                for (Object anE : e) {
-                    //get next micro; should be transferRtoA or transferAtoR
-                    Microinstruction micro =
-                            (Microinstruction) anE;
-                    //remove it from all machine instructions
-                    removeAllOccurencesOf(micro);
-                    //also remove the micro from the list of micros of that type.
-                    microsThatUseIt.get(micro).remove(micro);
-                }
+                removeMicro(oldArray);
             }
         }
 
@@ -648,19 +662,13 @@ public class Machine extends Module<Machine> implements Serializable {
     // returns a HashMap whose keys consist of all microinstructions that
     // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
-    public HashMap<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse
-    (Module m) {
-        HashMap<Microinstruction, ObservableList<Microinstruction>> result =
-                new HashMap<>();
+    public Map<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module<?> m) {
+        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(MICRO_CLASSES.length);
 
         for (String aMicroClass : MICRO_CLASSES) {
             ObservableList<Microinstruction> v = microMap.get(aMicroClass);
-            for (int i = v.size() - 1; i >= 0; i--) {
-                Microinstruction micro = v.get(i);
-                if (micro.uses(m)) {
-                    result.put(micro, v);
-                }
-            }
+            v.stream().filter(micro -> micro.uses(m))
+                    .forEach(micro -> result.put(micro, v));
         }
 
         return result;
@@ -778,41 +786,31 @@ public class Machine extends Module<Machine> implements Serializable {
     //--------------------------------
     // JRL (11.3.00) clearAllRegisters
     public void clearAllRegisters() {
-        ObservableList<Register> registers =
-                (ObservableList<Register>) getModule("registers");
-        for (Register register : registers) {
-            register.clear();
-        }
+        getModule("registers", Register.class).forEach(Register::clear);
     }
 
     //--------------------------------
     // JRL (11.3.00) clearAllRegisterArrays
     public void clearAllRegisterArrays() {
-        for (int i = 0; i < getModule("registerArrays").size(); i++) {
-            ((RegisterArray) getModule("registerArrays").get(i)).clear();
-        }
+        getModule("registerArrays", RegisterArray.class).forEach(RegisterArray::clear);
     }
 
     //--------------------------------
     // JRL (11.3.00) clearAllRAMs
     public void clearAllRAMs() {
-        for (int i = 0; i < getModule("rams").size(); i++) {
-            ((RAM) getModule("rams").get(i)).clear();
-        }
+        getModule("rams", RAM.class).forEach(RAM::clear);
     }
 
     //--------------------------------
     // returns a Vector of all machine instructions that use m
-    public Vector getInstructionsThatUse(Microinstruction m) {
-        Vector<MachineInstruction> result = new Vector<MachineInstruction>();
-        for (MachineInstruction instr : instructions) {
-            if (instr.usesMicro(m)) {
-                result.addElement(instr);
-            }
-        }
+    public List<MachineInstruction> getInstructionsThatUse(Microinstruction m) {
+        List<MachineInstruction> result = instructions.stream()
+                .filter(instr -> instr.usesMicro(m))
+                .collect(Collectors.toList());
+        
         //don't forget the fetchSequence too.
         if (fetchSequence.usesMicro(m)) {
-            result.addElement(fetchSequence);
+            result.add(fetchSequence);
         }
 
         return result;
@@ -820,22 +818,19 @@ public class Machine extends Module<Machine> implements Serializable {
 
     //--------------------------------
     // returns a List of all machine instructions that use f
-    public List<MachineInstruction> getInstructionsThatUse(Field f) {
-        List<MachineInstruction> result = new ArrayList<MachineInstruction>();
-        for (MachineInstruction instr : instructions) {
-            if (instr.usesField(f)) {
-                result.add(instr);
-            }
-        }
+    public List<MachineInstruction> getInstructionsThatUse(final Field f) {
+        checkNotNull(f);
+        
+        List<MachineInstruction> result = instructions.stream()
+                .filter(instr -> instr.usesField(f))
+                .collect(Collectors.toList());
         return result;
     }
 
     //--------------------------------
     // deletes from all machine instructions every use of m
     public void removeAllOccurencesOf(Microinstruction m) {
-        for (MachineInstruction instr : instructions) {
-            instr.removeMicro(m);
-        }
+        instructions.forEach(in -> in.removeMicro(m));
         fetchSequence.removeMicro(m);
     }
 
@@ -897,8 +892,7 @@ public class Machine extends Module<Machine> implements Serializable {
                     runMode != RunModes.ABORT &&
                     haltBitsThatAreSet().size() == 0) {
 
-                MachineInstruction currentInstruction =
-                        controlUnit.getCurrentInstruction();
+                MachineInstruction currentInstruction = controlUnit.getCurrentInstruction();
                 List<Microinstruction> microInstructions =
                         currentInstruction.getMicros();
                 int currentIndex = controlUnit.getMicroIndex();
@@ -1016,12 +1010,12 @@ public class Machine extends Module<Machine> implements Serializable {
                             ((boolean) getStateWrapper().getValue()) == true) ||
                             getStateWrapper().getState() == Machine.State
                                     .EXCEPTION_THROWN) {
-                        ObservableList<Microinstruction> ios = getMicros("io");
-                        for (int i = 0; i < ios.size(); i++) {
-                            IOChannel channel = ((IO) ios.get(i)).getConnection();
+                        ObservableList<IO> ios = getMicros("io", IO.class);
+                        for (IO io : ios) {
+                            final IOChannel channel = io.getConnection();
                             // FIXME #95
-                            if ((channel instanceof FileChannel) &&
-                                    ((IO) ios.get(i)).getDirection().equals("output")) {
+                            if (channel instanceof FileChannel &&
+                                    io.getDirection().equals("output")) {
                                 ((FileChannel) channel).writeToFile();
                             }
                         }
@@ -1053,7 +1047,7 @@ public class Machine extends Module<Machine> implements Serializable {
 
         for (Microinstruction micro : this.getMicros("transferRtoR")) {
             TransferRtoR tRtoR = (TransferRtoR) micro;
-            tRtoR.setDestStartBit(tRtoR.getDest().getWidth().sub(tRtoR.getNumBits()) -
+            tRtoR.setDestStartBit(tRtoR.getDest().getWidth() - tRtoR.getNumBits() -
                     tRtoR.getDestStartBit());
             tRtoR.setSrcStartBit(tRtoR.getSource().getWidth() - tRtoR.getNumBits() -
                     tRtoR.getSrcStartBit());
@@ -1087,7 +1081,7 @@ public class Machine extends Module<Machine> implements Serializable {
 
         for (Microinstruction micro : this.getMicros("set")) {
             CpusimSet set = (CpusimSet) micro;
-            set.setStart(set.getRegister().getWidth() - set.getNumBits().sub(set.getStart()).as());
+            set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart());
         }
     }
 
@@ -1095,12 +1089,13 @@ public class Machine extends Module<Machine> implements Serializable {
     // haltBitsThatAreSet: returns a Vector of all condition bits
     // specified by all Halt micros have value 1
 
-    public Vector haltBitsThatAreSet() {
-        Vector<ConditionBit> result = new Vector<ConditionBit>();
+    public List<ConditionBit> haltBitsThatAreSet() {
+    	
+        List<ConditionBit> result = Lists.newArrayListWithCapacity(getModule("conditionBits").size());
         for (int i = 0; i < getModule("conditionBits").size(); i++) {
             ConditionBit condBit = conditionBits.get(i);
             if (condBit.getHalt() && condBit.isSet()) {
-                result.addElement(condBit);
+                result.add(condBit);
             }
         }
         return result;

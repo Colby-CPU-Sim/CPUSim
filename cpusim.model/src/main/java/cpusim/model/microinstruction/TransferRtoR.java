@@ -9,6 +9,7 @@ import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -16,7 +17,8 @@ import javafx.beans.property.SimpleObjectProperty;
  * The TransferRtoR microinstruction transfers data from a register to a register.
  */
 public class TransferRtoR extends Microinstruction {
-    private SimpleObjectProperty<Register> source;
+    
+	private SimpleObjectProperty<Register> source;
     private SimpleIntegerProperty srcStartBit;
     private SimpleObjectProperty<Register> dest;
     private SimpleIntegerProperty destStartBit;
@@ -24,22 +26,22 @@ public class TransferRtoR extends Microinstruction {
 
     /**
      * Constructor
-     * creates a new Test object with input values.
+     * creates a new Transfer object with input values.
      *
      * @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
      * @param source the register whose value is to be tested.
-     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be tested.
+     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be transfered.
      * @param dest the destination register.
      * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
      * @param numBits a non-negative integer indicating the number of bits to be tested.
      */
     public TransferRtoR(String name, Machine machine,
                 Register source,
-                Integer srcStartBit,
+                int srcStartBit,
                 Register dest,
-                Integer destStartBit,
-                Integer numBits){
+                int destStartBit,
+                int numBits){
         super(name, machine);
         this.source = new SimpleObjectProperty<>(source);
         this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
@@ -71,7 +73,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getSrcStartBit(){
+    public int getSrcStartBit(){
         return srcStartBit.get();
     }
 
@@ -80,7 +82,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @param newSrcStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setSrcStartBit(Integer newSrcStartBit){
+    public void setSrcStartBit(int newSrcStartBit){
         srcStartBit.set(newSrcStartBit);
     }
 
@@ -107,7 +109,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getDestStartBit(){
+    public int getDestStartBit(){
         return destStartBit.get();
     }
 
@@ -116,7 +118,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @param newDestStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setDestStartBit(Integer newDestStartBit){
+    public void setDestStartBit(int newDestStartBit){
         destStartBit.set(newDestStartBit);
     }
 
@@ -125,7 +127,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @return the integer value of the number of bits.
      */
-    public Integer getNumBits(){
+    public int getNumBits(){
         return numBits.get();
     }
 
@@ -134,7 +136,7 @@ public class TransferRtoR extends Microinstruction {
      *
      * @param newNumbits the new value of the number of bits.
      */
-    public void setNumBits(Integer newNumbits){
+    public void setNumBits(int newNumbits){
         numBits.set(newNumbits);
     }
     
@@ -177,6 +179,7 @@ public class TransferRtoR extends Microinstruction {
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         //move the bit values of the registers to the far left end of the 64-bit long
@@ -232,8 +235,8 @@ public class TransferRtoR extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<TransferRtoR name=\"" + getHTMLName() +
+    public String getXMLDescription(String indent){
+        return indent + "<TransferRtoR name=\"" + getHTMLName() +
                 "\" source=\"" + getSource().getID() +
                 "\" srcStartBit=\"" + getSrcStartBit() +
                 "\" dest=\"" + getDest().getID() +
@@ -246,8 +249,9 @@ public class TransferRtoR extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getSource().getHTMLName() +
                 "</TD><TD>" + getSrcStartBit() +
                 "</TD><TD>" + getDest().getHTMLName() +
@@ -262,19 +266,8 @@ public class TransferRtoR extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == source.get() || m == dest.get());
-    }
-
-    public static void main(String[] args) {
-        Register src = new Register("SRC", 10);
-        src.setValue(21);
-        System.out.println("src: " + Long.toBinaryString(src.getValue()));
-        Register dst = new Register("DST", 8);
-        dst.setValue(-1);
-        System.out.println("dest: " + Long.toBinaryString(dst.getValue()));
-        TransferRtoR micro = new TransferRtoR("milo", null, src, 4,dst,1,5);
-        micro.execute();
-        System.out.println("new dest: " + Long.toBinaryString(dst.getValue()));
     }
 }

@@ -22,10 +22,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import cpusim.model.ExecutionException;
-import cpusim.model.util.Convert;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.model.util.units.ArchValue;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.PushBackReader;
 import cpusim.util.PushBackWriter;
 
@@ -35,7 +34,7 @@ import cpusim.util.PushBackWriter;
  * It maintains PushBackReaders and FileWriters for each file
  * and maintains the data to and from the user.
  */
-public class FileChannel implements IOChannel  {
+public class FileChannel implements IOChannel, AutoCloseable  {
 	// Where to get or send the data
 	private File file;
 	
@@ -57,6 +56,17 @@ public class FileChannel implements IOChannel  {
         this.reader = null;
         this.writer = null;
     }
+    
+    @Override
+    public void close() throws IOException {
+    	if (reader != null) {
+    		reader.close();
+    	}
+    	
+    	if (writer != null) {
+    		writer.close();
+    	}
+    }
 
     /**
      * returns the next integer from input as a long that fits in the given
@@ -67,7 +77,7 @@ public class FileChannel implements IOChannel  {
      * @throws ExecutionException if it cannot read a long.
      */
     @Override
-    public long readLong(ArchValue numBits) {
+    public long readLong(int numBits) {
         try {
             if (reader == null) {
                 reader = new PushBackReader(new FileReader(file));
@@ -97,7 +107,7 @@ public class FileChannel implements IOChannel  {
             // Push back the last character read
             reader.unread();
             // Make sure input is valid
-            long value = Convert.fromAnyBaseStringToLong(s);
+            long value = ConvertStrings.toLong(s);
             Validate.fitsInBits(value, numBits);
             return value;
         } catch (ValidationException ve) {
@@ -147,7 +157,7 @@ public class FileChannel implements IOChannel  {
      * @return the Unicode character read
      * @throws ExecutionException if it cannot read an Unicode char.
      */
-    public char readUnicode() {
+    public int readUnicode() {
         try {
             if (reader == null) {
                 reader = new PushBackReader(new FileReader(file));
@@ -215,7 +225,7 @@ public class FileChannel implements IOChannel  {
      * @param longValue the long value to be output
      * @throws ExecutionException if the long is not an ASCII char
      */
-    public void writeAscii(long longValue) {
+    public void writeAscii(char longValue) {
         if (longValue > 255 || longValue < 0)
             throw new ExecutionException("Attempt to output the value " +
                     longValue + " as an ASCII value.");
@@ -238,18 +248,18 @@ public class FileChannel implements IOChannel  {
     /**
      * writes the given long value to the output as a Unicode value
      *
-     * @param longValue the long value to be output
+     * @param unicodeChar the long value to be output
      * @throws ExecutionException if the long is not an Unicode char
      */
-    public void writeUnicode(long longValue) {
-        if (longValue > 65535 || longValue < 0)
+    public void writeUnicode(int unicodeChar) {
+        if (unicodeChar > 65535 || unicodeChar < 0)
             throw new ExecutionException("Attempt to output the value " +
-                    longValue + " as a Unicode value.");
+                    unicodeChar + " as a Unicode value.");
         try {
             if (writer == null) {
                 writer = new PushBackWriter(file);
             }
-            writer.write((int) longValue);
+            writer.write((int) unicodeChar);
             writer.flush();
         } catch (IOException ioe) {
             String message = "CPUSim was unable to write " +

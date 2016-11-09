@@ -3,14 +3,22 @@
  */
 package cpusim.model.iochannel;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
-import org.hamcrest.core.IsEqual;
+import cpusim.model.util.conversion.ConvertLongs;
+import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,34 +29,40 @@ import org.junit.Test;
  */
 public class StreamChannelTest {
 
-	private ByteArrayOutputStream byteOutput;
+	private InputStream inStream;
 	private PrintStream outStream;
+	
+	private StreamChannel sc;
 	
 	@Before
 	public void before() {
 
-
-	BufferedReader bufferedReader = Mockito.mock(BufferedReader.class);
-	when(bufferedReader.readLine()).thenReturn("first line").thenReturn("second line");
-	
-	when(new Client(bufferedReader).parseLine()).thenEquals(IsEqual.equalTo("1"));
-
+		outStream = mock(PrintStream.class);
 
 	}
 	
 	@After
 	public void after() {
 		try {
-			outStream.close();
-			byteOutput.close();
+			
+			if (outStream != null) {
+				outStream.close();
+				outStream = null;
+			}
+			
+			if (inStream != null) { 
+				inStream.close();
+				inStream = null;
+			}
+			
+			if (sc != null) { 
+				sc.close();
+				sc = null;
+			}
 			
 		} catch (IOException ioe) {
 			throw new IllegalStateException(ioe);
 		}
-	}
-	
-	private String getLastOutput() {
-		return new String(byteOutput.toByteArray());
 	}
 	
 	/**
@@ -56,7 +70,7 @@ public class StreamChannelTest {
 	 */
 	@Test
 	public void testStreamChannel() {
-		final StreamChannel sc = new StreamChannel();
+		sc = new StreamChannel();
 
 		assertEquals(System.in, sc.getInputStream());
 		assertEquals(System.out, sc.getOutputStream());
@@ -67,50 +81,122 @@ public class StreamChannelTest {
 	 */
 	@Test
 	public void testStreamChannelInputStreamPrintStream() {
-		final StreamChannel sc = new StreamChannel();
+		sc = new StreamChannel();
 
 		assertEquals(System.in, sc.getInputStream());
 		assertEquals(System.out, sc.getOutputStream());
 	}
 
-	/**
-	 * Test method for {@link cpusim.model.iochannel.StreamChannel#writeString(java.lang.String)}.
-	 */
-	@Test
-	public void testWriteString() {
-		fail("Not yet implemented");
-	}
+	
 
 	/**
 	 * Test method for {@link cpusim.model.iochannel.StreamChannel#readString(java.lang.String)}.
 	 */
 	@Test
-	public void testReadString() {
-		fail("Not yet implemented");
+	public void testReadString() throws IOException {
+		try (PipedOutputStream pos = new PipedOutputStream();
+			 PrintWriter pw = new PrintWriter(pos);
+			 PipedInputStream in = new PipedInputStream(pos)) {
+
+			outStream = mock(PrintStream.class);
+			sc = new StreamChannel(in, outStream);
+			
+			final String INPUT = "0xDEADBEEF";
+			
+			pw.write(INPUT);
+			pw.write(System.getProperty("line.separator"));
+			pw.flush();
+			
+			assertTrue(in.available() > 0);
+			assertEquals(INPUT, sc.readString("No: "));
+		}
 	}
 
 	/**
 	 * Test method for {@link cpusim.model.iochannel.StreamChannel#readLong(cpusim.model.util.units.ArchValue)}.
 	 */
 	@Test
-	public void testReadLong() {
-		fail("Not yet implemented");
+	public void testReadLong() throws IOException {
+		try (PipedOutputStream pos = new PipedOutputStream();
+			 PrintWriter pw = new PrintWriter(pos);
+			 PipedInputStream in = new PipedInputStream(pos)) {
+
+			outStream = mock(PrintStream.class);
+			sc = new StreamChannel(in, outStream);
+			
+			final ArchValue bytes = ArchType.Byte.of(4);
+			final long INPUT = 0xDEADBEEF & bytes.mask();
+			
+			pw.write(Long.toString(INPUT));
+			pw.write(System.getProperty("line.separator"));
+			pw.flush();
+			
+			assertTrue(in.available() > 0);
+			assertEquals(INPUT, sc.readLong((int)bytes.as()));
+		}
 	}
 
 	/**
 	 * Test method for {@link cpusim.model.iochannel.StreamChannel#readAscii()}.
+	 * @throws IOException 
 	 */
 	@Test
-	public void testReadAscii() {
-		fail("Not yet implemented");
+	public void testReadAscii() throws IOException {
+		try (PipedOutputStream pos = new PipedOutputStream();
+			 PrintWriter pw = new PrintWriter(pos);
+			 PipedInputStream in = new PipedInputStream(pos)) {
+
+			outStream = mock(PrintStream.class);
+			sc = new StreamChannel(in, outStream);
+			
+			final char INPUT = '$';
+			
+			pw.write(INPUT);
+			pw.write(System.getProperty("line.separator"));
+			pw.flush();
+			
+			assertTrue(in.available() > 0);
+			
+			assertEquals(INPUT, sc.readAscii());
+		}
 	}
 
 	/**
 	 * Test method for {@link cpusim.model.iochannel.StreamChannel#readUnicode()}.
 	 */
 	@Test
-	public void testReadUnicode() {
-		fail("Not yet implemented");
+	public void testReadUnicode() throws IOException {
+		try (PipedOutputStream pos = new PipedOutputStream();
+			 PrintWriter pw = new PrintWriter(pos);
+			 PipedInputStream in = new PipedInputStream(pos)) {
+
+			outStream = mock(PrintStream.class);
+			sc = new StreamChannel(in, outStream);
+			
+			final ArchValue bytes = ArchType.Byte.of(2);
+			final int INPUT = (int) (0xDEADBEEF & bytes.mask());
+			
+			pw.write(ConvertLongs.to16WString(INPUT, bytes));
+			pw.write(System.getProperty("line.separator"));
+			pw.flush();
+			
+			assertTrue(in.available() > 0);
+			assertEquals(INPUT, sc.readUnicode());
+		}
+	}
+	
+	/**
+	 * Test method for {@link cpusim.model.iochannel.StreamChannel#writeString(java.lang.String)}.
+	 */
+	@Test
+	public void testWriteString() {
+		outStream = mock(PrintStream.class);
+		sc = new StreamChannel(mock(InputStream.class), outStream);
+		
+		final String TEST_OUTPUT = "test string.";
+		
+		sc.writeString(TEST_OUTPUT);
+		verify(outStream).print(TEST_OUTPUT);
 	}
 
 	/**
@@ -118,23 +204,41 @@ public class StreamChannelTest {
 	 */
 	@Test
 	public void testWriteLong() {
-		fail("Not yet implemented");
+		outStream = mock(PrintStream.class);
+		sc = new StreamChannel(mock(InputStream.class), outStream);
+		
+		final long TEST_OUTPUT = Long.MAX_VALUE;
+		
+		sc.writeLong(TEST_OUTPUT);
+		verify(outStream).print(TEST_OUTPUT);
 	}
 
 	/**
-	 * Test method for {@link cpusim.model.iochannel.StreamChannel#writeAscii(long)}.
+	 * Test method for {@link IOChannel#writeAscii(char)}.
 	 */
 	@Test
 	public void testWriteAscii() {
-		fail("Not yet implemented");
+		outStream = mock(PrintStream.class);
+		sc = new StreamChannel(mock(InputStream.class), outStream);
+		
+		final long TEST_OUTPUT = 0xDEADBEEF & ArchType.Byte.of(1).mask();
+		
+		sc.writeAscii(TEST_OUTPUT);
+		verify(outStream).print(TEST_OUTPUT);
 	}
 
 	/**
-	 * Test method for {@link cpusim.model.iochannel.StreamChannel#writeUnicode(long)}.
+	 * Test method for {@link cpusim.model.iochannel.StreamChannel#writeUnicode(int)}.
 	 */
 	@Test
 	public void testWriteUnicode() {
-		fail("Not yet implemented");
+		outStream = mock(PrintStream.class);
+		sc = new StreamChannel(mock(InputStream.class), outStream);
+		
+		final int TEST_OUTPUT = (int) (0xDEADBEEF & ArchType.Byte.of(2).mask());
+		
+		sc.writeUnicode(TEST_OUTPUT);
+		verify(outStream).print((long)TEST_OUTPUT);
 	}
 
 	/**
@@ -142,15 +246,24 @@ public class StreamChannelTest {
 	 */
 	@Test
 	public void testFlush() {
-		fail("Not yet implemented");
+		outStream = mock(PrintStream.class);
+		sc = new StreamChannel(mock(InputStream.class), outStream);
+		
+		sc.flush(true);
+		verify(outStream).flush();
 	}
 
 	/**
 	 * Test method for {@link cpusim.model.iochannel.StreamChannel#reset()}.
+	 * @throws IOException 
 	 */
 	@Test
-	public void testReset() {
-		fail("Not yet implemented");
+	public void testReset() throws IOException {
+		inStream = mock(InputStream.class);
+		sc = new StreamChannel(inStream, outStream);
+		
+		sc.reset();
+		verify(inStream).reset();
 	}
 
 }

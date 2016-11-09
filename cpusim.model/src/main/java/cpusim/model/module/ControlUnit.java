@@ -29,7 +29,7 @@ public class ControlUnit extends Module<ControlUnit>
         implements Serializable
 {
 
-    private MachineInstruction<?> currentInstruction;
+    private MachineInstruction currentInstruction;
     //the instr currently or about to be executed
     private int microIndex;
     //the index of the micro sequence
@@ -80,7 +80,7 @@ public class ControlUnit extends Module<ControlUnit>
      * getter for the current instruction
      * @return the current instruction
      */
-    public MachineInstruction<?> getCurrentInstruction()
+    public MachineInstruction getCurrentInstruction()
     {
         return this.currentInstruction;
     }
@@ -89,7 +89,7 @@ public class ControlUnit extends Module<ControlUnit>
      * setter for the current instruction
      * @param instr the new instruction to be set as the current one
      */
-    public void setCurrentInstruction(MachineInstruction<?> instr)
+    public void setCurrentInstruction(MachineInstruction instr)
     {
         this.currentInstruction = instr;
     }
@@ -178,10 +178,10 @@ public class ControlUnit extends Module<ControlUnit>
      */
     public class State
     {
-        private MachineInstruction<?> instr;
+        private MachineInstruction  instr;
         private int microIndex;
 
-        public State(MachineInstruction<?> instr, int microIndex)
+        public State(MachineInstruction instr, int microIndex)
         {
             this.instr = instr;
             this.microIndex = microIndex;
@@ -195,7 +195,7 @@ public class ControlUnit extends Module<ControlUnit>
 
         public int getIndex() { return microIndex; }
 
-        public MachineInstruction<?> getInstr() { return instr; }
+        public MachineInstruction getInstr() { return instr; }
     }
 
 }

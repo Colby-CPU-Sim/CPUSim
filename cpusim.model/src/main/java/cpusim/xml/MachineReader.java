@@ -53,7 +53,9 @@ import java.util.Set;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
@@ -91,6 +93,7 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.module.RegisterRAMPair;
+import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;
 import cpusim.model.util.MachineReaderException;
 import cpusim.model.util.Validate;
@@ -111,8 +114,7 @@ public class MachineReader {
 	// the current machine instruction being constructed
 	private String currentFormat; // holds the field lengths until they are
 	private String opcodeString; // holds the opcode for error messages
-	// FIXME #94 Why unused?
-	// private String opcodeLine; //the line number of the opcode for error
+	private String opcodeLine; //the line number of the opcode for error
 	// messages
 	private Locator locator;
 	private List<RegisterRAMPair> registerRAMPairs; // holds the current pairs
@@ -169,7 +171,7 @@ public class MachineReader {
 		// initialize the punctuation characters to the default chars.
 		// These will be replaced by new ones if the .cpu file specifies
 		// punctuation characters.
-		chars = new ArrayList<>(Arrays.asList(Machine.getDefaultPunctChars()));
+		chars = Machine.getDefaultPunctChars();
 
 	}
 
@@ -240,15 +242,15 @@ public class MachineReader {
 	// --------------------------
 	public void endMachine() {
 		try {
-			MachineInstruction[] instrs = machine.getInstructions().toArray(new MachineInstruction[] {});
-			Validate.allOpcodesAreUnique(machine.getInstructions());
+			List<MachineInstruction> instrs = machine.getInstructions();
 			Validate.allNamesAreUnique(instrs);
+			Validate.allOpcodesAreUnique(instrs);
 		} catch (ValidationException e) {
 			throw new MachineReaderException(getCurrentLine() + e.getMessage());
 		}
 
 		// check the punctuation characters
-		PunctChar[] punctChars = chars.toArray(new PunctChar[chars.size()]);
+		List<PunctChar> punctChars = Lists.newArrayList(chars);
 		try {
 			Validate.punctChars(chars);
 		} catch (ValidationException exc) {
@@ -335,7 +337,7 @@ public class MachineReader {
 					+ "\" must be in the range -(2^" + (numBits - 1) + ") and" + "(2^" + (numBits - 1) + "-1).");
 		}
 
-		final Field f = new Field(name, type, ArchType.Bit.of(numBits), rel, FXCollections.observableArrayList(new ArrayList<>()),
+		final Field f = new Field(name, type, numBits, rel, FXCollections.observableHashMap(),
 				defaultValue, Field.SignedType.fromBool(signed));
 		machine.getFields().add(f);
 		fields.put(name, f);
@@ -1366,7 +1368,7 @@ public class MachineReader {
 		// validate the name attribute
 		String name = attrs.getValue("name");
 		try {
-			Validate.nameIsValidAssembly(name, chars.toArray(new PunctChar[] {}));
+			Validate.nameIsValidAssembly(name, chars);
 		} catch (ValidationException e) {
 			throw new MachineReaderException(getCurrentLine() + e.getMessage());
 		}
@@ -1413,10 +1415,11 @@ public class MachineReader {
 			currentInstruction = new MachineInstruction(name, opcode, currentFormat, machine);
 		} else {
 			// version 3: separate formats for machine & assembly instructions
+			
 			currentInstruction = new MachineInstruction(name, opcode,
 					Convert.formatStringToFields(currentInstructionFormat, machine),
-					Convert.formatStringToFields(currentAssemblyFormat, machine), Convert.xmlToColorsList(instrColors),
-					Convert.xmlToColorsList(assemblyColors), machine);
+					Convert.formatStringToFields(currentAssemblyFormat, machine), 
+					Colors.xmlToColorsList(instrColors), Colors.xmlToColorsList(assemblyColors), machine);
 		}
 
 		machine.getInstructions().add(currentInstruction);
@@ -1436,7 +1439,7 @@ public class MachineReader {
 					if (!fields.containsKey(fieldName)) {
 						int fieldLength = Math.abs(Integer.parseInt(fieldName));
 						Field field = new Field(fieldName, Field.Type.required, fieldLength, Field.Relativity.absolute,
-								FXCollections.observableArrayList(), 0, true);
+								FXCollections.observableHashMap(), 0, Field.SignedType.Signed);
 
 						machine.getFields().add(field);
 						fields.put(fieldName, field);

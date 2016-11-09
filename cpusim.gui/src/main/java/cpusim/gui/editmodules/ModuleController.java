@@ -18,36 +18,51 @@ import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
-public abstract class ModuleController
+import static com.google.common.base.Preconditions.*;
+
+/**
+ *
+ * FIXME Why does {@link #clones} exist?
+ * @param <T>
+ */
+abstract class ModuleController<T extends Module<T>>
         extends TableView
 {
-    public Mediator mediator;
-    public Machine machine;      //the current machine being simulated
-    HashMap assocList;  //associates the current modules
+    protected Mediator mediator;
+    protected Machine machine;      //the current machine being simulated
+    protected Map<T, T> assocList;  //associates the current modules
     //with the edited clones; key = new clone, value = original
-    public Module[] clones;  //the current clones
-    Node parentFrame; //for the parent of error messages
+    protected ObservableList<T> clones;  //the current clones
+    protected Node parentFrame; //for the parent of error messages
+    
+    protected final Class<T> moduleClass;
 
     //-------------------------------
     /**
      * Constructor
      * @param mediator holds the information to be shown in tables
      */
-    public ModuleController(Mediator mediator)
+    public ModuleController(Mediator mediator, Class<T> moduleClass)
     {
         this.mediator = mediator;
         this.machine = mediator.getMachine();
-        assocList = new HashMap();
+        assocList = new HashMap<>();
         clones = null;  //subclasses must initialize clones via createClones()
         parentFrame = null;
+        
+        this.moduleClass = moduleClass;
     }
 
 
@@ -63,28 +78,16 @@ public abstract class ModuleController
     }
 
     /**
-     * returns a new Module with the given name
-     *
-     * @param newName the name of the new hardware module
-     * @return a new hardware module with the given name
-     */
-    public Module getNewModule(String newName)
-    {
-        Module prototype = getPrototype();
-        Module clone = (Module) prototype.clone();
-        clone.setName(newName);
-        return clone;
-    }
-
-    /**
      * returns an array of clones of the current module.
      *
      * @return an array of clones of the current module.
      */
-    public Module[] getClones()
+    public List<T> getClones()
     {
-        assert clones != null :
-                "clones == null in ModuleFactory.getClones()";
+        if (clones == null) {
+            throw new NullPointerException("clones == null");
+        }
+        
         return clones;
     }
 
@@ -93,9 +96,11 @@ public abstract class ModuleController
      * @param clone the clone of the original module
      * @return the original hardware module of the given clone.
      */
-    public Module getCurrentFromClone(Module clone)
+    public T getCurrentFromClone(final T clone)
     {
-        return (Module) assocList.get(clone);
+        checkNotNull(clone);
+        
+        return assocList.get(clone);
     }
 
     /**
@@ -115,7 +120,9 @@ public abstract class ModuleController
      * It does not check for validity
      * @param clones the clones that will be set to the new array.
      */
-    public abstract void setClones(ObservableList clones);
+    public void setClones(ObservableList<? extends T> clones) {
+        FXCollections.copy(this.clones, clones);
+    }
 
     /**
      * check if the given list of micro instructions have valid values.
@@ -136,73 +143,69 @@ public abstract class ModuleController
 
     //========================================
     // utility methods
-
-    /**
-     * creates an array of clones of the current modules,
-     * adding the appropriate ChangeListeners to its properties
-     *
-     * @return the clones of the current modules
-     */
-    public Module[] createClones()
-    {
-        ObservableList<? extends Module> currentModules = getCurrentModules();
-        Module[] clones = (Module[])
-                Array.newInstance(this.getModuleClass(), currentModules.size());
-        for (int i = 0; i < currentModules.size(); i++) {
-            Module clone = (Module) currentModules.get(i).clone();
-            clones[i] = clone;
-            assocList.put(clone, currentModules.get(i));
-        }
-        return clones;
-    }
-
+    
     /**
      * returns a list of updated modules based on the objects
      * in the list.  It replaces the objects in the list with their
      * associated objects, if any, after updating the fields of those old objects.
-     * It also sorts the micros by name.
      *
      * @param list a list of modules
      * @return a list of updated modules
      */
-    public Vector<Module> createNewModulesList(Module[] list)
+    protected final List<T> createNewModulesList(List<? extends T> list)
     {
-        Vector<Module> newModules = new Vector<>();
-        for (Module module : list) {
-            Module oldModule = (Module) assocList.get(module);
+        List<T> newModules = new ArrayList<T>();
+        
+        for (final T module : list) {
+            final T oldModule = assocList.get(module);
             if (oldModule != null) {
                 //if the new incr is just an edited clone of an old module,
                 //then just copy the new data to the old module
-                module.copyDataTo(oldModule);
-                newModules.addElement(oldModule);
-            }
-            else {
-                if (module instanceof Register) {
-                    ((Register) module).setValue(((Register) module).getInitialValue());
-                }
-                if (module instanceof RegisterArray) {
-                    RegisterArray registerArray = (RegisterArray) module;
-                    for (Register r : registerArray.registers())
-                        r.setValue(r.getInitialValue());
-                }
-                newModules.addElement(module);
+                module.copyTo(oldModule);
+                newModules.add(oldModule);
             }
         }
+        
         return newModules;
     }
-
-    //========================================
-    // methods inherited from Controller interface
-
+    
     /**
-     * returns a new module object with the given name
+     * Utilizes {@link #getCurrentModules()} to get a list of the {@link Module} in use, then clones the values into
+     * new instances placing them into {@link #assocList}.
      *
-     * @param name the name of the object.
-     * @return a new module
+     * @return Non-{@code null} {@link List} of the cloned objects.
      */
-    public Object getNewObject(String name)
-    {
-        return getNewModule(name);
+    protected final List<T> loadClonesFromCurrentModules() {
+        List<T> currentModules = getCurrentModules();
+        
+        List<T> clones = new ArrayList<>();
+        for (final T m: currentModules) {
+            final T clone = m.cloneOf();
+            clones.add(clone);
+            assocList.put(clone, m);
+        }
+        
+        return clones;
+    }
+    
+    /**
+     * Loads all of the values from {@link #getClones()} into the {@link TableView} passed.
+     * @param table Table to load into
+     */
+    protected void loadClonesIntoTableView(TableView<T> table) {
+        checkNotNull(table);
+ 
+        ObservableList<T> items = table.getItems();
+        getClones().stream().forEach(items::add);
+    }
+    
+    /**
+     * returns the class object for the controller's objects
+     *
+     * @return the class object for the controller's objects
+     */
+    public final Class<T> getModuleClass() {
+        return moduleClass;
     }
 
     //========================================
@@ -213,21 +216,16 @@ public abstract class ModuleController
      *
      * @return the prototype of the right subclass
      */
-    abstract Module getPrototype();
+    public abstract T getPrototype();
 
-    /**
-     * returns the class object for the controller's objects
-     *
-     * @return the class object for the controller's objects
-     */
-    abstract Class getModuleClass();
+    
 
     /**
      * returns a list of the current modules
      *
      * @return a list of the current modules
      */
-    public abstract ObservableList<? extends Module> getCurrentModules();
+    public abstract ObservableList<T> getCurrentModules();
 
     /**
      * checks if new modules of this class can be created.

@@ -7,8 +7,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
-public class UpdateDisplayManager
-        implements ChangeListener<Machine.StateWrapper>, CPUSimConstants{
+public class UpdateDisplayManager implements ChangeListener<Machine.StateWrapper> {
 
     private DesktopController desktop;
     private Mediator mediator;

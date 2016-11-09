@@ -46,18 +46,9 @@ public class Comment extends Microinstruction
      */
     public Object clone()
     {
-        assert false : "Comment.clone() was called.";
-        return null; //to satisfy the compiler's need for a return value
+        throw new UnsupportedOperationException("Comment.clone() was called.");
     } // end clone()
 
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param newMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction newMicro)
-    {
-        assert false : "Comment.copyDataTo() was called.";
-    } // end copyDataTo()
 
 
     /**
@@ -66,12 +57,13 @@ public class Comment extends Microinstruction
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m)
+    @Override
+    public boolean uses(Module<?> m)
     {
         return false;
     }
 
-
+    @Override
     public void execute()
     {
         //do nothing
@@ -81,7 +73,8 @@ public class Comment extends Microinstruction
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
         //not used, since Comment micros only appear in the execute
         //or fetch sequences, in which case, just the name (encoded for
@@ -89,21 +82,14 @@ public class Comment extends Microinstruction
         return "";
     }
 
-//    Use the inherited toString() method that returns the name of the Microinstruction
-//    public String toString()
-//    {
-//        //so that it always is displayed in italics and gray.
-//        return "<html><em><font color=gray>" +
-//                getHTMLName() + "</font></em></html>";
-//    }
-
     /**
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription()
+    @Override
+    public String getXMLDescription(String indent)
     {
-        return "<Comment name=\"" + HtmlEncoder.sEncode(getName()) +
+        return indent + "<Comment name=\"" + HtmlEncoder.sEncode(getName()) +
                 "\" id=\"" + getID() + "\" />";
     }
 } // end Comment class

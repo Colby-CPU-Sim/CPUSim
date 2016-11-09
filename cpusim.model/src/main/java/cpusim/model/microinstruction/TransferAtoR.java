@@ -5,7 +5,7 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.ExecutionException;
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
@@ -41,13 +41,13 @@ public class TransferAtoR extends Microinstruction {
      */
     public TransferAtoR(String name, Machine machine,
                         RegisterArray source,
-                        Integer srcStartBit,
+                        int srcStartBit,
                         Register dest,
-                        Integer destStartBit,
-                        Integer numBits,
+                        int destStartBit,
+                        int numBits,
                         Register index,
-                        Integer indexStart,
-                        Integer indexNumBits){
+                        int indexStart,
+                        int indexNumBits){
         super(name, machine);
         this.source = new SimpleObjectProperty<>(source);
         this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
@@ -82,7 +82,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getSrcStartBit(){
+    public int getSrcStartBit(){
         return srcStartBit.get();
     }
 
@@ -91,7 +91,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @param newSrcStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setSrcStartBit(Integer newSrcStartBit){
+    public void setSrcStartBit(int newSrcStartBit){
         srcStartBit.set(newSrcStartBit);
     }
 
@@ -118,7 +118,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getDestStartBit(){
+    public int getDestStartBit(){
         return destStartBit.get();
     }
 
@@ -127,7 +127,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @param newDestStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setDestStartBit(Integer newDestStartBit){
+    public void setDestStartBit(int newDestStartBit){
         destStartBit.set(newDestStartBit);
     }
 
@@ -136,7 +136,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @return the integer value of the number of bits.
      */
-    public Integer getNumBits(){
+    public int getNumBits(){
         return numBits.get();
     }
 
@@ -145,7 +145,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @param newNumbits the new value of the number of bits.
      */
-    public void setNumBits(Integer newNumbits){
+    public void setNumBits(int newNumbits){
         numBits.set(newNumbits);
     }
 
@@ -172,7 +172,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getIndexStart(){
+    public int getIndexStart(){
         return indexStart.get();
     }
 
@@ -181,7 +181,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @param newIndexStart the new index of the start bit for the set microinstruction.
      */
-    public void setIndexStart(Integer newIndexStart){
+    public void setIndexStart(int newIndexStart){
         indexStart.set(newIndexStart);
     }
 
@@ -190,7 +190,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @return the integer value of the number of bits.
      */
-    public Integer getIndexNumBits(){
+    public int getIndexNumBits(){
         return indexNumBits.get();
     }
 
@@ -199,7 +199,7 @@ public class TransferAtoR extends Microinstruction {
      *
      * @param newIndexNumBits the new value of the number of bits.
      */
-    public void setIndexNumBits(Integer newIndexNumBits){
+	public void setIndexNumBits(int newIndexNumBits){
         indexNumBits.set(newIndexNumBits);
     }
 
@@ -246,6 +246,7 @@ public class TransferAtoR extends Microinstruction {
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         //manipulate variables depending on the indexing scheme
@@ -326,8 +327,9 @@ public class TransferAtoR extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<TransferAtoR name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<TransferAtoR name=\"" + getHTMLName() +
                 "\" source=\"" + getSource().getID() +
                 "\" srcStartBit=\"" + getSrcStartBit() +
                 "\" dest=\"" + getDest().getID() +
@@ -343,8 +345,9 @@ public class TransferAtoR extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getSource().getHTMLName() +
                 "</TD><TD>" + getSrcStartBit() +
                 "</TD><TD>" + getDest().getHTMLName() +
@@ -362,7 +365,8 @@ public class TransferAtoR extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == source.get() || m == dest.get() || m == index.get());
     }
 

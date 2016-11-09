@@ -27,15 +27,15 @@
 package cpusim.gui.options;
 
 import cpusim.Mediator;
-import cpusim.assembler.PunctChar;
-import cpusim.assembler.PunctChar.Use;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
+import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
+import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
@@ -64,6 +64,8 @@ import javafx.util.Callback;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -135,13 +137,13 @@ public class OptionsController implements Initializable {
     @FXML
     private TableColumn<PunctChar, String> leftASCIIColumn;
     @FXML
-    private TableColumn<PunctChar, Use> leftTypeColumn;
+    private TableColumn<PunctChar, PunctChar.Use> leftTypeColumn;
     @FXML
     private TableView<PunctChar> rightPunctuationTable;
     @FXML
     private TableColumn<PunctChar, String> rightASCIIColumn;
     @FXML
-    private TableColumn<PunctChar, Use> rightTypeColumn;
+    private TableColumn<PunctChar, PunctChar.Use> rightTypeColumn;
 
     @FXML
     private ComboBox<ComboBoxChannel> changeAllCombo;
@@ -331,7 +333,7 @@ public class OptionsController implements Initializable {
     private boolean saveHighlightingTab() {
         if (!highlightingTab.isDisabled()) {
             ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
-            Validate.allRegisterRAMPairAreUnique(data);
+            ValidateControllers.allRegisterRAMPairAreUnique(data);
             mediator.setRegisterRamPairs(data);
         }
         return true;
@@ -383,11 +385,7 @@ public class OptionsController implements Initializable {
             punctChars.addAll(rightPunctuationTable.getItems());
             try {
                 Validate.punctChars(punctChars);
-                PunctChar[] pca = new PunctChar[punctChars.size()];
-                for (int i = 0; i < punctChars.size(); i++) {
-                    pca[i] = punctChars.get(i);
-                }
-                mediator.getMachine().setPunctChars(pca);
+                mediator.getMachine().setPunctChars(new ArrayList<>(punctChars));
                 return true;
             } catch (ValidationException ex) {
                 if (tabPane.getSelectionModel().getSelectedItem() != punctuationTab) {
@@ -637,12 +635,12 @@ public class OptionsController implements Initializable {
             return esc;
         };
 
-        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>> cellComboFactory1
-                = setStringTableColumn -> new ComboBoxTableCell<>(Use.values());
+        Callback<TableColumn<PunctChar, PunctChar.Use>, TableCell<PunctChar, PunctChar.Use>> cellComboFactory1
+                = setStringTableColumn -> new ComboBoxTableCell<>(PunctChar.Use.values());
 
-        Callback<TableColumn<PunctChar, Use>, TableCell<PunctChar, Use>>
+        Callback<TableColumn<PunctChar, PunctChar.Use>, TableCell<PunctChar, PunctChar.Use>>
             cellComboFactory2 =
-                setStringTableColumn -> new ComboBoxTableCell<>(Use.values());
+                setStringTableColumn -> new ComboBoxTableCell<>(PunctChar.Use.values());
 
         // Set cellValue Factory
         leftASCIIColumn.setCellValueFactory(new PropertyValueFactory<>("Char"));
@@ -665,14 +663,14 @@ public class OptionsController implements Initializable {
         // Put values into table
         ObservableList<PunctChar> leftData = leftPunctuationTable.getItems();
         ObservableList<PunctChar> rightData = rightPunctuationTable.getItems();
-        PunctChar[] originalPunctChars = mediator.getMachine().getPunctChars();
-        int leftSize = (originalPunctChars.length) / 2;
-        int rightSize = originalPunctChars.length - leftSize;
+        List<PunctChar> originalPunctChars = mediator.getMachine().getPunctChars();
+        int leftSize = (originalPunctChars.size()) / 2;
+        int rightSize = originalPunctChars.size() - leftSize;
         for (int i = 0; i < leftSize + rightSize; i++) {
             if (i < leftSize) {
-                leftData.add(originalPunctChars[i].copy());
+                leftData.add(originalPunctChars.get(i).copy());
             } else {
-                rightData.add(originalPunctChars[i].copy());
+                rightData.add(originalPunctChars.get(i).copy());
             }
         }
         leftPunctuationTable.setItems(leftData);
@@ -687,11 +685,11 @@ public class OptionsController implements Initializable {
      */
     private void initializeIOOptionsTab() {
 
-        // make initial Channels
+        // make initial GUIChannels
         allChannels = FXCollections.observableArrayList(
-                StreamChannel.console(),
-                CPUSimConstants.DIALOG_CHANNEL,
-                CPUSimConstants.FILE_CHANNEL);
+                GUIChannels.CONSOLE,
+                GUIChannels.DIALOG,
+                GUIChannels.FILE);
 
         ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
         for (int i = 0; i < ios.size(); i++) {
@@ -726,7 +724,7 @@ public class OptionsController implements Initializable {
         // IO column is not editable.
         connectionColumn.setCellFactory(cellComboIOChannelFactory);
         connectionColumn.setOnEditCommit(text -> {
-            if (!text.getNewValue().equals(CPUSimConstants.FILE_CHANNEL)) {
+            if (!text.getNewValue().equals(GUIChannels.FILE)) {
                 text.getRowValue().setChannel(text.getNewValue());
             } else {
                 IOChannel newChannel = getFileChannelFromChooser(text.getOldValue());
@@ -760,11 +758,11 @@ public class OptionsController implements Initializable {
         // the change listener is called appropriately.
         final ComboBoxChannel nullChannel = new NullComboBoxChannel("individually");
         ComboBoxChannel dialogCBChannel = new ComboBoxChannel(
-                "to " + CPUSimConstants.DIALOG_CHANNEL.toString(),
-                (BufferedChannel) CPUSimConstants.DIALOG_CHANNEL);
+                "to " + GUIChannels.DIALOG.toString(),
+                GUIChannels.DIALOG);
         ComboBoxChannel consoleCBChannel = new ComboBoxChannel(
-                "to " + StreamChannel.console().toString(),
-                (BufferedChannel) StreamChannel.console());
+                "to " + GUIChannels.CONSOLE.toString(),
+                GUIChannels.CONSOLE);
         this.changeAllCombo.getItems().addAll(
                 nullChannel, dialogCBChannel, consoleCBChannel);
         this.changeAllCombo.setValue(nullChannel);
@@ -893,7 +891,7 @@ public class OptionsController implements Initializable {
         @SuppressWarnings("unchecked")
         @Override
         public void updateItem(T item, boolean empty) {
-            if (item != CPUSimConstants.FILE_CHANNEL ||
+            if (!item.equals(GUIChannels.FILE) ||
                     IOOptionsSelectedSet == null) {
                 super.updateItem(item, empty);
                 if (item instanceof FileChannel) {

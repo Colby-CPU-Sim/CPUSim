@@ -86,12 +86,17 @@ import cpusim.assembler.SourceLine;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;
+import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.assembler.Assembler;
+import cpusim.model.assembler.AssemblyException;
 import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
+import cpusim.model.util.conversion.ConvertLongs;
+import cpusim.model.util.units.ArchType;
 import cpusim.util.*;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
@@ -726,29 +731,29 @@ public class Mediator {
                     continue;
                 } else {
                     if (dataChunkBeginAddress != -1) {
-                        ramInMIF += "[" + Convert.fromLongToHexadecimalString(
+                        ramInMIF += "[" + ConvertLongs.fromLongToHexadecimalString(
                                 dataChunkBeginAddress, ram.getCellSize()) + ".." +
-                                Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
-                                Convert.fromLongToTwosComplementString(ramLoc.getValue(),
+                                ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
+                                ConvertLongs.fromLongToTwosComplementString(ramLoc.getValue(),
                                         ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
                         dataChunkBeginAddress = -1;
                     } else {
-                        ramInMIF += Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits())
-                                + "        :  " + Convert.fromLongToTwosComplementString(ramLoc.getValue(),
+                        ramInMIF += ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits())
+                                + "        :  " + ConvertLongs.fromLongToTwosComplementString(ramLoc.getValue(),
                                 ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
                     }
                 }
             } else {
                 if (dataChunkBeginAddress != -1) {
-                    ramInMIF += "[" + Convert.fromLongToHexadecimalString(
+                    ramInMIF += "[" + ConvertLongs.fromLongToHexadecimalString(
                             dataChunkBeginAddress, ram.getCellSize()) + ".." +
-                            Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
-                            Convert.fromLongToTwosComplementString(ramLoc.getValue(),
+                            ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
+                            ConvertLongs.fromLongToTwosComplementString(ramLoc.getValue(),
                                     ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
                     dataChunkBeginAddress = -1;
                 } else {
-                    ramInMIF += Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits())
-                            + "        :  " + Convert.fromLongToTwosComplementString(ramLoc.getValue(),
+                    ramInMIF += ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits())
+                            + "        :  " + ConvertLongs.fromLongToTwosComplementString(ramLoc.getValue(),
                             ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
                 }
             }
@@ -761,24 +766,24 @@ public class Mediator {
     }
 
     public String ramToIntelHex(RAM ram) {
-        String ramInIntelHex = "";
+        final StringBuilder ramInIntelHex = new StringBuilder();
 
         int bytesNeeded = (ram.getCellSize() + 7) / 8;
 
 
         for (RAMLocation ramLoc : ram.data()) {
-            ramInIntelHex += ":";
-            ramInIntelHex += Convert.fromLongToHexadecimalString(bytesNeeded, 8);
-            ramInIntelHex += Convert.fromLongToHexadecimalString(ramLoc.getAddress(), 16);
-            ramInIntelHex += "00";
-            ramInIntelHex += Convert.fromLongToHexadecimalString(ramLoc.getValue(), bytesNeeded * 8);
-            ramInIntelHex += getCheckSumString(bytesNeeded, (int) ramLoc.getAddress(), ramLoc.getValue());
-            ramInIntelHex += NEWLINE;
+            ramInIntelHex.append(":");
+            ramInIntelHex.append(ConvertLongs.fromLongToHexadecimalString(bytesNeeded, 8));
+            ramInIntelHex.append(ConvertLongs.fromLongToHexadecimalString(ramLoc.getAddress(), 16));
+            ramInIntelHex.append("00");
+            ramInIntelHex.append(ConvertLongs.fromLongToHexadecimalString(ramLoc.getValue(), bytesNeeded * 8));
+            ramInIntelHex.append(getCheckSumString(bytesNeeded, (int) ramLoc.getAddress(), ramLoc.getValue()));
+            ramInIntelHex.append(NEWLINE);
         }
+    
+        ramInIntelHex.append(":00000001FF");
 
-        ramInIntelHex += ":00000001FF";
-
-        return ramInIntelHex;
+        return ramInIntelHex.toString();
     }
 
     /**
@@ -1061,12 +1066,12 @@ public class Mediator {
 
     private String getCheckSumString(int byteCount, int address, long value) {
         int sum = byteCount + address % 256 + address / 256;
-        byte[] bytes = Convert.fromLongToByteArray(value, byteCount);
+        byte[] bytes = BigInteger.valueOf(value & ArchType.Byte.getMask(byteCount)).toByteArray();
         for (byte b : bytes)
             sum += b;
         sum &= 255;  // to get just the lowest 8 bits
         int checkSum = (256 - sum) % 256; // only want the lowest 8 bits
-        return Convert.fromLongToHexadecimalString(checkSum, 8);
+        return ConvertLongs.fromLongToHexadecimalString(checkSum, 8);
     }
 
     public void parseIntelHexFile(String fileText, RAM ram, String pathName) {

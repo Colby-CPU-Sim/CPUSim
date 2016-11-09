@@ -24,7 +24,6 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.util.CPUSimConstants;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -48,7 +47,7 @@ import java.util.ResourceBundle;
  */
 public class IncrementTableController
         extends MicroController
-        implements Initializable, CPUSimConstants {
+        implements Initializable {
     @FXML TableView<Increment> table;
     @FXML TableColumn<Increment,String> name;
     @FXML TableColumn<Increment,Register> register;
@@ -70,7 +69,7 @@ public class IncrementTableController
         this.currentMicros = machine.getMicros("increment");
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
-        this.prototype = new Increment("???", machine, r, NO_CONDITIONBIT, NO_CONDITIONBIT, Long.valueOf(1));
+        this.prototype = new Increment("???", machine, r, ConditionBit.none(), ConditionBit.none(), Long.valueOf(1));
         clones = (Microinstruction[]) createClones();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "IncrementTable.fxml");
@@ -132,7 +131,7 @@ public class IncrementTableController
                     }
                 };
 
-        final ObservableList condBit = FXCollections.observableArrayList(NO_CONDITIONBIT);
+        final ObservableList condBit = FXCollections.observableArrayList(ConditionBit.none());
         condBit.addAll((ObservableList<ConditionBit>)machine.getModule("conditionBits"));
         Callback<TableColumn<Increment,ConditionBit>,TableCell<Increment,ConditionBit>> cellCondFactory =
                 new Callback<TableColumn<Increment, ConditionBit>, TableCell<Increment, ConditionBit>>() {
@@ -161,7 +160,7 @@ public class IncrementTableController
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();

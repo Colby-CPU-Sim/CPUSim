@@ -29,19 +29,26 @@
 package cpusim.xml;
 
 
-import cpusim.iochannel.FileChannel;
-import cpusim.iochannel.IOChannel;
-import cpusim.model.*;
-import cpusim.model.assembler.EQU;
-import cpusim.model.assembler.PunctChar;
-import cpusim.model.microinstruction.Comment;
-import cpusim.model.microinstruction.IO;
-import cpusim.util.RegisterRAMPair;
-import javafx.collections.ObservableList;
-
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.List;
+
+import cpusim.model.Field;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.Microinstruction;
+import cpusim.model.Module;
+import cpusim.model.assembler.EQU;
+import cpusim.model.assembler.PunctChar;
+import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.IOChannel;
+import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.IO;
+import cpusim.model.module.RegisterRAMPair;
+
+import com.google.common.collect.ImmutableList;
+
+import javafx.collections.ObservableList;
 
 //import cpusim.gui.*;
 //import cpusim.scrollabledesktop.BaseInternalFrame;
@@ -232,28 +239,31 @@ public class MachineWriter
     // The module windows are the open windows for registers and rams
     public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out)
     {
-        ObservableList[] moduleVectors = {
-            machine.getModule("registers"),
-            machine.getModule("registerArrays"),
-            machine.getModule("conditionBits"),
-            machine.getModule("rams")
-        };
-        ObservableList[] microVectors = {
-            machine.getMicros("set"),
-            machine.getMicros("test"),
-            machine.getMicros("increment"),
-            machine.getMicros("shift"),
-            machine.getMicros("logical"),
-            machine.getMicros("arithmetic"),
-            machine.getMicros("branch"),
-            machine.getMicros("transferRtoR"),
-            machine.getMicros("transferRtoA"),
-            machine.getMicros("transferAtoR"),
-            machine.getMicros("decode"),
-            machine.getMicros("setCondBit"),
-            machine.getMicros("io"),
-            machine.getMicros("memoryAccess")
-        };
+        List<ObservableList<? extends Module<?>>> moduleVectors = 
+    		ImmutableList.<ObservableList<? extends Module<?>>>builder()
+    			.add(machine.getModule("registers"))
+    			.add(machine.getModule("registerArrays"))
+    			.add(machine.getModule("conditionBits"))
+    			.add(machine.getModule("rams"))
+    			.build();
+        
+        List<ObservableList<Microinstruction>> microVectors = 
+        		ImmutableList.<ObservableList<Microinstruction>>builder()
+        			.add(machine.getMicros("set"))
+        			.add(machine.getMicros("test"))
+        			.add(machine.getMicros("increment"))
+        			.add(machine.getMicros("shift"))
+        			.add(machine.getMicros("logical"))
+        			.add(machine.getMicros("arithmetic"))
+        			.add(machine.getMicros("branch"))
+        			.add(machine.getMicros("transferRtoR"))
+        			.add(machine.getMicros("transferRtoA"))
+        			.add(machine.getMicros("transferAtoR"))
+        			.add(machine.getMicros("decode"))
+        			.add(machine.getMicros("setCondBit"))
+        			.add(machine.getMicros("io"))
+        			.add(machine.getMicros("memoryAccess"))
+        			.build();
 
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println(internalDTD);
@@ -262,8 +272,8 @@ public class MachineWriter
 
         //print the punctuation characters and their uses
         out.println("\t<!--............. Punctuation Options .............-->");
-        PunctChar[] chars = machine.getPunctChars();
-        if( chars.length == 0 )
+        List<PunctChar> chars = machine.getPunctChars();
+        if( chars.size() == 0 )
             out.println("\t<!-- none -->");
         else
             for(PunctChar c : chars)
@@ -284,7 +294,7 @@ public class MachineWriter
         HashSet<FileChannel> fileChannelSet = new HashSet<FileChannel>();
         out.println();
         out.println("\t<!--............. FileChannels .................-->");
-        ObservableList ios = machine.getMicros("io");
+        ObservableList<Microinstruction> ios = machine.getMicros("io");
         for (int i = 0; i < ios.size(); i++) {
             IOChannel channel = ((IO) ios.get(i)).getConnection();
             if (channel instanceof FileChannel)
@@ -302,27 +312,27 @@ public class MachineWriter
         }
 
         //print the modules
-        for (int i = 0; i < moduleVectors.length; i++) {
+        for (int i = 0; i < moduleVectors.size(); i++) {
             out.println();
             out.println("\t" + moduleHeaders[i]);
-            if (moduleVectors[i].size() == 0)
+            if (moduleVectors.get(i).size() == 0)
                 out.println("\t<!-- none -->");
             else
-                for (int j = 0; j < moduleVectors[i].size(); j++)
-                    out.println("\t" + ((Module)
-                            moduleVectors[i].get(j)).getXMLDescription());
+                for (Module<?> m : moduleVectors.get(i)) {
+                	out.println("\t" + m.getXMLDescription("\t\t"));
+                }
         }
 
         //print the micros except for End
-        for (int i = 0; i < microVectors.length; i++) {
+        for (int i = 0; i < microVectors.size(); i++) {
             out.println();
             out.println("\t" + microHeaders[i]);
-            if (microVectors[i].size() == 0)
+            if (microVectors.get(i).size() == 0)
                 out.println("\t<!-- none -->");
             else
-                for (int j = 0; j < microVectors[i].size(); j++)
-                    out.println("\t" + ((Microinstruction)
-                            microVectors[i].get(j)).getXMLDescription());
+            	for (Microinstruction m : microVectors.get(i)) {
+                	out.println("\t" + m.getXMLDescription("\t\t"));
+                }
         }
 
         //print the End micro
@@ -338,19 +348,19 @@ public class MachineWriter
             out.println("\t<!-- none -->");
         else
             for( Comment comment : comments)
-                out.println("\t" + comment.getXMLDescription());
+                out.println("\t" + comment.getXMLDescription("\t\t"));
 
         //print the global EQUs
         out.println();
         out.println("\t<!--............. global equs ..................-->");
 
-        ObservableList EQUs = machine.getEQUs();
+        ObservableList<EQU> EQUs = machine.getEQUs();
         if (EQUs.size() == 0)
             out.println("\t<!-- none -->");
         else
             for (int j = 0; j < EQUs.size(); j++)
                 out.println("\t" + ((EQU)
-                        EQUs.get(j)).getXMLDescription());
+                        EQUs.get(j)).getXMLDescription("\t\t"));
 
         //print the fetch sequence
         out.println();

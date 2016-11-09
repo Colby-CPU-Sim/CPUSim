@@ -12,7 +12,6 @@ import cpusim.model.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.StyledListCell;
 import cpusim.util.BackupManager;
-import cpusim.util.CPUSimConstants;
 import cpusim.util.OutlineChangesManager;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -36,8 +35,7 @@ import java.util.ResourceBundle;
 /**
  * A tool bar used for debug mode.
  */
-public class DebugToolBarController extends ToolBar implements Initializable,
-        CPUSimConstants, ChangeListener<Machine.StateWrapper>
+public class DebugToolBarController extends ToolBar implements Initializable, ChangeListener<Machine.StateWrapper>
 {
     @FXML
     Button goButton;
@@ -170,7 +168,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
      */
     @FXML
     public void onBackupMachineInstrClick(ActionEvent e) {
-        // Can't back up the IO Channels--this is mentioned in user manual.
+        // Can't back up the IO GUIChannels--this is mentioned in user manual.
         backupManager.backupOneMachineInstruction();
         machine.getControlUnit().reset();
         machine.setState(Machine.State.EXECUTION_HALTED, false);
@@ -185,7 +183,7 @@ public class DebugToolBarController extends ToolBar implements Initializable,
      */
     @FXML
     public void onBackupMicroInstrClick(ActionEvent e) {
-        // Can't back up the IO Channels--this is mentioned in user manual.
+        // Can't back up the IO GUIChannels--this is mentioned in user manual.
         backupManager.backupOneMicroInstruction();
         machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();

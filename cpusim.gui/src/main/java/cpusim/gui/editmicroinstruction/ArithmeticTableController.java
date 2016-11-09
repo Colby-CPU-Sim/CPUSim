@@ -23,7 +23,6 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.util.CPUSimConstants;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -47,7 +46,7 @@ import java.util.ResourceBundle;
  */
 public class ArithmeticTableController
         extends MicroController
-        implements Initializable, CPUSimConstants {
+        implements Initializable {
     @FXML TableView<Arithmetic> table;
     @FXML TableColumn<Arithmetic,String> name;
     @FXML TableColumn<Arithmetic,Register> source1;
@@ -72,7 +71,7 @@ public class ArithmeticTableController
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
         this.prototype = new Arithmetic("???", machine, "ADD", r, r, r,
-                NO_CONDITIONBIT, NO_CONDITIONBIT);
+                ConditionBit.none(), ConditionBit.none());
         clones = (Microinstruction[]) createClones();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ArithmeticTable.fxml");
@@ -147,7 +146,7 @@ public class ArithmeticTableController
                     }
                 };
 
-        final ObservableList condBit = FXCollections.observableArrayList(NO_CONDITIONBIT);
+        final ObservableList condBit = FXCollections.observableArrayList(ConditionBit.none());
         condBit.addAll((ObservableList<ConditionBit>)machine.getModule("conditionBits"));
         Callback<TableColumn<Arithmetic,ConditionBit>,TableCell<Arithmetic,ConditionBit>> cellCondFactory =
                 new Callback<TableColumn<Arithmetic, ConditionBit>, TableCell<Arithmetic, ConditionBit>>() {
@@ -178,7 +177,7 @@ public class ArithmeticTableController
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();

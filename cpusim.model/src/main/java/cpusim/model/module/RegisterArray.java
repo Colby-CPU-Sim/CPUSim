@@ -28,12 +28,16 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+
 import static com.google.common.base.Preconditions.*;
 
 /**
  * A register array is an indexed list of any number of registers.
  */
-public class RegisterArray extends Module<RegisterArray>
+public class RegisterArray extends Module<RegisterArray> implements Iterable<Register>
 {
 
     //------------------------
@@ -44,6 +48,8 @@ public class RegisterArray extends Module<RegisterArray>
     private int numIndexDigits;  //== floor(log10(length-1))+1
 
     //------------------------
+    
+    
 
     /**
      * Constructor
@@ -75,7 +81,7 @@ public class RegisterArray extends Module<RegisterArray>
      * @param length a positive base-10 integer specifying the number of registers in the register array.
      * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
      */
-    public RegisterArray(String name, int length, int width, ObservableList registers)
+    public RegisterArray(String name, int length, int width, ObservableList<Register> registers)
     {
         super(name);
         this.width = new SimpleIntegerProperty(width);  //used in setLength
@@ -112,17 +118,33 @@ public class RegisterArray extends Module<RegisterArray>
     {
         return registers;
     }
-
+    
+    @Override
+    public Iterator<Register> iterator() {
+        return registers.iterator();
+    }
+    
+    @Override
+    public void forEach(final Consumer<? super Register> action) {
+        registers.forEach(action);
+    }
+    
+    @Override
+    public Spliterator<Register> spliterator() {
+        return registers.spliterator();
+    }
+    
     /**
      * overrides the Module.setName() method it inherits
      */
     public void setName(String name)
     {
         super.setName(name);
+        
         for (int i = 0; i < registers.size(); i++){
-            if (!registers.get(i).getNameDirty())
-                registers.get(i).setName(name + "[" +
-                        toStringOfLength(i, numIndexDigits) + "]");
+            final Register r = registers.get(i);
+            if (!r.getNameDirty())
+                r.setName(name + "[" + toStringOfLength(i, numIndexDigits) + "]");
         }
     }
 
@@ -183,7 +205,7 @@ public class RegisterArray extends Module<RegisterArray>
     public void setRegisters(ObservableList<Register> newRegisters){
         for (int i = 0; i < newRegisters.size(); i++){
             if (newRegisters.size() <= registers.size()){
-                newRegisters.get(i).copyDataTo(registers.get(i));
+                newRegisters.get(i).copyTo(registers.get(i));
             }
             else {
                 registers.add(newRegisters.get(i));
@@ -212,29 +234,22 @@ public class RegisterArray extends Module<RegisterArray>
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
-        String registerTableString = "<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
+        StringBuilder registerTableString = new StringBuilder("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
                     "CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">" + 
                 "<TR><TD><B>Name</B></TD><TD><B>" +
                 "Width</B></TD><TD><B>Initial Value</B></TD>"+
-                "<TD><B>Read Only</B></TD><B>";
+                "<TD><B>Read Only</B></TD><B>");
         for (Register register : registers){
-            registerTableString += register.getHTMLDescription();
+            registerTableString.append(register.getHTMLDescription(indent + "\t"));
         }
-        registerTableString += "</TABLE><P></P>";
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getLength() +
-                "</TD><TD>" + getWidth() + "</TD><TD>" + registerTableString +
-                "</TD></TR>";
-    }
-
-    /**
-     * returns the XML description
-     * @return the XML description
-     */
-    public String getXMLDescription()
-    {
+        registerTableString.append("</TABLE><P></P>");
         
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getLength() +
+                "</TD><TD>" + getWidth() + "</TD><TD>" + registerTableString.toString() +
+                "</TD></TR>";
     }
 
     /**
@@ -298,15 +313,9 @@ public class RegisterArray extends Module<RegisterArray>
                 + getID() + "\" >" + nl;
         //write the descriptions of all the registers in the array
         for(int i = 0; i < length.get(); i++)
-            result += "\t\t" + registers.get(i).getXMLDescription() + nl;
+            result += "\t\t" + registers.get(i).getXMLDescription(indent + "\t") + nl;
         result += "\t</RegisterArray>";
         return indent + result;
-	}
-
-	@Override
-	public String getHTMLDescription(String indent) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

@@ -113,8 +113,6 @@ public abstract class Microinstruction
 
     public abstract void execute();
 
-    public abstract Object clone();
-
     /**
      * returns true if this microinstruction uses m (so if m is modified, this micro may need to be modified.
      * 

@@ -48,7 +48,7 @@ import java.util.Vector;
  * Time: 11:42 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ConditionBitTableController extends ModuleController implements Initializable {
+public class ConditionBitTableController extends ModuleController<ConditionBit> implements Initializable {
     @FXML
     TableView<ConditionBit> table;
     @FXML
@@ -57,10 +57,10 @@ public class ConditionBitTableController extends ModuleController implements Ini
     @FXML TableColumn<ConditionBit,Integer> bit;
     @FXML TableColumn<ConditionBit,Boolean> halt;
 
-    private ObservableList currentModules;
+    private ObservableList<ConditionBit> currentModules;
     private RegistersTableController registerController;
     private RegisterArrayTableController arrayController;
-    ObservableList registerList;
+    private ObservableList<Register> registerList;
 
     /**
      * Constructor
@@ -71,11 +71,10 @@ public class ConditionBitTableController extends ModuleController implements Ini
     public ConditionBitTableController(Mediator mediator,
                                        RegistersTableController registerController,
                                        RegisterArrayTableController arrayController){
-        super(mediator);
-        this.currentModules = machine.getModule("conditionBits");
+        super(mediator, ConditionBit.class);
+        this.currentModules = machine.getModule("conditionBits", ConditionBit.class);
         this.registerController = registerController;
         this.arrayController = arrayController;
-        clones = (Module[]) createClones();
         fixClonesToUseCloneRegisters();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ConditionBitTable.fxml");
@@ -168,7 +167,7 @@ public class ConditionBitTableController extends ModuleController implements Ini
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();
@@ -218,7 +217,7 @@ public class ConditionBitTableController extends ModuleController implements Ini
      */
     private void fixClonesToUseCloneRegisters()
     {
-        for (int i = 0; i < clones.length; i++) {
+        for (int i = 0; i < clones.size; i++) {
             ConditionBit bit = (ConditionBit) clones[i];
             Register originalRegister = bit.getRegister();
             Register cloneRegister =
@@ -247,15 +246,6 @@ public class ConditionBitTableController extends ModuleController implements Ini
                                 arrays.get(0).registers().get(0) :
                                 null))
                 , 0, false);
-    }
-
-    /**
-     * getter for the class object for the controller's objects
-     * @return the class object
-     */
-    public Class getModuleClass()
-    {
-        return ConditionBit.class;
     }
 
     /**
@@ -391,7 +381,7 @@ public class ConditionBitTableController extends ModuleController implements Ini
             if (oldBit != null) {
                 //if the new bit is just an edited clone of an old bit,
                 //then just copy the new data to the old bit
-                bit.copyDataTo(oldBit);
+                bit.copyTo(oldBit);
                 //now fix it to refer to the original register instead of
                 //the clone.
                 Register oldRegister = (Register)

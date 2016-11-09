@@ -170,11 +170,10 @@ public class Register extends Module<Register>
     public Register(String name, int width, long initialValue, EnumSet<Access> readOnly, boolean dirty)
     {
         super(name);
-        checkNotNull(width);
         checkNotNull(readOnly);
         
         this.value = new SimpleLongProperty(this, "register value", 0);
-        setWidth(width);
+        this.width = new SimpleIntegerProperty(width);
         this.initialValue = new SimpleLongProperty(initialValue);
         this.access = new SimpleObjectProperty<>(readOnly);
         nameDirty = dirty;

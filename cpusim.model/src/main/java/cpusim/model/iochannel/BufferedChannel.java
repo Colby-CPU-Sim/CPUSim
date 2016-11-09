@@ -19,7 +19,6 @@ import cpusim.model.util.MoreStrings;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
-import cpusim.model.util.units.ArchValue;
 
 /**
  * This class represents an IOChannel that uses the State pattern to
@@ -132,7 +131,7 @@ public class BufferedChannel implements IOChannel {
 	 * @param numBits - the number of bits the long should be able to fit into.
 	 */
     @Override
-	public long readLong(ArchValue numBits) {
+	public long readLong(int numBits) {
 		if(this.inputBuffer.length() > 0) {
             return this.getLongFromInputBuffer(numBits);
 		} else {
@@ -182,7 +181,7 @@ public class BufferedChannel implements IOChannel {
 	 * 
 	 * Uses the state to read a Unicode character from the channel.
 	 */
-	public char readUnicode() {
+	public int readUnicode() {
 		//If buffer not empty, get the long from the front of the buffer 
 		//and throws an exception if the initial characters do not make a long
 		if(this.inputBuffer.length() > 0) {
@@ -216,11 +215,11 @@ public class BufferedChannel implements IOChannel {
 
 	/**
 	 * Uses the state to output an ASCII value to the user.
-	 * 
-	 * @param longValue - the long value of the character to
-	 * output to the user.
-	 */
-	public void writeAscii(long longValue) {
+	 *
+     * @param longValue - the long value of the character to
+     * output to the user.
+     */
+	public void writeAscii(char longValue) {
 		char charValue = (char) longValue;
 		if (charValue != '\n') {
 			this.outputBuffer.append(charValue);
@@ -239,11 +238,11 @@ public class BufferedChannel implements IOChannel {
 	 * that user can still output a newline character with
 	 * this.
 	 * 
-	 * @param longValue - the long value of the Unicode character
+	 * @param unicodeChar - the long value of the Unicode character
 	 * to output to the user.
 	 */
-	public void writeUnicode(long longValue) {
-		this.outputBuffer.append(String.valueOf(longValue));
+	public void writeUnicode(int unicodeChar) {
+		this.outputBuffer.append(String.valueOf(unicodeChar));
 	}
 
 	/**
@@ -263,7 +262,7 @@ public class BufferedChannel implements IOChannel {
 	 * @return the next long in the output buffer
 	 * @throws ExecutionException if the next element is not an integer
 	 */
-	private long getLongFromInputBuffer(ArchValue numBits) throws ExecutionException {
+	private long getLongFromInputBuffer(int numBits) throws ExecutionException {
 
 		CharSequence inputString = this.inputBuffer.toString().trim();
 		long nextLong = 0;

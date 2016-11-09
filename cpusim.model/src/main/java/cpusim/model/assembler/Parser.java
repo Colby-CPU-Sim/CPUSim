@@ -13,6 +13,12 @@
 
 package cpusim.model.assembler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
+
 /*
  * Michael Goldenberg, Ben Borchard, and Jinghui Yu made the following changes in 12/4/13
  * 
@@ -40,14 +46,16 @@ package cpusim.model.assembler;
 
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
-import cpusim.model.assembler.AssemblyException.*;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.util.Convert;
+import cpusim.model.assembler.AssemblyException.ImportError;
+import cpusim.model.assembler.AssemblyException.InvalidTokenException;
+import cpusim.model.assembler.AssemblyException.NameSpaceError;
+import cpusim.model.assembler.AssemblyException.SyntaxError;
+import cpusim.model.assembler.AssemblyException.TypeError;
+import cpusim.model.assembler.AssemblyException.UndefinedOperandError;
 import cpusim.util.SourceLine;
-
-import java.util.*;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Parser class
@@ -660,7 +668,7 @@ public class Parser {
                     token);
         }
 
-        String contentsWithEscapes = Convert.tokenContentsToStringWithEscapes(token);
+        String contentsWithEscapes = token.contentsToStringWithEscapes();
 
         node.comment += contentsWithEscapes; //save the string in the comment
 
@@ -746,7 +754,7 @@ public class Parser {
                                 + "\" is not a legal operand here");
                 //check that the token is one of the legal values for this field
                 boolean found = false;
-                for (FieldValue value : field.getValues()) {
+                for (FieldValue value : field.getValues().values()) {
                     if (value.getName().equals(token.contents)) {
                         found = true;
                     }

@@ -40,15 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.MoreFXCollections;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.conversion.ConvertStrings;
@@ -56,14 +51,19 @@ import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineInstruction class
 
-public abstract class MachineInstruction<T extends MachineInstruction<T>>
-        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>
+public class MachineInstruction
+        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<MachineInstruction>
 {
 
     private String name;				//the name of the machine instruction
@@ -124,16 +124,22 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         this.instructionColors = newInstrColors;
         
         //for backwards compatibility
-        ArrayList<Field> fieldsToRemove = new ArrayList<>();
+        List<Field> fieldsToRemove = new ArrayList<>();
         for (Field field : this.assemblyFields){
             if (field.getType() == Field.Type.ignored){
                 fieldsToRemove.add(field);
             }
         }
+        
         for (Field field : fieldsToRemove){
             this.assemblyColors.remove(this.assemblyFields.indexOf(field));
             this.assemblyFields.remove(field);
         }
+    }
+    
+    public MachineInstruction(final MachineInstruction other){
+        this(other.name, other.opcode, other.instructionFields, other.assemblyFields, other.instructionColors,
+        		other.assemblyColors, other.machine);
     }
 
     //===================================
@@ -159,7 +165,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
      * This method is the only way to change the fields of this instruction.
      * @param instructionFields A List of the Fields of the instruction
      */
-    public void setInstructionFields(ArrayList<Field> instructionFields)
+    public void setInstructionFields(List<Field> instructionFields)
     {
         this.instructionFields = instructionFields;
 
@@ -169,7 +175,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         return instructionFields;
     }
     
-    public void setInstructionColors(ArrayList<String> instructionColors){
+    public void setInstructionColors(List<String> instructionColors){
         this.instructionColors = instructionColors;
     }
     
@@ -177,7 +183,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         return this.instructionColors;
     }
     
-    public void setAssemblyColors(ArrayList<String> assemblyColors){
+    public void setAssemblyColors(List<String> assemblyColors){
         this.assemblyColors = assemblyColors;
     }
     
@@ -192,7 +198,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
     public ArchValue getNumBits(){
         int numBits = 0;
         for (Field field : this.instructionFields){
-            numBits += field.getNumBits().as();
+            numBits += field.getNumBits();
         }
         
         return ArchType.Bit.of(numBits);
@@ -206,10 +212,9 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
     public List<Integer> getPositiveFieldLengths()
     {
         return getInstructionFields().stream()
-        		.map(Field::getNumBits)
-        		.filter(len -> len.gt(ArchValue.ZERO))
-        		.map(ArchValue::as)
-        		.map(Long::intValue)
+        		.mapToInt(Field::getNumBits)
+        		.filter(len -> len < 0)
+        		.boxed()
         		.collect(Collectors.toList());
     }
 
@@ -222,12 +227,12 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         List<Field> fields = getInstructionFields();
         int size = 0;
         for(Field field : fields)
-            if(field.getNumBits().as() > 0)
+            if(field.getNumBits() > 0)
                 size++;
         boolean[] isSigned = new boolean[size];
         int j = 0;
         for (Field field : fields)
-            if (field.getNumBits().as() > 0) {
+            if (field.getNumBits() > 0) {
                 isSigned[j] = field.isSigned();
                 j++;
             }
@@ -257,7 +262,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         		
         int i = 0;
         for(Field field : assemblyFields){
-            if(field.getNumBits().gtZero()){
+            if(field.getNumBits() > 0){
                 aColors.add(assemblyColors.get(i));
             }
             i++;
@@ -363,7 +368,7 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
     {
         int length = 0;
         for (Field field : getInstructionFields()) {
-            length += field.getNumBits().as();
+            length += field.getNumBits();
         }
         return length;
     }
@@ -421,12 +426,12 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         
         double length = 0.0;
         for(Field field : instructionFields){
-            length += (double)field.getNumBits().as();
+            length += (double)field.getNumBits();
         }
         
         for (int i=0; i<instructionFields.size(); i++){
             instrFormat += "<td align=\"center\" width=\""+Math.rint((((double)
-                    instructionFields.get(i).getNumBits().as())/length)*100)+"%\" bgcolor=\""
+                    instructionFields.get(i).getNumBits())/length)*100)+"%\" bgcolor=\""
                     +instructionColors.get(i)+
                     "\">"+ instructionFields.get(i).getName()+"</td>";
         }
@@ -457,6 +462,10 @@ public abstract class MachineInstruction<T extends MachineInstruction<T>>
         return indent + result + "</TD></TR>";
 	}
 
-	public abstract <U extends T> void copyTo(U other);
+	@Override
+	public <U extends MachineInstruction> void copyTo(U other) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method, copyTo");
+	}
 	
 } // end class MachineInstruction

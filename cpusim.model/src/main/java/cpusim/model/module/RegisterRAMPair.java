@@ -15,8 +15,11 @@
 
 package cpusim.model.module;
 
+import com.google.common.base.MoreObjects;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.Objects;
 
 
 /**
@@ -112,6 +115,25 @@ public class RegisterRAMPair implements Cloneable {
                 "\" ram=\"" + ram.get().getID() + "\" dynamic=\"" +
                 (dynamic.get() ? "true" : "false") + "\" />";
     }
-
+    
+    @Override
+    public int hashCode() {
+        return Objects.hash(dynamic.get(), addressAtStart, register.get(), ram.get());
+    }
+    
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final RegisterRAMPair that = (RegisterRAMPair) o;
+        return addressAtStart == that.addressAtStart &&
+                Objects.equals(register, that.register) &&
+                Objects.equals(ram, that.ram) &&
+                Objects.equals(dynamic, that.dynamic);
+    }
 }
 

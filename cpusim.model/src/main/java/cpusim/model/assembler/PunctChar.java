@@ -12,9 +12,8 @@ import cpusim.model.util.LegacyXMLSupported;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Text;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 /**
  * This class stores the role or use of each punctuation character in the
@@ -27,28 +26,29 @@ public class PunctChar implements HTMLEncodable, LegacyXMLSupported {
 		symbol, label, comment, pseudo, token, illegal
 	}
 
-	@Text
     private final SimpleStringProperty ch;
 	
     private SimpleObjectProperty<Use> use;
 
-    public PunctChar(char c, Use u) {
+    public PunctChar(@JsonProperty("char") char c, 
+    		@JsonProperty("use") @JacksonXmlProperty(isAttribute=true) Use u) {
         ch = new SimpleStringProperty();
         ch.setValue(String.valueOf(c)); 
         use = new SimpleObjectProperty<>();
         use.setValue(u);
     }
 
+    @JsonProperty("char")
     public char getChar() {
         return ch.get().charAt(0);
     }
     
-	@Attribute
+    @JsonProperty("use")
+    @JacksonXmlProperty(isAttribute=true)
     public Use getUse() {
         return use.get();
     }
 
-	@Attribute
     public void setUse(Use u) {
     	use.setValue(u);
     }
@@ -65,11 +65,11 @@ public class PunctChar implements HTMLEncodable, LegacyXMLSupported {
                 use.get() + "</TD></TR>";
     }
     
-    public SimpleStringProperty CharProperty() {
+    public SimpleStringProperty charProperty() {
     	return ch;
     }
     
-    public SimpleObjectProperty<Use> UseProperty() {
+    public SimpleObjectProperty<Use> useProperty() {
     	return use;
     }
     

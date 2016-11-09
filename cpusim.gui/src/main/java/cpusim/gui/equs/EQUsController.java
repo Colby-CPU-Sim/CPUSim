@@ -11,12 +11,11 @@
 package cpusim.gui.equs;
 
 import cpusim.Mediator;
-import cpusim.assembler.EQU;
-import cpusim.gui.desktop.FontData;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.Base;
 import cpusim.gui.util.EditingMultiBaseStyleLongCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.model.assembler.EQU;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 

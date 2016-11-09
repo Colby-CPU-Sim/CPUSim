@@ -18,7 +18,7 @@ import org.fxmisc.richtext.StyledTextArea;
  * This class manages the messages and input and output sent to and from
  * the console TextArea at the bottom of the Desktop window.
  */
-public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPUSimConstants
+public class ConsoleManager implements ChangeListener<Machine.StateWrapper>
 {
     private StyledTextArea ioConsole;
 
@@ -57,7 +57,7 @@ public class ConsoleManager implements ChangeListener<Machine.StateWrapper>, CPU
             if(currentMicro instanceof IO) {
                 IO micro = (IO) currentMicro;
                 if(micro.getDirection().equals("input") &&
-                        micro.getConnection().equals(StreamChannel.console())) {
+                        micro.getConnection().equals(GUIChannels.CONSOLE)) {
                     printToConsole("","yellow");
                     Platform.runLater(() -> ioConsole.requestFocus());
                 }

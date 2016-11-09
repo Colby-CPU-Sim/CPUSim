@@ -18,18 +18,21 @@
  */
 package cpusim.gui.iochannel;
 
+import com.google.common.base.MoreObjects;
 import cpusim.model.ExecutionException;
-import cpusim.model.iochannel.StringChannel;
+import cpusim.model.iochannel.IOChannel;
+import cpusim.model.util.units.ArchType;
 import cpusim.util.Dialogs;
 import cpusim.util.FXUtilities;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
  * This class implements IOChannel using Dialog Boxes.
  */
-public class DialogChannel implements StringChannel {
+public class DialogChannel extends AbstractStringChannel {
 
     // Stage to bring up dialogs in front of
     private Stage stage;
@@ -40,8 +43,7 @@ public class DialogChannel implements StringChannel {
 
     /**
      * Creates a new dialog channel. There is only
-     * one DialogChannel that is used, however, look in
-     * CPUSimConstants file to find the DialogChannel.
+     * one DialogChannel that is used, {@link cpusim.util.GUIChannels#DIALOG}
      *
      * @param name - The name given to the console channel.
      */
@@ -58,7 +60,7 @@ public class DialogChannel implements StringChannel {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
-
+    
     /**
      * displays an output to the user
      *
@@ -67,11 +69,7 @@ public class DialogChannel implements StringChannel {
     @Override
     public void writeString(final String s) {
         try {
-            FXUtilities.runAndWait(new Runnable() {
-                public void run() {
-                    Dialogs.createConfirmationDialog(stage, "Output", s).showAndWait();
-                }
-            });
+            FXUtilities.runAndWait(() -> Dialogs.createConfirmationDialog(stage, "Output", s).showAndWait());
         } catch (Exception e) {
             throw new ExecutionException("An Exception was thrown" +
                     " when we attempted to read from the dialog.");
@@ -87,11 +85,7 @@ public class DialogChannel implements StringChannel {
     @Override
     public String readString(final String prompt) {
         try {
-            FXUtilities.runAndWait(new Runnable() {
-                public void run() {
-                    input = Dialogs.createTextInputDialog(stage,"Input Dialog",prompt).showAndWait();
-                }
-            });
+            FXUtilities.runAndWait(() -> input = Dialogs.createTextInputDialog(stage,"Input Dialog",prompt).showAndWait());
         } catch (Exception e) {
             throw new ExecutionException("An Exception was thrown" +
                     " when we attempted to read from the dialog.");
@@ -105,14 +99,17 @@ public class DialogChannel implements StringChannel {
         }
         return input.get();
     }
-
-
+    
+    
     /**
      * Gives a string representation of the object.
      * In this case, its name field.
      */
     public String toString() {
-        return name;
+        return MoreObjects.toStringHelper(getClass())
+                .addValue(this.name)
+                .add("stage", this.stage)
+                .toString();
     }
 
 }

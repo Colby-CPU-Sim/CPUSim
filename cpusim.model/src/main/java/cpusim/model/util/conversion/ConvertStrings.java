@@ -6,11 +6,13 @@ package cpusim.model.util.conversion;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 
 import cpusim.model.Field;
@@ -117,13 +119,18 @@ public abstract class ConvertStrings {
 	 */
 	public static ImmutableList<Field> formatStringToFields(String format, Machine machine){
 	    checkNotNull(machine);
-		final String[] stringFields = checkNotNull(format).split("\\s"); // split on whitespace
+	    checkNotNull(format);
+	    
+	    final List<String> fields = Splitter.on(CharMatcher.whitespace())
+	    		.trimResults()
+	    		.omitEmptyStrings()
+	    		.splitToList(format);
 	    
 	    final Map<String, Field> fieldMap = NamedObject.toNamedMap(machine.getFields());
 	    
 	    final ImmutableList.Builder<Field> bld = ImmutableList.builder();
 	    
-	    Arrays.stream(stringFields).map(name -> {
+	    fields.stream().map(name -> {
 	    	if (!fieldMap.containsKey(name)) {
 	    		throw new IllegalStateException("Unknown field specified: " + name);
 	    	}

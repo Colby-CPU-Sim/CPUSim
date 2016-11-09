@@ -20,12 +20,12 @@
 
 package cpusim.model.assembler;
 
-import cpusim.model.Machine;
-import cpusim.model.MachineInstruction;
-import cpusim.util.Convert;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.util.conversion.ConvertStrings;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the CodeGenerator class
@@ -91,7 +91,7 @@ public class CodeGenerator
             AssemblyException.InvalidOperandError, AssemblyException.MemoryError,
             AssemblyException.SyntaxError, AssemblyException.ValueError {
         int cellSize = machine.getCodeStore().getCellSize(); //num bits per cell
-        List operands = instructionCall.operands;
+        List<Token> operands = instructionCall.operands;
         int numberOfCells = (int) getLong((Token) operands.get(0));
 
         if (numberOfCells <= 0) {
@@ -202,11 +202,11 @@ public class CodeGenerator
      *
      * @throws AssemblyException if something is illegal
      */
-    private void handleNormalInstruction(InstructionCall instructionCall,
-                                         List<AssembledInstructionCall> aics) throws
+    private static void handleNormalInstruction(InstructionCall instructionCall,
+                                         		List<AssembledInstructionCall> aics) throws
             AssemblyException {
         MachineInstruction machineInstruction = instructionCall.machineInstruction;
-        int[] posFieldLengths = machineInstruction.getPositiveFieldLengths();
+        List<Integer> posFieldLengths = machineInstruction.getPositiveFieldLengths();
         boolean[] posLenFieldSigns = machineInstruction.getPosLenFieldSigns();
         List<Token> operands = instructionCall.operands;
 
@@ -214,32 +214,34 @@ public class CodeGenerator
         //No exception should be thrown here since the opcode must be legal
         //at this point and fit in the number of bits devoted to it.
         String opcodePart = toBinary(machineInstruction.getOpcode(),
-                posFieldLengths[0], false, false, null, true);
+                posFieldLengths.get(0).intValue(), false, false, null, true);
 
         //convert all the operands to binary strings of the appropriate size,
         //and add them to an array of Strings
-        String[] instrParts = new String[posFieldLengths.length];
+        
+        String[] instrParts = new String[posFieldLengths.size()];
         instrParts[0] = opcodePart;
-        for (int i = 1; i < instrParts.length; i++) {
+     
+        for (int i = 1; i < posFieldLengths.size(); i++) {
             int actualIndex = machineInstruction.getRelativeOrderOfFields()[i - 1] + 1;
-            int currentFieldLength = posFieldLengths[actualIndex];
+            int currentFieldLength = posFieldLengths.get(actualIndex).intValue();
             boolean currentFieldSign = posLenFieldSigns[actualIndex];
             long op = getLong(operands.get(i - 1)); //operand index = field index -1
             instrParts[actualIndex] = toBinary(op, currentFieldLength,
                     currentFieldSign, true, operands.get(i - 1), false);
         }
 
-        String combinedFields = "";
+        StringBuilder combinedFields = new StringBuilder();
         //combine all the Strings
         for (String instrPart : instrParts) {
-            combinedFields += instrPart;
+            combinedFields.append(instrPart);
         }
         int numBits = combinedFields.length();
 
         //parse the combinedFields string, radix 2 (from binary), into a long
         //fromRootController a new Assembled instruction call with this long value and its
         //field lengths
-        long longVal = Long.parseLong(combinedFields, 2);
+        long longVal = Long.parseLong(combinedFields.toString(), 2);
         longVal = (longVal << (64 - numBits)) >> (64 - numBits); //extend the sign bit
         /* OLD WAY OF EXTENDING THE SIGN BIT
         if (combinedFields.charAt(0) == '1')
@@ -276,7 +278,7 @@ public class CodeGenerator
      * @return the string of 0's and 1's representing the decimal value
      * @throws AssemblyException.ValueError if the value doesn't fit
      */
-    private String toBinary(long decimal, int bits, boolean signed, boolean ignoreSign,
+    private static String toBinary(long decimal, int bits, boolean signed, boolean ignoreSign,
                             Token t, boolean isOpcode) throws AssemblyException
             .ValueError {
         String result;
@@ -323,11 +325,11 @@ public class CodeGenerator
     //-------------------------------
     //gets the string in the token's contents and converts it to a long,
     //which it returns.
-    private long getLong(Token token) throws AssemblyException.SyntaxError {
+    private static long getLong(Token token) throws AssemblyException.SyntaxError {
         String string = token.contents;
         long answer;
         try {
-            answer = Convert.fromAnyBaseStringToLong(string);
+            answer = ConvertStrings.toLong(string);
         } catch (NumberFormatException e) {
             throw new AssemblyException.SyntaxError("The number " + token.contents + " " +
                     "" + "could not be parsed as a long (64-bit integer)." +

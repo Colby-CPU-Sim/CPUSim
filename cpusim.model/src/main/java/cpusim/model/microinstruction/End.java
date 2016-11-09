@@ -34,6 +34,14 @@ public class End extends Microinstruction
     } // end constructor
     
     /**
+     * Copy constructor
+     * @param other
+     */
+    public End(End other) {
+    	super(other.getName(), other.machine);
+    }
+    
+    /**
      * returns the class of the microinstruction
      * @return the class of the microinstruction
      */
@@ -46,11 +54,10 @@ public class End extends Microinstruction
      * clone the micro instruction
      * @return a clone of this microinstruction
      */
+    @Override
     public Object clone()
     {
-        assert false :
-                "End.cloneMe() was called.";
-        return null; //to satisfy the compiler's need for a return value
+        throw new UnsupportedOperationException("Can not clone " + End.class.getName());
     } // end clone()
 
     /**
@@ -79,6 +86,7 @@ public class End extends Microinstruction
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         machine.getControlUnit().setMicroIndex(0);
@@ -90,7 +98,8 @@ public class End extends Microinstruction
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription()
+    @Override
+    public String getXMLDescription(String indent)
     {
         return "";
     }
@@ -99,7 +108,8 @@ public class End extends Microinstruction
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
         return "";
     }

@@ -50,9 +50,9 @@ public abstract class ConvertLongs {
 		
 		final String binStr = Long.toBinaryString(value);
 		if (value < 0)
-            return binStr.substring(64 - numBits.as());
+            return binStr.substring((int)(64 - numBits.as()));
         else {
-            return StringUtils.leftPad(binStr, numBits.as(), '0');
+            return StringUtils.leftPad(binStr, (int)numBits.as(), '0');
         }
 	}
 
@@ -72,6 +72,16 @@ public abstract class ConvertLongs {
 	 */
 	public static String toHexString(long value, ArchValue numBits) {
 		return Long.toHexString(value & ((1 << numBits.as()) - 1));
+	}
+	
+	/**
+	 * Returns a string representing the long value
+	 * in hexadecimal using the given number of bits
+	 * 
+	 * @deprecated Use {@link #toHexString(long, ArchValue)}
+	 */
+	public static String toHexString(long value, int numBits) {
+		return toHexString(value, ArchValue.bits(numBits));
 	}
 
 	/**
@@ -168,7 +178,7 @@ public abstract class ConvertLongs {
 	public static String toAsciiString(long value, ArchValue numBits)
 	{
 		final ArchValue bytesVal = numBits.convert(ArchType.Byte);
-        final StringBuilder resBld = new StringBuilder(bytesVal.getValue());
+        final StringBuilder resBld = new StringBuilder((int)bytesVal.getValue());
         
         long vvalue = value;
         long vmask = bytesVal.mask();

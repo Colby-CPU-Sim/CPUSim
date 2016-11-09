@@ -8,14 +8,13 @@
 
 package cpusim.gui.editmodules.arrayregisters;
 
-import cpusim.model.Module;
-import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingLongCell;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -30,9 +29,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * This class is the TableView for one of the register arrays.  One of these
@@ -46,11 +50,11 @@ public class RegisterArrayTableView extends TableView implements Initializable {
     @FXML TableColumn<Register,Long> initialValue;
     @FXML TableColumn<Register,Boolean> readOnly;
 
-    HashMap assocList;  //associates the current modules
+    private Map<Register, Register> assocList;  //associates the current modules
     //with the edited clones; key = new clone, value = original
-    public Module[] clones;  //the current clones
-    Node parentFrame; //for the parent of error messages
-    String arrayName;
+    private List<Register> clones;  //the current clones
+    private Node parentFrame; //for the parent of error messages
+    private String arrayName;
 
     private ObservableList currentRegisters;
 
@@ -61,8 +65,8 @@ public class RegisterArrayTableView extends TableView implements Initializable {
     public RegisterArrayTableView(String arrayName, ObservableList registers){
         this.arrayName = arrayName;
         this.currentRegisters = registers;
-        assocList = new HashMap();
-        clones = (Module[]) createClones();
+        assocList = new HashMap<>();
+        clones = createClones();
 
         parentFrame = null;
 
@@ -77,9 +81,8 @@ public class RegisterArrayTableView extends TableView implements Initializable {
             assert false : "Unable to load file: Tables.fxml";
         }
 
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((Register)clones[i]);
-        }
+        final List<Register> items = table.getItems();
+        clones.stream().forEach(items::add);
     }
 
     /**
@@ -146,7 +149,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();
@@ -215,7 +218,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
      * getter for the class object for the controller's objects
      * @return the class object
      */
-    public Class getModuleClass()
+    public Class<?> getModuleClass()
     {
         return Register.class;
     }
@@ -224,7 +227,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
      * getter for the current hardware module
      * @return the current hardware module
      */
-    public ObservableList getCurrentModules()
+    public ObservableList<Register> getCurrentModules()
     {
         return currentRegisters;
     }
@@ -254,13 +257,9 @@ public class RegisterArrayTableView extends TableView implements Initializable {
      *
      * @param newClones Object array containing new set of clones
      */
-    public void setClones(ObservableList newClones)
+    public void setClones(ObservableList<Register> newClones)
     {
-        Register[] branches = new Register[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            branches[i] = (Register) newClones.get(i);
-        }
-        clones = branches;
+        clones = new ArrayList<>(newClones);
     }
 
     /**
@@ -320,87 +319,33 @@ public class RegisterArrayTableView extends TableView implements Initializable {
      *
      * @return an array of clones of the current module.
      */
-    public Module[] getClones()
+    public List<Register> getClones()
     {
-        assert clones != null :
-                "clones == null in ModuleFactory.getClones()";
+        if (clones == null) {
+            throw new IllegalStateException("clones == null in ModuleFactory.getClones()");
+        }
+        
         return clones;
     }
-
-    /**
-     * returns the original module (in the machine) whose clone is given.
-     * @param clone the clone of the original module
-     * @return the original hardware module of the given clone.
-     */
-    public Module getCurrentFromClone(Module clone)
-    {
-        return (Module) assocList.get(clone);
-    }
-
+    
     /**
      * creates an array of clones of the current modules,
      * adding the appropriate ChangeListeners to its properties
      *
      * @return the clones of the current modules
      */
-    public Object[] createClones()
+    public List<Register> createClones()
     {
-        ObservableList<? extends Module> currentModules = getCurrentModules();
-        Module[] clones = (Module[])
-                Array.newInstance(this.getModuleClass(), currentModules.size());
-        for (int i = 0; i < currentModules.size(); i++) {
-            Module clone = (Module)
-                    ((Module) currentModules.get(i)).clone();
-            clones[i] = clone;
-            assocList.put(clone, currentModules.get(i));
+        ObservableList<Register> currentModules = getCurrentModules();
+        List<Register> clones = new ArrayList<>(currentModules.size());
+        for (Register r: currentModules) {
+            final Register clone = r.cloneOf();
+            
+            clones.add(clone);
+            assocList.put(clone, r);
         }
+        
         return clones;
-    }
-
-    /**
-     * returns a list of updated modules based on the objects
-     * in the list.  It replaces the objects in the list with their
-     * associated objects, if any, after updating the fields of those old objects.
-     * It also sorts the micros by name.
-     *
-     * @param list a list of modules
-     * @return a list of updated modules
-     */
-    public Vector createNewModulesList(Module[] list)
-    {
-        Vector newModules = new Vector();
-        for (int i = 0; i < list.length; i++) {
-            Module module = list[i];
-            Module oldModule = (Module) assocList.get(module);
-            if (oldModule != null) {
-                //if the new incr is just an edited clone of an old module,
-                //then just copy the new data to the old module
-                module.copyDataTo(oldModule);
-                newModules.addElement(oldModule);
-            }
-        }
-        return newModules;
-    }
-
-    /**
-     * Check validity of array of Objects' names.
-     *
-     * @param modules an array of Objects to check.
-     * @return boolean denoting whether array has objects with
-     * valid names or not
-     */
-    public boolean checkNameValidity(Object[] modules)
-    {
-        boolean result = true;
-        try {
-            Validate.allNamesAreUnique(modules);
-            for (Object f : modules) {
-                Validate.nameIsNonEmpty(((Module)f).getName());
-            }
-        } catch (ValidationException e) {
-            result = false;
-        }
-        return result;
     }
 
 

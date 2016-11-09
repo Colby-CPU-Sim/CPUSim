@@ -223,10 +223,9 @@
  */
 package cpusim.gui.desktop;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import cpusim.Mediator;
-import cpusim.assembler.SourceLine;
-import cpusim.assembler.Token;
 import cpusim.gui.about.AboutController;
 import cpusim.gui.desktop.editorpane.*;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
@@ -241,10 +240,9 @@ import cpusim.gui.preferences.PreferencesController;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
-import cpusim.model.iochannel.BufferedChannel;
-import cpusim.model.iochannel.ConsoleChannel;
-import cpusim.model.iochannel.DialogChannel;
+import cpusim.model.assembler.Token;
 import cpusim.model.microinstruction.IO;
+import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -553,10 +551,8 @@ public class DesktopController implements Initializable
         bindItemDisablesToSimpleBooleanProperties();
 
         // Set up channels
-        ((DialogChannel) (((BufferedChannel) (CPUSimConstants.DIALOG_CHANNEL))
-                .getChannel())).setStage(stage);
-        ((ConsoleChannel) (((BufferedChannel) (StreamChannel.console()))
-                .getChannel())).setMediator(mediator);
+        GUIChannels.Unbuffered.DIALOG.setStage(stage);
+        GUIChannels.Unbuffered.CONSOLE.setMediator(mediator);
 
         // whenever a new tab in the code text area is selected,
         // set the line numbers and line wrap and style according to the settings
@@ -1766,12 +1762,12 @@ public class DesktopController implements Initializable
      * displays a message listing all the halt bits that are set.
      */
     public void displayHaltBitsThatAreSet() {
-        Vector setHaltedBits = mediator.getMachine().haltBitsThatAreSet();
+        List<ConditionBit> setHaltedBits = mediator.getMachine().haltBitsThatAreSet();
         if (setHaltedBits.size() > 0) {
-            String message = "The following halt condition bits are set:  ";
-            for (int i = 0; i < setHaltedBits.size(); i++)
-                message += setHaltedBits.elementAt(i) + "  ";
-            consoleManager.printlnToConsole(message);
+            StringBuilder bld = new StringBuilder();
+            bld.append("The following halt condition bits are set: ");
+            bld.append(Joiner.on("  ").join(setHaltedBits));
+            consoleManager.printlnToConsole(bld.toString());
         }
     }
 
@@ -2090,7 +2086,7 @@ public class DesktopController implements Initializable
             boolean consoleIsInputOrOutputChannel = false;
             for (Microinstruction micro : ios) {
                 IO io = (IO) micro;
-                if (io.getConnection().equals(StreamChannel.console())) {
+                if (io.getConnection().equals(GUIChannels.CONSOLE)) {
                     consoleIsInputOrOutputChannel = true;
                 }
             }

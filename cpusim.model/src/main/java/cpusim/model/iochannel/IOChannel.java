@@ -25,6 +25,8 @@ import cpusim.model.ExecutionException;
  * @author Stephen Morse
  * @author Ian Tibbits
  * @author Terrence Tan
+ *
+ * @author Kevin Brightwell (Nava2)
  * 
  * @since 2013-08-01
  */
@@ -54,7 +56,7 @@ public interface IOChannel {
      * @return the Unicode character read
      * @throws ExecutionException if it cannot read an Unicode char.
      */
-    public char readUnicode();
+    public int readUnicode();
 
     /**
      * writes the given long value to the output
@@ -69,15 +71,15 @@ public interface IOChannel {
      * @param longValue the long value to be output
      * @throws ExecutionException if the long is not an ASCII char
      */
-    public void writeAscii(long longValue);
+    public void writeAscii(char longValue);
 
     /**
      * writes the given long value to the output as a Unicode value
      *
-     * @param longValue the long value to be output
+     * @param unicodeChar the long value to be output
      * @throws ExecutionException if the long is not an Unicode char
      */
-    public void writeUnicode(long longValue);
+    public void writeUnicode(int unicodeChar);
     
 	/**
 	 * displays an output to the user

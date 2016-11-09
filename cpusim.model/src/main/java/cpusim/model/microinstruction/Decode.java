@@ -5,15 +5,16 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.*;
+import java.util.List;
+
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
-import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.List;
+import javafx.beans.property.SimpleObjectProperty;
 
 /**
  * The branch microinstruction is identical to the Test microinstruction except
@@ -126,8 +127,9 @@ public class Decode extends Microinstruction
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<Decode name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<Decode name=\"" + getHTMLName() +
                 "\" ir=\"" + getIr().getID() +
                 "\" id=\"" + getID() + "\" />";
     }
@@ -136,8 +138,9 @@ public class Decode extends Microinstruction
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getIr().getHTMLName() +
                 "</TD></TR>";
     }
@@ -148,7 +151,7 @@ public class Decode extends Microinstruction
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    public boolean uses(Module<?> m){
         return (m == ir.get());
     }
 }

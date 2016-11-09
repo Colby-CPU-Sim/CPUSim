@@ -16,6 +16,9 @@
  */
 package cpusim.model.iochannel;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
@@ -23,15 +26,12 @@ import java.util.Scanner;
 import cpusim.model.util.Convert;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
-
-import static com.google.common.base.Preconditions.*;
 
 /**
  * This class implements IOChannel using the terminal/command line.  It is
  * used when CPU Sim is run in non-GUI mode.
  */
-public class StreamChannel implements IOChannel {
+public class StreamChannel implements IOChannel, AutoCloseable {
 
 	private final InputStream in;
 	private final PrintStream out;
@@ -74,6 +74,20 @@ public class StreamChannel implements IOChannel {
 		this.out = checkNotNull(out);
 		
 		this.scanner = new Scanner(in);
+	}
+	
+	
+	@Override
+	public void close() throws IOException {
+		if (in != null && in != System.in) {
+			// don't close System.in for obvious reasons, but we compare with == since reference it correct
+			scanner.close();
+		}
+		
+		if (out != null && out != System.out) {
+			// same justification for out
+			out.close();
+		}
 	}
 
 	/**
@@ -124,10 +138,10 @@ public class StreamChannel implements IOChannel {
 	}
 	
 	@Override
-	public long readLong(ArchValue numBits) {
+	public long readLong(int numBits) {
 		final String line = getLine();
 		final long init = Long.parseLong(line);
-		return init & numBits.mask();
+		return init & ArchType.Bit.getMask(numBits);
 	}
 	
 	@Override
@@ -137,9 +151,9 @@ public class StreamChannel implements IOChannel {
 	}
 	
 	@Override
-	public char readUnicode() {
+	public int readUnicode() {
 		final String line = getLine();
-		return (char)ConvertStrings.from16WToLong(line, ArchType.Byte.of(1));
+		return (int)ConvertStrings.from16WToLong(line, ArchType.Byte.of(2));
 	}
 	
 	@Override
@@ -148,25 +162,29 @@ public class StreamChannel implements IOChannel {
 	}
 	
 	@Override
-	public void writeAscii(long longValue) {
+	public void writeAscii(char longValue) {
 		out.print(ArchType.Byte.of(1).mask() & longValue);
 	}
 	
 	@Override
-	public void writeUnicode(long longValue) {
-		out.print(ArchType.Byte.of(2).mask() & longValue);
-		
+	public void writeUnicode(int unicodeChar) {
+		out.print(ArchType.Byte.of(2).mask() & unicodeChar);
 	}
 	
 	@Override
 	public void flush(boolean saveInputBuffers) {
-		// Does nothing
-		
+		out.flush();
 	}
 	
 	@Override
 	public void reset() {
-		// nothing to reset
+		try {
+			if (in != null) {
+				in.reset();
+			}
+		} catch (IOException ioe) {
+			throw new IllegalStateException(ioe);
+		}
 	}
 
 }

@@ -22,6 +22,7 @@ import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 
+import cpusim.util.ValidateControllers;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,13 +37,14 @@ import javafx.util.Callback;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
  */
 public class RegisterArrayTableController
-        extends ModuleController implements Initializable {
+        extends ModuleController<RegisterArray> implements Initializable {
     @FXML
     TableView<RegisterArray> table;
     @FXML
@@ -50,7 +52,7 @@ public class RegisterArrayTableController
     @FXML TableColumn<RegisterArray,Integer> length;
     @FXML TableColumn<RegisterArray,Integer> width;
 
-    private ObservableList currentModules;;
+    private ObservableList<RegisterArray> currentModules;;
     private RegisterArray prototype;
     private ConditionBitTableController bitController;
 
@@ -59,10 +61,11 @@ public class RegisterArrayTableController
      * @param mediator holds the machine and information needed
      */
     public RegisterArrayTableController(Mediator mediator){
-        super(mediator);
-        this.currentModules = machine.getModule("registerArrays");
+        super(mediator, RegisterArray.class);
+        this.currentModules = machine.getModule("registerArrays", RegisterArray.class);
         this.prototype = new RegisterArray("???",4, 32);
-        clones = (Module[]) createClones();
+        
+        this.loadClonesFromCurrentModules();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RegisterArrayTable.fxml");
 
@@ -72,10 +75,9 @@ public class RegisterArrayTableController
             // should never happen
             assert false : "Unable to load file: RegisterArrayTable.fxml";
         }
-
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((RegisterArray)clones[i]);
-        }
+        
+        this.loadClonesIntoTableView(table);
+        
     }
 
     /**
@@ -126,7 +128,7 @@ public class RegisterArrayTableController
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();
@@ -178,25 +180,18 @@ public class RegisterArrayTableController
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Module getPrototype()
+    @Override
+    public RegisterArray getPrototype()
     {
         return prototype;
-    }
-
-    /**
-     * getter for the class object for the controller's objects
-     * @return the class object
-     */
-    public Class getModuleClass()
-    {
-        return RegisterArray.class;
     }
 
     /**
      * getter for the current hardware module
      * @return the current hardware module
      */
-    public ObservableList getCurrentModules()
+    @Override
+    public ObservableList<RegisterArray> getCurrentModules()
     {
         return currentModules;
     }
@@ -205,36 +200,12 @@ public class RegisterArrayTableController
      * returns a string of the types of the controller
      * @return a string of the types of the controller
      */
+    @Override
     public String toString()
     {
         return "RegisterArray";
     }
-
-    /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "amount"};
-//    }
-
-    /**
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
-    {
-        RegisterArray[] registerArrays = new RegisterArray[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            registerArrays[i] = (RegisterArray) newClones.get(i);
-        }
-        clones = registerArrays;
-    }
-
+    
     /**
      * Check validity of array of Objects' properties.
      */
@@ -248,7 +219,7 @@ public class RegisterArrayTableController
         }
 
         //build up a HashMap of old registers and new widths
-        HashMap<Register,Integer> h = new HashMap<>();
+        Map<Register,Integer> h = new HashMap<>();
         for (int i = 0; i < registerArrays.length; i++) {
             RegisterArray oldArray =
                     (RegisterArray) getCurrentFromClone(registerArrays[i]);
@@ -267,9 +238,10 @@ public class RegisterArrayTableController
                     .toArray(new Register[registerArray.getLength()]));
         }
         Validate.rangesAreInBound(registerArrays);
-        Validate.registerArrayWidthsAreOkay(bitController,registerArrays);
-        Validate.registerWidthsAreOkayForMicros(machine,h);
-        Validate.registerArrayWidthsAreOkayForTransferMicros(machine,registerArrays,this);
+        Validate.registerWidthsAreOkayForMicros(machine, h);
+        
+        ValidateControllers.registerArrayWidthsAreOkay(bitController,registerArrays);
+        ValidateControllers.registerArrayWidthsAreOkayForTransferMicros(machine,registerArrays,this);
     }
 
 

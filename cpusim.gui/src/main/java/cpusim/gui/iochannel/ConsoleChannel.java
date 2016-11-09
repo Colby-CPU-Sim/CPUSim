@@ -30,9 +30,10 @@
  */
 package cpusim.gui.iochannel;
 
-import cpusim.ExecutionException;
 import cpusim.Mediator;
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
+import cpusim.model.iochannel.IOChannel;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import org.fxmisc.richtext.StyledTextArea;
@@ -41,7 +42,7 @@ import org.fxmisc.richtext.StyledTextArea;
  * This class implements IOChannel using a console that appears as a
  * panel along the bottom edge of the main CPU Sim desktop.
  */
-public class ConsoleChannel implements StringChannel {
+public class ConsoleChannel extends AbstractStringChannel {
 	/** Name of this Channel */
 	private String name; 
 	/** TextArea this channel uses for IO */
@@ -55,7 +56,8 @@ public class ConsoleChannel implements StringChannel {
 	private boolean inputCancelled;
 	/** Used to tell if user finished giving input */
 	private boolean doneInput;
-	/** To keep track of where user input starts in console */
+    
+    /** To keep track of where user input starts in console */
 	private int startCaret;
 	/** reference to the mediator */
 	private Mediator mediator;
@@ -68,8 +70,7 @@ public class ConsoleChannel implements StringChannel {
 
 	/**
 	 * Constructor for new Console Channel. There is only
-	 * one Console channel that is used, however, look in
-	 * CPUSimConstants file to find the ConsoleChannel.
+	 * one Console channel that is used, {@link cpusim.util.GUIChannels#CONSOLE}.
 	 * 
 	 * @param name - The name given to the console channel.
 	 */

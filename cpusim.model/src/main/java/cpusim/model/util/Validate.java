@@ -89,6 +89,7 @@ package cpusim.model.util;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -99,13 +100,13 @@ import java.util.Set;
 // the libraries we need to import
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
-import cpusim.model.assembler.EQU;
-import cpusim.model.assembler.PunctChar;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
+import cpusim.model.assembler.EQU;
+import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.CpusimSet;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.microinstruction.IO;
@@ -121,8 +122,9 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
-import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
+
+import com.google.common.collect.Sets;
 
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -169,7 +171,20 @@ public class Validate
         }
 
         allOpcodesAreUnique(instrs);
-        namedObjectsAreUniqueAndNonempty(instrs.toArray());
+        namedObjectsAreUniqueAndNonempty(instrs);
+    }
+    
+    /**
+     * Validates the namedObjects whose names are not used in assembly code.
+     * Will throw a classCastException if the array of objects passed in are not
+     * instances of NamedObject
+     * @param objects the nameable objects to be checked
+     * 
+     * @deprecated Use {@link #namedObjectsAreUniqueAndNonempty(List)}
+     */
+    public static void namedObjectsAreUniqueAndNonempty(NamedObject[] objects)
+    {
+        namedObjectsAreUniqueAndNonempty(Arrays.asList(objects));
     }
     
     /**
@@ -178,12 +193,10 @@ public class Validate
      * instances of NamedObject
      * @param objects the nameable objects to be checked
      */
-    public static void namedObjectsAreUniqueAndNonempty(Object[] objects)
-    {
-        allNamesAreUnique(objects);
+    public static void namedObjectsAreUniqueAndNonempty(List<? extends NamedObject> objects) {
+    	allNamesAreUnique(objects);
         allNamesAreNonEmpty(objects);
     }
-    
     
     
     /**
@@ -192,7 +205,7 @@ public class Validate
      * @param machine the machine in its current state
      */    
     public static void EQUNames(List<EQU> equs, Machine machine){
-        allNamesAreUnique(equs.toArray());
+        allNamesAreUnique(equs);
         for (EQU equ : equs) {
                 Validate.nameIsValidAssembly(equ.getName(), machine);
         }
@@ -267,7 +280,7 @@ public class Validate
         List<Field> fields = instr.getAssemblyFields();
         int numOptional = 0;
         for(Field field: fields) {
-            if(!(field.getType()==Type.required) && field.getNumBits().as() > 0)
+            if(!(field.getType()==Type.required) && field.getNumBits() > 0)
                 numOptional++;
         }
         if(numOptional > 1)
@@ -281,11 +294,24 @@ public class Validate
      * Will throw a classCastException if the array of objects passed in are not
      * instances of NamedObject
      * @param objects list of nameable objects
+     * 
+     * @deprecated use {@link #allNamesAreNonEmpty(List)}
      */
-    public static void allNamesAreNonEmpty(Object[] objects)
+    public static void allNamesAreNonEmpty(NamedObject[] objects)
     {
-        for (Object obj : objects) {
-            nameIsNonEmpty(((NamedObject) obj).getName());
+        allNamesAreNonEmpty(Arrays.asList(objects));
+    }
+    
+    /**
+     * validates that all names in a list of nameable objects are not empty.
+     * Will throw a classCastException if the array of objects passed in are not
+     * instances of NamedObject
+     * @param objects list of nameable objects
+     */
+    public static void allNamesAreNonEmpty(List<? extends NamedObject> objects)
+    {
+        for (NamedObject obj : objects) {
+            nameIsNonEmpty(obj.getName());
         }
     }
 
@@ -299,11 +325,11 @@ public class Validate
     {
         for (int i = 0; i < instrs.size() - 1; i++) {
             for (int j = i + 1; j < instrs.size(); j++) {
-                final ArchValue len1 = instrs.get(i).getInstructionFields().get(0).getNumBits();
-                final ArchValue len2 = instrs.get(j).getInstructionFields().get(0).getNumBits();
+                final int len1 = instrs.get(i).getInstructionFields().get(0).getNumBits();
+                final int len2 = instrs.get(j).getInstructionFields().get(0).getNumBits();
                 
                 if (instrs.get(i).getOpcode() == instrs.get(j).getOpcode()
-                        && len1.equals(len2)) {
+                        && len1 == len2) {
                     throw new ValidationException("The opcode \"" +
                              ConvertLongs.toHexString(instrs.get(i).getOpcode(), len1) +
                              "\" (hex) is used more than once.\nAll opcode " +
@@ -319,22 +345,35 @@ public class Validate
      * Will throw a classCastException if the array of objects passed in are not
      * instances of NamedObject
      * @param list array of namedObjects
+     * 
+     * @deprecated Use {@link #allNamesAreUnique(List)}
      */
-    public static void allNamesAreUnique(Object[] list)
+    public static void allNamesAreUnique(NamedObject[] list)
     {
-        for (int i = 0; i < list.length - 1; i++) {
-            for (int j = i + 1; j < list.length; j++) {
-                if (((NamedObject) list[i]).getName().equals(
-                        ((NamedObject) list[j]).getName())) {
-                    throw new ValidationException("The name \"" +
-                                        ((NamedObject) list[i]).getName() +
-                                        "\" is used more than once.\n" +
-                                        "All names must be unique.");
-                }
-            }
-        }
+        allNamesAreUnique(Arrays.<NamedObject>asList(list));
     }
-
+    
+    /**
+     * checks if all the names in the array of machine instrs are unique.
+     * Will throw a classCastException if the array of objects passed in are not
+     * instances of NamedObject
+     * @param list array of namedObjects
+     * 
+     * @since 2016-11-09
+     */
+    public static void allNamesAreUnique(List<? extends NamedObject> list)
+    {
+    	final Set<String> names = Sets.newHashSetWithExpectedSize(list.size());
+    	for (NamedObject obj: list) {
+    		if (names.contains(obj.getName())) {
+    			throw new ValidationException("The name \"" + obj.getName() +
+                        "\" is used more than once.\n" +
+                        "All names must be unique.");
+    		}
+    		
+    		names.add(obj.getName());
+    	}
+    }
     /**
      * Validates that a specific instruction has at least one field
      * @param instr machine instruction whose field list is to be validated
@@ -370,7 +409,7 @@ public class Validate
     public static void firstFieldIsProper(MachineInstruction instr)
     {
         Field opField = instr.getInstructionFields().get(0);
-        if (opField.getNumBits().as() == 0 ||
+        if (opField.getNumBits() == 0 ||
                 opField.getRelativity() != Field.Relativity.absolute ||
                 !(opField.getType()==Type.required) ||
                 opField.getValues().size() > 0) {
@@ -403,8 +442,7 @@ public class Validate
      * @param instr the machine instruction (needed for the error message)
      */
     public static void opcodeFits(MachineInstruction instr) {
-        if (instr.getOpcode() >= (long) Math.pow(2, instr.getInstructionFields().get(0)
-                .getNumBits().as())) {
+        if (instr.getOpcode() >= (long) Math.pow(2, instr.getInstructionFields().get(0).getNumBits())) {
             throw new ValidationException("The opcode \"" +
                     ConvertLongs.toHexString(instr.getOpcode(),
                             instr.getNumBits()) +
@@ -478,19 +516,18 @@ public class Validate
      * validates that the field lengths of a certain instruction are at most 64 bits
      * @param instr machine instruction to be checked
      */
-    public static void fieldLengthsAreAtMost64(MachineInstruction
-                                                       instr)
+    public static void fieldLengthsAreAtMost64(MachineInstruction instr)
     {
-        int[] fieldLengths = instr.getPositiveFieldLengths();
-        int sum = 0;
-        for (int fieldLength : fieldLengths)
-            sum += fieldLength;
-        if (sum <= 0 || sum > 64)
+        final List<Integer> fieldLengths = instr.getPositiveFieldLengths();
+        final int sum = fieldLengths.stream().mapToInt(Integer::intValue).sum();
+        
+        if (sum <= 0 || sum > 64) {
             throw new ValidationException(
                     "The values of the field lengths" +
                     " of instruction \"" + instr.getName() +
                     "\"\nmust add up to a positive number " +
                     "less than or equal to 64.");
+        }
     }
 
     /**
@@ -503,13 +540,13 @@ public class Validate
     {
         for (IO io : ios) {
             if (io.getType().equals("ascii") &&
-                    io.getBuffer().getWidth().lt(ArchType.Byte.of(1))) {
+                    io.getBuffer().getWidth() < 1) {
                 throw new ValidationException("IO \"" + io + "\" is of type " +
                         "ascii and so needs a\nbuffer register at least " +
                         "8 bits wide.");
             }
             else if (io.getType().equals("unicode") &&
-                    io.getBuffer().getWidth().lt(ArchType.Byte.of(2))) {
+                    io.getBuffer().getWidth() < 2) {
                 throw new ValidationException("IO \"" + io + "\" is of type " +
                         "unicode and so needs a\nbuffer register at least " +
                         "16 bits wide.");
@@ -575,34 +612,34 @@ public class Validate
 
         for (CpusimSet set1 : sets) {
             final CpusimSet set = set1;
-            final ArchValue start = set.getStart();
-            final ArchValue numBits = set.getNumBits();
-            final long value = set.getValue();
+            final int start = set.getStart();
+            final int numBits = set.getNumBits();
+//            final long value = set.getValue();
 
             Register register = set.getRegister();
 
-            if (start.lt(ArchValue.ZERO)) {
+            if (start < 0) {
                 throw new ValidationException("You cannot specify a negative value for the " +
                         "start bit\n" +
                         "in the instruction " + set.getName() + ".");
             }
             
-            if (numBits.lte(ArchValue.ZERO)) {
+            if (numBits <= 0) {
                 throw new ValidationException("You must specify a positive value for the " +
                         "bitwise width\nof the set range " +
                         "in the instruction " + set.getName() + ".");
             }
             
-            final ArchValue regWidth = register.getWidth();
+            final int regWidth = register.getWidth();
             
-            if (start.gte(regWidth)) {
+            if (start >= regWidth) {
                 throw new ValidationException("Invalid start index for the specified register " +
                         "in the Set microinstruction " + set.getName() +
                         ".\nIt must be non-negative, and less than the " +
                         "register's length.");
             }
             
-            if (start.add(numBits).gt(regWidth)) {
+            if ((start + numBits) > regWidth) {
                 throw new ValidationException("The bitwise width of the set area in the Set " +
                         "microinstruction " +
                         set.getName() + "\n is too large to fit in the register.");
@@ -653,21 +690,21 @@ public class Validate
     public static void rangeInBound(List<Test> tests)
     {
         for (Test test : tests) {
-        	final ArchValue start = test.getStart();
-        	final ArchValue numBits = test.getNumBits();
+        	final int start = test.getStart();
+        	final int numBits = test.getNumBits();
 
-            if (start.lt(ArchValue.ZERO) || numBits.lt(ArchValue.ZERO)) {
+            if (start < 0 || numBits < 0) {
                 throw new ValidationException("You cannot specify a negative value for the " +
                         "start bits,\nor the bitwise width of the test range\n" +
                         "in the microinstruction " + test.getName() + ".");
             }
-            else if (start.gte(test.getRegister().getWidth())) {
+            else if (start >= test.getRegister().getWidth()) {
                 throw new ValidationException("The start bit in the microinstruction "
                         + test.getName() + " is out of range.\n" +
                         "It must be non-negative, and less than the " +
                         "register's length.");
             }
-            else if ((start.add(numBits)).gt(test.getRegister().getWidth())) {
+            else if ((start + numBits) > test.getRegister().getWidth()) {
                 throw new ValidationException("The bits specified in the Test " +
                         "microinstruction " + test.getName() +
                         " are too large to fit in the register.");
@@ -861,11 +898,22 @@ public class Validate
     /**
      * check if one or more names is "<none>"   (ConditionBit)
      * @param list a list of module objects
+     * 
+     * @deprecated Use {@link #someNameIsNone(List)}
      */
-    public static void someNameIsNone(Module[] list)
+    public static void someNameIsNone(Module<?>[] list)
+    {
+        someNameIsNone(Arrays.asList(list));
+    }
+    
+    /**
+     * check if one or more names is "<none>"   (ConditionBit)
+     * @param list a list of module objects
+     */
+    public static void someNameIsNone(List<? extends Module<?>> list)
     {
         //find if any existing micro already has the name "<none>"
-        for (Module aList : list) {
+        for (Module<?> aList : list) {
             if (aList.getName().equals("<none>")) {
                 throw new ValidationException("A ConditionBit has been given the " +
                         "name \"<none>\".\nThat name is reserved to indicate" +
@@ -949,8 +997,8 @@ public class Validate
      * @param machineInstructions
      * @param machineInstruction 
      */
-    public static void instructionsOpcodeIsValid(List<MachineInstruction>
-            machineInstructions, MachineInstruction machineInstruction){
+    public static void instructionsOpcodeIsValid(List<MachineInstruction> machineInstructions, 
+    		MachineInstruction machineInstruction){
         
         opcodeIsNonnegative(machineInstruction.getOpcode());
         
@@ -1025,22 +1073,19 @@ public class Validate
      * @param h a HashMap of key = original Registers, value = new width
      * any micros to be invalid.
      */
-    public static void registerWidthsAreOkayForMicros(Machine machine, HashMap h)
+    public static void registerWidthsAreOkayForMicros(Machine machine, Map<? extends Module<?>, Integer> h)
     {
         //make a HashMap of old registers as keys and
         //old widths as Integer values
-        Map<Module, Integer> newWidths = new HashMap<>();
-        for (int i = 0; i < machine.getModule("registers").size(); i++) {
-            newWidths.put(machine.getModule("registers").get(i),
-                    Integer.valueOf(((Register) machine.getModule("registers").get(i)).getWidth()));
+        Map<Module<?>, Integer> newWidths = new HashMap<>();
+        final List<Register> registers = machine.getModule("registers", Register.class);
+        for (Register r: registers) {
+            newWidths.put(r, r.getWidth());
         }
         
-        for (Module m: machine.getModule("registerArrays")) {
-            RegisterArray array = (RegisterArray) m;
-            
-            for (int j = 0; j < array.getLength(); j++) {
-                newWidths.put(array.registers().get(j),
-                		Integer.valueOf(array.registers().get(j).getWidth()));
+        for (RegisterArray array: machine.getModule("registerArrays", RegisterArray.class)) {
+            for (Register r: array) {
+                newWidths.put(r, r.getWidth());
             }
         }
 
@@ -1056,8 +1101,8 @@ public class Validate
         for (Microinstruction shift1 : shifts) {
             Shift shift = (Shift) shift1;
             Register source = shift.getSource();
-            int sourceWidth = newWidths.get(source).intValue();
-            int destWidth = newWidths.get(shift.getDestination()).intValue();
+            int sourceWidth = newWidths.get(source);
+            int destWidth = newWidths.get(shift.getDestination());
             if (sourceWidth != destWidth) {
                 throw new ValidationException("The new width " + sourceWidth +
                         " of register " + shift.getSource() + "\nand new width " +
@@ -1069,9 +1114,9 @@ public class Validate
         ObservableList<Microinstruction> logicals = machine.getMicros("logical");
         for (Microinstruction logical1 : logicals) {
             Logical logical = (Logical) logical1;
-            int source1Width = newWidths.get(logical.getSource1()).intValue();
-            int source2Width = newWidths.get(logical.getSource2()).intValue();
-            int destWidth = newWidths.get(logical.getDestination()).intValue();
+            int source1Width = newWidths.get(logical.getSource1());
+            int source2Width = newWidths.get(logical.getSource2());
+            int destWidth = newWidths.get(logical.getDestination());
             if (source1Width != destWidth || source2Width != destWidth) {
                 throw new ValidationException("The new width " + source1Width +
                         " of register " + logical.getSource1() + ",\nnew width " +
@@ -1086,7 +1131,7 @@ public class Validate
         for (Microinstruction set1 : sets) {
             CpusimSet set = (CpusimSet) set1;
             int newWidth = newWidths.get(set.getRegister()).intValue();
-            if (newWidth < set.getStart().add(set.getNumBits()).as()) {
+            if (newWidth < set.getStart() + set.getNumBits()) {
                 throw new ValidationException("The new width " + newWidth +
                         " of register " + set.getRegister() +
                         "\ncauses microinstruction " + set + " to be invalid.");
@@ -1148,8 +1193,7 @@ public class Validate
                         " of register " + t.getDest() +
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
-            int indexWidth =
-                    (Integer) newWidths.get(t.getIndex());
+            int indexWidth = newWidths.get(t.getIndex());
             if (indexWidth < t.getIndexStart() + t.getIndexNumBits()) {
                 throw new ValidationException("The new width " + indexWidth +
                         " of register " + t.getIndex() +
@@ -1433,9 +1477,23 @@ public class Validate
                     " doesn't fit in " + numBits + " bits\n");
         }
     }
+    
+    /**
+     * Checks whether the given long value can be represented in twos
+     * complement using the given number of bits.
+     * @param value the long value to be checked
+     * @param numBits the number of bits into which the value must fit
+     * @throws ValidationException if the value does not fit in the given
+     *         number of bits
+     * 
+     * @deprecated Use {@link #fitsInBits(long, ArchValue)}
+     */
+    public static void fitsInBits(long value, int numBits) {
+        fitsInBits(value, ArchValue.bits(numBits));
+    }
 
     public static void fieldIsValid(Field field) {
-        if (field.getNumBits().as() == 0 && field.getType().equals(Type.ignored)) {
+        if (field.getNumBits() == 0 && field.getType().equals(Type.ignored)) {
             throw new ValidationException("A field of length 0 cannot be ignored." +
                     " Field " + field.getName() + " is such a field.");
     	}
@@ -1447,27 +1505,27 @@ public class Validate
         
         if(field.getValues().size() > 0 &&
                 (! field.getRelativity().equals(Field.Relativity.absolute) ||
-                 field.getNumBits().as() == 0)) {
+                 field.getNumBits() == 0)) {
             throw new ValidationException("Field " + field.getName() + " must be" +
                     " absolute and have a positive number of bits in order to use " +
                     " a set of fixed values.");
         }
         
-        if(field.getNumBits().as() > 0)
+        if(field.getNumBits() > 0)
             fitsInBits(field.getDefaultValue(), field.getNumBits());
         
         fieldValuesAreValid(field, field.getValues());
     }
 
     public static void fieldValuesAreValid(Field field, ObservableMap<String, FieldValue> allFieldValues) {
-    	ArchValue numBits = field.getNumBits();
+    	final int numBits = field.getNumBits();
     	
         for(FieldValue fieldValue : allFieldValues.values()) {
             if (fieldValue.getValue() < 0 && !field.isSigned())
                 throw new ValidationException("Field " + field.getName() + " is unsigned" +
                     " and so " + fieldValue.getName() + " cannot have a negative field value.");
             
-            if (numBits.as() > 0)
+            if (numBits > 0)
                 fitsInBits(fieldValue.getValue(), numBits);
         }
     }

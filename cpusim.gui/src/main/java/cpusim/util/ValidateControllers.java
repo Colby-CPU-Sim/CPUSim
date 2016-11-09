@@ -4,6 +4,9 @@
 package cpusim.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import cpusim.gui.editmodules.ConditionBitTableController;
@@ -15,7 +18,7 @@ import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.RegisterRAMPair;
+import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.ValidationException;
 
 import javafx.collections.ObservableList;
@@ -143,19 +146,24 @@ public class ValidateControllers {
      * if there are duplicated pairs.
      * @param data the list of RegisterRAMPairs.
      */
-    public static void allRegisterRAMPairAreUnique(ObservableList<RegisterRAMPair> data){
-        RegisterRAMPair pair1;
-        RegisterRAMPair pair2;
-        for (int i = 0; i < data.size() - 1; i++) {
-            for (int j = i + 1; j < data.size(); j++) {
-                pair1 = data.get(i);
-                pair2 = data.get(j);
-                if (pair1.getRegister().equals(pair2.getRegister()) &&
-                        pair1.getRam().equals(pair2.getRam()))
-                    throw new ValidationException("The Register " +
-                            pair1.getRegister().getName() +
-                            " and the RAM " + pair1.getRam().getName() +
-                            " pair has been set twice.");
+    public static void allRegisterRAMPairAreUnique(List<RegisterRAMPair> data){
+        
+        Set<RegisterRAMPair> set = new HashSet<>(data);
+        if (set.size() != data.size()) {
+            // Now check all of them to find the first duplicate
+            
+            for (int i = 0; i < data.size() - 1; i++) {
+                for (int j = i + 1; j < data.size(); j++) {
+                    final RegisterRAMPair pair1 = data.get(i);
+                    final RegisterRAMPair pair2 = data.get(j);
+                    
+                    if (pair1.equals(pair2)) {
+                        throw new ValidationException("The Register " +
+                                pair1.getRegister().getName() +
+                                " and the RAM " + pair1.getRam().getName() +
+                                " pair has been set twice.");
+                    }
+                }
             }
         }
     }

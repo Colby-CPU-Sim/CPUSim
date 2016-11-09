@@ -5,17 +5,21 @@
 
 package cpusim.model.microinstruction;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ControlUnit;
+import cpusim.model.util.Copyable;
+
 import javafx.beans.property.SimpleIntegerProperty;
 
 /**
  * The branch microinstruction is identical to the Test microinstruction except
  * that it is an unconditional jump.
  */
-public class Branch extends Microinstruction
+public class Branch extends Microinstruction implements Copyable<Branch>
 {
     private SimpleIntegerProperty amount;
     private ControlUnit controlUnit;
@@ -88,23 +92,23 @@ public class Branch extends Microinstruction
      * copies the data from the current micro to a specific micro
      * @param oldMicro the micro instruction that will be updated
      */
-    public void copyTo(Microinstruction oldMicro)
+    @Override
+    public void copyTo(Branch oldMicro)
     {
-        assert oldMicro instanceof Branch :
-                "Passed non-Branch to Branch.copyDataTo()";
-        Branch newBranch = (Branch) oldMicro;
-        newBranch.setName(getName());
-        newBranch.setAmount(getAmount());
-        newBranch.controlUnit = controlUnit;
+        checkNotNull(oldMicro);
+        oldMicro.setName(getName());
+        oldMicro.setAmount(getAmount());
+        oldMicro.controlUnit = controlUnit;
     }
 
     /**
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription()
+    @Override
+    public String getXMLDescription(String indent)
     {
-        return "<Branch name=\"" + getHTMLName() +
+        return indent + "<Branch name=\"" + getHTMLName() +
                 "\" amount=\"" + getAmount() +
                 "\" id=\"" + getID() + "\" />";
     }
@@ -113,9 +117,10 @@ public class Branch extends Microinstruction
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription()
+    @Override
+    public String getHTMLDescription(String indent)
     {
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" +
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" +
                 getAmount() + "</TD></TR>";
     }
 
@@ -125,7 +130,7 @@ public class Branch extends Microinstruction
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m)
+    public boolean uses(Module<?> m)
     {
         return false;
     }

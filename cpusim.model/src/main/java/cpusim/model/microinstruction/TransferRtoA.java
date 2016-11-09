@@ -12,12 +12,16 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.ExecutionException;
+import static com.google.common.base.Preconditions.checkArgument;
+
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+import cpusim.model.module.Register.Access;
 import cpusim.model.module.RegisterArray;
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -47,13 +51,13 @@ public class TransferRtoA extends Microinstruction {
      */
     public TransferRtoA(String name, Machine machine,
                         Register source,
-                        Integer srcStartBit,
+                        int srcStartBit,
                         RegisterArray dest,
-                        Integer destStartBit,
-                        Integer numBits,
+                        int destStartBit,
+                        int numBits,
                         Register index,
-                        Integer indexStart,
-                        Integer indexNumBits){
+                        int indexStart,
+                        int indexNumBits){
         super(name, machine);
         this.source = new SimpleObjectProperty<>(source);
         this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
@@ -63,6 +67,22 @@ public class TransferRtoA extends Microinstruction {
         this.index = new SimpleObjectProperty<>(index);
         this.indexStart = new SimpleIntegerProperty(indexStart);
         this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+    }
+    
+    /**
+     * Copy constructor, copies all <em>values</em> not property references.
+     * @param other
+     */
+    public TransferRtoA(final TransferRtoA other){
+		super(other);
+		this.source = new SimpleObjectProperty<>(other.source.get());
+		this.srcStartBit = new SimpleIntegerProperty(other.srcStartBit.get());
+		this.dest = new SimpleObjectProperty<>(other.dest.get());
+		this.destStartBit = new SimpleIntegerProperty(other.destStartBit.get());
+		this.numBits = new SimpleIntegerProperty(other.numBits.get());
+		this.index = new SimpleObjectProperty<>(other.index.get());
+		this.indexStart = new SimpleIntegerProperty(other.indexStart.get());
+		this.indexNumBits = new SimpleIntegerProperty(other.indexNumBits.get());
     }
 
     /**
@@ -88,7 +108,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getSrcStartBit(){
+    public int getSrcStartBit(){
         return srcStartBit.get();
     }
 
@@ -97,7 +117,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @param newSrcStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setSrcStartBit(Integer newSrcStartBit){
+    public void setSrcStartBit(int newSrcStartBit){
         srcStartBit.set(newSrcStartBit);
     }
 
@@ -124,7 +144,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getDestStartBit(){
+    public int getDestStartBit(){
         return destStartBit.get();
     }
 
@@ -133,7 +153,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @param newDestStartBit the new index of the start bit for the set microinstruction.
      */
-    public void setDestStartBit(Integer newDestStartBit){
+    public void setDestStartBit(int newDestStartBit){
         destStartBit.set(newDestStartBit);
     }
 
@@ -142,7 +162,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @return the integer value of the number of bits.
      */
-    public Integer getNumBits(){
+    public int getNumBits(){
         return numBits.get();
     }
 
@@ -151,7 +171,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @param newNumbits the new value of the number of bits.
      */
-    public void setNumBits(Integer newNumbits){
+    public void setNumBits(int newNumbits){
         numBits.set(newNumbits);
     }
 
@@ -178,7 +198,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @return the integer value of the index.
      */
-    public Integer getIndexStart(){
+    public int getIndexStart(){
         return indexStart.get();
     }
 
@@ -187,7 +207,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @param newIndexStart the new index of the start bit for the set microinstruction.
      */
-    public void setIndexStart(Integer newIndexStart){
+    public void setIndexStart(int newIndexStart){
         indexStart.set(newIndexStart);
     }
 
@@ -196,7 +216,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @return the integer value of the number of bits.
      */
-    public Integer getIndexNumBits(){
+    public int getIndexNumBits(){
         return indexNumBits.get();
     }
 
@@ -205,7 +225,7 @@ public class TransferRtoA extends Microinstruction {
      *
      * @param newIndexNumBits the new value of the number of bits.
      */
-    public void setIndexNumBits(Integer newIndexNumBits){
+    public void setIndexNumBits(int newIndexNumBits){
         indexNumBits.set(newIndexNumBits);
     }
     
@@ -222,21 +242,23 @@ public class TransferRtoA extends Microinstruction {
      * duplicate the set class and return a copy of the original Set class.
      *
      * @return a copy of the Set class
+     * 
+     * @deprecated Use {@link #TransferRtoA(TransferRtoA)}
      */
     public Object clone(){
-        return new TransferRtoA(getName(),machine,getSource(),getSrcStartBit(),
-                getDest(),getDestStartBit(),getNumBits(),
-                getIndex(),getIndexStart(),getIndexNumBits());
+        return new TransferRtoA(this);
     }
 
     /**
      * copies the data from the current micro to a specific micro
      * @param oldMicro the micro instruction that will be updated
+     * 
+     * @deprecated Use {@link #TransferRtoA(TransferRtoA)}
      */
     public void copyTo(Microinstruction oldMicro)
     {
-        assert oldMicro instanceof TransferRtoA :
-                "Passed non-TransferRtoA to TransferRtoA.copyDataTo()";
+        checkArgument(oldMicro instanceof TransferRtoA, "Passed non-TransferRtoA to TransferRtoA.copyDataTo()");
+        
         TransferRtoA newTransferRtoA = (TransferRtoA) oldMicro;
         newTransferRtoA.setName(getName());
         newTransferRtoA.setSource(getSource());
@@ -277,10 +299,11 @@ public class TransferRtoA extends Microinstruction {
         
         //validate the ability to write to the destination register
         Register destination = dest.get().registers().get((int) indexValue);
-        if (destination.getReadOnly() == true)
+        if (destination.getAccess().equals(Access.readOnly())) {
             throw new ExecutionException("Attempt to write to read-only Register " +
                     destination.getName() + " in the transferRtoA " +
                     "microinstruction: " + getName());
+        }
         
         //transfer the data from the registers
         
@@ -339,8 +362,9 @@ public class TransferRtoA extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<TransferRtoA name=\"" + getHTMLName() +
+    @Override
+    public String getXMLDescription(String indent){
+        return indent + "<TransferRtoA name=\"" + getHTMLName() +
                 "\" source=\"" + getSource().getID() +
                 "\" srcStartBit=\"" + getSrcStartBit() +
                 "\" dest=\"" + getDest().getID() +
@@ -356,8 +380,9 @@ public class TransferRtoA extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() +
+    @Override
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getSource().getHTMLName() +
                 "</TD><TD>" + getSrcStartBit() +
                 "</TD><TD>" + getDest().getHTMLName() +
@@ -375,7 +400,8 @@ public class TransferRtoA extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    @Override
+    public boolean uses(Module<?> m){
         return (m == source.get() || m == dest.get() || m == index.get());
     }
 

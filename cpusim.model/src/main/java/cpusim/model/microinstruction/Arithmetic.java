@@ -170,12 +170,15 @@ public class Arithmetic extends Microinstruction {
             result = op1.subtract(op2);
         else if (type.get().equals("MULTIPLY"))
             result = op1.multiply(op2);
-        else if (type.get().equals("DIVIDE"))
-            if (op2.compareTo(BigInteger.ZERO) == 0)
-                throw new ExecutionException("There was an " +
-                        "attempt to divide by 0.");
-            else
+        else if (type.get().equals("DIVIDE")) {
+            if (op2.compareTo(BigInteger.ZERO) == 0) {
+                throw new ExecutionException("There was an attempt to divide by 0.");
+            } else {
                 result = op1.divide(op2);
+            }
+        } else {
+        	throw new ExecutionException("Unknown arithmetic operation.");
+        }
 
         //set overflow bit if necessary
         if (result.compareTo(twoToWidthMinusOne) >= 0 ||
@@ -238,15 +241,15 @@ public class Arithmetic extends Microinstruction {
      * returns the XML description
      * @return the XML description
      */
-    public String getXMLDescription(){
-        return "<Arithmetic name=\"" + getHTMLName() +
+    public String getXMLDescription(String indent) {
+        return indent + "<Arithmetic name=\"" + getHTMLName() +
                 "\" type=\"" + getType() +
                 "\" source1=\"" + getSource1().getID() +
                 "\" source2=\"" + getSource2().getID() +
                 "\" destination=\"" + getDestination().getID() +
-                (overflowBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
+                (overflowBit.get() !=  ConditionBit.none() ?
                         "\" overflowBit=\"" + getOverflowBit().getID() : "") +
-                (carryBit.get() != CPUSimConstants.NO_CONDITIONBIT ?
+                (carryBit.get() != ConditionBit.none() ?
                         "\" carryBit=\"" + getCarryBit().getID() : "") +
                 "\" id=\"" + getID() + "\" />";
     }
@@ -255,8 +258,8 @@ public class Arithmetic extends Microinstruction {
      * returns the HTML description
      * @return the HTML description
      */
-    public String getHTMLDescription(){
-        return "<TR><TD>" + getHTMLName() + "</TD><TD>" + getType() +
+    public String getHTMLDescription(String indent){
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getType() +
                 "</TD><TD>" + getSource1().getHTMLName() + "</TD><TD>" +
                 getSource2().getHTMLName() +
                 "</TD><TD>" + getDestination().getHTMLName() + "</TD><TD>" +
@@ -270,7 +273,7 @@ public class Arithmetic extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
-    public boolean uses(Module m){
+    public boolean uses(Module<?> m){
         return (m == getSource1() || m == getSource2() || m == getDestination()
                 || m == getCarryBit() || m == getOverflowBit());
     }
