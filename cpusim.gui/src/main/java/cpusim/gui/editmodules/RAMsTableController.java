@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
  * The controller for editing the Branch command in the EditMicroDialog.
  */
 public class RAMsTableController
-        extends ModuleController implements Initializable {
+        extends ModuleController<RAM> implements Initializable {
     @FXML TableView<RAM> table;
     @FXML TableColumn<RAM,String> name;
     @FXML TableColumn<RAM,Integer> length;
@@ -53,10 +53,9 @@ public class RAMsTableController
      * @param mediator holds the machine and information needed
      */
     public RAMsTableController(Mediator mediator){
-        super(mediator);
+        super(mediator, RAM.class);
         this.currentRAMs = machine.getAllRAMs();
         this.prototype = new RAM("???",128, 8);
-        clones = (Module[]) createClones();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RamTable.fxml");
 
@@ -67,9 +66,7 @@ public class RAMsTableController
             assert false : "Unable to load file: RamTable.fxml";
         }
 
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((RAM)clones[i]);
-        }
+        loadClonesIntoTableView(table);
     }
 
     /**
@@ -90,92 +87,51 @@ public class RAMsTableController
         cellSize.prefWidthProperty().bind(table.prefWidthProperty().divide(100/35.0));
 
         Callback<TableColumn<RAM,String>,TableCell<RAM,String>> cellStrFactory =
-                new Callback<TableColumn<RAM, String>, TableCell<RAM, String>>() {
-                    @Override
-                    public TableCell<RAM, String> call(
-                            TableColumn<RAM, String> setStringTableColumn) {
-                        return new EditingStrCell<RAM>();
-                    }
-                };
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<RAM,Integer>,TableCell<RAM,Integer>> cellIntFactory =
-                new Callback<TableColumn<RAM, Integer>, TableCell<RAM, Integer>>() {
-                    @Override
-                    public TableCell<RAM, Integer> call(
-                            TableColumn<RAM, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<RAM>();
-                    }
-                };
+                setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
 
-        name.setCellValueFactory(new PropertyValueFactory<RAM, String>("name"));
-        length.setCellValueFactory(new PropertyValueFactory<RAM, Integer>("length"));
-        cellSize.setCellValueFactory(new PropertyValueFactory<RAM, Integer>("cellSize"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        length.setCellValueFactory(new PropertyValueFactory<>("length"));
+        cellSize.setCellValueFactory(new PropertyValueFactory<>("cellSize"));
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RAM, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RAM, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
+                text -> {
+                    String newName = text.getNewValue();
+                    String oldName = text.getOldValue();
+                    ( text.getRowValue()).setName(newName);
+                    try{
+                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
+                    } catch (ValidationException ex){
+                        (text.getRowValue()).setName(oldName);
+                        updateTable();
                     }
                 }
         );
 
         length.setCellFactory(cellIntFactory);
-        length.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RAM, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RAM, Integer> text) {
-                        ((RAM)text.getRowValue()).setLength(
-                                text.getNewValue());
-                    }
-                }
-        );
+        length.setOnEditCommit(text -> text.getRowValue().setLength(text.getNewValue()));
 
         cellSize.setCellFactory(cellIntFactory);
-        cellSize.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<RAM, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<RAM, Integer> text) {
-                        ((RAM)text.getRowValue()).setCellSize(
-                                text.getNewValue());
-                    }
-                }
-        );
+        cellSize.setOnEditCommit(text -> text.getRowValue().setCellSize(text.getNewValue()));
     }
 
     /**
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Module getPrototype()
+    public RAM getPrototype()
     {
         return prototype;
-    }
-
-    /**
-     * getter for the class object for the controller's objects
-     * @return the class object
-     */
-    public Class getModuleClass()
-    {
-        return RAM.class;
     }
 
     /**
      * getter for the current hardware module
      * @return the current hardware module
      */
-    public ObservableList getCurrentModules()
-    {
+    public ObservableList<RAM> getCurrentModules() {
         return currentRAMs;
     }
 
@@ -189,46 +145,13 @@ public class RAMsTableController
     }
 
     /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "amount"};
-//    }
-
-    /**
-     * setClones()
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
-    {
-        RAM[] rams = new RAM[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            rams[i] = (RAM) newClones.get(i);
-        }
-        clones = rams;
-    }
-
-    /**
      * Check validity of array of Objects' properties.
      */
     public void checkValidity()
     {
-        // convert the array to an array of RAMs
-        RAM[] rams = new RAM[table.getItems().size()];
-
-        for (int i = 0; i < table.getItems().size(); i++) {
-            rams[i] = (RAM) table.getItems().get(i);
-        }
-
         // check that all names are unique and nonempty
-        Validate.lengthsArePositive(rams);
-        Validate.cellSizesAreValid(rams);
+        Validate.lengthsArePositive(table.getItems());
+        Validate.cellSizesAreValid(table.getItems());
     }
 
     /**

@@ -14,19 +14,24 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
  * NOR, or XOR on the specified registers.
  */
-public class IO
-        extends Microinstruction {
-    private SimpleStringProperty type;
+public class IO extends Microinstruction implements Copyable<IO> {
+    
+    private SimpleStringProperty type; // FIXME Enum
     private SimpleObjectProperty<Register> buffer;
     private SimpleStringProperty direction;
     private IOChannel connection;
@@ -144,24 +149,11 @@ public class IO
     public String getMicroClass(){
         return "io";
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new IO(getName(),machine,getType(), getBuffer(),getDirection(),getConnection());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
+    
+    @Override
+    public <U extends IO> void copyTo(U newIO)
     {
-        assert oldMicro instanceof IO :
-                "Passed non-IO to IO.copyDataTo()";
-        IO newIO = (IO) oldMicro;
+        checkNotNull(newIO);
         newIO.setName(getName());
         newIO.setDirection(getDirection());
         newIO.setType(getType());
@@ -265,4 +257,28 @@ public class IO
                 "</TD><TD>" + HtmlEncoder.sEncode(getConnection().toString()) +
                 "</TD></TR>";
 	}
+    
+    /**
+     * check if the ios of type ascii have 8-bit-wide
+     * (or greater) buffers and ios of type unicode have
+     * 16-bit-wide (or greater) buffers.
+     * @param ios array of ios microinstruction
+     */
+    public static void validateBuffersAreWideEnough(List<IO> ios)
+    {
+        for (IO io : ios) {
+            if (io.getType().equals("ascii") &&
+                    io.getBuffer().getWidth() < 1) {
+                throw new ValidationException("IO \"" + io + "\" is of type " +
+                        "ascii and so needs a\nbuffer register at least " +
+                        "8 bits wide.");
+            }
+            else if (io.getType().equals("unicode") &&
+                    io.getBuffer().getWidth() < 2) {
+                throw new ValidationException("IO \"" + io + "\" is of type " +
+                        "unicode and so needs a\nbuffer register at least " +
+                        "16 bits wide.");
+            }
+        }
+    }
 }

@@ -96,7 +96,7 @@ abstract class ModuleController<T extends Module<T>>
      * @param clone the clone of the original module
      * @return the original hardware module of the given clone.
      */
-    public T getCurrentFromClone(final T clone)
+    public T getCurrentFromClone(final Module<?> clone)
     {
         checkNotNull(clone);
         
@@ -120,8 +120,10 @@ abstract class ModuleController<T extends Module<T>>
      * It does not check for validity
      * @param clones the clones that will be set to the new array.
      */
-    public void setClones(ObservableList<? extends T> clones) {
-        FXCollections.copy(this.clones, clones);
+    @SuppressWarnings("unchecked")
+    public void setClones(List<? extends Module<?>> clones) {
+        // TODO Investigate why this is even used
+        FXCollections.copy(this.clones, (List<T>)clones);
     }
 
     /**
@@ -152,9 +154,9 @@ abstract class ModuleController<T extends Module<T>>
      * @param list a list of modules
      * @return a list of updated modules
      */
-    protected final List<T> createNewModulesList(List<? extends T> list)
+    public final List<T> createNewModulesList(List<? extends T> list)
     {
-        List<T> newModules = new ArrayList<T>();
+        List<T> newModules = new ArrayList<>();
         
         for (final T module : list) {
             final T oldModule = assocList.get(module);
@@ -196,7 +198,7 @@ abstract class ModuleController<T extends Module<T>>
         checkNotNull(table);
  
         ObservableList<T> items = table.getItems();
-        getClones().stream().forEach(items::add);
+        getClones().forEach(items::add);
     }
     
     /**

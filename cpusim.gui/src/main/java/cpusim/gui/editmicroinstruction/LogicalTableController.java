@@ -1,34 +1,11 @@
-/**
- * Authoer: Jinghui Yu
- * Last editing date: 6/6/2013
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
- * which throws a ValidationException in lieu of returning a boolean value
- * 3.) Moved registersHaveEqualWidths method to the Validate class and changed the return value to void
- * from boolean
- */
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
-import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.microinstruction.Logical;
 import cpusim.model.module.Register;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -37,51 +14,43 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
  * The controller for editing the Logical command in the EditMicroDialog.
+ *
+ * @author Jinghui Yu
+ * @author Michael Goldenberg
+ * @author Ben Borchard
+ * @author Kevin Brightwell (Nava2)
+ *
+ * @since 2013-06-06
  */
-public class LogicalTableController
-        extends MicroController implements Initializable {
-    @FXML TableView<Logical> table;
-    @FXML TableColumn<Logical,String> name;
-    @FXML TableColumn<Logical,Register> source1;
-    @FXML TableColumn<Logical,Register> source2;
-    @FXML TableColumn<Logical,Register> destination;
-    @FXML TableColumn<Logical,String> type;
+class LogicalTableController extends MicroController<Logical> implements Initializable {
 
-    private ObservableList currentMicros;
-    private Logical prototype;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Logical,String> name;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Logical,Register> source1;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Logical,Register> source2;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Logical,Register> destination;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Logical,String> type;
 
     /**
      * Constructor
      * @param mediator the mediator used to store the machine
      */
-    public LogicalTableController(Mediator mediator){
-        super(mediator);
-        this.mediator = mediator;
-        this.machine = this.mediator.getMachine();
-        this.currentMicros = machine.getMicros("logical");
-        Register r = (machine.getAllRegisters().size() == 0 ? null :
-                (Register) machine.getAllRegisters().get(0));
-        this.prototype = new Logical("???", machine, "AND", r, r, r);
-        clones = (Microinstruction[]) createClones();
-
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "LogicalTable.fxml");
-
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            assert false : "Unable to load file: LogicalTable.fxml";
-        }
-
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((Logical)clones[i]);
-        }
+    LogicalTableController(Mediator mediator){
+        super(mediator, "LogicalTable.fxml", Logical.class);
     }
 
     /**
@@ -96,239 +65,119 @@ public class LogicalTableController
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        source1.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        source2.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        destination.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        type.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        
+        final double FACTOR = 100/20.0;
+        name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        source1.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        source2.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        destination.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        type.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
         Callback<TableColumn<Logical,String>,TableCell<Logical,String>> cellStrFactory =
-                new Callback<TableColumn<Logical, String>, TableCell<Logical, String>>() {
-                    @Override
-                    public TableCell<Logical, String> call(
-                            TableColumn<Logical, String> setStringTableColumn) {
-                        return new cpusim.gui.util.EditingStrCell<Logical>();
-                    }
-                };
+                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
         Callback<TableColumn<Logical,String>,TableCell<Logical,String>> cellTypeFactory =
-                new Callback<TableColumn<Logical, String>, TableCell<Logical, String>>() {
-                    @Override
-                    public TableCell<Logical, String> call(
-                            TableColumn<Logical, String> setStringTableColumn) {
-                        return new ComboBoxTableCell<Logical,String>(
-                                FXCollections.observableArrayList(
-                                        "AND",
-                                        "OR",
-                                        "NAND",
-                                        "NOR",
-                                        "XOR",
-                                        "NOT"
-                                )
-                        );
-                    }
-                };
+                setStringTableColumn -> new ComboBoxTableCell<>(
+                        FXCollections.observableArrayList(
+                                "AND",
+                                "OR",
+                                "NAND",
+                                "NOR",
+                                "XOR",
+                                "NOT"
+                        )
+                );
         Callback<TableColumn<Logical,Register>,TableCell<Logical,Register>> cellComboFactory =
-                new Callback<TableColumn<Logical, Register>, TableCell<Logical, Register>>() {
-                    @Override
-                    public TableCell<Logical, Register> call(
-                            TableColumn<Logical, Register> setStringTableColumn) {
-                        return new ComboBoxTableCell<Logical,Register>(
-                                machine.getAllRegisters());
-                    }
-                };
+                setStringTableColumn -> new ComboBoxTableCell<>(
+                        machine.getAllRegisters());
 
-        name.setCellValueFactory(new PropertyValueFactory<Logical, String>("name"));
-        type.setCellValueFactory(new PropertyValueFactory<Logical, String>("type"));
-        source1.setCellValueFactory(new PropertyValueFactory<Logical, Register>("source1"));
-        source2.setCellValueFactory(new PropertyValueFactory<Logical, Register>("source2"));
-        destination.setCellValueFactory(new PropertyValueFactory<Logical, Register>("destination"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        type.setCellValueFactory(new PropertyValueFactory<>("type"));
+        source1.setCellValueFactory(new PropertyValueFactory<>("source1"));
+        source2.setCellValueFactory(new PropertyValueFactory<>("source2"));
+        destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Logical, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Logical, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
-                    }
-                }
-        );
+        name.setOnEditCommit(new NameColumnHandler());
 
         type.setCellFactory(cellTypeFactory);
         type.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Logical, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Logical, String> text) {
-                        ((Logical)text.getRowValue()).setType(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setType(text.getNewValue())
         );
 
         source1.setCellFactory(cellComboFactory);
         source1.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Logical, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Logical, Register> text) {
-                        ((Logical)text.getRowValue()).setSource1(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setSource1(
+                        text.getNewValue())
         );
 
         source2.setCellFactory(cellComboFactory);
         source2.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Logical, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Logical, Register> text) {
-                        ((Logical)text.getRowValue()).setSource2(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setSource2(
+                        text.getNewValue())
         );
 
         destination.setCellFactory(cellComboFactory);
         destination.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Logical, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Logical, Register> text) {
-                        ((Logical)text.getRowValue()).setDestination(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setDestination(
+                        text.getNewValue())
         );
 
     }
 
-    /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
-    public Microinstruction getPrototype()
+    @Override
+    public Logical getPrototype()
     {
-        return prototype;
+        Register r = (machine.getAllRegisters().size() == 0 ? null :
+                machine.getAllRegisters().get(0));
+        return new Logical("???", machine, "AND", r, r, r);
     }
-
+    
     /**
-     * getter for the class object for the controller's objects
-     * @return the class object
+     * returns a string about the type of the 
+     * @return a string about the type of the 
      */
-    public Class getMicroClass()
-    {
-        return Logical.class;
-    }
-
-    /**
-     * getter for the current Logical Microinstructions.
-     * @return a list of current microinstructions.
-     */
-    public ObservableList getCurrentMicros()
-    {
-        return currentMicros;
-    }
-
-    /**
-     * returns a string about the type of the table.
-     * @return a string about the type of the table.
-     */
+    @Override
     public String toString()
     {
         return "Logical";
     }
-
-    /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "type", "source1", "source2", "destination"};
-//    }
-
-    /**
-     * use clones to replace existing Microinstructions
-     * in the machine, and update the machine to delete
-     * all references to the deleted Microinstructions.
-     */
-    public void updateCurrentMicrosFromClones()
+    
+    @Override
+    public void updateMachineFromItems()
     {
-        machine.setMicros("logical", createNewMicroList(clones));
+        machine.setMicros(Logical.class, getItems());
     }
-
-    /**
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
+    
+    @Override
+    public void checkValidity(ObservableList<Logical> micros)
     {
-        Logical[] logicals = new Logical[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            logicals[i] = (Logical) newClones.get(i);
-        }
-        clones = logicals;
+        super.checkValidity(micros);
+        
+        Logical.validateRegistersHaveEqualWidths(micros);
     }
-
-    /**
-     * Check validity of array of Objects' properties.
-     * @param micros an array of Objects to check.
-     * @return boolean denoting whether array has objects with
-     * valid properties or not
-     */
-    public void checkValidity(ObservableList micros)
-    {
-        // convert the array to an array of Branches
-        Logical[] logicals = new Logical[micros.size()];
-
-        for (int i = 0; i < micros.size(); i++) {
-            logicals[i] = (Logical) micros.get(i);
-        }
-
-        // check that all names are unique and nonempty
-        Validate.registersHaveEqualWidths(logicals);
-
-    }
-
-    /**
-     * returns true if new micros of this class can be created.
-     */
+    
+    @Override
     public boolean newMicrosAreAllowed()
     {
         return (machine.getModule("registers").size() > 0 ||
                 machine.getModule("registerArrays").size() > 0);
     }
-
-    /**
-     * get the ID of the corresponding help page
-     * @return the ID of the page
-     */
+    
+    @Override
     public String getHelpPageID()
     {
         return "Logical";
     }
 
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
+    @Override
     public void updateTable()
     {
         name.setVisible(false);
         name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
+        
+        super.updateTable();
     }
 
 }

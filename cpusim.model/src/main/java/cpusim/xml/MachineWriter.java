@@ -32,6 +32,7 @@ package cpusim.xml;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import cpusim.model.Field;
 import cpusim.model.Machine;
@@ -247,7 +248,7 @@ public class MachineWriter
     			.add(machine.getModule("rams"))
     			.build();
         
-        List<ObservableList<Microinstruction>> microVectors = 
+        List<ObservableList<Microinstruction>> microVectors =
         		ImmutableList.<ObservableList<Microinstruction>>builder()
         			.add(machine.getMicros("set"))
         			.add(machine.getMicros("test"))
@@ -291,12 +292,12 @@ public class MachineWriter
             }
 
         //get the file channels from the IO micros and print them out
-        HashSet<FileChannel> fileChannelSet = new HashSet<FileChannel>();
+        Set<FileChannel> fileChannelSet = new HashSet<>();
         out.println();
         out.println("\t<!--............. FileChannels .................-->");
-        ObservableList<Microinstruction> ios = machine.getMicros("io");
-        for (int i = 0; i < ios.size(); i++) {
-            IOChannel channel = ((IO) ios.get(i)).getConnection();
+        ObservableList<IO> ios = machine.getMicros(IO.class);
+        for (IO io : ios) {
+            IOChannel channel = io.getConnection();
             if (channel instanceof FileChannel)
                     fileChannelSet.add((FileChannel) channel);
         }

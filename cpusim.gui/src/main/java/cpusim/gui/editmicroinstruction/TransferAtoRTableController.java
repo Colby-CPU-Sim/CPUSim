@@ -18,19 +18,14 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Validate;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
-
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -39,59 +34,48 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
  * The controller for editing the TransferRtoA command in the EditMicroDialog.
  */
-public class TransferAtoRTableController
-        extends MicroController implements Initializable {
-    @FXML
-    TableView<TransferAtoR> table;
-    @FXML
-    TableColumn<TransferAtoR,String> name;
-    @FXML TableColumn<TransferAtoR,RegisterArray> source;
-    @FXML TableColumn<TransferAtoR,Integer> srcStartBit;
-    @FXML TableColumn<TransferAtoR,Register> dest;
-    @FXML TableColumn<TransferAtoR,Integer> destStartBit;
-    @FXML TableColumn<TransferAtoR,Integer> numBits;
-    @FXML TableColumn<TransferAtoR,Register> index;
-    @FXML TableColumn<TransferAtoR,Integer> indexStart;
-    @FXML TableColumn<TransferAtoR,Integer> indexNumBits;
-
-    private ObservableList currentMicros;
-    private TransferAtoR prototype;
-
+class TransferAtoRTableController
+        extends MicroController<TransferAtoR> implements Initializable {
+   
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,String> name;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,RegisterArray> source;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Integer> srcStartBit;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Register> dest;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Integer> destStartBit;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Integer> numBits;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Register> index;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Integer> indexStart;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<TransferAtoR,Integer> indexNumBits;
+    
     /**
      * Constructor
      * @param mediator the mediator used to store the machine
      */
-    public TransferAtoRTableController(Mediator mediator){
-        super(mediator);
-        this.mediator = mediator;
-        this.machine = this.mediator.getMachine();
-        this.currentMicros = machine.getMicros("transferAtoR");
-        RegisterArray a = (machine.getModule("registerArrays").size() == 0 ? null :
-                (RegisterArray) machine.getModule("registerArrays").get(0));
-        Register r = (machine.getAllRegisters().size() == 0 ? null :
-                (Register) machine.getAllRegisters().get(0));
-        this.prototype = new TransferAtoR("???", machine, a, 0, r, 0, 0, r,0, 0);
-        clones = (Microinstruction[]) createClones();
-
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "TransferAtoRTable.fxml");
-
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            assert false : "Unable to load file: TransferAtoRTable.fxml";
-        }
-
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((TransferAtoR)clones[i]);
-        }
+    TransferAtoRTableController(Mediator mediator){
+        super(mediator, "TransferAtoRTable.fxml", TransferAtoR.class);
     }
 
     /**
@@ -106,290 +90,121 @@ public class TransferAtoRTableController
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/12.0));
-        source.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        srcStartBit.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        dest.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        destStartBit.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        numBits.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        index.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        indexStart.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-        indexNumBits.prefWidthProperty().bind(table.prefWidthProperty().divide(100/11.0));
-
-        Callback<TableColumn<TransferAtoR, String>,
-                TableCell<TransferAtoR, String>> cellStrFactory =
-                new Callback<TableColumn<TransferAtoR, String>,
-                        TableCell<TransferAtoR, String>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn setStringTableColumn) {
-                        return new cpusim.gui.util.EditingStrCell<TransferAtoR>();
-                    }
-                };
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/12.0));
+        source.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        srcStartBit.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        dest.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        destStartBit.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        numBits.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        index.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        indexStart.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        indexNumBits.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
+        
         Callback<TableColumn<TransferAtoR,Integer>,
-                TableCell<TransferAtoR,Integer>> cellIntFactory =
-                new Callback<TableColumn<TransferAtoR,Integer>,
-                        TableCell<TransferAtoR, Integer>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn<TransferAtoR, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<TransferAtoR>();
-                    }
-                };
+                TableCell<TransferAtoR,Integer>> cellIntFactory = _ignore -> new EditingNonNegativeIntCell<>();
+        
         Callback<TableColumn<TransferAtoR,Register>,
                 TableCell<TransferAtoR,Register>> cellRegFactory =
-                new Callback<TableColumn<TransferAtoR, Register>,
-                        TableCell<TransferAtoR, Register>>() {
-                    @Override
-                    public TableCell<TransferAtoR,Register> call(
-                            TableColumn<TransferAtoR, Register> setStringTableColumn) {
-                        return new ComboBoxTableCell<TransferAtoR,Register>(
-                                machine.getAllRegisters()
-                        );
-                    }
-                };
+                    _ignore -> new ComboBoxTableCell<>(machine.getAllRegisters());
+        
         Callback<TableColumn<TransferAtoR,RegisterArray>,
                 TableCell<TransferAtoR,RegisterArray>> cellRegAFactory =
-                new Callback<TableColumn<TransferAtoR, RegisterArray>,
-                        TableCell<TransferAtoR, RegisterArray>>() {
-                    @Override
-                    public TableCell<TransferAtoR,RegisterArray> call(
-                            TableColumn<TransferAtoR, RegisterArray> setStringTableColumn) {
-                        return new ComboBoxTableCell<TransferAtoR,RegisterArray>(
-                                (ObservableList<RegisterArray>)machine.getModule("registerArrays")
-                        );
-                    }
-                };
+                    _ignore -> new ComboBoxTableCell<>(machine.getModule("registerArrays", RegisterArray.class));
 
-        name.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, String>("name"));
-        source.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, RegisterArray>("source"));
-        srcStartBit.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Integer>("srcStartBit"));
-        dest.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Register>("dest"));
-        destStartBit.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Integer>("destStartBit"));
-        numBits.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Integer>("numBits"));
-        index.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Register>("index"));
-        indexStart.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Integer>("indexStart"));
-        indexNumBits.setCellValueFactory(
-                new PropertyValueFactory<TransferAtoR, Integer>("indexNumBits"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        source.setCellValueFactory(new PropertyValueFactory<>("source"));
+        srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
+        dest.setCellValueFactory(new PropertyValueFactory<>("dest"));
+        destStartBit.setCellValueFactory(new PropertyValueFactory<>("destStartBit"));
+        numBits.setCellValueFactory(new PropertyValueFactory<>("numBits"));
+        index.setCellValueFactory(new PropertyValueFactory<>("index"));
+        indexStart.setCellValueFactory(new PropertyValueFactory<>("indexStart"));
+        indexNumBits.setCellValueFactory(new PropertyValueFactory<>("indexNumBits"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, String>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
-                    }
+        name.setCellFactory(_ignore -> new cpusim.gui.util.EditingStrCell<>());
+        name.setOnEditCommit(text -> {
+                String newName = text.getNewValue();
+                String oldName = text.getOldValue();
+                text.getRowValue().setName(newName);
+                try{
+                    NamedObject.validateUniqueAndNonempty(getItems());
+                } catch (ValidationException ex){
+                    (text.getRowValue()).setName(oldName);
+                    updateTable();
                 }
-        );
+            });
 
         source.setCellFactory(cellRegAFactory);
-        source.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, RegisterArray>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, RegisterArray> text) {
-                        ((TransferAtoR)text.getRowValue()).setSource(
-                                text.getNewValue());
-                    }
-                }
-        );
+        source.setOnEditCommit(text -> text.getRowValue().setSource(text.getNewValue()));
 
-        srcStartBit.setCellFactory(cellIntFactory);
-        srcStartBit.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, Integer> text) {
-                        ((TransferAtoR)text.getRowValue()).setSrcStartBit(
-                                text.getNewValue());
-                    }
-                }
-        );
+        srcStartBit.setCellFactory(_ignore -> new EditingNonNegativeIntCell<>());
+        srcStartBit.setOnEditCommit(text -> text.getRowValue().setSrcStartBit(text.getNewValue()));
 
         dest.setCellFactory(cellRegFactory);
-        dest.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Register>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, Register> text) {
-                        ((TransferAtoR)text.getRowValue()).setDest(
-                                text.getNewValue());
-                    }
-                }
-        );
+        dest.setOnEditCommit(text -> text.getRowValue().setDest(text.getNewValue()));
 
-        destStartBit.setCellFactory(cellIntFactory);
-        destStartBit.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, Integer> text) {
-                        ((TransferAtoR)text.getRowValue()).setDestStartBit(
-                                text.getNewValue());
-                    }
-                }
-        );
+        destStartBit.setCellFactory(_ignore -> new EditingNonNegativeIntCell<>());
+        destStartBit.setOnEditCommit(text -> text.getRowValue().setDestStartBit(text.getNewValue()));
 
         numBits.setCellFactory(cellIntFactory);
-        numBits.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferAtoR, Integer> text) {
-                        ((TransferAtoR)text.getRowValue()).setNumBits(
-                                text.getNewValue());
-                    }
-                }
-        );
+        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
 
         index.setCellFactory(cellRegFactory);
-        index.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<TransferAtoR, Register> text) {
-                        ((TransferAtoR)text.getRowValue()).setIndex(
-                                text.getNewValue());
-                    }
-                }
-        );
+        index.setOnEditCommit(text -> text.getRowValue().setIndex(text.getNewValue()));
 
         indexStart.setCellFactory(cellIntFactory);
-        indexStart.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<TransferAtoR, Integer> text) {
-                        ((TransferAtoR)text.getRowValue()).setIndexStart(
-                                text.getNewValue());
-                    }
-                }
-        );
+        indexStart.setOnEditCommit(text -> text.getRowValue().setIndexStart(text.getNewValue()));
 
         indexNumBits.setCellFactory(cellIntFactory);
-        indexNumBits.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferAtoR, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<TransferAtoR, Integer> text) {
-                        ((TransferAtoR)text.getRowValue()).setIndexNumBits(
-                                text.getNewValue());
-                    }
-                }
-        );
+        indexNumBits.setOnEditCommit(text -> text.getRowValue().setIndexNumBits(text.getNewValue()));
     }
-
+    
     /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
-    public Microinstruction getPrototype()
-    {
-        return prototype;
-    }
-
-    /**
-     * getter for the class object for the controller's objects
-     * @return the class object
-     */
-    public Class getMicroClass()
-    {
-        return TransferAtoR.class;
-    }
-
-    /**
-     * getter for the current TranferAtoR Microinstructions.
-     * @return a list of current microinstructions.
-     */
-    public ObservableList getCurrentMicros()
-    {
-        return currentMicros;
-    }
-
-    /**
-     * returns a string about the type of the table.
-     * @return a string about the type of the table.
+     * returns a string about the type of the 
+     * @return a string about the type of the 
      */
     public String toString()
     {
         return "TransferAtoR";
     }
-
-    /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "source", "srcStartBit", "dest",
-//                "destStartBit", "numBits", "index",
-//                "indexStart", "indexNumBits"};
-//    }
-
+    
+    @Override
+    public TransferAtoR getPrototype() {
+        RegisterArray a = (machine.getModule("registerArrays").size() == 0 ? null :
+                (RegisterArray) machine.getModule("registerArrays").get(0));
+        Register r = (machine.getAllRegisters().size() == 0 ? null : machine.getAllRegisters().get(0));
+        return new TransferAtoR("???", machine, a, 0, r, 0, 0, r,0, 0);
+    }
+    
     /**
      * use clones to replace existing Microinstructions
      * in the machine, and update the machine to delete
      * all references to the deleted Microinstructions.
      */
-    public void updateCurrentMicrosFromClones()
+    @Override
+    public void updateMachineFromItems()
     {
-        machine.setMicros("transferAtoR", createNewMicroList(clones));
-    }
-
-    /**
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
-    {
-        TransferAtoR[] transferAtoRs = new TransferAtoR[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            transferAtoRs[i] = (TransferAtoR) newClones.get(i);
-        }
-        clones = transferAtoRs;
+        machine.setMicros(TransferAtoR.class, getItems());
     }
 
     /**
      * Check validity of array of Objects' properties.
      * @param micros an array of Objects to check.
-     * @return boolean denoting whether array has objects with
-     * valid properties or not
      */
-    public void checkValidity(ObservableList micros)
+    @Override
+    public void checkValidity(ObservableList<TransferAtoR> micros)
     {
+        super.checkValidity(micros);
+        
         // convert the array to an array of TransferAtoRs
-        TransferAtoR[] transferAtoRs = new TransferAtoR[micros.size()];
-
-        for (int i = 0; i < micros.size(); i++) {
-            transferAtoRs[i] = (TransferAtoR) micros.get(i);
-
-            Validate.registerIsNotReadOnly(
-                    ((TransferAtoR) micros.get(i)).getDest(),
-                    ((TransferAtoR) micros.get(i)).getName());
+        for (TransferAtoR check: micros) {
+            Register.validateIsNotReadOnly(check.getDest(), check.getName());
         }
-
+        
         // check that all names are unique and nonempty
-        Validate.rangesAreInBound(transferAtoRs);
-
+        TransferAtoR.validateRangesInBound(micros);
     }
 
     /**
@@ -413,12 +228,12 @@ public class TransferAtoRTableController
      * updates the table by removing all the items and adding all back.
      * for refreshing the display.
      */
+    @Override
     public void updateTable()
     {
         name.setVisible(false);
         name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
+        
+        super.updateTable();
     }
 }

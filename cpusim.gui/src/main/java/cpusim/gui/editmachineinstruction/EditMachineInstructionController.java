@@ -26,22 +26,24 @@
  */
 package cpusim.gui.editmachineinstruction;
 
-import cpusim.*;
-import cpusim.model.*;
-import cpusim.model.Field.Type;
+import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
+import cpusim.model.Field;
+import cpusim.model.Field.Type;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;
-import cpusim.model.util.MoreFXCollections;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
+import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.util.Dialogs;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -50,8 +52,17 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -99,7 +110,7 @@ public class EditMachineInstructionController {
     @FXML
     Button deleteButton;
     @FXML
-    TreeView microInstrTreeView;
+    TreeView<String> microInstrTreeView;
 
     Mediator mediator;
     MachineInstruction currentInstr;
@@ -364,15 +375,14 @@ public class EditMachineInstructionController {
                 String className = db.getString().substring(lastComma + 1);
                 Microinstruction micro = null;
 
-                for (String string : Machine.MICRO_CLASSES) {
-                    for (Microinstruction instr : mediator.getMachine().getMicros
-                            (string)) {
-                        if (instr.getName().equals(microName) && instr
-                                .getMicroClass().equals(className)) {
+                for (Machine.MicroClass mc : Machine.MicroClass.values()) {
+                    for (Microinstruction instr : mediator.getMachine().getMicros(mc.getInstructionType())) {
+                        if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
                             micro = instr;
                         }
                     }
                 }
+                
                 if (className.equals("comment")) {
                     // we want Comment micros used in only one place so create a new one
                     micro = new Comment();
@@ -499,9 +509,9 @@ public class EditMachineInstructionController {
                         } else {
                             numOpcodeBits = 1;
                         }
-                        opcodeTextField.setText("0x" + Convert
-                                .fromLongToHexadecimalString(
-                                        currentInstr.getOpcode(), numOpcodeBits));
+                        opcodeTextField.setText(
+                                "0x" + ConvertLongs.fromLongToHexadecimalString(currentInstr.getOpcode(),
+                                        numOpcodeBits));
 
                     }
                     updateMicros();
@@ -827,10 +837,9 @@ public class EditMachineInstructionController {
 
                 Dragboard db = fieldName.startDragAndDrop(TransferMode.ANY);
 
-                int index = instructionFormatPane.getChildren().indexOf(fieldName)
-                        / 2;
+                int index = instructionFormatPane.getChildren().indexOf(fieldName) / 2;
 
-                ArrayList<Field> fields1 = currentInstr.getInstructionFields();
+                final List<Field> fields1 = currentInstr.getInstructionFields();
 
                 draggingField = fields1.get(index);
                 draggingColor = currentInstr.getInstructionColors().get(index);
@@ -906,7 +915,7 @@ public class EditMachineInstructionController {
                 int index = assemblyFormatPane.getChildren().indexOf(fieldName);
                 draggingIndex = index;
 
-                ArrayList<Field> fields1 = currentInstr.getAssemblyFields();
+                final List<Field> fields1 = currentInstr.getAssemblyFields();
 
                 draggingField = fields1.get(index);
                 draggingColor = currentInstr.getAssemblyColors().get(index);
@@ -1063,7 +1072,7 @@ public class EditMachineInstructionController {
                     }
                 }
 
-                draggingColor = Convert.generateRandomLightColor();
+                draggingColor = Colors.generateRandomLightColor();
                 if (currentInstr != null) {
                     draggingIndex = currentInstr.getAssemblyFields().size();
                 }
@@ -1143,8 +1152,7 @@ public class EditMachineInstructionController {
                     public void handle(MouseEvent mouseEvent) {
                         if (mouseEvent.getButton().equals(MouseButton.PRIMARY) &&
                                 mouseEvent.getClickCount() == 2) {
-                            ObservableList<TreeItem> list = microInstrTreeView.getRoot
-                                    ().getChildren();
+                            ObservableList<TreeItem<String>> list = microInstrTreeView.getRoot().getChildren();
 
                             for (TreeItem<String> t : list) {
                                 if (t.getValue().equals(micro.getMicroClass())) {
@@ -1237,21 +1245,16 @@ public class EditMachineInstructionController {
 
         TreeItem<String> rootNode = new TreeItem<>("MicroInstructions");
 
-        microInstrTreeView.setCellFactory(new Callback<TreeView, TreeCell>() {
-            @Override
-            public TreeCell call(TreeView param) {
-                return new DragTreeCell(mediator,
+        microInstrTreeView.setCellFactory(param ->
+                new DragTreeCell(mediator,
                         (Stage) implementationFormatPane.getScene().getWindow(),
-                        microInstrTreeView, EditMachineInstructionController.this.getClasses());
-            }
-        });
+                        microInstrTreeView, EditMachineInstructionController.this.getClasses()));
 
         rootNode.setExpanded(true);
 
-        for (String microClass : Machine.MICRO_CLASSES) {
-            TreeItem<String> classNode = new TreeItem<>(microClass);
-            for (final Microinstruction micro : mediator.getMachine().getMicros
-                    (microClass)) {
+        for (Machine.MicroClass microClass : Machine.MicroClass.values()) {
+            TreeItem<String> classNode = new TreeItem<>(microClass.getName());
+            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass.getInstructionType())) {
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }
@@ -1394,7 +1397,7 @@ public class EditMachineInstructionController {
     /**
      * commits the edit made to a comment microinstructions
      */
-    public void commitCommentEdit() {
+    private void commitCommentEdit() {
         currentCommentMicro.setName(commentEditor.getText());
         updateMicros();
         commentEditor = null;

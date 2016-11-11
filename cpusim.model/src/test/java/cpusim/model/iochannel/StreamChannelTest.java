@@ -221,7 +221,7 @@ public class StreamChannelTest {
 		outStream = mock(PrintStream.class);
 		sc = new StreamChannel(mock(InputStream.class), outStream);
 		
-		final long TEST_OUTPUT = 0xDEADBEEF & ArchType.Byte.of(1).mask();
+		final char TEST_OUTPUT = (char) (0xDEADBEEF & ArchType.Byte.of(1).mask());
 		
 		sc.writeAscii(TEST_OUTPUT);
 		verify(outStream).print(TEST_OUTPUT);

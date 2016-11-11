@@ -13,7 +13,6 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
@@ -37,8 +36,11 @@ import javafx.util.Callback;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
@@ -49,8 +51,11 @@ public class RegisterArrayTableController
     TableView<RegisterArray> table;
     @FXML
     TableColumn<RegisterArray,String> name;
-    @FXML TableColumn<RegisterArray,Integer> length;
-    @FXML TableColumn<RegisterArray,Integer> width;
+    @FXML
+    private TableColumn<RegisterArray,Integer> length;
+
+    @FXML
+    private TableColumn<RegisterArray,Integer> width;
 
     private ObservableList<RegisterArray> currentModules;;
     private RegisterArray prototype;
@@ -212,35 +217,27 @@ public class RegisterArrayTableController
     public void checkValidity()
     {
         // convert the array to an array of RegisterArrays
-        RegisterArray[] registerArrays = new RegisterArray[table.getItems().size()];
-
-        for (int i = 0; i < table.getItems().size(); i++) {
-            registerArrays[i] = table.getItems().get(i);
-        }
 
         //build up a HashMap of old registers and new widths
-        Map<Register,Integer> h = new HashMap<>();
-        for (int i = 0; i < registerArrays.length; i++) {
-            RegisterArray oldArray =
-                    (RegisterArray) getCurrentFromClone(registerArrays[i]);
-            if (oldArray != null &&
-                    registerArrays[i].getWidth() != oldArray.getWidth()) {
-                for (int j = 0; j < Math.min(registerArrays[i].getLength(),
-                        oldArray.getLength()); j++) {
-                    h.put(oldArray.registers().get(j), registerArrays[i].getWidth());
+        Map<Register, Integer> h = new HashMap<>();
+        List<RegisterArray> registerArrays = table.getItems();
+        for (RegisterArray array : registerArrays) {
+            RegisterArray oldArray = getCurrentFromClone(array);
+            if (oldArray != null && array.getWidth() != oldArray.getWidth()) {
+                for (int j = 0; j < Math.min(array.getLength(), oldArray.getLength()); j++) {
+                    h.put(oldArray.registers().get(j), array.getWidth());
                 }
             }
         }
 
         //now do all the tests
         for (RegisterArray registerArray : registerArrays) {
-            Validate.initialValuesAreInbound(registerArray.registers()
-                    .toArray(new Register[registerArray.getLength()]));
+            Validate.initialValuesAreInbound(registerArray.registers());
         }
-        Validate.rangesAreInBound(registerArrays);
+        Validate.registerArraysRangesInBound(registerArrays);
         Validate.registerWidthsAreOkayForMicros(machine, h);
         
-        ValidateControllers.registerArrayWidthsAreOkay(bitController,registerArrays);
+        ValidateControllers.registerArrayWidthsAreOkay(bitController, registerArrays);
         ValidateControllers.registerArrayWidthsAreOkayForTransferMicros(machine,registerArrays,this);
     }
 
@@ -260,19 +257,23 @@ public class RegisterArrayTableController
      * @param cloneRegister the clone of the register to be returned
      * @return the original register associated with the given clone register
      */
-    public Register getOriginalOf(Register cloneRegister)
-    {
+    public Register getOriginalOf(Register cloneRegister) {
+        checkNotNull(cloneRegister);
+
         //first find the clone array that contains the clone register
-        for (int j = 0; j < clones.length; j++) {
-            RegisterArray cloneArray = (RegisterArray) clones[j];
-            RegisterArray originalArray = (RegisterArray) assocList.get(cloneArray);
-            for (int i = 0; i < cloneArray.registers().size(); i++)
-                if (cloneArray.registers().get(i) == cloneRegister)
+        for (RegisterArray cloneArray : clones) {
+            RegisterArray originalArray = assocList.get(cloneArray);
+            for (int i = 0; i < cloneArray.registers().size(); i++) {
+                final Register clone = cloneArray.registers().get(i);
+                if (clone == cloneRegister) {
                     //we found the clone register!!
-                    if (originalArray.registers().size() > i)
+                    if (originalArray.registers().size() > i) {
                         return originalArray.registers().get(i);
-                    else
+                    } else {
                         return null;  //the clone is part of a new longer array
+                    }
+                }
+            }
         }
         return null;
     }
@@ -285,16 +286,16 @@ public class RegisterArrayTableController
     public Register getCloneOf(Register originalRegister)
     {
         //first find the original array that contains the original register
-        for (int j = 0; j < clones.length; j++) {
-            RegisterArray cloneArray = (RegisterArray) clones[j];
-            RegisterArray originalArray = (RegisterArray) assocList.get(cloneArray);
-            for (int i = 0; i < originalArray.registers().size(); i++)
+        for (RegisterArray cloneArray : clones) {
+            RegisterArray originalArray = assocList.get(cloneArray);
+            for (int i = 0; i < originalArray.registers().size(); i++) {
                 if (originalArray.registers().get(i) == originalRegister)
                     //we found the original register!!
                     if (cloneArray.registers().size() > i)
                         return cloneArray.registers().get(i);
                     else
                         return null;  //it no longer has a clone
+            }
         }
         return null;
     }

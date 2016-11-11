@@ -87,20 +87,9 @@
 
 package cpusim.model.util;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
+import com.google.common.base.Strings;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
-import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
@@ -109,7 +98,6 @@ import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.CpusimSet;
 import cpusim.model.microinstruction.Decode;
-import cpusim.model.microinstruction.IO;
 import cpusim.model.microinstruction.Logical;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.microinstruction.Shift;
@@ -123,13 +111,23 @@ import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.units.ArchValue;
-
-import com.google.common.collect.Sets;
-
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.*;
+
+///////////////////////////////////////////////////////////////////////////////
+// the libraries we need to import
 
 /**
  * This class has a bunch of static methods for testing the validity of
@@ -192,10 +190,10 @@ public class Validate
      * Will throw a classCastException if the array of objects passed in are not
      * instances of NamedObject
      * @param objects the nameable objects to be checked
+     * @deprecated Use {@link NamedObject#validateUniqueAndNonempty(List)}
      */
     public static void namedObjectsAreUniqueAndNonempty(List<? extends NamedObject> objects) {
-    	allNamesAreUnique(objects);
-        allNamesAreNonEmpty(objects);
+    	NamedObject.validateUniqueAndNonempty(objects);
     }
     
     
@@ -205,7 +203,7 @@ public class Validate
      * @param machine the machine in its current state
      */    
     public static void EQUNames(List<EQU> equs, Machine machine){
-        allNamesAreUnique(equs);
+        NamedObject.validateUniqueAndNonempty(equs);
         for (EQU equ : equs) {
                 Validate.nameIsValidAssembly(equ.getName(), machine);
         }
@@ -346,34 +344,13 @@ public class Validate
      * instances of NamedObject
      * @param list array of namedObjects
      * 
-     * @deprecated Use {@link #allNamesAreUnique(List)}
+     * @deprecated Use {@link NamedObject#validateNamesUnique(List)}
      */
     public static void allNamesAreUnique(NamedObject[] list)
     {
-        allNamesAreUnique(Arrays.<NamedObject>asList(list));
+        NamedObject.validateNamesUnique(Arrays.<NamedObject>asList(list));
     }
     
-    /**
-     * checks if all the names in the array of machine instrs are unique.
-     * Will throw a classCastException if the array of objects passed in are not
-     * instances of NamedObject
-     * @param list array of namedObjects
-     * 
-     * @since 2016-11-09
-     */
-    public static void allNamesAreUnique(List<? extends NamedObject> list)
-    {
-    	final Set<String> names = Sets.newHashSetWithExpectedSize(list.size());
-    	for (NamedObject obj: list) {
-    		if (names.contains(obj.getName())) {
-    			throw new ValidationException("The name \"" + obj.getName() +
-                        "\" is used more than once.\n" +
-                        "All names must be unique.");
-    		}
-    		
-    		names.add(obj.getName());
-    	}
-    }
     /**
      * Validates that a specific instruction has at least one field
      * @param instr machine instruction whose field list is to be validated
@@ -457,7 +434,7 @@ public class Validate
      */
     public static void nameIsNonEmpty(String name)
     {
-        if (name.equals("")) {
+        if (Strings.isNullOrEmpty(name)) {
             throw new ValidationException("A name must have at least one character.");
         }
     }
@@ -531,322 +508,25 @@ public class Validate
     }
 
     /**
-     * check if the ios of type ascii have 8-bit-wide
-     * (or greater) buffers and ios of type unicode have
-     * 16-bit-wide (or greater) buffers.
-     * @param ios array of ios microinstruction
-     */
-    public static void buffersAreWideEnough(IO[] ios)
-    {
-        for (IO io : ios) {
-            if (io.getType().equals("ascii") &&
-                    io.getBuffer().getWidth() < 1) {
-                throw new ValidationException("IO \"" + io + "\" is of type " +
-                        "ascii and so needs a\nbuffer register at least " +
-                        "8 bits wide.");
-            }
-            else if (io.getType().equals("unicode") &&
-                    io.getBuffer().getWidth() < 2) {
-                throw new ValidationException("IO \"" + io + "\" is of type " +
-                        "unicode and so needs a\nbuffer register at least " +
-                        "16 bits wide.");
-            }
-        }
-    }
-
-    /**
-     * checks if the registers have equal widths
-     * @param logicals an array of Logicals to check
-     * Logical objects with all equal width registers
-     */
-    public static void registersHaveEqualWidths(Logical[] logicals)
-    {
-
-        for (Logical logical : logicals) {
-            // get width of the source1, source2, and destination
-            // registers, if they are different, then the validity
-            // test fails
-            if (logical.getSource1().getWidth() ==
-                    logical.getSource2().getWidth() &&
-                    logical.getSource2().getWidth() ==
-                            logical.getDestination().getWidth()) {
-                continue;
-            }
-            else {
-                throw new ValidationException("At least one of the registers in the " +
-                        "microinstruction \"" + logical.getName() +
-                        "\" has\na bit width that is different than one " +
-                        "or more of the others.\nAll registers must have " +
-                        "the same number of bits.");
-            }
-        }
-    }
-
-    /**
-     * checks if the value of each Set microinstruction fits
-     * in the given number of bits in the microinstruction.
-     * The value is treated as either a 2's complement value or
-     * and unsigned integer value and so the range of legal values
-     * for n bits is -(2^(n-1)) to 2^n - 1.
-     * @param sets an array of Objects to check.
-     */
-    public static void valueFitsInNumBitsForSetMicros(CpusimSet[] sets)
-    {
-        for (CpusimSet set : sets) {
-            try {
-                fitsInBits(set.getValue(), set.getNumBits());
-            } catch (ValidationException e) {
-                throw new ValidationException(e.getMessage() +
-                        " in the microinstruction \"" + set.getName() + "\".");
-            }
-        }
-    }
-
-    /**
-     * checks if Set objects with all ranges all in Bounds properly
-     * @param sets an array of Sets to check
-     * Set objects with all ranges all in Bounds properly
-     */
-    public static void rangeInBound(CpusimSet[] sets)
-    {
-
-        for (CpusimSet set1 : sets) {
-            final CpusimSet set = set1;
-            final int start = set.getStart();
-            final int numBits = set.getNumBits();
-//            final long value = set.getValue();
-
-            Register register = set.getRegister();
-
-            if (start < 0) {
-                throw new ValidationException("You cannot specify a negative value for the " +
-                        "start bit\n" +
-                        "in the instruction " + set.getName() + ".");
-            }
-            
-            if (numBits <= 0) {
-                throw new ValidationException("You must specify a positive value for the " +
-                        "bitwise width\nof the set range " +
-                        "in the instruction " + set.getName() + ".");
-            }
-            
-            final int regWidth = register.getWidth();
-            
-            if (start >= regWidth) {
-                throw new ValidationException("Invalid start index for the specified register " +
-                        "in the Set microinstruction " + set.getName() +
-                        ".\nIt must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            
-            if ((start + numBits) > regWidth) {
-                throw new ValidationException("The bitwise width of the set area in the Set " +
-                        "microinstruction " +
-                        set.getName() + "\n is too large to fit in the register.");
-            }
-        }
-    }
-
-        /**
-         * checks the array of Shift micros to make sure none have
-         * a negative shift distances
-         * @param shifts the list of shift objects
-         */
-    public static void noNegativeDistances(Shift[] shifts)
-    {
-        for (Shift shift : shifts) {
-            if (shift.getDistance() <= 0) {
-                throw new ValidationException("The microinstruction \"" + shift.getName() +
-                        "\" has a negative or zero shift distance.\nShift distances " +
-                        "must be positive.");
-            }
-        }
-    }
-
-    /**
-     * checks if the two registers specified in the shift microinstructions have the same
-     * width
-     * @param shifts and array of shift microinstructions
-     */
-    public static void registersHaveEqualWidths(Shift[] shifts)
-    {
-        for (Shift shift : shifts) {
-            if (shift.getSource().getWidth() !=
-                    shift.getDestination().getWidth()) {
-                throw new ValidationException("The microinstruction " + shift.getName() +
-                        " has different-sized registers designated " +
-                        "for source and destination.\nBoth registers " +
-                        "must have the same number of bits.");
-            }
-        }
-    }
-
-
-    /**
-     * checks if the objects with all ranges all in Bounds properly
-     * @param tests an array of Sets to check
-     * the objects with all ranges all in Bounds properly
-     */
-    public static void rangeInBound(List<Test> tests)
-    {
-        for (Test test : tests) {
-        	final int start = test.getStart();
-        	final int numBits = test.getNumBits();
-
-            if (start < 0 || numBits < 0) {
-                throw new ValidationException("You cannot specify a negative value for the " +
-                        "start bits,\nor the bitwise width of the test range\n" +
-                        "in the microinstruction " + test.getName() + ".");
-            }
-            else if (start >= test.getRegister().getWidth()) {
-                throw new ValidationException("The start bit in the microinstruction "
-                        + test.getName() + " is out of range.\n" +
-                        "It must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            else if ((start + numBits) > test.getRegister().getWidth()) {
-                throw new ValidationException("The bits specified in the Test " +
-                        "microinstruction " + test.getName() +
-                        " are too large to fit in the register.");
-            }
-        }
-    }
-
-    /**
      * check if the ranges are in bound.
      * @param transferAtoRs an array of TransferRtoRs to check.
      * TransferRtoR objects with all ranges all in Bounds properly.
      */
     public static void rangesAreInBound(List<TransferAtoR> transferAtoRs)
     {
-        int srcStartBit, destStartBit, numBits, indexStart, indexNumBits;
-        TransferAtoR temp;
-        boolean startProblem = false;
-        String boundPhrase = "";
-
-        for (TransferAtoR transferAtoR : transferAtoRs) {
-            temp = transferAtoR;
-            srcStartBit = temp.getSrcStartBit();
-            destStartBit = temp.getDestStartBit();
-            numBits = temp.getNumBits();
-            indexNumBits = temp.getIndexNumBits();
-            indexStart = temp.getIndexStart();
-            if (srcStartBit < 0 || destStartBit < 0 || numBits < 0 ||
-                    indexStart < 0) {
-                throw new ValidationException("You have a negative value for one of the " +
-                        "start bits or the number of bits\nin the " +
-                        "microinstruction \"" + temp.getName() + "\".");
-            }
-            if (srcStartBit > temp.getSource().getWidth()) {
-                startProblem = true;
-                boundPhrase = "srcStartBit";
-            }
-            else if (destStartBit > temp.getDest().getWidth()) {
-                startProblem = true;
-                boundPhrase = "destStartBit";
-            }
-            else if (indexStart > temp.getIndex().getWidth()) {
-                startProblem = true;
-                boundPhrase = "indexStart";
-            }
-            if (startProblem) {
-                throw new ValidationException(boundPhrase + " has an invalid value for the " +
-                        "specified register in instruction " + temp.getName() +
-                        ".\nIt must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            if (indexNumBits <= 0) {
-                throw new ValidationException("A positive number of bits must be specified " +
-                        "for the index register.");
-            }
-            else if (srcStartBit + numBits >
-                    temp.getSource().getWidth() ||
-                    destStartBit + numBits >
-                            temp.getDest().getWidth()) {
-                throw new ValidationException("The number of bits being transferred is " +
-                        "too large to fit in the source array or the " +
-                        "destination register.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits to copy in the microinstruction \"" +
-                        temp.getName() + ".\"");
-            }
-            else if (indexStart + indexNumBits > temp.getIndex().getWidth()) {
-                throw new ValidationException("The number of bits specified in the index " +
-                        "register is " +
-                        "too large to fit in the index register.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits in the microinstruction \"" +
-                        temp.getName() + ".\"");
-            }
-        }
+        
     }
 
     /**
      * check if the ranges are in bound.
      * @param transferRtoAs an array of TransferRtoRs to check.
      * TransferRtoR objects with all ranges all in Bounds properly.
+     *
+     * @deprecated Use {@link TransferRtoA#validateRangesInBounds(List)}
      */
-    public static void rangesAreInBound(TransferRtoA[] transferRtoAs)
+    public static void rangesAreInBoundTransferRToA(List<TransferRtoA> transferRtoAs)
     {
-        int srcStartBit, destStartBit, numBits, indexStart, indexNumBits;
-        TransferRtoA temp;
-        boolean startProblem = false;
-        String boundPhrase = "";
-
-        for (TransferRtoA transferRtoA : transferRtoAs) {
-            temp = transferRtoA;
-            srcStartBit = temp.getSrcStartBit();
-            destStartBit = temp.getDestStartBit();
-            numBits = temp.getNumBits();
-            indexNumBits = temp.getIndexNumBits();
-            indexStart = temp.getIndexStart();
-            if (srcStartBit < 0 || destStartBit < 0 || numBits < 0 ||
-                    indexStart < 0) {
-                throw new ValidationException("You have a negative value for one of the " +
-                        "start bits or the number of bits\nin the " +
-                        "microinstruction \"" + temp.getName() + "\".");
-            }
-            if (srcStartBit > temp.getSource().getWidth()) {
-                startProblem = true;
-                boundPhrase = "srcStartBit";
-            }
-            else if (destStartBit > temp.getDest().getWidth()) {
-                startProblem = true;
-                boundPhrase = "destStartBit";
-            }
-            else if (indexStart > temp.getIndex().getWidth()) {
-                startProblem = true;
-                boundPhrase = "indexStart";
-            }
-            if (startProblem) {
-                throw new ValidationException(boundPhrase + " has an invalid value for the " +
-                        "specified register in instruction " + temp.getName() +
-                        ".\nIt must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            if (indexNumBits <= 0) {
-                throw new ValidationException("A positive number of bits must be specified " +
-                        "for the index register.");
-            }
-            else if (srcStartBit + numBits > temp.getSource().getWidth() ||
-                    destStartBit + numBits > temp.getDest().getWidth()) {
-                throw new ValidationException("The number of bits being transferred is " +
-                        "too large to fit in the source register or the " +
-                        "destination array.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits to copy in the microinstruction \"" +
-                        temp.getName() + ".\"");
-            }
-            else if (indexStart + indexNumBits > temp.getIndex().getWidth()) {
-                throw new ValidationException("The number of bits specified in the index " +
-                        "register is " +
-                        "too large to fit in the index register.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits in the microinstruction \"" +
-                        temp.getName() + ".\"");
-            }
-        }
-
+        TransferRtoA.validateRangesInBounds(transferRtoAs);
     }
 
     /**
@@ -928,15 +608,11 @@ public class Validate
      * Register objects with all ranges all in bounds
      * properly
      */
-    public static void bitInBounds(ConditionBit[] conditionBits)
+    public static void bitInBounds(List<? extends ConditionBit> conditionBits)
     {
-        int width, bit;
-        ConditionBit nextCB;
-
-        for (ConditionBit conditionBit : conditionBits) {
-            nextCB = conditionBit;
-            width = nextCB.getRegister().getWidth();
-            bit = nextCB.getBit();
+        for (ConditionBit nextCB : conditionBits) {
+            final int width = nextCB.getRegister().getWidth();
+            final int bit = nextCB.getBit();
             if (bit < 0) {
                 throw new ValidationException("You cannot specify a negative value for the " +
                         "bit index of the ConditionBit " + nextCB.getName() + ".");
@@ -952,8 +628,8 @@ public class Validate
      * check if all the cells in the ram have the valid sizes
      * @param rams the list of rams that will be checked
      */
-    public static void cellSizesAreValid(RAM[] rams) {
-        for (RAM ram : rams) {
+    public static void cellSizesAreValid(final List<? extends RAM> rams) {
+        for (RAM ram : checkNotNull(rams)) {
             int size = ram.getCellSize();
             if (size <= 0 || size > 64) {
                 throw new ValidationException("The RAM module \"" + ram.getName() +
@@ -968,14 +644,14 @@ public class Validate
      * @param rams an array of RAMs
      * positive length
      */
-    public static void lengthsArePositive(RAM[] rams)
-    {
-        for (RAM ram : rams)
+    public static void lengthsArePositive(final List<? extends RAM> rams) {
+        for (RAM ram : checkNotNull(rams)) {
             if (ram.getLength() <= 0) {
                 throw new ValidationException("The RAM module \"" + ram.getName() +
                         "\" has length " + ram.getLength() +
                         ".\nThe length must be a positive integer.");
             }
+        }
     }
     
     /**
@@ -1020,14 +696,11 @@ public class Validate
      * @param registers an array of Registers to check
      * with all widths all in bounds properly
      */
-    public static void widthsAreInBound(Register[] registers)
-    {
-        int width;
-        Register nextRegister;
+    public static void widthsAreInBound(List<? extends Register> registers) {
+        checkNotNull(registers);
 
-        for (Register register : registers) {
-            nextRegister = register;
-            width = nextRegister.getWidth();
+        for (Register nextRegister : registers) {
+            final int width = nextRegister.getWidth();
             if (width <= 0) {
                 throw new ValidationException("You must specify a positive value for the " +
                         "bitwise width\nof the Register " + nextRegister.getName() + ".");
@@ -1044,23 +717,18 @@ public class Validate
      * Check of the initialValue of some registers are in the proper bound 
      * @param registers registers to be checked
      */
-    public static void initialValuesAreInbound(Register[] registers){
-        int width;
-        Register nextRegister;
+    public static void initialValuesAreInbound(List<? extends Register> registers){
 
-        for (Register register : registers) {
-            nextRegister = register;
-            width = nextRegister.getWidth();
+        for (Register nextRegister : registers) {
+            final int width = nextRegister.getWidth();
             BigInteger max = BigInteger.valueOf(2).pow(width - 1);
             BigInteger initial = BigInteger.valueOf(nextRegister.getInitialValue());
             BigInteger unsignedMax = max.shiftLeft(1).subtract(BigInteger.ONE);
             if (!(max.negate().compareTo(initial) <= 0 &&
                     initial.compareTo(unsignedMax) <= 0)) {
-                throw new ValidationException("The initial value of register " +
-                        nextRegister.getName() +
-                        " is out of range. It must be set to a value greater than " +
-                        "or equal to " + max.negate() + " and smaller than or equal to " +
-                        unsignedMax + ".");
+                throw new ValidationException("The initial value of register " + nextRegister.getName() +
+                        " is out of range. It must be set to a value greater than or equal to " + max.negate() +
+                        " and smaller than or equal to " + unsignedMax + ".");
             }
         }
     }
@@ -1111,9 +779,8 @@ public class Validate
             }
         }
         
-        ObservableList<Microinstruction> logicals = machine.getMicros("logical");
-        for (Microinstruction logical1 : logicals) {
-            Logical logical = (Logical) logical1;
+        ObservableList<Logical> logicals = machine.getMicros(Logical.class);
+        for (Logical logical : logicals) {
             int source1Width = newWidths.get(logical.getSource1());
             int source2Width = newWidths.get(logical.getSource2());
             int destWidth = newWidths.get(logical.getDestination());
@@ -1127,10 +794,9 @@ public class Validate
             }
         }
         
-        ObservableList<Microinstruction> sets = machine.getMicros("set");
-        for (Microinstruction set1 : sets) {
-            CpusimSet set = (CpusimSet) set1;
-            int newWidth = newWidths.get(set.getRegister()).intValue();
+        ObservableList<CpusimSet> sets = machine.getMicros(CpusimSet.class);
+        for (CpusimSet set : sets) {
+            int newWidth = newWidths.get(set.getRegister());
             if (newWidth < set.getStart() + set.getNumBits()) {
                 throw new ValidationException("The new width " + newWidth +
                         " of register " + set.getRegister() +
@@ -1138,11 +804,9 @@ public class Validate
             }
         }
         
-        ObservableList<Microinstruction> tests = machine.getMicros("test");
-        for (Microinstruction test1 : tests) {
-            Test test = (Test) test1;
-            int newWidth =
-                    (Integer) newWidths.get(test.getRegister());
+        ObservableList<Test> tests = machine.getMicros(Test.class);
+        for (Test test : tests) {
+            int newWidth = newWidths.get(test.getRegister());
             if (newWidth < test.getStart() + test.getNumBits()) {
                 throw new ValidationException("The new width " + newWidth +
                         " of register " + test.getRegister() +
@@ -1150,13 +814,10 @@ public class Validate
             }
         }
         
-        ObservableList<Microinstruction> transferRtoRs = machine.getMicros("transferRtoR");
-        for (Microinstruction transferRtoR : transferRtoRs) {
-            TransferRtoR t = (TransferRtoR) transferRtoR;
-            int sourceWidth =
-                    (Integer) newWidths.get(t.getSource());
-            int destWidth =
-                    (Integer) newWidths.get(t.getDest());
+        ObservableList<TransferRtoR> transferRtoRs = machine.getMicros(TransferRtoR.class);
+        for (TransferRtoR t : transferRtoRs) {
+            int sourceWidth = newWidths.get(t.getSource());
+            int destWidth = newWidths.get(t.getDest());
             if (sourceWidth < t.getSrcStartBit() + t.getNumBits() ||
                     destWidth < t.getDestStartBit() + t.getNumBits()) {
                 throw new ValidationException("The new width " + sourceWidth +
@@ -1165,29 +826,24 @@ public class Validate
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
         }
-        ObservableList<Microinstruction> transferRtoAs = machine.getMicros("transferRtoA");
-        for (Microinstruction transferRtoA : transferRtoAs) {
-            TransferRtoA t = (TransferRtoA) transferRtoA;
-            int sourceWidth =
-                    (Integer) newWidths.get(t.getSource());
+        ObservableList<TransferRtoA> transferRtoAs = machine.getMicros(TransferRtoA.class);
+        for (TransferRtoA t : transferRtoAs) {
+            int sourceWidth = newWidths.get(t.getSource());
             if (sourceWidth < t.getSrcStartBit() + t.getNumBits()) {
                 throw new ValidationException("The new width " + sourceWidth +
                         " of register " + t.getSource() +
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
-            int indexWidth =
-                    (Integer) newWidths.get(t.getIndex());
+            int indexWidth = newWidths.get(t.getIndex());
             if (indexWidth < t.getIndexStart() + t.getIndexNumBits()) {
                 throw new ValidationException("The new width " + indexWidth +
                         " of register " + t.getIndex() +
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
         }
-        ObservableList<Microinstruction> transferAtoRs = machine.getMicros("transferAtoR");
-        for (Microinstruction transferAtoR : transferAtoRs) {
-            TransferAtoR t = (TransferAtoR) transferAtoR;
-            int destWidth =
-                    (Integer) newWidths.get(t.getDest());
+        ObservableList<TransferAtoR> transferAtoRs = machine.getMicros(TransferAtoR.class);
+        for (TransferAtoR t : transferAtoRs) {
+            int destWidth = newWidths.get(t.getDest());
             if (destWidth < t.getDestStartBit() + t.getNumBits()) {
                 throw new ValidationException("The new width " + destWidth +
                         " of register " + t.getDest() +
@@ -1228,14 +884,9 @@ public class Validate
      * @param registerArrays an array of Registers to check
      * with all ranges all in bounds properly
      */
-    public static void rangesAreInBound(RegisterArray[] registerArrays)
-    {
-        int width;
-        RegisterArray nextArray;
-
-        for (RegisterArray registerArray : registerArrays) {
-            nextArray = registerArray;
-            width = nextArray.getWidth();
+    public static void registerArraysRangesInBound(List<? extends RegisterArray> registerArrays) {
+        for (RegisterArray nextArray : registerArrays) {
+            final int width = nextArray.getWidth();
             if (width <= 0) {
                 throw new ValidationException("You must specify a positive value for the " +
                         "bitwise width\nof the registers in the RegisterArray " +
@@ -1332,12 +983,11 @@ public class Validate
      * checks if the dest register of the given microinstruction is read-only
      * @param register destination register of transferRtoR or transferAtoR
      * @param microName name of the given microinstruction
+     *
+     * @deprecated Use {@link Register#validateIsNotReadOnly(Register, String)}
      */
-    public static void registerIsNotReadOnly(Register register, String microName){
-        if (register.getReadOnly() == true)
-            throw new ValidationException("The destination register " +
-                    register.getName() + " of the microinstruction " +
-                    microName + " is read-only.");
+    public static void registerIsNotReadOnly(Register register, String microName) {
+        Register.validateIsNotReadOnly(register, microName);
     }
 
     /**
@@ -1348,47 +998,36 @@ public class Validate
      * @param transferRtoRs an list of transferRtoR microinstructions
      * @param setCondBits and list of setCondBit microinstructions
      */
-    public static void readOnlyRegistersAreImmutable(Register[] registers,
-                                                     ObservableList transferAtoRs,
-                                                     ObservableList transferRtoRs,
-                                                     ObservableList setCondBits){
-        List readOnlyRegisters = new ArrayList<String>();
-        for (int i = 0; i < registers.length; i++){
-            if (registers[i].getReadOnly()==true)
-                readOnlyRegisters.add(registers[i].getName());
-        }
+    public static void readOnlyRegistersAreImmutable(List<? extends Register> registers,
+                                                     List<? extends TransferAtoR> transferAtoRs,
+                                                     List<? extends TransferRtoR> transferRtoRs,
+                                                     List<? extends SetCondBit> setCondBits){
+        final Set<Register> readOnlyRegisters = registers.stream()
+                .filter(r -> r.getAccess().equals(Register.Access.readOnly()))
+                .collect(Collectors.toSet());
 
-        if (readOnlyRegisters.size() == 0)
-            return;
-        else {
-            for (Object o: transferAtoRs){
-                if (readOnlyRegisters.contains(((TransferAtoR)o).getDest().getName()))
-                    throw new ValidationException("The register " +
-                            ((TransferAtoR)o).getDest().getName() +
-                            " is used as the destination reigster in the " +
-                            "microinstruction transferAtoR " + ((TransferAtoR)o).getName() +
-                            ". You should change the microinstruction before " +
-                            "setting the register to read-only.");
+        if (readOnlyRegisters.size() > 0) {
+            for (TransferAtoR t: transferAtoRs){
+                if (readOnlyRegisters.contains(t.getDest())) {
+                    throw new ValidationException("The register " + t.getDest().getName() + " is used as the " +
+                            "destination register in the microinstruction transferAtoR " + t.getName() + ". " +
+                            "You should change the microinstruction before setting the register to read-only.");
+                }
             }
 
-            for (Object o: transferRtoRs){
-                if (readOnlyRegisters.contains(((TransferRtoR)o).getDest().getName()))
-                throw new ValidationException("The register " +
-                        ((TransferRtoR)o).getDest().getName() +
-                        " is used as the destination reigster in the " +
-                        "microinstruction transferRtoR " + ((TransferRtoR)o).getName() +
-                        ". You should change the microinstruction before " +
-                        "setting the register to read-only.");
+            for (TransferRtoR o: transferRtoRs) {
+                if (readOnlyRegisters.contains(o.getDest())) {
+                    throw new ValidationException("The register " + o.getDest().getName() + " is used as the " +
+                            "destination register in the microinstruction transferRtoR " + o.getName() + ". " +
+                            "You should change the microinstruction before setting the register to read-only.");
+                }
             }
 
-            for (Object o: setCondBits){
-                if (readOnlyRegisters.contains(((SetCondBit)o).getBit().getRegister()))
-                    throw new ValidationException("The register " +
-                            ((SetCondBit)o).getBit().getRegister() +
-                            " is used as the condition flag reigster in the " +
-                            "microinstruction setCondBit " + ((SetCondBit)o).getName() +
-                            ". You should change the microinstruction before " +
-                            "setting the register to read-only.");
+            for (SetCondBit o: setCondBits){
+                if (readOnlyRegisters.contains(o.getBit().getRegister()))
+                    throw new ValidationException("The register " + o.getBit().getRegister() + " is used as the " +
+                            "condition flag reigster in the microinstruction setCondBit " + o.getName() + ". " +
+                            "You should change the microinstruction before setting the register to read-only.");
             }
         }
     }
@@ -1398,9 +1037,9 @@ public class Validate
      * Otherwise it throws a validation exception
      * @param conditionBits the condition bits to check
      */
-    public static void registersNotReadOnly(ConditionBit[] conditionBits) {
+    public static void registersNotReadOnly(List<? extends ConditionBit> conditionBits) {
         for(ConditionBit cb : conditionBits){
-            if(cb.getRegister().getReadOnly()){
+            if(cb.getRegister().getAccess().equals(Register.Access.readOnly())) {
                 throw new ValidationException("The register \""+cb.getRegister().getName()+
                         "\" contains the halt bit \""+cb.getName()+"\".  This is not allowed. "
                         + "Any register containing a condition bit must be able to be written"
@@ -1492,41 +1131,5 @@ public class Validate
         fitsInBits(value, ArchValue.bits(numBits));
     }
 
-    public static void fieldIsValid(Field field) {
-        if (field.getNumBits() == 0 && field.getType().equals(Type.ignored)) {
-            throw new ValidationException("A field of length 0 cannot be ignored." +
-                    " Field " + field.getName() + " is such a field.");
-    	}
-        
-        if (!field.isSigned() && field.getDefaultValue() < 0) {
-            throw new ValidationException("Field " + field.getName() + " is unsigned" +
-                    " but has a negative default value.");
-        }
-        
-        if(field.getValues().size() > 0 &&
-                (! field.getRelativity().equals(Field.Relativity.absolute) ||
-                 field.getNumBits() == 0)) {
-            throw new ValidationException("Field " + field.getName() + " must be" +
-                    " absolute and have a positive number of bits in order to use " +
-                    " a set of fixed values.");
-        }
-        
-        if(field.getNumBits() > 0)
-            fitsInBits(field.getDefaultValue(), field.getNumBits());
-        
-        fieldValuesAreValid(field, field.getValues());
-    }
-
-    public static void fieldValuesAreValid(Field field, ObservableMap<String, FieldValue> allFieldValues) {
-    	final int numBits = field.getNumBits();
-    	
-        for(FieldValue fieldValue : allFieldValues.values()) {
-            if (fieldValue.getValue() < 0 && !field.isSigned())
-                throw new ValidationException("Field " + field.getName() + " is unsigned" +
-                    " and so " + fieldValue.getName() + " cannot have a negative field value.");
-            
-            if (numBits > 0)
-                fitsInBits(fieldValue.getValue(), numBits);
-        }
-    }
+    
 } //end of class Validate

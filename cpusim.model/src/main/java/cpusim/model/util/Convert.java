@@ -107,7 +107,20 @@ public abstract class Convert
 		}
         return bigNum.longValue();
     }
-
+    
+    /**
+     * Delegate to {@link #fromDecimalStringToLong(String, ArchValue)}.
+     *
+     * @param s
+     * @param numBits
+     * @return
+     *
+     * @deprecated Use {@link #fromDecimalStringToLong(String, ArchValue)}
+     */
+    public static long fromDecimalStringToLong(String s, int numBits) {
+        return fromDecimalStringToLong(s, ArchValue.bits(numBits));
+    }
+    
     //------------------------
     //fromBinaryStringToLong
     //returns the long number expressed by s, where s is a 2's complement number.

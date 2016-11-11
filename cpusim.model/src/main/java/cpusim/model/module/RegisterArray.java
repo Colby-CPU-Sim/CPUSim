@@ -37,7 +37,7 @@ import static com.google.common.base.Preconditions.*;
 /**
  * A register array is an indexed list of any number of registers.
  */
-public class RegisterArray extends Module<RegisterArray> implements Iterable<Register>
+public class RegisterArray extends Module<RegisterArray> implements Iterable<Register>, Sized<RegisterArray>
 {
 
     //------------------------
@@ -96,6 +96,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
      * getter of the width
      * @return the width as integer
      */
+    @Override
     public int getWidth()
     {
         return width.get();

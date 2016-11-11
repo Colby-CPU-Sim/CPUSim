@@ -28,6 +28,7 @@ package cpusim.model;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.xml.HTMLEncodable;
@@ -43,7 +44,7 @@ import javafx.beans.property.SimpleStringProperty;
 // the Microinstruction class
 
 public abstract class Microinstruction
-        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable
+        implements NamedObject, LegacyXMLSupported, HTMLEncodable
 {
 	
     // name of the microinstruction

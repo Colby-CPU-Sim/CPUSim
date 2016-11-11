@@ -7,9 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cpusim.Mediator;
-import cpusim.assembler.PunctChar;
 import cpusim.model.MachineInstruction;
 
+import cpusim.model.assembler.PunctChar;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 
@@ -70,7 +70,7 @@ public class CodePaneController
                 equRegExpr+"|"+macroRegExpr;
 
         // get the regExpr for "tokens" (special symbols consisting of exactly one char)
-        PunctChar[] punctChars = mediator.getMachine().getPunctChars();
+        List<PunctChar> punctChars = mediator.getMachine().getPunctChars();
         String tokensRegExpr = "";
         for(PunctChar chr: punctChars)
            if(chr.getUse()==PunctChar.Use.token)

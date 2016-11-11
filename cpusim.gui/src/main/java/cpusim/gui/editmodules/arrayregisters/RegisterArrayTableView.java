@@ -12,7 +12,9 @@ import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.model.Module;
+import cpusim.model.module.Modules;
 import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.collections.ObservableList;
@@ -42,13 +44,19 @@ import java.util.Set;
  * This class is the TableView for one of the register arrays.  One of these
  * TableViews is created for each register array.
  */
-public class RegisterArrayTableView extends TableView implements Initializable {
+public class RegisterArrayTableView extends TableView<Register> implements Initializable {
+    
     @FXML
-    TableView<Register> table;
+    private TableView<Register> table;
+    
     @FXML
-    TableColumn<Register,String> name;
-    @FXML TableColumn<Register,Long> initialValue;
-    @FXML TableColumn<Register,Boolean> readOnly;
+    private TableColumn<Register,String> name;
+    
+    @FXML
+    private TableColumn<Register,Long> initialValue;
+    
+    @FXML
+    private TableColumn<Register,Boolean> readOnly;
 
     private Map<Register, Register> assocList;  //associates the current modules
     //with the edited clones; key = new clone, value = original
@@ -56,13 +64,13 @@ public class RegisterArrayTableView extends TableView implements Initializable {
     private Node parentFrame; //for the parent of error messages
     private String arrayName;
 
-    private ObservableList currentRegisters;
+    private ObservableList<Register> currentRegisters;
 
     /**
      * Constructor
      * @param registers holds the register arrays and information needed
      */
-    public RegisterArrayTableView(String arrayName, ObservableList registers){
+    public RegisterArrayTableView(String arrayName, ObservableList<Register> registers){
         this.arrayName = arrayName;
         this.currentRegisters = registers;
         assocList = new HashMap<>();
@@ -277,7 +285,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
         }
 
         // check that all names are unique and nonempty
-        Validate.initialValuesAreInbound(registers);
+        Validate.initialValuesAreInbound(getItems());
 
     }
 
@@ -326,6 +334,14 @@ public class RegisterArrayTableView extends TableView implements Initializable {
         }
         
         return clones;
+    }
+    
+    /**
+     * Creates a clone of the current list of modules.
+     * @return
+     */
+    public List<Register> createNewModulesList() {
+       return Modules.createNewModulesListWithAssociation(getClones(), assocList);
     }
     
     /**

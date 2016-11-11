@@ -27,6 +27,10 @@ import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.util.Comparator;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Module class
@@ -96,6 +100,14 @@ public abstract class Module<T extends Module<T>>
         return ID;
     }
 
-    public abstract Object clone();
+    /**
+     * Simple {@link Comparator} that just checks the {@link #getName()} of {@link Module}.
+     */
+    public static class NameComparator implements Comparator<Module<?>> {
+        @Override
+        public int compare(Module<?> o1, Module<?> o2) {
+            return checkNotNull(o1).getName().compareTo(checkNotNull(o2).getName());
+        }
+    }
 
 } //end of class Module

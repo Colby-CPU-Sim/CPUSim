@@ -13,6 +13,7 @@
 package cpusim.model.microinstruction;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
@@ -22,18 +23,18 @@ import cpusim.model.module.Register;
 import cpusim.model.module.Register.Access;
 import cpusim.model.module.RegisterArray;
 
+import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.List;
 
 /**
  * The TransferRtoA microinstruction transfers data from a register to a register array.
  */
-public class TransferRtoA extends Microinstruction {
-    private SimpleObjectProperty<Register> source;
-    private SimpleIntegerProperty srcStartBit;
-    private SimpleObjectProperty<RegisterArray> dest;
-    private SimpleIntegerProperty destStartBit;
-    private SimpleIntegerProperty numBits;
+public class TransferRtoA extends Transfer<Register, RegisterArray> implements Copyable<TransferRtoA> {
+    
     private SimpleObjectProperty<Register> index;
     private SimpleIntegerProperty indexStart;
     private SimpleIntegerProperty indexNumBits;
@@ -58,12 +59,7 @@ public class TransferRtoA extends Microinstruction {
                         Register index,
                         int indexStart,
                         int indexNumBits){
-        super(name, machine);
-        this.source = new SimpleObjectProperty<>(source);
-        this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
-        this.dest = new SimpleObjectProperty<>(dest);
-        this.destStartBit = new SimpleIntegerProperty(destStartBit);
-        this.numBits = new SimpleIntegerProperty(numBits);
+        super(name, machine, source, srcStartBit, dest, destStartBit, numBits);
         this.index = new SimpleObjectProperty<>(index);
         this.indexStart = new SimpleIntegerProperty(indexStart);
         this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
@@ -75,104 +71,10 @@ public class TransferRtoA extends Microinstruction {
      */
     public TransferRtoA(final TransferRtoA other){
 		super(other);
-		this.source = new SimpleObjectProperty<>(other.source.get());
-		this.srcStartBit = new SimpleIntegerProperty(other.srcStartBit.get());
-		this.dest = new SimpleObjectProperty<>(other.dest.get());
-		this.destStartBit = new SimpleIntegerProperty(other.destStartBit.get());
-		this.numBits = new SimpleIntegerProperty(other.numBits.get());
+		
 		this.index = new SimpleObjectProperty<>(other.index.get());
 		this.indexStart = new SimpleIntegerProperty(other.indexStart.get());
 		this.indexNumBits = new SimpleIntegerProperty(other.indexNumBits.get());
-    }
-
-    /**
-     * returns the name of the set microinstruction as a string.
-     *
-     * @return the name of the set microinstruction.
-     */
-    public Register getSource(){
-        return source.get();
-    }
-
-    /**
-     * updates the register used by the microinstruction.
-     *
-     * @param newSource the new selected register for the set microinstruction.
-     */
-    public void setSource(Register newSource){
-        source.set(newSource);
-    }
-
-    /**
-     * returns the index of the start bit of the microinstruction.
-     *
-     * @return the integer value of the index.
-     */
-    public int getSrcStartBit(){
-        return srcStartBit.get();
-    }
-
-    /**
-     * updates the index of the start bit of the microinstruction.
-     *
-     * @param newSrcStartBit the new index of the start bit for the set microinstruction.
-     */
-    public void setSrcStartBit(int newSrcStartBit){
-        srcStartBit.set(newSrcStartBit);
-    }
-
-    /**
-     * returns the name of the set microinstruction as a string.
-     *
-     * @return the name of the set microinstruction.
-     */
-    public RegisterArray getDest(){
-        return dest.get();
-    }
-
-    /**
-     * updates the register used by the microinstruction.
-     *
-     * @param newDest the new selected register for the set microinstruction.
-     */
-    public void setDest(RegisterArray newDest){
-        dest.set(newDest);
-    }
-
-    /**
-     * returns the index of the start bit of the microinstruction.
-     *
-     * @return the integer value of the index.
-     */
-    public int getDestStartBit(){
-        return destStartBit.get();
-    }
-
-    /**
-     * updates the index of the start bit of the microinstruction.
-     *
-     * @param newDestStartBit the new index of the start bit for the set microinstruction.
-     */
-    public void setDestStartBit(int newDestStartBit){
-        destStartBit.set(newDestStartBit);
-    }
-
-    /**
-     * returns the number of bits of the value.
-     *
-     * @return the integer value of the number of bits.
-     */
-    public int getNumBits(){
-        return numBits.get();
-    }
-
-    /**
-     * updates the number of bits of the value.
-     *
-     * @param newNumbits the new value of the number of bits.
-     */
-    public void setNumBits(int newNumbits){
-        numBits.set(newNumbits);
     }
 
     /**
@@ -242,31 +144,19 @@ public class TransferRtoA extends Microinstruction {
      * duplicate the set class and return a copy of the original Set class.
      *
      * @return a copy of the Set class
-     * 
+     *
      * @deprecated Use {@link #TransferRtoA(TransferRtoA)}
      */
-    public Object clone(){
+    public Object clone() {
         return new TransferRtoA(this);
     }
 
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     * 
-     * @deprecated Use {@link #TransferRtoA(TransferRtoA)}
-     */
-    public void copyTo(Microinstruction oldMicro)
+    @Override
+    public <U extends TransferRtoA> void copyTo(U newTransferRtoA)
     {
-        checkArgument(oldMicro instanceof TransferRtoA, "Passed non-TransferRtoA to TransferRtoA.copyDataTo()");
-        
-        TransferRtoA newTransferRtoA = (TransferRtoA) oldMicro;
-        newTransferRtoA.setName(getName());
-        newTransferRtoA.setSource(getSource());
-        newTransferRtoA.setSrcStartBit(getSrcStartBit());
-        newTransferRtoA.setDest(getDest());
+        copyToHelper(newTransferRtoA);
+       
         newTransferRtoA.setIndex(getIndex());
-        newTransferRtoA.setDestStartBit(getDestStartBit());
-        newTransferRtoA.setNumBits(getNumBits());
         newTransferRtoA.setIndexStart(getIndexStart());
         newTransferRtoA.setIndexNumBits(getIndexNumBits());
     }
@@ -402,7 +292,47 @@ public class TransferRtoA extends Microinstruction {
      */
     @Override
     public boolean uses(Module<?> m){
-        return (m == source.get() || m == dest.get() || m == index.get());
+        return super.uses(m) || m == index.get();
+    }
+    
+    /**
+     * check if the ranges are in bound.
+     * @param transferRtoAs an array of TransferRtoRs to check.
+     * TransferRtoR objects with all ranges all in Bounds properly.
+     */
+    public static void validateRangesInBounds(List<TransferRtoA> transferRtoAs)
+    {
+        for (TransferRtoA transferRtoA : transferRtoAs) {
+            validateBaseInBounds(transferRtoA);
+            
+            int indexNumBits = transferRtoA.getIndexNumBits();
+            int indexStart = transferRtoA.getIndexStart();
+            if (indexStart < 0) {
+                throw new ValidationException("You have a negative value for the index start bit in " +
+                        "microinstruction \"" + transferRtoA.getName() + "\".");
+            }
+            
+            if (indexStart > transferRtoA.getIndex().getWidth()) {
+                throw new ValidationException("Index start bit has an invalid value for the " +
+                        "specified register in instruction " + transferRtoA.getName() +
+                        ".\nIt must be non-negative, and less than the " +
+                        "register's length.");
+            }
+            
+            if (indexNumBits <= 0) {
+                throw new ValidationException("A positive number of bits must be specified " +
+                        "for the index register.");
+            }
+            else if (indexStart + indexNumBits > transferRtoA.getIndex().getWidth()) {
+                throw new ValidationException("The number of bits specified in the index " +
+                        "register is " +
+                        "too large to fit in the index register.\n" +
+                        "Please specify a new start bit or a smaller number " +
+                        "of bits in the microinstruction \"" +
+                        transferRtoA.getName() + ".\"");
+            }
+        }
+        
     }
 
 }

@@ -13,6 +13,19 @@
 
 package cpusim.model.assembler;
 
+import cpusim.model.Field;
+import cpusim.model.Field.Type;
+import cpusim.model.FieldValue;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.assembler.AssemblyException.ImportError;
+import cpusim.model.assembler.AssemblyException.InvalidTokenException;
+import cpusim.model.assembler.AssemblyException.NameSpaceError;
+import cpusim.model.assembler.AssemblyException.SyntaxError;
+import cpusim.model.assembler.AssemblyException.TypeError;
+import cpusim.model.assembler.AssemblyException.UndefinedOperandError;
+import cpusim.util.SourceLine;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +34,9 @@ import java.util.Stack;
 
 /*
  * Michael Goldenberg, Ben Borchard, and Jinghui Yu made the following changes in 12/4/13
- * 
+ *
  * 1.) Added two stacks, includeFileNames and includeLabelHashStack.  The former has the
- * current file being parsed on top, the latter has the hash of original label tokens and 
+ * current file being parsed on top, the latter has the hash of original label tokens and
  * new label tokens with a unique name
  * 2.) Made the Include() method have a first pass to find label tokens and fromRootController new
  * label tokens with unique names
@@ -38,24 +51,10 @@ import java.util.Stack;
  * been declared
  * 6.) Chaged the includeFistPass() method and Instr() method to allow funtionality for
  * global labels
- * 
+ *
  */
-
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
-
-import cpusim.model.Field;
-import cpusim.model.Field.Type;
-import cpusim.model.FieldValue;
-import cpusim.model.Machine;
-import cpusim.model.MachineInstruction;
-import cpusim.model.assembler.AssemblyException.ImportError;
-import cpusim.model.assembler.AssemblyException.InvalidTokenException;
-import cpusim.model.assembler.AssemblyException.NameSpaceError;
-import cpusim.model.assembler.AssemblyException.SyntaxError;
-import cpusim.model.assembler.AssemblyException.TypeError;
-import cpusim.model.assembler.AssemblyException.UndefinedOperandError;
-import cpusim.util.SourceLine;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Parser class
@@ -754,7 +753,7 @@ public class Parser {
                                 + "\" is not a legal operand here");
                 //check that the token is one of the legal values for this field
                 boolean found = false;
-                for (FieldValue value : field.getValues().values()) {
+                for (FieldValue value : field.getValues()) {
                     if (value.getName().equals(token.contents)) {
                         found = true;
                     }

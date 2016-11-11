@@ -30,10 +30,15 @@ import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.model.microinstruction.SetCondBit;
+import cpusim.model.microinstruction.TransferAtoR;
+import cpusim.model.microinstruction.TransferRtoA;
+import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 
+import cpusim.util.ValidateControllers;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -48,16 +53,13 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The controller for editing the Registers in the EditModules dialog.
  */
 public class RegistersTableController
-        extends ModuleController implements Initializable {
+        extends ModuleController<Register> implements Initializable {
     @FXML
     TableView<Register> table;
     @FXML
@@ -66,7 +68,7 @@ public class RegistersTableController
     @FXML TableColumn<Register,Long> initialValue;
     @FXML TableColumn<Register,Boolean> readOnly;
 
-    private ObservableList currentModules;
+    private ObservableList<Register> currentModules;
     private Register prototype;
     private ConditionBitTableController bitController;
 
@@ -75,10 +77,9 @@ public class RegistersTableController
      * @param mediator holds the machine and information needed
      */
     public RegistersTableController(Mediator mediator){
-        super(mediator);
-        this.currentModules = machine.getModule("registers");
+        super(mediator, Register.class);
+        this.currentModules = machine.getModule("registers", Register.class);
         this.prototype = new Register("???", 16, 0, false);
-        clones = (Module[]) createClones();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RegistersTable.fxml");
 
@@ -89,9 +90,7 @@ public class RegistersTableController
             assert false : "Unable to load file: RegistersTable.fxml";
         }
 
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((Register)clones[i]);
-        }
+        loadClonesIntoTableView(table);
     }
 
     /**
@@ -161,7 +160,7 @@ public class RegistersTableController
                         String oldName = text.getOldValue();
                         ( text.getRowValue()).setName(newName);
                         try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                         } catch (ValidationException ex){
                             (text.getRowValue()).setName(oldName);
                             updateTable();
@@ -210,7 +209,7 @@ public class RegistersTableController
      * gets the tableview object
      * @return the tableview object
      */
-    public TableView getTable() {
+    public TableView<Register> getTable() {
         return table;
     }
 
@@ -227,7 +226,7 @@ public class RegistersTableController
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Module getPrototype()
+    public Register getPrototype()
     {
         return prototype;
     }
@@ -251,19 +250,10 @@ public class RegistersTableController
     }
 
     /**
-     * getter for the class object for the controller's objects
-     * @return the class object
-     */
-    public Class getModuleClass()
-    {
-        return Register.class;
-    }
-
-    /**
      * getter for the current hardware module
      * @return the current hardware module
      */
-    public ObservableList getCurrentModules()
+    public ObservableList<Register> getCurrentModules()
     {
         return currentModules;
     }
@@ -278,46 +268,17 @@ public class RegistersTableController
     }
 
     /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "amount"};
-//    }
-
-    /**
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
-    {
-        Register[] branches = new Register[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            branches[i] = (Register) newClones.get(i);
-        }
-        clones = branches;
-    }
-
-    /**
      * Check validity of array of Objects' properties.
      */
     public void checkValidity()
     {
         // convert the array to an array of Registers
-        Register[] registers = new Register[table.getItems().size()];
 
-        for (int i = 0; i < table.getItems().size(); i++) {
-            registers[i] = table.getItems().get(i);
-        }
-
+        List<Register> registers = getCurrentModules();
         //build up a HashMap of old registers and new widths
-        HashMap<Register,Integer> table = new HashMap<>();
+        Map<Register, Integer> table = new HashMap<>();
         for (Register register : registers) {
-            Register oldRegister = (Register) getCurrentFromClone(register);
+            Register oldRegister = getCurrentFromClone(register);
             if (oldRegister != null && oldRegister.getWidth() != register.getWidth()) {
                 table.put(oldRegister, register.getWidth());
             }
@@ -329,12 +290,12 @@ public class RegistersTableController
         
         //Validate.registersNotReadOnly();
 
-        Validate.registerWidthsAreOkay(bitController,registers);
+        ValidateControllers.registerWidthsAreOkay(bitController,registers);
         Validate.registerWidthsAreOkayForMicros(machine,table);
         Validate.readOnlyRegistersAreImmutable(registers,
-                machine.getMicros("transferAtoR"),
-                machine.getMicros("transferRtoR"),
-                machine.getMicros("setCondBit"));
+                machine.getMicros(TransferAtoR.class),
+                machine.getMicros(TransferRtoR.class),
+                machine.getMicros(SetCondBit.class));
 
     }
 

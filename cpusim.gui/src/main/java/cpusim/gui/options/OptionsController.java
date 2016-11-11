@@ -35,7 +35,6 @@ import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
-import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
@@ -43,7 +42,9 @@ import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.util.*;
+import cpusim.util.Dialogs;
+import cpusim.util.GUIChannels;
+import cpusim.util.ValidateControllers;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -341,13 +342,13 @@ public class OptionsController implements Initializable {
 
     private boolean saveIOOptionsTab() {
         if (!IOOptionsTab.isDisabled()) {
-            ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
+            ObservableList<IO> ios = mediator.getMachine().getMicros(IO.class);
             ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
             for (IOOptionsData d : data) {
                 IO micro = (IO) ios.get(ios.indexOf(d.getIo()));
                 micro.setConnection(d.getChannel());
             }
-            mediator.getMachine().setMicros("io", ios);
+            mediator.getMachine().setMicros(IO.class, ios);
         }
         return true;
     }

@@ -18,14 +18,12 @@
  */
 package cpusim.gui.editmachineinstruction.editfields;
 
+import cpusim.gui.util.EditingLongCell;
 import cpusim.model.Field;
 import cpusim.model.FieldValue;
-import cpusim.model.util.Validate;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
-import cpusim.gui.util.EditingLongCell;
 import cpusim.util.Dialogs;
-
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -50,18 +48,23 @@ import java.util.ResourceBundle;
  */
 public class EditFieldValuesController implements Initializable {
     
-    ObservableList<FieldValue> allFieldValues;
+    private ObservableList<FieldValue> allFieldValues;
     
-    Stage stage;
+    private Stage stage;
     
     @FXML BorderPane mainPane;
     
-    @FXML TableView<FieldValue> table;
-    @FXML TableColumn<FieldValue,String> name;
-    @FXML TableColumn<FieldValue,Long> value;
+    @FXML
+    private TableView<FieldValue> table;
+    @FXML
+    private TableColumn<FieldValue, String> name;
+    @FXML
+    private TableColumn<FieldValue, Long> value;
     
-    @FXML Button delete;
-    @FXML Button duplicate;
+    @FXML
+    private Button delete;
+    @FXML
+    private Button duplicate;
     
     private FieldValue selectedFieldValueName;
     private Field field;
@@ -70,15 +73,11 @@ public class EditFieldValuesController implements Initializable {
      * constructor
      */
     public EditFieldValuesController(Field f, Stage stage) {
-        allFieldValues = FXCollections.observableArrayList();
-        
         this.field = f;
         
         this.stage = stage;
         
-        for (FieldValue fieldValue : field.getValues()){
-            allFieldValues.add(new FieldValue(fieldValue.getName(), fieldValue.getValue()));
-        }
+        allFieldValues = field.getValues();
     }
 
     /**
@@ -114,7 +113,7 @@ public class EditFieldValuesController implements Initializable {
                     String oldName = text.getOldValue();
                     ( text.getRowValue()).setName(newName);
                     try{
-                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                        NamedObject.validateUniqueAndNonempty(table.getItems());
                     }
                     catch(ValidationException ex) {
                         (text.getRowValue()).setName(oldName);
@@ -135,17 +134,15 @@ public class EditFieldValuesController implements Initializable {
         });
                 
         table.setItems(allFieldValues);
-        
-        
     }
     
     /**
      * creates a new field name with a unique name based on '?'
      * @param ae unused action event
      */
-    @FXML
+    @FXML @SuppressWarnings("unused")
     protected void handleNew(ActionEvent ae){
-        String uniqueName = createUniqueName(table.getItems(), "?");
+        String uniqueName = NamedObject.createUniqueName(table.getItems());
         allFieldValues.add(0, new FieldValue(uniqueName, 0));
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
@@ -199,7 +196,7 @@ public class EditFieldValuesController implements Initializable {
     @FXML
     protected void handleOkay(ActionEvent ae){
         try {
-            Validate.fieldValuesAreValid(field, allFieldValues);
+            Field.validateFieldValues(field, allFieldValues);
         }
         catch (ValidationException ex) {
             Dialogs.createErrorDialog(stage, "Field Value Error",
@@ -245,27 +242,6 @@ public class EditFieldValuesController implements Initializable {
             fieldNames.add(fieldValue.getName());
         }
         return true;
-    }
-    
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "?" and tries again.
-     *
-     * @param list list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    public String createUniqueName(ObservableList list, String proposedName)
-    {
-        String oldName;
-        for (Object obj : list) {
-            oldName = obj.toString();
-            if (oldName != null && oldName.equals(proposedName))
-                return createUniqueName(list, proposedName + "?");
-        }
-        return proposedName;
     }
     
     private boolean fieldValueNameTaken(String newName) {

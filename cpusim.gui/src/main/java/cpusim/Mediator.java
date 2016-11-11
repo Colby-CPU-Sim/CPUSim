@@ -79,10 +79,6 @@
  */
 package cpusim;
 
-import cpusim.assembler.AssembledInstructionCall;
-import cpusim.assembler.Assembler;
-import cpusim.assembler.AssemblyException;
-import cpusim.assembler.SourceLine;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;

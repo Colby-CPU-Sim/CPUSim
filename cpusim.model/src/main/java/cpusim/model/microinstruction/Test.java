@@ -1,30 +1,30 @@
-/**
- * auther: Jinghui Yu
- * last edit date: 6/4/2013
- */
-
 package cpusim.model.microinstruction;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.function.BiPredicate;
 
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.List;
+import java.util.function.BiPredicate;
+
+import static com.google.common.base.Preconditions.*;
+
 /**
  * The Test microinstruction allows the computer to jump to other microinstructions
  * within the current fetch or execute sequence.
+ *
+ * @author Jinghui Yu
+ * @since 2013-06-04
  */
-
-public class Test extends Microinstruction {
+public class Test extends Microinstruction implements Copyable<Test> {
 	
 	public enum Operation {
 		
@@ -204,17 +204,6 @@ public class Test extends Microinstruction {
     public void setOmission(int newOmission){
         omission.set(newOmission);
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     * 
-     * @deprecated Use {@link #copyTo(Microinstruction)}
-     */
-    public Object clone(){
-        return new Test(getName(),machine,getRegister(),getStart(),getNumBits(),
-                getComparison(),getValue(),getOmission());
-    }
     
     /**
      * returns the class of the microinstruction
@@ -287,16 +276,13 @@ public class Test extends Microinstruction {
         	throw new IllegalStateException("Illegal comparison in Test microinstruction " + getName());
         }
     }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
+    
+    
+    @Override
+    public <U extends Test> void copyTo(U newTest)
     {
-        assert oldMicro instanceof Test :
-                "Passed non-Test to Test.copyDataTo()";
-        Test newTest = (Test) oldMicro;
+        checkNotNull(newTest);
+        
         newTest.setName(getName());
         newTest.setRegister(getRegister());
         newTest.setStart(getStart());
@@ -312,6 +298,7 @@ public class Test extends Microinstruction {
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
+    @Override
     public boolean uses(Module<?> m){
         return (m == register.get());
     }
@@ -335,5 +322,34 @@ public class Test extends Microinstruction {
                 "</TD><TD>" + getComparison() + "</TD><TD>" + getValue() +
                 "</TD><TD>" + getOmission() + "</TD></TR>";
 	}
-
+    
+    /**
+     * checks if the objects with all ranges all in Bounds properly
+     * @param tests an array of Sets to check
+     * the objects with all ranges all in Bounds properly
+     */
+    public static void validateRangeInBound(List<Test> tests)
+    {
+        for (Test test : tests) {
+            final int start = test.getStart();
+            final int numBits = test.getNumBits();
+            
+            if (start < 0 || numBits < 0) {
+                throw new ValidationException("You cannot specify a negative value for the " +
+                        "start bits,\nor the bitwise width of the test range\n" +
+                        "in the microinstruction " + test.getName() + ".");
+            }
+            else if (start >= test.getRegister().getWidth()) {
+                throw new ValidationException("The start bit in the microinstruction "
+                        + test.getName() + " is out of range.\n" +
+                        "It must be non-negative, and less than the " +
+                        "register's length.");
+            }
+            else if ((start + numBits) > test.getRegister().getWidth()) {
+                throw new ValidationException("The bits specified in the Test " +
+                        "microinstruction " + test.getName() +
+                        " are too large to fit in the register.");
+            }
+        }
+    }
 }

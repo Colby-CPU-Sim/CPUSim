@@ -9,14 +9,17 @@ import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
+import cpusim.model.util.Copyable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The branch microinstruction is identical to the Test microinstruction except
  * that it is an unconditional jump.
  */
-public class SetCondBit extends Microinstruction {
+public class SetCondBit extends Microinstruction implements Copyable<SetCondBit> {
     private SimpleStringProperty value;
     private SimpleObjectProperty<ConditionBit> bit;
 
@@ -81,30 +84,9 @@ public class SetCondBit extends Microinstruction {
     }
 
     /**
-     * duplicate the set class and return a copy of the original Set class.       *
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new SetCondBit(getName(),machine,getBit(),getValue());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
-    {
-        assert oldMicro instanceof SetCondBit :
-                "Passed non-SetCondBit to SetCondBit.copyDataTo()";
-        SetCondBit newSetCondBit = (SetCondBit) oldMicro;
-        newSetCondBit.setName(getName());
-        newSetCondBit.setBit(getBit());
-        newSetCondBit.setValue(getValue());
-    }
-
-    /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         bit.get().set((value.get().equals("0") ? 0 : 1));
@@ -133,7 +115,17 @@ public class SetCondBit extends Microinstruction {
                 "</TD><TD>" + getValue() +
                 "</TD></TR>";
     }
-
+    
+    @Override
+    public <U extends SetCondBit> void copyTo(final U other) {
+        checkNotNull(other);
+        
+        other.setName(getName());
+        
+        other.setValue(getValue());
+        other.setBit(getBit());
+    }
+    
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.

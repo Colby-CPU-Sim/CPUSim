@@ -31,21 +31,21 @@
 */  
 package cpusim.model.module;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.EnumSet;
-
 import cpusim.model.Module;
+import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.EnumSet;
+
+import static com.google.common.base.Preconditions.*;
+
 /**
  * Edit the parameters associated with any register or fromRootController new or delete old registers.
  */
-public class Register extends Module<Register>
+public class Register extends Module<Register> implements Sized<Register>
 {
 	/**
 	 * Memory Access specifier, usually used with an {@link EnumSet}.
@@ -184,6 +184,7 @@ public class Register extends Module<Register>
      * getter of the width
      * @return the width as integer
      */
+    @Override
     public int getWidth()
     {
         return width.get();
@@ -375,6 +376,18 @@ public class Register extends Module<Register>
         newRegister.setAccess(access.get());
         newRegister.setNameDirty(nameDirty);
 	}
-
+    
+    /**
+     * checks if the dest register of the given {@link cpusim.model.Microinstruction} is read-only
+     * @param r destination register to check
+     * @param microName name of the given {@link cpusim.model.Microinstruction}
+     */
+	public static void validateIsNotReadOnly(final Register r, final String microName) {
+        if (r.getAccess().equals(Access.readOnly())) {
+            throw new ValidationException("The destination register " +
+                    r.getName() + " of the microinstruction " +
+                    microName + " is read-only.");
+        }
+    }
 
 } //end class Register

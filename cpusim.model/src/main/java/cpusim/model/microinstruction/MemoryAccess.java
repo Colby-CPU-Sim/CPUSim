@@ -5,14 +5,17 @@ import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
  * NOR, or XOR on the specified registers.
  */
-public class MemoryAccess extends Microinstruction {
+public class MemoryAccess extends Microinstruction implements Copyable<MemoryAccess> {
 	
     private SimpleStringProperty direction;
     private SimpleObjectProperty<RAM> memory;
@@ -117,32 +120,9 @@ public class MemoryAccess extends Microinstruction {
     }
 
     /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new MemoryAccess(getName(),machine,getDirection(),getMemory(),getData(),getAddress());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
-    {
-        assert oldMicro instanceof MemoryAccess :
-                "Passed non-MemoryAccess to MemoryAccess.copyDataTo()";
-        MemoryAccess newMemoryAccess = (MemoryAccess) oldMicro;
-        newMemoryAccess.setName(getName());
-        newMemoryAccess.setDirection(getDirection());
-        newMemoryAccess.setMemory(getMemory());
-        newMemoryAccess.setData(getData());
-        newMemoryAccess.setAddress(getAddress());
-    }
-
-    /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         int addressValue = (int) address.get().getValue();
@@ -210,7 +190,18 @@ public class MemoryAccess extends Microinstruction {
                 "</TD><TD>" + getAddress().getHTMLName() +
                 "</TD></TR>";
     }
-
+    
+    @Override
+    public <U extends MemoryAccess> void copyTo(final U newMemoryAccess) {
+        checkNotNull(newMemoryAccess);
+        
+        newMemoryAccess.setName(getName());
+        newMemoryAccess.setDirection(getDirection());
+        newMemoryAccess.setMemory(getMemory());
+        newMemoryAccess.setData(getData());
+        newMemoryAccess.setAddress(getAddress());
+    }
+    
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.

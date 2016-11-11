@@ -47,6 +47,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.controlsfx.control.CheckComboBox;
 
 import java.io.IOException;
 import java.net.URL;
@@ -74,7 +75,7 @@ public class EditFieldsController implements Initializable {
     @FXML TableColumn<Field,Integer> numBits;
     @FXML TableColumn<Field,Long> defaultValue;
     @FXML TableColumn<Field,Field.Relativity> relativity;
-    @FXML TableColumn<Field,Boolean> signed;
+    @FXML TableColumn<Field,Field.SignedType> signed;
     
     @FXML Button deleteButton;
     @FXML Button duplicateButton;
@@ -108,14 +109,14 @@ public class EditFieldsController implements Initializable {
             }
             allFields.add(new Field(field.getName(), field.getType(), field.getNumBits(),
                     field.getRelativity(), fieldValues, field.getDefaultValue(), 
-                    field.isSigned()));
+                    field.getSigned()));
         }
 
         // clone the machine instructions using the cloned fields
         for (MachineInstruction instr : editMachineInstructionController.getInstructions()){
             
-            ArrayList<Field> oldInstrFields = instr.getInstructionFields();
-            ArrayList<Field> newInstrFields = new ArrayList<>();
+            final List<Field> oldInstrFields = instr.getInstructionFields();
+            final List<Field> newInstrFields = new ArrayList<>();
             for (Field field : oldInstrFields){
                 for (Field aField : allFields) {
                     if (field.getName().equals(aField.getName())) {
@@ -124,8 +125,8 @@ public class EditFieldsController implements Initializable {
                 }
             }
             
-            ArrayList<Field> oldAssemblyFields = instr.getAssemblyFields();
-            ArrayList<Field> newAssemblyFields = new ArrayList<>();
+            List<Field> oldAssemblyFields = instr.getAssemblyFields();
+            List<Field> newAssemblyFields = new ArrayList<>();
             for (Field field : oldAssemblyFields){
                 for (Field aField : allFields) {
                     if (field.getName().equals(aField.getName())) {
@@ -229,12 +230,12 @@ public class EditFieldsController implements Initializable {
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(
-                text -> {
+                text -> { // FIXME repeated
                     String newName = text.getNewValue();
                     String oldName = text.getOldValue();
                     ( text.getRowValue()).setName(newName);
                     try{
-                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems().toArray());
+                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
                     } catch (ValidationException ex) {
                         (text.getRowValue()).setName(oldName);
                     }
@@ -256,7 +257,10 @@ public class EditFieldsController implements Initializable {
         relativity.setCellFactory(cellRelFactory);
         relativity.setOnEditCommit(text -> text.getRowValue().setRelativity(text.getNewValue()));
 
-        signed.setCellFactory(cellBoolFactory);
+        signed.setCellFactory(v -> {
+            new TableCell<>()
+            new CheckComboBox<Field.SignedType>(FXCollections.observableArrayList(Field.SignedType.values()))
+        });
         signed.setOnEditCommit(text -> text.getRowValue().setSigned(text.getNewValue()));
 
         table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {

@@ -1,24 +1,26 @@
-/**
- * Author: Jinghui Yu
- * Last editing date: 6/6/2013
- */
-
 package cpusim.model.microinstruction;
-
-import java.math.BigInteger;
 
 import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.math.BigInteger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The increment microinstrucion adds an integer constant to the contents of a register.
+ *
+ * @author Jinghui Yu
+ * @since 2013-06-06
  */
-public class Increment extends Microinstruction{
+public class Increment extends Microinstruction implements Copyable<Increment> {
+    
     private SimpleObjectProperty<Register> register;
     private SimpleObjectProperty<ConditionBit> overflowBit;
     private SimpleObjectProperty<ConditionBit> carryBit;
@@ -38,7 +40,7 @@ public class Increment extends Microinstruction{
                      Register register,
                      ConditionBit overflowBit,
                      ConditionBit carryBit,
-                     Long delta){
+                     long delta){
         super(name, machine);
         this.register = new SimpleObjectProperty<>(register);
         this.overflowBit = new SimpleObjectProperty<>(overflowBit);
@@ -118,24 +120,10 @@ public class Increment extends Microinstruction{
     public String getMicroClass(){
         return "increment";
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new Increment(getName(),machine,getRegister(),getOverflowBit(),getCarryBit(),getDelta());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
-    {
-        assert oldMicro instanceof Increment :
-                "Passed non-Increment to Increment.copyDataTo()";
-        Increment newIncr = (Increment) oldMicro;
+    
+    @Override
+    public <U extends Increment> void copyTo(final U newIncr) {
+        checkNotNull(newIncr);
         newIncr.setName(getName());
         newIncr.setRegister(getRegister());
         newIncr.setOverflowBit(getOverflowBit());
@@ -146,6 +134,7 @@ public class Increment extends Microinstruction{
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         BigInteger bigValue = BigInteger.valueOf(register.get().getValue());
@@ -179,6 +168,7 @@ public class Increment extends Microinstruction{
      * returns the XML description
      * @return the XML description
      */
+    @Override
     public String getXMLDescription(String indent){
         return indent + "<Increment name=\"" + getHTMLName() +
                 "\" register=\"" + getRegister().getID() +
@@ -194,6 +184,7 @@ public class Increment extends Microinstruction{
      * returns the HTML description
      * @return the HTML description
      */
+    @Override
     public String getHTMLDescription(String indent) {
         return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getOverflowBit().getHTMLName() +
@@ -207,6 +198,7 @@ public class Increment extends Microinstruction{
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
+    @Override
     public boolean uses(Module<?> m){
         return (m == register.get() ||
                 m == overflowBit.get() ||

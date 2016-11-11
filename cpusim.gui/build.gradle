@@ -10,6 +10,9 @@ dependencies {
     compile 'org.reactfx:reactfx:2.0-M4'
     compile 'org.fxmisc.undo:undofx:1.1.1'
     compile 'org.fxmisc.richtext:richtextfx:0.6.9'
+
+    // http://search.maven.org/#artifactdetails%7Corg.controlsfx%7Ccontrolsfx%7C8.40.12%7C
+    compile 'org.controlsfx:controlsfx:8.40.12'
     
     compile project(':cpusim.model')
     

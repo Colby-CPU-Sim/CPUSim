@@ -12,10 +12,9 @@ import cpusim.gui.editmodules.RegistersTableController;
 import cpusim.gui.help.HelpController;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Validate;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -25,24 +24,32 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableView;
 import javafx.scene.input.InputEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class EditArrayRegistersController implements Initializable {
     @FXML
+    private
     ComboBox<String> arrayCombo;
     @FXML
+    private
     Pane tablePane;
     @FXML
+    private
     Button okButton;
     @FXML
+    private
     Button cancelButton;
     @FXML
     Button helpButton;
@@ -50,7 +57,7 @@ public class EditArrayRegistersController implements Initializable {
     private Mediator mediator;
     private RegistersTableController registerController;
     private ObservableList<RegisterArray> registerArrays;
-    private TableView activeTable;
+    private TableView<Register> activeTable;
     private ChangeTable tableMap;
     private String selection;
 
@@ -142,8 +149,8 @@ public class EditArrayRegistersController implements Initializable {
                     for (RegisterArrayTableView r : tableMap.getMap().values()) {
                         list.addAll(r.getItems());
                     }
-
-                    Validate.allNamesAreUnique(list.toArray());
+    
+                    NamedObject.validateUniqueAndNonempty(list);
                     ((RegisterArrayTableView) activeTable).checkValidity(list);
                 } catch (ValidationException ex) {
                     Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
@@ -170,7 +177,7 @@ public class EditArrayRegistersController implements Initializable {
             for (RegisterArrayTableView r : tableMap.getMap().values()) {
                 list.addAll(r.getItems());
             }
-            Validate.allNamesAreUnique(list.toArray());
+            NamedObject.validateUniqueAndNonempty(list);
             getCurrentController().checkValidity(objList);
             //update the machine with the new values
             updateRegisters();
@@ -221,7 +228,7 @@ public class EditArrayRegistersController implements Initializable {
      *
      * @return the table view object that is current being edited in the window.
      */
-    public RegisterArrayTableView getCurrentController() {
+    private RegisterArrayTableView getCurrentController() {
         return tableMap.getMap().get(arrayCombo.getValue());
     }
 
@@ -230,13 +237,13 @@ public class EditArrayRegistersController implements Initializable {
      * and the machine needs to be updated based on the changes
      * made while the dialog was open (JRL)
      */
-    protected void updateRegisters() { // and the machine needs to be updated based on the changes
-        // made.
+    private void updateRegisters() {
+        // and the machine needs to be updated based on the changes made.
         getCurrentController().setClones(activeTable.getItems());
         for (RegisterArrayTableView t : tableMap.getMap().values()) {
             for (RegisterArray ra : registerArrays) {
                 if (ra.getName().equals(t.getArrayName())) {
-                    ra.registers().setAll(t.createNewModulesList(t.getClones()));
+                    ra.registers().setAll(t.createNewModulesList());
                 }
             }
         }

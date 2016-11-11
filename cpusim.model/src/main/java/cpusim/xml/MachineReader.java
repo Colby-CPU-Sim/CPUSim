@@ -38,56 +38,20 @@
 
 package cpusim.xml;
 
-import java.io.File;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-
-///////////////////////////////////////////////////////////////////////////////
-// the libraries we need to import
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
-import cpusim.model.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
-import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
-import cpusim.model.microinstruction.Arithmetic;
-import cpusim.model.microinstruction.Branch;
-import cpusim.model.microinstruction.Comment;
-import cpusim.model.microinstruction.CpusimSet;
-import cpusim.model.microinstruction.Decode;
-import cpusim.model.microinstruction.End;
-import cpusim.model.microinstruction.IO;
-import cpusim.model.microinstruction.Increment;
-import cpusim.model.microinstruction.Logical;
-import cpusim.model.microinstruction.MemoryAccess;
-import cpusim.model.microinstruction.SetCondBit;
-import cpusim.model.microinstruction.Shift;
-import cpusim.model.microinstruction.Test;
-import cpusim.model.microinstruction.TransferAtoR;
-import cpusim.model.microinstruction.TransferRtoA;
-import cpusim.model.microinstruction.TransferRtoR;
+import cpusim.model.microinstruction.*;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
@@ -96,11 +60,25 @@ import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;
 import cpusim.model.util.MachineReaderException;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.model.util.units.ArchType;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import org.xml.sax.Attributes;
+import org.xml.sax.Locator;
+
+import java.io.File;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+///////////////////////////////////////////////////////////////////////////////
+// the libraries we need to import
 
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineReader class
@@ -243,7 +221,7 @@ public class MachineReader {
 	public void endMachine() {
 		try {
 			List<MachineInstruction> instrs = machine.getInstructions();
-			Validate.allNamesAreUnique(instrs);
+			NamedObject.validateUniqueAndNonempty(instrs);
 			Validate.allOpcodesAreUnique(instrs);
 		} catch (ValidationException e) {
 			throw new MachineReaderException(getCurrentLine() + e.getMessage());
@@ -260,7 +238,7 @@ public class MachineReader {
 
 		// set the code store if not already set
 		if (machine.getModule("rams").size() > 0 && machine.getCodeStore() == null) {
-			machine.setCodeStore((RAM) machine.getModule("rams").get(0));
+			machine.setCodeStore(machine.getModule("rams", RAM.class).get(0));
 		}
 	}
 
@@ -337,7 +315,7 @@ public class MachineReader {
 					+ "\" must be in the range -(2^" + (numBits - 1) + ") and" + "(2^" + (numBits - 1) + "-1).");
 		}
 
-		final Field f = new Field(name, type, numBits, rel, FXCollections.observableHashMap(),
+		final Field f = new Field(name, type, numBits, rel, FXCollections.observableArrayList(),
 				defaultValue, Field.SignedType.fromBool(signed));
 		machine.getFields().add(f);
 		fields.put(name, f);
@@ -355,7 +333,7 @@ public class MachineReader {
 					+ "\" must be an integer, not \"" + valueString + "\".");
 		}
 		Field lastField = machine.getFields().get(machine.getFields().size() - 1);
-		lastField.getValues().put(name, new FieldValue(name, value));
+		lastField.getValues().add(new FieldValue(name, value));
 	}
 
 	// --------------------------
@@ -403,7 +381,7 @@ public class MachineReader {
 			currentRegisterArrayIndex++;
 		} else {
 			r = new Register(name, width, initialValue, readOnly);
-			((ObservableList<Register>) machine.getModule("registers")).add(r);
+			machine.getModule("registers", Register.class).add(r);
 		}
 		components.put(id, r);
 	}
@@ -439,7 +417,7 @@ public class MachineReader {
 		RegisterArray r = new RegisterArray(name, length, width);
 		String id = attrs.getValue("id");
 		components.put(id, r);
-		((ObservableList<RegisterArray>) machine.getModule("registerArrays")).add(r);
+		machine.getModule("registerArrays", RegisterArray.class).add(r);
 
 		// now prepare for reading in the registers
 		currentRegisterArray = r;
@@ -481,7 +459,7 @@ public class MachineReader {
 		ConditionBit c = new ConditionBit(name, machine, register, bit, halt);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		((ObservableList<ConditionBit>) machine.getModule("conditionBits")).add(c);
+		machine.getModule("conditionBits", ConditionBit.class).add(c);
 	}
 
 	// --------------------------
@@ -519,7 +497,7 @@ public class MachineReader {
 		RAM ram = new RAM(name, length, cellSize);
 		String id = attrs.getValue("id");
 		components.put(id, ram);
-		((ObservableList<RAM>) machine.getModule("rams")).add(ram);
+		machine.getModule("rams", RAM.class).add(ram);
 	}
 
 	// --------------------------
@@ -577,11 +555,10 @@ public class MachineReader {
             carryBit = (ConditionBit) mod;
         }
 
-        Increment c = new Increment(name, machine, register, overflowBit, carryBit,
-                Long.valueOf(delta));
+        Increment c = new Increment(name, machine, register, overflowBit, carryBit, delta);
         String id = attrs.getValue("id");
         components.put(id, c);
-        machine.getMicros("increment").add(c);
+        machine.getMicros(Increment.class).add(c);
     }
 
 	// --------------------------
@@ -642,7 +619,7 @@ public class MachineReader {
 		Arithmetic c = new Arithmetic(name, machine, type, source1, source2, destination, overflowBit, carryBit);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("arithmetic").add(c);
+		machine.getMicros(Arithmetic.class).add(c);
 	}
 
 	// --------------------------
@@ -718,7 +695,7 @@ public class MachineReader {
 		TransferRtoR c = new TransferRtoR(name, machine, source, srcStartBit, dest, destStartBit, numBits);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("transferRtoR").add(c);
+		machine.getMicros(TransferRtoR.class).add(c);
 	}
 
 	// --------------------------
@@ -840,7 +817,7 @@ public class MachineReader {
 				indexStart, indexNumBits);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("transferRtoA").add(c);
+		machine.getMicros(TransferRtoA.class).add(c);
 	}
 
 	// --------------------------
@@ -962,7 +939,7 @@ public class MachineReader {
 				indexStart, indexNumBits);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("transferAtoR").add(c);
+		machine.getMicros(TransferAtoR.class).add(c);
 	}
 
 	// --------------------------
@@ -1008,7 +985,7 @@ public class MachineReader {
 		Shift c = new Shift(name, machine, source, dest, type, direction, distance);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("shift").add(c);
+		machine.getMicros(Shift.class).add(c);
 	}
 
 	// --------------------------
@@ -1027,7 +1004,7 @@ public class MachineReader {
 		Branch c = new Branch(name, machine, amount, machine.getControlUnit());
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("branch").add(c);
+		machine.getMicros(Branch.class).add(c);
 	}
 
 	// --------------------------
@@ -1067,7 +1044,7 @@ public class MachineReader {
 		Logical c = new Logical(name, machine, type, source1, source2, destination);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("logical").add(c);
+		machine.getMicros(Logical.class).add(c);
 	}
 
 	// --------------------------
@@ -1133,7 +1110,7 @@ public class MachineReader {
 		CpusimSet c = new CpusimSet(name, machine, register, start, numBits, Long.valueOf(value));
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("set").add(c);
+		machine.getMicros(CpusimSet.class).add(c);
 	}
 
 	// --------------------------
@@ -1200,7 +1177,7 @@ public class MachineReader {
 		Test c = new Test(name, machine, register, start, numBits, comparison, Long.valueOf(value), omission);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("test").add(c);
+		machine.getMicros(Test.class).add(c);
 	}
 
 	// --------------------------
@@ -1218,7 +1195,7 @@ public class MachineReader {
 		Decode c = new Decode(name, machine, ir);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("decode").add(c);
+		machine.getMicros(Decode.class).add(c);
 	}
 
 	// --------------------------
@@ -1275,7 +1252,7 @@ public class MachineReader {
 		IO c = new IO(name, machine, type, buffer, direction, connection);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("io").add(c);
+		machine.getMicros(IO.class).add(c);
 	}
 
 	// --------------------------
@@ -1319,7 +1296,7 @@ public class MachineReader {
 		MemoryAccess c = new MemoryAccess(name, machine, direction, memory, data, address);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("memoryAccess").add(c);
+		machine.getMicros(MemoryAccess.class).add(c);
 	}
 
 	// --------------------------
@@ -1338,7 +1315,7 @@ public class MachineReader {
 		SetCondBit c = new SetCondBit(name, machine, bit, value);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getMicros("setCondBit").add(c);
+		machine.getMicros(SetCondBit.class).add(c);
 	}
 
 	// --------------------------
@@ -1439,7 +1416,7 @@ public class MachineReader {
 					if (!fields.containsKey(fieldName)) {
 						int fieldLength = Math.abs(Integer.parseInt(fieldName));
 						Field field = new Field(fieldName, Field.Type.required, fieldLength, Field.Relativity.absolute,
-								FXCollections.observableHashMap(), 0, Field.SignedType.Signed);
+								FXCollections.observableArrayList(), 0, Field.SignedType.Signed);
 
 						machine.getFields().add(field);
 						fields.put(fieldName, field);

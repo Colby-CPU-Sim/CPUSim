@@ -14,11 +14,16 @@ import cpusim.model.module.Register;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.xml.HTMLEncodable;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.List;
+
 /**
  * The Set microinstruction allows the computer to set the contents
  * of any contiguous set of bits in any register to any fixed value.
@@ -245,5 +250,69 @@ public class CpusimSet extends Microinstruction implements LegacyXMLSupported, N
 	public boolean uses(Module<?> m) {
 		return (m == register.get());
 	}
+    
+    /**
+     * checks if Set objects with all ranges all in Bounds properly
+     * @param sets an array of Sets to check
+     * Set objects with all ranges all in Bounds properly
+     */
+    public static void validateRangeInBound(List<CpusimSet> sets)
+    {
+        
+        for (CpusimSet set : sets) {
+            final int start = set.getStart();
+            final int numBits = set.getNumBits();
+//            final long value = set.getValue();
+            
+            Register register = set.getRegister();
+            
+            if (start < 0) {
+                throw new ValidationException("You cannot specify a negative value for the " +
+                        "start bit\n" +
+                        "in the instruction " + set.getName() + ".");
+            }
+            
+            if (numBits <= 0) {
+                throw new ValidationException("You must specify a positive value for the " +
+                        "bitwise width\nof the set range " +
+                        "in the instruction " + set.getName() + ".");
+            }
+            
+            final int regWidth = register.getWidth();
+            
+            if (start >= regWidth) {
+                throw new ValidationException("Invalid start index for the specified register " +
+                        "in the Set microinstruction " + set.getName() +
+                        ".\nIt must be non-negative, and less than the " +
+                        "register's length.");
+            }
+            
+            if ((start + numBits) > regWidth) {
+                throw new ValidationException("The bitwise width of the set area in the Set " +
+                        "microinstruction " +
+                        set.getName() + "\n is too large to fit in the register.");
+            }
+        }
+    }
+    
+    /**
+     * checks if the value of each Set microinstruction fits
+     * in the given number of bits in the microinstruction.
+     * The value is treated as either a 2's complement value or
+     * and unsigned integer value and so the range of legal values
+     * for n bits is -(2^(n-1)) to 2^n - 1.
+     * @param sets an array of Objects to check.
+     */
+    public static void validateValueFitsInNumBitsForSetMicros(List<CpusimSet> sets)
+    {
+        for (CpusimSet set : sets) {
+            try {
+                Validate.fitsInBits(set.getValue(), set.getNumBits());
+            } catch (ValidationException e) {
+                throw new ValidationException(e.getMessage() +
+                        " in the microinstruction \"" + set.getName() + "\".");
+            }
+        }
+    }
 
 }

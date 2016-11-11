@@ -12,13 +12,14 @@
 
 package cpusim.gui.util;
 
-import cpusim.assembler.EQU;
 import cpusim.gui.desktop.FontData;
+import cpusim.model.assembler.EQU;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.util.Convert;
 import cpusim.model.util.MoreStrings;
 
+import cpusim.model.util.conversion.ConvertLongs;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -254,15 +255,15 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
     private String convertLong(Long l) {
         switch (base.getBase()) {
             case "Bin":
-                return Convert.fromLongToTwosComplementString(l, cellSize);
+                return ConvertLongs.fromLongToTwosComplementString(l, cellSize);
             case "Hex":
-                return Convert.fromLongToHexadecimalString(l, cellSize);
+                return ConvertLongs.fromLongToHexadecimalString(l, cellSize);
             case "Dec":
                 return String.valueOf(l);
             case "Unsigned Dec":
-                return Convert.fromLongToUnsignedDecString(l, cellSize);
+                return ConvertLongs.fromLongToUnsignedDecString(l, cellSize);
             default:
-                return Convert.fromLongToAsciiString(l, cellSize);
+                return ConvertLongs.fromLongToAsciiString(l, cellSize);
         }
     }
 

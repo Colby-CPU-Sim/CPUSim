@@ -21,11 +21,13 @@ package cpusim.model.assembler;
 // the libraries we need to import
 
 import cpusim.model.Field;
+import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Normalizer class
@@ -291,12 +293,16 @@ public class Normalizer
                     } else if (op.type == Token.Type.VAR &&
                             field.getValue(op.contents) != null) {
                         //the var is one of the acceptable values for the field.
-                        String newContents = "" +
-                                field.getValue(op.contents).getValue();
+                        
+                        Optional<FieldValue> value = field.getValue(op.contents);
+                        if (!value.isPresent()) {
+                           throw new IllegalStateException(op.contents + " does not exist in Field");
+                        }
+                        
+                        String newContents = Long.toString(value.get().getValue());
                         //make newContents at least as long as op's contents
                         //for positioning of highlighting if an error occurs
-                        for (int j = newContents.length(); j < op.contents.length();
-                                j++)
+                        for (int j = newContents.length(); j < op.contents.length(); j++)
                             newContents = '0' + newContents;
                         Token newOpToken = new Token(
                                 op.filename, op.type,

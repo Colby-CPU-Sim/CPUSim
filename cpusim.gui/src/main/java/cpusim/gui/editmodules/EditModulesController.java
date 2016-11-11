@@ -7,12 +7,15 @@
  */
 package cpusim.gui.editmodules;
 
+import com.google.common.collect.ImmutableList;
 import cpusim.model.Machine;
 import cpusim.Mediator;
+import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.help.HelpController;
+import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -51,34 +54,42 @@ import java.util.*;
  */
 public class EditModulesController implements Initializable {
     @FXML
-    ComboBox<String> moduleCombo;
-    @FXML
-    Pane tablePane;
-    @FXML
-    Button newButton;
-    @FXML
-    Button deleteButton;
-    @FXML
-    Button duplicateButton;
-    @FXML
-    Button okButton;
-    @FXML
-    Button cancelButton;
-    @FXML
-    Button helpButton;
-    @FXML
-    Button propertiesButton;
+    private ComboBox<String> moduleCombo;
 
-    Mediator mediator;
-    Machine machine;
-    DesktopController desktop;
+    @FXML
+    private Pane tablePane;
 
-    private Module selectedSet = null;
-    private TableView activeTable;
+    @FXML
+    private Button newButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
+    private Button duplicateButton;
+
+    @FXML
+    private Button okButton;
+
+    @FXML
+    private Button cancelButton;
+
+    @FXML
+    private Button helpButton;
+
+    @FXML
+    private Button propertiesButton;
+
+    private Mediator mediator;
+    private Machine machine;
+    private DesktopController desktop;
+
+    private Module<?> selectedSet = null;
+    private TableView<Module<?>> activeTable;
     private ChangeTable tableMap;
     private ContentChangeListener contentChangeListener;
-
-    public static final String CURRENT = "Current";
+    
+    private static final String CURRENT_NAME = "Current";
 
     public EditModulesController(Mediator mediator, DesktopController desktop) {
         this.mediator = mediator;
@@ -106,7 +117,7 @@ public class EditModulesController implements Initializable {
 
         tableMap.setParents(tablePane);
         tablePane.getChildren().clear();
-        activeTable = tableMap.getMap().get("Register");
+        activeTable = tableMap.get(Register.class);
         tablePane.getChildren().add(activeTable);
 
         activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -186,9 +197,10 @@ public class EditModulesController implements Initializable {
     protected void onNewButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
         String uniqueName = createUniqueName(activeTable.getItems(), "?");
-        Object newObject = getController(CURRENT).getNewObject(uniqueName);
+        Module<?> newObject = getControllerUnchecked(currentController()).getPrototype().cloneOf();
+        newObject.setName(uniqueName);
 
-         activeTable.getItems().add(activeTable.getItems().size(), newObject);
+        activeTable.getItems().add(activeTable.getItems().size(), newObject);
         ((ModuleController) activeTable).updateTable();
         activeTable.getSelectionModel().select(newObject);
         if (activeTable instanceof RegisterArrayTableController) {
@@ -209,14 +221,19 @@ public class EditModulesController implements Initializable {
         //if so, warn the user and return.
         if ((selectedSet instanceof Register) ||
                 (selectedSet instanceof RegisterArray)) {
-            Vector cBitsThatUseIt =
-                    ((ConditionBitTableController) tableMap.getMap().
-                            get("ConditionBit")).getBitClonesThatUse(selectedSet);
+            ConditionBitTableController ctrl = (ConditionBitTableController)tableMap.get(ConditionBit.class);
+            List<ConditionBit> cBitsThatUseIt;
+            if (selectedSet instanceof Register) {
+                cBitsThatUseIt = ctrl.getBitClonesThatUse((Register) selectedSet);
+            } else {
+                cBitsThatUseIt = ctrl.getBitClonesThatUse((RegisterArray) selectedSet);
+            }
+
             if (cBitsThatUseIt.size() > 0) {
                 String message = selectedSet + " is used by the " +
                         "following condition bits: \n  ";
                 for (int i = 0; i < cBitsThatUseIt.size(); i++)
-                    message += cBitsThatUseIt.elementAt(i) +
+                    message += cBitsThatUseIt.get(i) +
                             (i == cBitsThatUseIt.size() - 1 ? "" : ",  ");
                 message += ".\nYou need to delete those condition bits first.";
                 Dialogs.createErrorDialog(tablePane.getScene().getWindow(), "Deletion " +
@@ -227,26 +244,26 @@ public class EditModulesController implements Initializable {
 
         //now test to see if it is used by any micros and if so,
         //warn the user that those micros will be deleted too.
-        Module oldModule =
-                getController(CURRENT).getCurrentFromClone(selectedSet);
+        Module<?> oldModule = getControllerUnchecked(currentController()).getCurrentFromClone(selectedSet);
         if (oldModule != null) {
-            HashMap microsThatUseIt = machine.getMicrosThatUse(oldModule);
+            Map<Microinstruction, ObservableList<Microinstruction>> microsThatUseIt =
+                    machine.getMicrosThatUse(oldModule);
             if (microsThatUseIt.size() > 0) {
                 String[] options = {"Yes, delete it", "Cancel"};
-                String message = selectedSet + " is used by the " +
-                        "following microinstructions: \n  ";
+                StringBuilder message = new StringBuilder(selectedSet.toString());
+                message.append(" is used by the following microinstructions: \n  ");
 
-                Set s = microsThatUseIt.keySet();
+                Set<Microinstruction> s = microsThatUseIt.keySet();
                 Iterator it = s.iterator();
                 while (it.hasNext()) {
-                    message += it.next() +
-                            (it.hasNext() ? ",  " : "");
+                    message.append(it.next());
+                    message.append(it.hasNext() ? ",  " : "");
                 }
-                message += ".\n  If you delete it, all these " +
-                        "microinstructions will also be deleted.  " +
-                        "Really delete it?";
+
+                message.append(".\n  If you delete it, all these microinstructions will also be deleted.  ");
+                message.append("Really delete it?");
                 Optional<ButtonType> result = Dialogs.createConfirmationDialog
-                        (tablePane.getScene().getWindow(), "Confirm Deletion", message)
+                        (tablePane.getScene().getWindow(), "Confirm Deletion", message.toString())
                         .showAndWait();
                 if (result.get() == ButtonType.CANCEL ||
                         result.get() == ButtonType.NO ||
@@ -279,7 +296,7 @@ public class EditModulesController implements Initializable {
     @FXML
     public void onDuplicateButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
-        Module newObject = (Module) selectedSet.clone();
+        Module<?> newObject = selectedSet.cloneOf();
         String uniqueName = createUniqueDuplicatedName(activeTable.getItems(),
                 newObject.getName());
         newObject.setName(uniqueName);
@@ -302,14 +319,14 @@ public class EditModulesController implements Initializable {
         EditArrayRegistersController controller;
         if (activeTable.getSelectionModel().getSelectedIndex() == -1) {
             controller = new EditArrayRegistersController(mediator,
-                    (RegistersTableController) tableMap.getMap().get("Register"),
-                    (RegisterArrayTableController) tableMap.getMap().get("RegisterArray"));
+                    (RegistersTableController) tableMap.get(Register.class),
+                    (RegisterArrayTableController) tableMap.get(RegisterArray.class));
         }
         else {
             controller = new EditArrayRegistersController(mediator,
-                    (RegistersTableController) tableMap.getMap().get("Register"),
-                    (RegisterArrayTableController) tableMap.getMap().get("RegisterArray"),
-                    ((RegisterArray) activeTable.getItems().get(
+                    (RegistersTableController) tableMap.get(Register.class),
+                    (RegisterArrayTableController) tableMap.get(RegisterArray.class),
+                    (activeTable.getItems().get(
                             activeTable.getSelectionModel().getSelectedIndex()
                     )).getName()
             );
@@ -359,10 +376,12 @@ public class EditModulesController implements Initializable {
         //ObservableList objList = activeTable.getItems();
         try {
 
-            String[] controllerStrings = {"Register", "RegisterArray", "ConditionBit",
-                    "RAM"};
-            for (String controller : controllerStrings) {
-                getController(controller).checkValidity();
+//            String[] controllerStrings = {"Register", "RegisterArray", "ConditionBit",
+//                    "RAM"};
+            List<Class<? extends Module<?>>> values = ImmutableList.of(Register.class, RegisterArray.class,
+                    ConditionBit.class, RAM.class);
+            for (Class<? extends Module<?>> controller : values) {
+                getControllerUnchecked(controller).checkValidity();
             }
 
             //update the machine with the new values
@@ -413,23 +432,54 @@ public class EditModulesController implements Initializable {
             hc.selectTreeItem(startString);
         }
     }
-
+    
     /**
-     * gets the table view object specified by the input String. The options are
-     * "Register", "RegisterArray", "ConditionBit", "RAM", and CURRENT (a static string
-     * that
-     * will return the currently active table).
+     * Get the class representing the current controller. The options are:
+     * <ul>
+     *     <li>{@code Register} -> {@link Register}</li>
+     *     <li>{@code RegisterArray} -> {@link RegisterArray}</li>
+     *     <li>{@code ConditionBit} -> {@link ConditionBit}</li>
+     *     <li>{@code RAM} -> {@link RAM}</li>
+     * </ul>
      *
-     * @param controller the String representation of the desired controller
+     * @return the {@link Class} representing the currently requested controller
+     */
+    private Class<? extends Module<?>> currentController() {
+        switch (moduleCombo.getValue()) {
+        case "Register":
+            return Register.class;
+    
+        case "RegisterArray":
+            return RegisterArray.class;
+    
+        case "ConditionBit":
+            return ConditionBit.class;
+        
+        case "RAM":
+            return RAM.class;
+        
+        default:
+            throw new IllegalArgumentException("Unknown module specified: " + moduleCombo.getValue());
+        }
+    }
+    
+    /**
+     * Get the {@link ModuleController} for the required {@link Module} class.
+     *
+     * @param controllerClazz the {@link Class} of the {@link ModuleController}.
      * @return the table view object that is current being edited in the window.
      */
-    public ModuleController getController(String controller) {
-        if (controller.equals(CURRENT)) {
-            return tableMap.getMap().get(moduleCombo.getValue());
-        }
-        else {
-            return tableMap.getMap().get(controller);
-        }
+    private <T extends Module<T>> ModuleController<T> getController(Class<T> controllerClazz) {
+        return tableMap.get(controllerClazz);
+    }
+    
+    /**
+     * Unchecked version of {@link #getController(Class)}
+     * @param controllerClazz
+     * @return
+     */
+    private ModuleController<?> getControllerUnchecked(Class<? extends Module<?>> controllerClazz) {
+        return tableMap.getMap().get(controllerClazz);
     }
 
     /**
@@ -487,25 +537,23 @@ public class EditModulesController implements Initializable {
     protected void updateMachine() { // and the machine needs to be updated based on
     // the changes
         // ma
-        getController(CURRENT).setClones(activeTable.getItems());
+        getControllerUnchecked(currentController()).setClones(activeTable.getItems());
 
-        machine.setRAMs(sortVectorByName(
-                tableMap.getMap().get("RAM").createNewModulesList(
-                        tableMap.getMap().get("RAM").getClones())));
-        machine.setRegisters(sortVectorByName(
-                tableMap.getMap().get("Register").createNewModulesList(
-                        tableMap.getMap().get("Register").getClones())));
-        machine.setRegisterArrays(sortVectorByName(
-                tableMap.getMap().get("RegisterArray").createNewModulesList(
-                        tableMap.getMap().get("RegisterArray").getClones())));
-        machine.setConditionBits(sortVectorByName(
-                tableMap.getMap().get("ConditionBit").createNewModulesList(
-                        tableMap.getMap().get("ConditionBit").getClones())));
-        if (!machine.getModule("rams").contains(machine.getCodeStore())) {
+        machine.setRAMs(sortModulesByName(
+                tableMap.get(RAM.class).createNewModulesList(tableMap.get(RAM.class).getClones())));
+        machine.setRegisters(sortModulesByName(
+                tableMap.get(Register.class).createNewModulesList(tableMap.get(Register.class).getClones())));
+        machine.setRegisterArrays(sortModulesByName(
+                tableMap.get(RegisterArray.class).createNewModulesList(tableMap.get(RegisterArray.class).getClones())));
+        machine.setConditionBits(sortModulesByName(
+                tableMap.get(ConditionBit.class).createNewModulesList(tableMap.get(ConditionBit.class).getClones())));
+        
+        List<RAM> rams = machine.getModule("rams", RAM.class);
+        if (!rams.contains(machine.getCodeStore())) {
             //the code store was deleted so set a different
             //RAM to be the code store
-            if (machine.getModule("rams").size() != 0) {
-                machine.setCodeStore((RAM) machine.getModule("rams").get(0));
+            if (rams.size() != 0) {
+                machine.setCodeStore(rams.get(0));
             }
             else {
                 machine.setCodeStore(null);
@@ -520,23 +568,27 @@ public class EditModulesController implements Initializable {
 
     //sorts the given Vector of Modules in place by name
     //using Selection Sort.  It returns the modified vector.
-    private Vector sortVectorByName(Vector modules) {
-        for (int i = 0; i < modules.size() - 1; i++) {
-            //find the smallest from positions i to the end
-            String nameOfSmallest = ((Module) modules.elementAt(i)).getName();
-            int indexOfSmallest = i;
-            for (int j = i + 1; j < modules.size(); j++) {
-                Module next = (Module) modules.elementAt(j);
-                if (next.getName().compareTo(nameOfSmallest) < 0) {
-                    indexOfSmallest = j;
-                    nameOfSmallest = next.getName();
-                }
-            }
-            //swap smallest into position i
-            Object temp = modules.elementAt(i);
-            modules.setElementAt(modules.elementAt(indexOfSmallest), i);
-            modules.setElementAt(temp, indexOfSmallest);
-        }
+    private <T extends Module<T>> List<T> sortModulesByName(final List<T> modules) {
+
+        Collections.sort(modules, new Module.NameComparator());
+
+//        for (int i = 0; i < modules.size() - 1; i++) {
+//            //find the smallest from positions i to the end
+//            String nameOfSmallest = ((Module) modules.get(i)).getName();
+//            int indexOfSmallest = i;
+//            for (int j = i + 1; j < modules.size(); j++) {
+//                Module next = (Module) modules.get(j);
+//                if (next.getName().compareTo(nameOfSmallest) < 0) {
+//                    indexOfSmallest = j;
+//                    nameOfSmallest = next.getName();
+//                }
+//            }
+//            //swap smallest into position i
+//            Module<?> temp = modules.get(i);
+//            modules.set(i, modules.get(indexOfSmallest));
+//            modules.set(indexOfSmallest, temp);
+//        }
+
         return modules;
     }
 
@@ -544,7 +596,7 @@ public class EditModulesController implements Initializable {
      * a listener listening for changes to the table selection and
      * update the status of buttons.
      */
-    class ContentChangeListener implements ChangeListener<Module> {
+    private class ContentChangeListener implements ChangeListener<Module> {
 
         @Override
         public void changed(ObservableValue<? extends Module> selected,
@@ -566,15 +618,15 @@ public class EditModulesController implements Initializable {
     /**
      * a class that holds the current microinstruction class
      */
-    class ChangeTable {
-        Map<String, ModuleController> typesMap;
+    private class ChangeTable {
+        private Map<Class<? extends Module<?>>, ModuleController<?>> typesMap;
 
         /**
          * Constructor
          *
          * @param mediator the current mediator
          */
-        public ChangeTable(Mediator mediator) {
+        ChangeTable(Mediator mediator) {
             // an hashmap that holds types as the keys and sub fxml names as values.
             typesMap = buildMap(mediator);
 
@@ -586,7 +638,7 @@ public class EditModulesController implements Initializable {
          * @param mediator mediator that holds all the information
          * @return the map that contains all the controllers
          */
-        public Map buildMap(Mediator mediator) {
+        private Map<Class<? extends Module<?>>, ModuleController<?>> buildMap(Mediator mediator) {
             final RegistersTableController registerTableController
                     = new RegistersTableController(mediator);
             final RegisterArrayTableController registerArrayTableController
@@ -600,12 +652,13 @@ public class EditModulesController implements Initializable {
             registerTableController.setBitController(conditionBitTableController);
             registerArrayTableController.setBitController(conditionBitTableController);
 
-            Map<String, ModuleController> map = new HashMap<String, ModuleController>() {{
-                put("Register", registerTableController);
-                put("RegisterArray", registerArrayTableController);
-                put("ConditionBit", conditionBitTableController);
-                put("RAM", ramTableController);
+            Map<Class<? extends Module<?>>, ModuleController<?>> map = new HashMap<Class<? extends Module<?>>, ModuleController<?>>() {{
+                put(Register.class, registerTableController);
+                put(RegisterArray.class, registerArrayTableController);
+                put(ConditionBit.class, conditionBitTableController);
+                put(RAM.class, ramTableController);
             }};
+
             return map;
         }
 
@@ -614,8 +667,22 @@ public class EditModulesController implements Initializable {
          *
          * @return the map of controllers.
          */
-        public Map<String, ModuleController> getMap() {
+        public Map<Class<? extends Module<?>>, ModuleController<?>> getMap() {
             return typesMap;
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T extends Module<T>> ModuleController<T> get(Class<T> clazz) {
+            return (ModuleController<T>)typesMap.get(clazz);
+        }
+    
+        /**
+         * Get the same result as {@link #get(Class)} but returns an unchecked version.
+         * @param clazz
+         * @return
+         */
+        public ModuleController<?> getUnchecked(Class<? extends Module<?>> clazz) {
+            return typesMap.get(clazz);
         }
 
         /**

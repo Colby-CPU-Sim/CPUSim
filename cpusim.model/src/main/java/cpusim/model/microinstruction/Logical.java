@@ -4,14 +4,20 @@ import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
  * NOR, or XOR on the specified registers.
  */
-public class Logical extends Microinstruction {
+public class Logical extends Microinstruction implements Copyable<Logical> {
 	
 	// FIXME replace type with Enum
 	
@@ -115,36 +121,25 @@ public class Logical extends Microinstruction {
     public String getMicroClass(){
         return "logical";
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new Logical(getName(),machine,getType(), getSource1(),getSource2(),getDestination());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
-    {
-        assert oldMicro instanceof Logical :
-                "Passed non-Logical to Logical.copyDataTo()";
-        Logical newLogical = (Logical) oldMicro;
+    
+    @Override
+    public <U extends Logical> void copyTo(final U newLogical) {
+        checkNotNull(newLogical);
+        
         newLogical.setName(getName());
         newLogical.setType(getType());
         newLogical.setSource1(getSource1());
         newLogical.setSource2(getSource2());
         newLogical.setDestination(getDestination());
     }
-
+    
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
+        // FIXME Replace with Enum
         long op1 = source1.get().getValue();
         long op2 = source2.get().getValue();
         long result = 0;
@@ -199,6 +194,33 @@ public class Logical extends Microinstruction {
     @Override
     public boolean uses(Module<?> m){
         return (m == source1.get() || m == source2.get() || m == destination.get());
+    }
+    
+    /**
+     * checks if the registers have equal widths
+     * @param logicals an array of Logicals to check
+     * Logical objects with all equal width registers
+     */
+    public static void validateRegistersHaveEqualWidths(List<Logical> logicals)
+    {
+        for (Logical logical : logicals) {
+            // get width of the source1, source2, and destination
+            // registers, if they are different, then the validity
+            // test fails
+            if (logical.getSource1().getWidth() ==
+                    logical.getSource2().getWidth() &&
+                    logical.getSource2().getWidth() ==
+                            logical.getDestination().getWidth()) {
+                continue;
+            }
+            else {
+                throw new ValidationException("At least one of the registers in the " +
+                        "microinstruction \"" + logical.getName() +
+                        "\" has\na bit width that is different than one " +
+                        "or more of the others.\nAll registers must have " +
+                        "the same number of bits.");
+            }
+        }
     }
 
 }

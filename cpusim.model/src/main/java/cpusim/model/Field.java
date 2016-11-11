@@ -1,34 +1,38 @@
-/**
- * File: Field
- * Last Update: August 2013
- * @author Kevin Marsteller & Dale Skrien
- */
 package cpusim.model;
-
-import cpusim.model.util.Copyable;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.MoreFXCollections;
-import cpusim.model.util.NamedObject;
-import cpusim.xml.HTMLEncodable;
-import cpusim.xml.HtmlEncoder;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-//import cpusim.xml.HtmlEncoder;
-import javafx.beans.property.*;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.LegacyXMLSupported;
+import cpusim.model.util.MoreFXCollections;
+import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
+import cpusim.xml.HTMLEncodable;
+import cpusim.xml.HtmlEncoder;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
+
 
 /**
  * Class used to hold field options for each field of 
  * a machine instruction.
+ *
+ * @author Kevin Marsteller
+ * @author Dale Skrien
+ * @author Kevin Brightwell (Nava2)
+ *
+ * @since 2013-08-01
  */
 public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXMLSupported, HTMLEncodable {
 
@@ -85,7 +89,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     /**
      * The acceptable values for this field
      */
-    private ObservableMap<String, FieldValue> values;  		
+    private ObservableList<FieldValue> values;
     
     /**
      * The value to use if optional or ignored
@@ -113,7 +117,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      */
     public Field(String name) {
         this(name, Type.required, 0, Relativity.absolute,
-             FXCollections.emptyObservableMap(), 0, SignedType.Signed);
+             FXCollections.observableArrayList(), 0, SignedType.Signed);
     }
     
     /**
@@ -129,9 +133,9 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     	this.type = new SimpleObjectProperty<>(other.type.getValue());
         this.numBits = new SimpleIntegerProperty(other.numBits.getValue());
         this.relativity = new SimpleObjectProperty<>(other.relativity.getValue());
-        this.defaultValue = new SimpleLongProperty(other.defaultValue.getValue().longValue());
+        this.defaultValue = new SimpleLongProperty(other.defaultValue.getValue());
         this.signed = new SimpleObjectProperty<>(other.signed.getValue());
-    	this.values = MoreFXCollections.copyObservableMap(other.getValues());
+    	this.values = MoreFXCollections.copyObservableList(other.getValues());
     }
     
     /**
@@ -153,7 +157,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     			 @JsonProperty("type") Type type, 
     			 @JsonProperty("numBits") int length, 
     			 @JsonProperty("relativity") Relativity relativity,
-    			 @JsonProperty("values") ObservableMap<String, FieldValue> values, 
+    			 @JsonProperty("values") ObservableList<FieldValue> values,
     			 @JsonProperty("defaultValue") long defaultValue, 
     			 @JsonProperty("signed") SignedType signed) {
         this.name = new SimpleStringProperty();
@@ -170,35 +174,6 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
         this.values = values;
         this.defaultValue.set(defaultValue);
         this.signed.set(checkNotNull(signed));
-    }
-    
-    /**
-     * Constructor for new Field with specified values.
-     * 
-     * @param name - Name of Field.
-     * @param type - Type of Field.
-     * @param length - Numbits of field.
-     * @param relativity - Enum relativity type.
-     * @param values - List of FieldValues.
-     * @param defaultValue - The default int value.
-     * @param signed - Whether or not the Field is a signed int.
-     * 
-     * @deprecated Use {@link #Field(String, Type, int, Relativity, ObservableMap, long, SignedType)} instead.
-     * 
-     * @since 2016-09-20
-     */
-    @Deprecated
-    public Field(String name, 
-    			 Type type, 
-    			 int length, 
-    			 Relativity relativity,
-    			 ObservableList<FieldValue> values, 
-    			 long defaultValue, 
-    			 SignedType signed) {
-        this(name, type, length, relativity, 
-        		FXCollections.observableMap(values.stream()
-        				.collect(Collectors.toMap(FieldValue::getName, f -> f))), 
-        		defaultValue, signed);
     }
 
     ////////////////// Setters and getters //////////////////
@@ -239,9 +214,9 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
         this.relativity.set(relativity);
     }
 
-    public ObservableMap<String, FieldValue> getValues() { return values; }
+    public ObservableList<FieldValue> getValues() { return values; }
 
-    public void setValues(ObservableMap<String, FieldValue> values) {
+    public void setValues(ObservableList<FieldValue> values) {
         this.values = values;
     }
 
@@ -270,6 +245,54 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
         return signed;
     }
     
+    /**
+     * Checks the values within a {@link Field} are valid.
+     *
+     * @throws ValidationException if a field is invalid.
+     */
+    public void validate() {
+        if (this.getNumBits() == 0 && this.getType().equals(Type.ignored)) {
+            throw new ValidationException("A field of length 0 cannot be ignored." +
+                    " Field " + getName() + " is such a field.");
+        }
+        
+        if (!this.isSigned() && this.getDefaultValue() < 0) {
+            throw new ValidationException("Field " + getName() + " is unsigned" +
+                    " but has a negative default value.");
+        }
+        
+        if(getValues().size() > 0 &&
+                (!getRelativity().equals(Field.Relativity.absolute) || getNumBits() == 0)) {
+            throw new ValidationException("Field " + getName() + " must be" +
+                    " absolute and have a positive number of bits in order to use " +
+                    " a set of fixed values.");
+        }
+        
+        if (getNumBits() > 0)
+            Validate.fitsInBits(getDefaultValue(), getNumBits());
+        
+        validateFieldValues(this, getValues());
+    }
+    
+    /**
+     * Checks that all signs are correct based on values.
+     * @param field
+     * @param allFieldValues
+     */
+    public static void validateFieldValues(Field field, List<FieldValue> allFieldValues) {
+        final int numBits = field.getNumBits();
+        
+        for(FieldValue fieldValue : allFieldValues) {
+            if (fieldValue.getValue() < 0 && !field.isSigned())
+                throw new ValidationException("Field " + field.getName() + " is unsigned" +
+                        " and so " + fieldValue.getName() + " cannot have a negative field value.");
+            
+            if (numBits > 0) {
+                Validate.fitsInBits(fieldValue.getValue(), numBits);
+            }
+        }
+    }
+    
     @Override
     public void copyTo(final Field newField) {
     	checkNotNull(newField);
@@ -287,10 +310,10 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * returns the FieldValue with the given name.
      * returns null if there is no such FieldValue
      * @param name the String with the name of the value
-     * @return the FieldValue with that name, or null if none exists
+     * @return the FieldValue with that name, or {@link Optional#empty()} if none exists
      */
-    public FieldValue getValue(String name) {
-        return values.get(name);
+    public Optional<FieldValue> getValue(final String name) {
+        return values.stream().filter(f -> f.getName().equals(name)).findFirst();
     }
 
     /**
@@ -300,35 +323,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     public String toString() {
         return name.get();
     }
-
-    /**
-     * Returns a clone of this field.
-     */
-    @Override @Deprecated
-    public Object clone() {
-        Field c = null;
-        try {
-            c = (Field) super.clone();
-            c.setName(name.get());
-            c.setType(type.get());
-            c.setNumBits(numBits.get());
-            c.setRelativity(relativity.get());
-            c.setValues(MoreFXCollections.copyObservableMap(values));
-            c.setDefaultValue(defaultValue.get());
-            c.setSigned(signed.get());
-        } catch (CloneNotSupportedException e) {
-            throw new IllegalStateException(e); // should never happen because Field implements Clonable
-        }
-        
-        return c;
-    }
-
-    /**
-     * Gives the XMLDescription of this Field.
-     * 
-     * @param indent - amount of indent. String of spaces.
-     * @return - The XML description.
-     */
+    
     @Override
     public String getXMLDescription(String indent) {
         String nl = System.getProperty("line.separator");
@@ -337,17 +332,12 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
                 "\" relativity=\"" + getRelativity() + "\" signed=\"" + isSigned()
                 + "\" defaultValue=\"" + getDefaultValue() +
                 "\" id=\"" + getID() + "\">" + nl;
-        for (FieldValue value : values.values())
+        for (FieldValue value : values)
             result += indent + "\t" + value.getXMLDescription(indent + "\t") + nl;
         result += indent + "</Field>";
         return result;
     }
     
-    /**
-     * Gives an HTML description of this Field.
-     * 
-     * @return Gives an HTML description of this Field.
-     */
     @Override
     public String getHTMLDescription(String indent) {
         String result = "<TR><TD>" + HtmlEncoder.sEncode(name.get()) +
@@ -360,7 +350,7 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
         if (values.size() == 0) 
         	result += HtmlEncoder.sEncode("<any>");
         
-        for (FieldValue fieldValue : values.values()) {
+        for (FieldValue fieldValue : values) {
             result += HtmlEncoder.sEncode(fieldValue.getName() + "=") +
                     fieldValue.getValue() + "<BR>";
         }

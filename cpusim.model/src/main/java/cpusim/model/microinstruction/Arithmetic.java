@@ -1,11 +1,4 @@
-/**
- * Author: Jinghui Yu
- * Last Editing date: 6/6/2013
- */
-
 package cpusim.model.microinstruction;
-
-import java.math.BigInteger;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
@@ -13,14 +6,25 @@ import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.math.BigInteger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The arithmetic microinstruction use three registers and optionally two condition
  * bits.
+ *
+ * @author Jinghui Yu
+ * @author Kevin Brightwell (Nava2)
+ *
+ * @since 2013-06-06
  */
-public class Arithmetic extends Microinstruction {
+public class Arithmetic extends Microinstruction implements Copyable<Arithmetic> {
+    
     private SimpleStringProperty type;
     private SimpleObjectProperty<Register> source1;
     private SimpleObjectProperty<Register> source2;
@@ -154,8 +158,8 @@ public class Arithmetic extends Microinstruction {
     /**
      * execute the micro instruction from machine
      */
-    public void execute()
-    {
+    @Override
+    public void execute() {
         long value1 = source1.get().getValue();
         long value2 = source2.get().getValue();
         BigInteger op1 = BigInteger.valueOf(value1);
@@ -209,25 +213,11 @@ public class Arithmetic extends Microinstruction {
     public String getMicroClass() {
         return "arithmetic";
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     * @return a copy of the Set class
-     */
-    public Object clone(){
-        return new Arithmetic(getName(), machine, getType(), getSource1(),getSource2(),
-                getDestination(),getOverflowBit(),getCarryBit());
-    }
-
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
-    public void copyTo(Microinstruction oldMicro)
-    {
-        assert oldMicro instanceof Arithmetic :
-                "Passed non-Arithmetic to Arithmetic.copyDataTo()";
-        Arithmetic newArithmetic = (Arithmetic) oldMicro;
+    
+    @Override
+    public <U extends Arithmetic> void copyTo(final U newArithmetic) {
+        checkNotNull(newArithmetic);
+        
         newArithmetic.setName(getName());
         newArithmetic.setType(getType());
         newArithmetic.setSource1(getSource1());
@@ -254,10 +244,7 @@ public class Arithmetic extends Microinstruction {
                 "\" id=\"" + getID() + "\" />";
     }
 
-    /**
-     * returns the HTML description
-     * @return the HTML description
-     */
+    @Override
     public String getHTMLDescription(String indent){
         return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getType() +
                 "</TD><TD>" + getSource1().getHTMLName() + "</TD><TD>" +
@@ -267,12 +254,7 @@ public class Arithmetic extends Microinstruction {
                 "</TD><TD>" + getCarryBit().getHTMLName() + "</TD></TR>";
     }
 
-    /**
-     * returns true if this microinstruction uses m
-     * (so if m is modified, this micro may need to be modified.
-     * @param m the module that holds the microinstruction
-     * @return boolean value true if this micro used the module
-     */
+    @Override
     public boolean uses(Module<?> m){
         return (m == getSource1() || m == getSource2() || m == getDestination()
                 || m == getCarryBit() || m == getOverflowBit());

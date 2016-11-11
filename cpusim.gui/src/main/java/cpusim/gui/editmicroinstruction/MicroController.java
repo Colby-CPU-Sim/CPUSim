@@ -13,48 +13,83 @@
 
 package cpusim.gui.editmicroinstruction;
 
-import cpusim.model.Machine;
 import cpusim.Mediator;
+import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
-import javafx.collections.FXCollections;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.NamedObject;
+import cpusim.model.util.ValidationException;
+import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
-import java.lang.reflect.Array;
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * MicroController class parent of all the microinstruction controller
+ *
+ * @author Kevin Brightwell (Nava2)
  */
-public abstract class MicroController
-        extends TableView  {
-    public Mediator mediator;
-    public Machine machine;      //the current machine being simulated
-    HashMap assocList;  //associates the current micros
-    //with the edited clones; key = new clone, value = original
-    public Microinstruction[] clones;  //the current clones
-    Node parentFrame;   //for the parent of the error dialog
+abstract class MicroController<T extends Microinstruction & Copyable<T>>
+        extends TableView<T>  {
+    protected final Mediator mediator;
+    protected final Machine machine;      //the current machine being simulated
+    
+    private final Class<T> microClass;
+    
+    private Node parentFrame;   //for the parent of the error dialog
+    
+    private ObservableList<T> currentMicros;
 
     /**
      * Constructor
      * @param mediator holds the information to be shown in tables
      */
-    public MicroController(Mediator mediator)
+    MicroController(Mediator mediator, final String fxmlFile, Class<T> clazz)
     {
         this.mediator = mediator;
         this.machine = mediator.getMachine();
-        assocList = new HashMap();
-        clones = null;
-        parentFrame = null;//subclasses must initialize clones by calling createClones()
+        this.microClass = clazz;
+        this.currentMicros = machine.getMicros(clazz);
+        
+        this.parentFrame = null;//subclasses must initialize clones by calling createClones()
+    
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, checkNotNull(fxmlFile));
+    
+        try {
+            fxmlLoader.load();
+        } catch (IOException ioe) {
+            // should never happen
+            throw new IllegalStateException("Unable to load file: " + fxmlFile, ioe);
+        }
     }
 
     /**
      * sets the value of parentFrame.
      */
-    public void setParentFrame(Node parent)
+    void setParentFrame(Node parent)
     {
         parentFrame = parent;
+    }
+    
+    /**
+     * Get the stored class.
+     * @return The internal {@link Class} of the items
+     */
+    final Class<T> getMicroClass() {
+        return microClass;
     }
 
     /**
@@ -63,34 +98,11 @@ public abstract class MicroController
      * @param newName the name of the new microinstruction
      * @return a new Microinstruction with the given name
      */
-    public Microinstruction getNewMicro(String newName)
+    private T getNewMicro(String newName)
     {
-        Microinstruction prototype = getPrototype();
-        Microinstruction clone = (Microinstruction) prototype.clone();
+        T clone = getPrototype().cloneOf();
         clone.setName(newName);
         return clone;
-    }
-
-    /**
-     * returns an array of clones of the current microinstructions.
-     *
-     * @return an array of clones of the current microinstructions.
-     */
-    public Microinstruction[] getClones()
-    {
-        assert clones != null :
-                "clones == null in MicroController.getClones()";
-        return clones;
-    }
-
-    /**
-     * returns the original micro (in the machine) whose clone is given.
-     * @param clone the clone of the original micro instruction
-     * @return the original micro instruction of the given clone.
-     */
-    public Microinstruction getCurrentFromClone(Microinstruction clone)
-    {
-        return (Microinstruction) assocList.get(clone);
     }
 
     /**
@@ -105,24 +117,35 @@ public abstract class MicroController
     //========================================
     // public abstract methods to be overridden by each subclass
 
+//    /**
+//     * sets the clones to the new array.
+//     * It does not check for validity
+//     * @param clones the clones that will be set to the new array.
+//     */
+//    protected void setClones(ObservableList<T> clones) {
+//        this.clones = checkNotNull(clones);
+//    }
+    
     /**
-     * sets the clones to the new array.
-     * It does not check for validity
-     * @param clones the clones that will be set to the new array.
+     * update the machine's micros from {@link #getItems()}
      */
-    public abstract void setClones(ObservableList clones);
-
-    /**
-     * update the machine's micros from the array of clones
-     */
-    public abstract void updateCurrentMicrosFromClones();
+    public abstract void updateMachineFromItems();
 
     /**
      * check if the given list of micro instructions have valid values.
-     * @param objects the list of micro instructions
-     * @return true if the array of objects have valid properties
+     * @param micros the list of micro instructions
      */
-    public abstract void checkValidity(ObservableList objects);
+    public void checkValidity(ObservableList<T> micros) {
+        // check that all names are unique and nonempty
+        NamedObject.validateUniqueAndNonempty(micros);
+    }
+    
+    /**
+     * Calles {@link #checkValidity(ObservableList)} with the items in the {@link #getItems()}.
+     */
+    public final void checkValidity() {
+        checkValidity(getItems());
+    }
 
     /**
      * returns the type of the controller
@@ -130,85 +153,6 @@ public abstract class MicroController
      * @return the type of the controller
      */
     public abstract String toString();
-
-    //========================================
-    // utility methods
-
-    /**
-     * creates an array of clones of the current microinstructions,
-     * adding the appropriate ChangeListeners to its properties
-     *
-     * @return the clones of the current instructions
-     */
-    public Object[] createClones()
-    {
-        ObservableList currentMicros = getCurrentMicros();
-        Microinstruction[] clones = (Microinstruction[])Array.newInstance(
-                this.getMicroClass(), currentMicros.size());
-        for (int i = 0; i < currentMicros.size(); i++) {
-            Microinstruction clone = (Microinstruction)
-                    ((Microinstruction) currentMicros.get(i)).clone();
-            clones[i] = clone;
-            assocList.put(clone, currentMicros.get(i));
-        }
-        return clones;
-    }
-
-    /**
-     * returns a list of updated microinstructions based on the objects
-     * in the list.  It replaces the objects in the list with their
-     * associated objects, if any, after updating the fields of those old objects.
-     * It also sorts the micros by name.
-     *
-     * @param list a list of micro instructions
-     * @return a list of updated micro instructions
-     */
-    public ObservableList createNewMicroList(Microinstruction[] list)
-    {
-        ObservableList newMicros = FXCollections.observableArrayList();
-        for (int i = 0; i < list.length; i++) {
-            Microinstruction micro = list[i];
-            Microinstruction oldMicro = (Microinstruction) assocList.get(micro);
-            if (oldMicro != null) {
-                //if the new micro is just an edited clone of an old micro,
-                //then just copy the new data to the old micro
-                micro.copyDataTo(oldMicro);
-                newMicros.add(oldMicro);
-            }
-            else
-                newMicros.add(micro);
-        }
-        return sortVectorByName(newMicros);
-    }
-
-    /**
-     * sorts the given list of Microinstructions in place by name
-     * using Selection Sort.  It returns the modified ObservableList.
-     *
-     * @param micros a list of micro instructions to be sorted
-     * @return a list of sorted micro instruction
-     */
-    private ObservableList sortVectorByName(ObservableList micros)
-    {
-        for (int i = 0; i < micros.size() - 1; i++) {
-            //find the smallest from positions i to the end
-            String nameOfSmallest =
-                    ((Microinstruction) micros.get(i)).getName();
-            int indexOfSmallest = i;
-            for (int j = i + 1; j < micros.size(); j++) {
-                Microinstruction next = (Microinstruction) micros.get(j);
-                if (next.getName().compareTo(nameOfSmallest) < 0) {
-                    indexOfSmallest = j;
-                    nameOfSmallest = next.getName();
-                }
-            }
-            //swap smallest into position i
-            Object temp = micros.get(i);
-            micros.set(i, micros.get(indexOfSmallest));
-            micros.set(indexOfSmallest, temp);
-        }
-        return micros;
-    }
     
     //========================================
     // methods inherited from Controller interface
@@ -219,7 +163,7 @@ public abstract class MicroController
      * @param name the name of the object.
      * @return a new microinstruction
      */
-    public Object getNewObject(String name)
+    private T getNewObject(String name)
     {
         return getNewMicro(name);
     }
@@ -232,22 +176,9 @@ public abstract class MicroController
      *
      * @return the prototype of the right subclass
      */
-    public abstract Microinstruction getPrototype();
-
-    /**
-     * returns the class object for the controller's objects
-     *
-     * @return the class object for the controller's objects
-     */
-    public abstract Class getMicroClass();
-
-    /**
-     * returns a list of the current microinstructions
-     *
-     * @return a list of the current microinsturctions
-     */
-    public abstract ObservableList getCurrentMicros();
-
+    // FIXME Make this deprecated, use a Default Constructor
+    public abstract T getPrototype();
+    
     /**
      * checks if new micros of this class can be created.
      * This may be false, for example, if you wanted to fromRootController
@@ -260,6 +191,111 @@ public abstract class MicroController
      * updates the table by removing all the items and adding all back.
      * for refreshing the display.
      */
-    public abstract void updateTable();
+    public void updateTable() {
+        double w = getWidth();
+        setPrefWidth(w-1);
+        setPrefWidth(w);
+    }
+    
+    
+    /**
+     * Called by the UI when the duplicate button is clicked.
+     */
+    public void createDuplicateEntry() {
+        T newObject = getPrototype().cloneOf();
+        String uniqueName = NamedObject.createUniqueDuplicatedName(getItems(), newObject);
+        newObject.setName(uniqueName);
+        getItems().add(0, newObject);
+        
+        //update display
+        updateTable();
+        scrollTo(1);
+        getSelectionModel().select(0);
+    }
+    
+    /**
+     * Called by an owner when a new entry should be added
+     */
+    public void createNewEntry() {
+    
+        //add a new item at the end of the list.
+        String uniqueName = NamedObject.createUniqueName(getItems());
+        T newObject = getNewObject(uniqueName);
+    
+        // A really ugly hack to fromRootController a unique opcode
+        // required by InstructionDialog
+        /**
+         if (EditDialog.this instanceof InstructionDialog) {
+         MachineInstruction instr = (MachineInstruction) newObject;
+         long uniqueOpcode =
+         ((MachineInstrFactory) getCurrentFactory()
+         ).createUniqueOpcode(model.getAllObjects());
+         instr.setOpcode(uniqueOpcode);
+         }*/
+        getItems().add(0, newObject);
+        updateTable();
+    }
+    
+    /**
+     * Deletes an entry at {@code index}.
+     *
+     * @param index The index to remove.
+     */
+    public void deleteEntry(int index) {
+        final T theMicro = getItems().get(index);
+    
+        //first see if it is used by any machine instructions and,
+        // if so, warn the user.
+        List<MachineInstruction> instrsThatUseIt = mediator.getMachine().getInstructionsThatUse(theMicro);
+        if (instrsThatUseIt.size() > 0) {
+            String message = theMicro + " is used by the " +
+                    "following machine instructions: \n  ";
+            for (int i = 0; i < instrsThatUseIt.size(); i++)
+                message += instrsThatUseIt.get(i) + " ";
+            message += ".\nReally delete it?";
+        
+            Alert dialog = Dialogs.createConfirmationDialog(parentFrame.getScene().getWindow(),
+                    "Confirm Deletion", message);
+            final Optional<ButtonType> result = dialog.showAndWait();
+            
+            if (result.isPresent()) {
+                final ButtonType res = result.get();
+                if(res == ButtonType.CANCEL ||
+                        res == ButtonType.NO ||
+                        res == ButtonType.CLOSE)
+                    return; //don't delete anything
+            }
+        }
+    
+        // actually remove it:
+        getItems().remove(index);
+    
+        if (index == 0) {
+            getSelectionModel().select(0);
+        }
+        else{
+            getSelectionModel().select(index - 1);
+        }
+    }
+    
+    /**
+     * Implements an {@link EventHandler} for the {@link TableColumn.CellEditEvent} for handling
+     * {@link NamedObject}-based types.
+     */
+    class NameColumnHandler implements EventHandler<TableColumn.CellEditEvent<T, String>> {
+        @Override
+        public void handle(final TableColumn.CellEditEvent<T, String> text) {
+            String newName = text.getNewValue();
+            String oldName = text.getOldValue();
+            text.getRowValue().setName(newName);
+            
+            try {
+                NamedObject.validateUniqueAndNonempty(getItems());
+            } catch (ValidationException ex) {
+                text.getRowValue().setName(oldName);
+                updateTable();
+            }
+        }
+    }
 
 }

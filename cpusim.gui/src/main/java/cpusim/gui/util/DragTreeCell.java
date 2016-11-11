@@ -14,22 +14,26 @@
 package cpusim.gui.util;
 
 
-import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.fetchsequence.EditFetchSequenceController;
+import cpusim.model.Machine;
+import cpusim.model.Microinstruction;
 import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.*;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -71,96 +75,90 @@ public class DragTreeCell extends TreeCell<String> {
     }
 
     public void setupMouseClickEvent() {
-        this.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent
-                        .getClickCount() == 2) {
-                    FXMLLoader fxmlLoader = new FXMLLoader(
-                            EditMicroinstructionsController.class.getResource("EditMicroinstructions.fxml"));
-                    EditMicroinstructionsController controller = new
-                            EditMicroinstructionsController(mediator, getClasses());
-                    //controller
-                    fxmlLoader.setController(controller);
-                    //go to the table with this set of micro instruction
-                    TreeItem item = (TreeItem) treeView.getSelectionModel()
-                            .getSelectedItem();
-                    String name = "";
-                    if (isClass) {
-                        name = item.getValue().toString().substring(0, 1).toUpperCase()
-                                + item.getValue().toString().substring(1);
+        this.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getButton().equals(MouseButton.PRIMARY) && mouseEvent
+                    .getClickCount() == 2) {
+                FXMLLoader fxmlLoader = new FXMLLoader(
+                        EditMicroinstructionsController.class.getResource("EditMicroinstructions.fxml"));
+                EditMicroinstructionsController controller = new
+                        EditMicroinstructionsController(mediator, getClasses());
+                //controller
+                fxmlLoader.setController(controller);
+                //go to the table with this set of micro instruction
+                TreeItem item1 = (TreeItem) treeView.getSelectionModel()
+                        .getSelectedItem();
+                String name = "";
+                if (isClass) {
+                    name = item1.getValue().toString().substring(0, 1).toUpperCase()
+                            + item1.getValue().toString().substring(1);
+                }
+                else if (!isNothing) {
+                    name = item1.getParent().getValue().toString().substring(0, 1)
+                            .toUpperCase()
+                            + item1.getParent().getValue().toString().substring(1);
+                }
+                if (name.equals("Io")) {
+                    name = "IO";
+                }
+                if (!name.equals("End") && !(treeItem.getValue().equals("comment") &&
+                        treeItem.getParent().getValue().equals("MicroInstructions")
+                )) {
+                    final Stage dialogStage = new Stage();
+                    Pane dialogRoot = null;
+                    try {
+                        dialogRoot = fxmlLoader.load();
+                    } catch (IOException e) {
+                        // should never happen
+                        assert false : "Unable to load file: EditMicroinstructions.fxml";
                     }
-                    else if (!isNothing) {
-                        name = item.getParent().getValue().toString().substring(0, 1)
-                                .toUpperCase()
-                                + item.getParent().getValue().toString().substring(1);
-                    }
-                    if (name.equals("Io")) {
-                        name = "IO";
-                    }
-                    if (!name.equals("End") && !(treeItem.getValue().equals("comment") &&
-                            treeItem.getParent().getValue().equals("MicroInstructions")
-                    )) {
-                        final Stage dialogStage = new Stage();
-                        Pane dialogRoot = null;
-                        try {
-                            dialogRoot = fxmlLoader.load();
-                        } catch (IOException e) {
-                            // should never happen
-                            assert false : "Unable to load file: EditMicroinstructions.fxml";
-                        }
-                        Scene dialogScene = new Scene(dialogRoot);
-                        dialogStage.setScene(dialogScene);
-                        dialogStage.initOwner(stage);
-                        dialogStage.initModality(Modality.WINDOW_MODAL);
-                        dialogStage.setTitle("Edit Microinstructions");
+                    Scene dialogScene = new Scene(dialogRoot);
+                    dialogStage.setScene(dialogScene);
+                    dialogStage.initOwner(stage);
+                    dialogStage.initModality(Modality.WINDOW_MODAL);
+                    dialogStage.setTitle("Edit Microinstructions");
 
-                        dialogScene.addEventFilter(
-                                KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
-                                    @Override
-                                    public void handle(KeyEvent event) {
-                                        if (event.getCode().equals(KeyCode.ESCAPE)) {
-                                            if (dialogStage.isFocused()) {
-                                                dialogStage.close();
-                                            }
-                                        }
+                    dialogScene.addEventFilter(
+                            KeyEvent.KEY_RELEASED, event -> {
+                                if (event.getCode().equals(KeyCode.ESCAPE)) {
+                                    if (dialogStage.isFocused()) {
+                                        dialogStage.close();
                                     }
-                                });
-                        dialogStage.show();
-
-                        controller.selectSection(name);
-                        //if clicking on a microinstruction, highlight it in current
-                        // the micro instruction table
-                        if (!isClass && !isNothing) {
-                            ObservableList l = controller.getActiveTable().getItems();
-                            for (int i = 0; i < l.size(); i++) {
-                                if (((Microinstruction) l.get(i)).getName().equals(item
-                                        .getValue())) {
-                                    controller.getActiveTable().getSelectionModel()
-                                            .select(i);
                                 }
+                            });
+                    dialogStage.show();
+
+                    controller.selectSection(name);
+                    //if clicking on a microinstruction, highlight it in current
+                    // the micro instruction table
+                    if (!isClass && !isNothing) {
+                        ObservableList l = controller.getActiveTable().getItems();
+                        for (int i = 0; i < l.size(); i++) {
+                            if (((Microinstruction) l.get(i)).getName().equals(item1
+                                    .getValue())) {
+                                controller.getActiveTable().getSelectionModel()
+                                        .select(i);
                             }
                         }
+                    }
 
 
-                    }
-                    else if (name.equals("End")) {
-                        Dialogs.createInformationDialog(stage, "Non-Editable " +
-                                        "Microinstruction",
-                                "The microinstruction \"End\" is a " +
-                                        "built-in microinstruction, and is not editable" +
-                                        ".").showAndWait();
-                    }
-                    else {
-                        Dialogs.createInformationDialog(stage, "Non-Editable " +
-                                        "Microinstruction",
-                                "The microinstruction \"comment\" is a " +
-                                        "built-in microinstruction, and is not editable" +
-                                        ".  It exists so that"
-                                        + " the user can make comments within the " +
-                                        "implementation"
-                                        + " of an instruction").showAndWait();
-                    }
+                }
+                else if (name.equals("End")) {
+                    Dialogs.createInformationDialog(stage, "Non-Editable " +
+                                    "Microinstruction",
+                            "The microinstruction \"End\" is a " +
+                                    "built-in microinstruction, and is not editable" +
+                                    ".").showAndWait();
+                }
+                else {
+                    Dialogs.createInformationDialog(stage, "Non-Editable " +
+                                    "Microinstruction",
+                            "The microinstruction \"comment\" is a " +
+                                    "built-in microinstruction, and is not editable" +
+                                    ".  It exists so that"
+                                    + " the user can make comments within the " +
+                                    "implementation"
+                                    + " of an instruction").showAndWait();
                 }
             }
         });
@@ -187,8 +185,8 @@ public class DragTreeCell extends TreeCell<String> {
         treeItem = this.getTreeItem();
 
         if (treeItem != null) {
-            for (String microClass : Machine.MICRO_CLASSES) {
-                if ((treeItem.getValue().equals(microClass) &&
+            for (Machine.MicroClass microClass : Machine.MicroClass.values()) {
+                if ((treeItem.getValue().equals(microClass.getName()) &&
                         treeItem.getParent().getValue().equals("MicroInstructions"))
                         || (treeItem.getValue().equals("MicroInstructions") &&
                         this.getTreeItem().getParent() == null)) {
@@ -207,20 +205,17 @@ public class DragTreeCell extends TreeCell<String> {
 
         if (!isNothing) {
             if (!isClass) {
-                this.setOnDragDetected(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
+                this.setOnDragDetected(event -> {
 
-                        Dragboard dragBoard = startDragAndDrop(TransferMode.ANY);
+                    Dragboard dragBoard = startDragAndDrop(TransferMode.ANY);
 
-                    /* Put a string on a dragboard */
-                        ClipboardContent content = new ClipboardContent();
-                        content.putString(treeItem.getValue() + "," + treeItem
-                                .getParent().getValue());
-                        dragBoard.setContent(content);
+                /* Put a string on a dragboard */
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(treeItem.getValue() + "," + treeItem
+                            .getParent().getValue());
+                    dragBoard.setContent(content);
 
-                        event.consume();
-                    }
+                    event.consume();
                 });
             }
         }

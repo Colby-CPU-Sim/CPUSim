@@ -54,15 +54,17 @@ import java.util.ResourceBundle;
 public class EditFetchSequenceController implements Initializable {
 
     @FXML ScrollPane implementationFormatScrollPane;
-    @FXML AnchorPane implementationFormatPane;
-    @FXML TreeView<String> microInstrTreeView;
+    @FXML
+    private AnchorPane implementationFormatPane;
+    @FXML
+    private TreeView<String> microInstrTreeView;
 
-    Mediator mediator;
-    TextField commentEditor;
+    private Mediator mediator;
+    private TextField commentEditor;
 
-    Microinstruction currentCommentMicro;
+    private Microinstruction currentCommentMicro;
 
-    ObservableList<Microinstruction> micros;
+    private ObservableList<Microinstruction> micros;
 
     public EditFetchSequenceController(Mediator mediator) {
         this.mediator = mediator;
@@ -110,11 +112,9 @@ public class EditFetchSequenceController implements Initializable {
             String className = db.getString().split(",")[1];
             Microinstruction micro = null;
 
-            for (String string : Machine.MICRO_CLASSES) {
-                for (Microinstruction instr : mediator.getMachine().getMicros
-                        (string)) {
-                    if (instr.getName().equals(microName) && instr.getMicroClass()
-                            .equals(className)) {
+            for (Machine.MicroClass mc : Machine.MicroClass.values()) {
+                for (Microinstruction instr : mediator.getMachine().getMicros(mc.getInstructionType())) {
+                    if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
                         micro = instr;
                     }
                 }
@@ -281,9 +281,9 @@ public class EditFetchSequenceController implements Initializable {
 
         rootNode.setExpanded(true);
 
-        for(String microClass : Machine.MICRO_CLASSES){
-            TreeItem<String> classNode = new TreeItem<>(microClass);
-            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass)){
+        for(Machine.MicroClass microClass : Machine.MicroClass.values()){
+            TreeItem<String> classNode = new TreeItem<>(microClass.getName());
+            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass.getInstructionType())){
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }
@@ -332,7 +332,7 @@ public class EditFetchSequenceController implements Initializable {
     /**
      * commits the edit made to a comment microinstructions
      */
-    public void commitCommentEdit(){
+    private void commitCommentEdit(){
         currentCommentMicro.setName(commentEditor.getText());
         updateMicros();
         commentEditor = null;

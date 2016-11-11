@@ -16,16 +16,22 @@ import cpusim.model.Machine;
 import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The shift microinstruction performs a bit-wise shift of the contents of the
  * specified source register to either the left ot the right and places the result
  * in the destination register.
  */
-public class Shift extends Microinstruction {
+public class Shift extends Microinstruction implements Copyable<Shift> {
 	
     private SimpleObjectProperty<Register> source;
     private SimpleObjectProperty<Register> destination;
@@ -155,7 +161,18 @@ public class Shift extends Microinstruction {
     public Object clone(){
         return new Shift(getName(),machine,getSource(),getDestination(),getType(),getDirection(),getDistance());
     }
-
+    
+    @Override
+    public <U extends Shift> void copyTo(final U other) {
+        checkNotNull(other);
+        other.setName(getName());
+        other.setSource(getSource());
+        other.setDestination(getDestination());
+        other.setType(getType());
+        other.setDirection(getDirection());
+        other.setDistance(getDistance());
+    }
+    
     /**
      * copies the data from the current micro to a specific micro
      * @param oldMicro the micro instruction that will be updated
@@ -254,4 +271,39 @@ public class Shift extends Microinstruction {
     public boolean uses(Module<?> m){
         return (m == source.get() || m == destination.get());
     }
+    
+    /**
+     * checks the array of Shift micros to make sure none have
+     * a negative shift distances
+     * @param shifts the list of shift objects
+     */
+    public static void validateNoNegativeDistances(List<Shift> shifts)
+    {
+        for (Shift shift : shifts) {
+            if (shift.getDistance() <= 0) {
+                throw new ValidationException("The microinstruction \"" + shift.getName() +
+                        "\" has a negative or zero shift distance.\nShift distances " +
+                        "must be positive.");
+            }
+        }
+    }
+    
+    /**
+     * checks if the two registers specified in the shift microinstructions have the same
+     * width
+     * @param shifts and array of shift microinstructions
+     */
+    public static void validateRegistersHaveEqualWidths(List<Shift> shifts)
+    {
+        for (Shift shift : shifts) {
+            if (shift.getSource().getWidth() !=
+                    shift.getDestination().getWidth()) {
+                throw new ValidationException("The microinstruction " + shift.getName() +
+                        " has different-sized registers designated " +
+                        "for source and destination.\nBoth registers " +
+                        "must have the same number of bits.");
+            }
+        }
+    }
+    
 }

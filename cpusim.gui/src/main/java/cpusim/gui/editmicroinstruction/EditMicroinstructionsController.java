@@ -12,7 +12,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.*;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
@@ -40,46 +44,61 @@ import java.util.*;
  * editing microinstructions.
  */
 public class EditMicroinstructionsController implements Initializable {
+    
     @FXML
-    ComboBox<String> microinstructionCombo;
+    private ComboBox<String> microinstructionCombo;
+    
     @FXML
-    Pane tablePane;
+    private Pane tablePane;
+    
     @FXML
-    Button newButton;
+    private Button newButton;
+    
     @FXML
-    Button deleteButton;
+    private Button deleteButton;
+    
     @FXML
-    Button duplicateButton;
+    private Button duplicateButton;
+    
     @FXML
-    Button okButton;
+    private Button okButton;
+    
     @FXML
-    Button cancelButton;
+    private Button cancelButton;
+    
     @FXML
-    Button helpButton;
+    private Button helpButton;
 
-    Mediator mediator;
+    private Mediator mediator;
 
     private Microinstruction selectedSet = null;
-    private TableView activeTable;
-    private ChangeTable tableMap;
+    private MicroController<? extends Microinstruction> activeTable;
     private ContentChangeListener listener;
     private DragTreeCell parent;
+    private ImmutableMicroControllerMap typesMap;
     
     public EditMicroinstructionsController(Mediator mediator) {
-        this.mediator = mediator;
-        activeTable = null;
-        tableMap = new ChangeTable();
-        listener = new ContentChangeListener();
+        this(mediator, null);
     }
 
     public EditMicroinstructionsController(Mediator mediator, DragTreeCell parent) {
         this.mediator = mediator;
         activeTable = null;
-        tableMap = new ChangeTable();
         listener = new ContentChangeListener();
         this.parent = parent;
+        typesMap = new ImmutableMicroControllerMap(mediator);
     }
-
+    
+    /**
+     * sets the parents frame for each controller.
+     * @param tables the controller to be edited.
+     */
+    public void setParents(Node tables) {
+        for (MicroController microController : typesMap.values()) {
+            microController.setParentFrame(tables);
+        }
+    }
+    
     /**
      * initializes the dialog window after its root element has been processed.
      * contains a listener to the combo box, so that the content of the table will
@@ -95,9 +114,9 @@ public class EditMicroinstructionsController implements Initializable {
 
         microinstructionCombo.setVisibleRowCount(14); // show all micros at once
 
-        tableMap.setParents(tablePane);
+        setParents(tablePane);
         tablePane.getChildren().clear();
-        activeTable = tableMap.getMap().get("TransferRtoR");
+        activeTable = typesMap.getController(TransferRtoR.class);
         tablePane.getChildren().add(activeTable);
 
         activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -120,12 +139,12 @@ public class EditMicroinstructionsController implements Initializable {
                 (selected, oldType, newType) -> {
                     activeTable.getSelectionModel().selectedItemProperty().
                             removeListener(listener);
-                    tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
+                    typesMap.get(oldType).getSelectionModel().clearSelection();
                     tablePane.getChildren().clear();
                     tablePane.getChildren().add(
-                            tableMap.getMap().get(newType));
+                            typesMap.get(newType));
 
-                    activeTable = tableMap.getMap().get(newType);
+                    activeTable = typesMap.getController(Machine.MicroClass.fromName(newType).getInstructionType());
                     activeTable.setPrefWidth(tablePane.getWidth());
                     activeTable.setPrefHeight(tablePane.getHeight());
                     activeTable.setColumnResizePolicy(TableView
@@ -146,7 +165,7 @@ public class EditMicroinstructionsController implements Initializable {
         EventHandler validityFilter = new EventHandler<InputEvent>() {
             public void handle(InputEvent event) {
                 try{
-                    ((MicroController)activeTable).checkValidity(activeTable.getItems());
+                    ((MicroController<?>)activeTable).checkValidity();
 
                 } catch (ValidationException ex){
                     Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
@@ -166,22 +185,7 @@ public class EditMicroinstructionsController implements Initializable {
      */
     @FXML
     protected void onNewButtonClick(ActionEvent e) {
-        //add a new item at the end of the list.
-        String uniqueName = createUniqueName(activeTable.getItems(), "?");
-        Object newObject = getCurrentController().getNewObject(uniqueName);
-
-        // A really ugly hack to fromRootController a unique opcode
-        // required by InstructionDialog
-        /**
-         if (EditDialog.this instanceof InstructionDialog) {
-         MachineInstruction instr = (MachineInstruction) newObject;
-         long uniqueOpcode =
-         ((MachineInstrFactory) getCurrentFactory()
-         ).createUniqueOpcode(model.getAllObjects());
-         instr.setOpcode(uniqueOpcode);
-         }*/
-        activeTable.getItems().add(0, newObject);
-        ((MicroController) activeTable).updateTable();
+        activeTable.createNewEntry();
     }
 
     /**
@@ -192,42 +196,7 @@ public class EditMicroinstructionsController implements Initializable {
     @FXML
     public void onDeleteButtonClick(ActionEvent e) {
         int selected = activeTable.getSelectionModel().getSelectedIndex();
-        Microinstruction theMicro =
-                (Microinstruction) activeTable.getItems().get(selected);
-
-        //first see if it is used by any machine instructions and,
-        // if so, warn the user.
-        Microinstruction oldInstr =
-                ((MicroController)activeTable).getCurrentFromClone(theMicro);
-        if (oldInstr != null) {
-            Vector instrsThatUseIt =
-                    mediator.getMachine().getInstructionsThatUse(oldInstr);
-            if (instrsThatUseIt.size() > 0) {
-                String message = theMicro + " is used by the " +
-                        "following machine instructions: \n  ";
-                for (int i = 0; i < instrsThatUseIt.size(); i++)
-                    message += instrsThatUseIt.elementAt(i) + " ";
-                message += ".\nReally delete it?";
-
-                Alert dialog = Dialogs.createConfirmationDialog(tablePane.getScene()
-                                .getWindow(),
-                        "Confirm Deletion", message);
-                Optional<ButtonType> result = dialog.showAndWait();
-                if(result.get() == ButtonType.CANCEL ||
-                        result.get() == ButtonType.NO ||
-                        result.get() == ButtonType.CLOSE)
-                    return; //don't delete anything
-            }
-        }
-
-        activeTable.getItems().remove(activeTable.getItems().indexOf(selectedSet));
-
-        if (selected == 0) {
-            activeTable.getSelectionModel().select(0);
-        }
-        else{
-            activeTable.getSelectionModel().select( selected - 1 );
-        }
+        activeTable.deleteEntry(selected);
     }
 
     /**
@@ -238,14 +207,7 @@ public class EditMicroinstructionsController implements Initializable {
     @FXML
     public void onDuplicateButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
-        Microinstruction newObject = (Microinstruction) selectedSet.clone();
-        String uniqueName = createUniqueDuplicatedName(activeTable.getItems(), newObject.getName());
-        newObject.setName(uniqueName);
-        activeTable.getItems().add(0, newObject);
-        //update display
-        ((MicroController) activeTable).updateTable();
-        activeTable.scrollTo(1);
-        activeTable.getSelectionModel().select(0);
+        activeTable.createDuplicateEntry();
     }
 
     /**
@@ -256,10 +218,8 @@ public class EditMicroinstructionsController implements Initializable {
     @FXML
     public void onOKButtonClick(ActionEvent e) {
         //get the current edited clones
-        ObservableList objList = activeTable.getItems();
-
         try{
-            getCurrentController().checkValidity(objList);
+            getCurrentController().checkValidity();
             //update the machine with the new values
             updateMachine();
             //get a handle to the stage.
@@ -273,8 +233,6 @@ public class EditMicroinstructionsController implements Initializable {
             Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
                     "Microinstruction Error", ex.getMessage()).showAndWait();
         }
-
-
     }
 
     /**
@@ -315,66 +273,17 @@ public class EditMicroinstructionsController implements Initializable {
      * @return  the table view object that is current being edited in the window.
      */
     public MicroController getCurrentController() {
-        return tableMap.getMap().get(microinstructionCombo.getValue());
+        return typesMap.get(Machine.MicroClass.fromName(microinstructionCombo.getValue()).getInstructionType());
     }
-
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "?" and tries again.
-     *
-     * @param list         list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    public String createUniqueName(ObservableList list, String proposedName) {
-        String oldName;
-        for (Object obj : list) {
-            oldName = obj.toString();
-            if (oldName != null && oldName.equals(proposedName)) {
-                return createUniqueName(list, proposedName + "?");
-            }
-        }
-        return proposedName;
-    }
-
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "copy" and tries again.
-     *
-     * @param list         list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    protected String createUniqueDuplicatedName(ObservableList list,
-                                                String proposedName) {
-        int i = 1;
-        String s = proposedName +"_copy1";
-
-        for (Object aList : list) {
-            String oldName = aList.toString();
-            // Duplicating name properly
-            if (oldName != null && oldName.equals(s)) {
-                i++;
-                s = s.substring(0, s.length()-1)+String.valueOf(i);
-            }
-        }
-        return s;
-    }
-
+    
     /**
      * Called whenever the dialog is exited via the 'ok' button
      * and the machine needs to be updated based on the changes
      * made while the dialog was open (JRL)
      */
     protected void updateMachine() {
-        for (MicroController controller : tableMap.getMap().values()) {
-            ObservableList microList = controller.getItems();
-            controller.setClones(microList);
-            controller.updateCurrentMicrosFromClones();
+        for (MicroController<?> controller : typesMap.values()) {
+            controller.updateMachineFromItems();
         }
         mediator.setMachineDirty(true);
     }
@@ -398,55 +307,6 @@ public class EditMicroinstructionsController implements Initializable {
                 selectedSet = newMicro;
                 deleteButton.setDisable(false);
                 duplicateButton.setDisable(false);
-            }
-        }
-    }
-
-    /**
-     * a class that holds the current microinstruction class
-     */
-    class ChangeTable {
-        Map<String, MicroController> typesMap;
-
-        /**
-         * Constructor
-         */
-        public ChangeTable() {
-            // an hashmap that holds types as the keys and sub fxml names as values.
-            typesMap = new HashMap<String, MicroController>() {{
-                put("Set", new SetTableController(mediator));
-                put("Test", new TestTableController(mediator));
-                put("Increment", new IncrementTableController(mediator));
-                put("Shift", new ShiftTableController(mediator));
-                put("Logical", new LogicalTableController(mediator));
-                put("Arithmetic", new ArithmeticTableController(mediator));
-                put("Branch", new BranchTableController(mediator));
-                put("TransferRtoR", new TransferRtoRTableController(mediator));
-                put("TransferRtoA", new TransferRtoATableController(mediator));
-                put("TransferAtoR", new TransferAtoRTableController(mediator));
-                put("Decode", new DecodeTableController(mediator));
-                put("SetCondBit", new SetCondBitTableController(mediator));
-                put("IO", new IOTableController(mediator));
-                put("MemoryAccess", new MemoryAccessTableController(mediator));
-            }};
-
-        }
-
-        /**
-         * returns the map of controllers.
-         * @return the map of controllers.
-         */
-        public Map<String, MicroController> getMap() {
-            return typesMap;
-        }
-
-        /**
-         * sets the parents frame for each controller.
-         * @param tables the controller to be edited.
-         */
-        public void setParents(Node tables) {
-            for (MicroController microController : typesMap.values()) {
-                microController.setParentFrame(tables);
             }
         }
     }

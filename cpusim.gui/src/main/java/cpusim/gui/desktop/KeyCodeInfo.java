@@ -5,8 +5,7 @@
  */
 package cpusim.gui.desktop;
 
-import cpusim.model.util.Convert;
-
+import cpusim.util.FXUtilities;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.MenuItem;
@@ -37,7 +36,7 @@ public class KeyCodeInfo {
         String[] keys = keyBinding.split("-");
         KeyCode key = KeyCode.getKeyCode(keys[keys.length - 1]);
         if (key == null) {
-            key = Convert.charToKeyCode(keys[keys.length - 1]);
+            key = FXUtilities.charToKeyCode(keys[keys.length - 1]);
         }
         keys[keys.length - 1] = null;
         if (keys.length > 1) {

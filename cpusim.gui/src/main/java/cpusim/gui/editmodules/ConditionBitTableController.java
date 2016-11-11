@@ -38,8 +38,8 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -83,13 +83,10 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: ConditionBitTable.fxml";
+            throw new IllegalStateException("Unable to load file: conditionBitTable.fxml", exception);
         }
 
-        for (int i = 0; i < clones.length; i++){
-            table.getItems().add((ConditionBit)clones[i]);
-        }
-
+        loadClonesIntoTableView(table);
     }
 
     /**
@@ -217,16 +214,16 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      */
     private void fixClonesToUseCloneRegisters()
     {
-        for (int i = 0; i < clones.size; i++) {
-            ConditionBit bit = (ConditionBit) clones[i];
+        for (ConditionBit bit: clones) {
             Register originalRegister = bit.getRegister();
-            Register cloneRegister =
-                    registerController.getCloneOf(originalRegister);
-            if (cloneRegister == null)
+            Register cloneRegister = registerController.getCloneOf(originalRegister);
+            if (cloneRegister == null) {
                 cloneRegister = arrayController.getCloneOf(originalRegister);
-            assert cloneRegister != null: "No clone register of " +
-                    "register " + originalRegister + " in ConditionBitController." +
-                    "fixClonesToUseCloneRegisters().";
+            } else {
+                throw new IllegalStateException("No clone register of register " + originalRegister +
+                        " in ConditionBitController.fixClonesToUseCloneRegisters().");
+            }
+
             bit.setRegister(cloneRegister);
         }
     }
@@ -235,8 +232,7 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Module getPrototype()
-    {
+    public ConditionBit getPrototype() {
         ObservableList<Register> registers = registerController.getTable().getItems();
         ObservableList<RegisterArray> arrays = arrayController.getTable().getItems();
         return new ConditionBit("???", machine,
@@ -287,41 +283,17 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
 //        return new String[]{"name", "amount"};
 //    }
 
-
-
-    /**
-     * setClones()
-     * Set the clones to the new array passed as a parameter.
-     * Does not check for validity.
-     *
-     * @param newClones Object array containing new set of clones
-     */
-    public void setClones(ObservableList newClones)
-    {
-        ConditionBit[] condBits = new ConditionBit[newClones.size()];
-        for (int i = 0; i < newClones.size(); i++) {
-            condBits[i] = (ConditionBit) newClones.get(i);
-        }
-        clones = condBits;
-    }
-
     /**
      * Check validity of array of Objects' properties.
      */
     public void checkValidity()
     {
-        // convert the array to an array of Transfers
-        ConditionBit[] conditionBits = new ConditionBit[table.getItems().size()];
-
-        for (int i = 0; i < table.getItems().size(); i++) {
-            conditionBits[i] = (ConditionBit) table.getItems().get(i);
-        }
-
         // check that all names are unique and nonempty and that none of the registers
         // are read only
-        Validate.bitInBounds(conditionBits);
-        Validate.someNameIsNone(conditionBits);
-        Validate.registersNotReadOnly(conditionBits);
+        final List<ConditionBit> items = table.getItems();
+        Validate.bitInBounds(items);
+        Validate.someNameIsNone(items);
+        Validate.registersNotReadOnly(items);
     }
 
     /**
@@ -339,26 +311,23 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
     /**
      * returns a Vector of the conditionBit clones that use the given Module
      * (either a register or a register in a register array).
-     * @param theModule an module object
+     * @param array A {@link RegisterArray} to check
      * @return a vector of the conditionBit clones
      */
-    public Vector getBitClonesThatUse(Module theModule)
+    public List<ConditionBit> getBitClonesThatUse(RegisterArray array)
     {
-        Vector result = new Vector();
-        if (theModule instanceof Register) {
-            for (int i = 0; i < clones.length; i++)
-                if (((ConditionBit) clones[i]).getRegister() == theModule)
-                    result.addElement(clones[i]);
-        }
-        else { //theModule is an instance of RegisterArray
-            RegisterArray array = (RegisterArray) theModule;
-            for (int j = 0; j < array.getLength(); j++)
-                for (int k = 0; k < clones.length; k++)
-                    if (((ConditionBit) clones[k]).getRegister() ==
-                            array.registers().get(j))
-                        result.addElement(clones[k]);
-        }
-        return result;
+        final Set<Register> arrSet = new HashSet<>();
+        arrSet.addAll(array.registers());
+
+        return clones.stream()
+                .filter(cl -> arrSet.contains(cl.getRegister()))
+                .collect(Collectors.toList());
+    }
+
+    public List<ConditionBit> getBitClonesThatUse(Register register) {
+        return clones.stream()
+                .filter(cl -> cl.getRegister() == register)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -3,11 +3,9 @@
  */
 package cpusim.util;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import cpusim.gui.editmodules.ConditionBitTableController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
@@ -41,12 +39,11 @@ public class ValidateControllers {
      * @since 2015-02-12
      */
     public static void registerWidthsAreOkay(ConditionBitTableController bitController,
-                                      Register[] registers)
+                                             List<? extends Register> registers)
     {
         for (Register register : registers) {
-            Vector bits = bitController.getBitClonesThatUse(register);
-            for (int j = 0; j < bits.size(); j++) {
-                ConditionBit bit = (ConditionBit) bits.elementAt(j);
+            List<ConditionBit> bits = bitController.getBitClonesThatUse(register);
+            for (ConditionBit bit: bits) {
                 if (bit.getBit() >= register.getWidth()) {
                     throw new ValidationException("ConditionBit " + bit.getName() +
                             " refers to bit " + bit.getBit() + " of register " +
@@ -68,18 +65,15 @@ public class ValidateControllers {
      * @since 2015-02-12
      */
     public static void registerArrayWidthsAreOkay(ConditionBitTableController bitController,
-                                                  RegisterArray[] arrays)
+                                                  List<? extends RegisterArray> arrays)
     {
         for (RegisterArray array : arrays) {
-            for (int k = 0; k < array.getLength(); k++) {
-                Vector bits = bitController.getBitClonesThatUse(array.registers().get(k));
-                for (int j = 0; j < bits.size(); j++) {
-                    ConditionBit bit = (ConditionBit) bits.elementAt(j);
-                    if (bit.getBit() >= array.registers().get(k).getWidth()) {
-                        throw new ValidationException("ConditionBit " + bit.getName() +
-                                " refers to bit " + bit.getBit() + " of register " +
-                                array.registers().get(k) +
-                                ",\nso you can't make the array " +
+            for (Register register : array) {
+                List<ConditionBit> bits = bitController.getBitClonesThatUse(register);
+                for (ConditionBit bit : bits) {
+                    if (bit.getBit() >= register.getWidth()) {
+                        throw new ValidationException("ConditionBit " + bit.getName() + " refers to bit " +
+                                bit.getBit() + " of register " + register + ",\nso you can't make the array " +
                                 "narrower than " + (bit.getBit() + 1) + " bits.");
                     }
                 }
@@ -93,22 +87,21 @@ public class ValidateControllers {
      */
     public static void registerArrayWidthsAreOkayForTransferMicros(
             Machine machine,
-            RegisterArray[] arrays,
+            List<? extends RegisterArray> arrays,
             RegisterArrayTableController controller)
     {
         //make a HashMap of old arrays as keys and new widths as
         //Integer values
-        HashMap newWidths = new HashMap();
-        for (int i = 0; i < machine.getModule("registerArrays").size(); i++)
-            newWidths.put(
-                    machine.getModule("registerArrays").get(i),
-                    ((RegisterArray)
-                            machine.getModule("registerArrays").get(i)).getWidth());
+        final Map<RegisterArray, Integer> newWidths = new HashMap<>();
+
+        newWidths.putAll(
+                machine.getModule("registerArrays", RegisterArray.class).stream()
+                    .collect(Collectors.toMap(Function.identity(), RegisterArray::getWidth)));
+
 
         //now adjust the HashMap to use the new proposed widths
         for (RegisterArray array : arrays) {
-            RegisterArray oldArray =
-                    (RegisterArray) controller.getCurrentFromClone(array);
+            RegisterArray oldArray = controller.getCurrentFromClone(array);
             if (oldArray != null) {
                 newWidths.put(oldArray, array.getWidth());
             }
@@ -116,25 +109,21 @@ public class ValidateControllers {
 
         //now go through all transfers to see if width changes will make them
         //invalid
-        ObservableList<Microinstruction> transferAtoRs = machine.getMicros("transferAtoR");
-        for (Microinstruction transferAtoR : transferAtoRs) {
-            TransferAtoR t = (TransferAtoR) transferAtoR;
-            int sourceWidth =
-                    (Integer) newWidths.get(t.getSource());
+        ObservableList<TransferAtoR> transferAtoRs = machine.getMicros(TransferAtoR.class);
+        for (TransferAtoR t : transferAtoRs) {
+            int sourceWidth = newWidths.get(t.getSource());
             if (sourceWidth < t.getSrcStartBit() + t.getNumBits()) {
                 throw new ValidationException("The new width " + sourceWidth +
                         " of register array " + t.getSource() +
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
         }
-        ObservableList<Microinstruction> transferRtoAs = machine.getMicros("transferRtoA");
-        for (Microinstruction transferRtoA : transferRtoAs) {
-            TransferRtoA t = (TransferRtoA) transferRtoA;
-            int destWidth =
-                    (Integer) newWidths.get(t.getDest());
+
+        ObservableList<TransferRtoA> transferRtoAs = machine.getMicros(TransferRtoA.class);
+        for (TransferRtoA t : transferRtoAs) {
+            final int destWidth = newWidths.get(t.getDest());
             if (destWidth < t.getDestStartBit() + t.getNumBits()) {
-                throw new ValidationException("The new width " + destWidth +
-                        " of register array " + t.getDest() +
+                throw new ValidationException("The new width " + destWidth + " of register array " + t.getDest() +
                         "\ncauses microinstruction " + t + " to be invalid.");
             }
         }
