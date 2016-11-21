@@ -36,7 +36,6 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Copyable;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -91,157 +90,6 @@ public class Machine extends Module<Machine> implements Serializable {
         HALTED_STEP_BY_MICRO
     }
 
-    public enum MicroClass {
-        ARITHMETIC("arithmetic", Arithmetic.class)
-        , BRANCH("branch", Branch.class)
-        , DECODE("decode", Decode.class)
-        , END("end", End.class)
-        , COMMENT("comment", Comment.class)
-        , INCREMENT("increment", Increment.class)
-        , IO("io", IO.class)
-        , LOGICAL("logical", Logical.class)
-        , MEMORY_ACCESS("memoryAccess", MemoryAccess.class)
-        , SET("set", CpusimSet.class)
-        , SET_COND_BIT("setCondBit", SetCondBit.class)
-        , SHIFT("shift", Shift.class)
-        , TEST("test", Test.class)
-        , TRANSFER_R2R("transferRtoR", TransferRtoR.class)
-        , TRANSFER_R2A("transferRtoA", TransferRtoA.class)
-        , TRANSFER_A2R("transferAtoR", TransferAtoR.class);
-
-        private final String name;
-        private final Class<? extends Microinstruction> instructionType;
-
-        private static final ImmutableMap<Class<? extends Microinstruction>, MicroClass> FROM_CLASS
-                = ImmutableMap.copyOf(Arrays.stream(MicroClass.values())
-                    .collect(Collectors.toMap(MicroClass::getInstructionType, Function.identity())));
-
-        private static final ImmutableMap<String, MicroClass> FROM_NAME
-                = ImmutableMap.copyOf(Arrays.stream(MicroClass.values())
-                .collect(Collectors.toMap(MicroClass::getName, Function.identity())));
-
-        MicroClass(final String name, final Class<? extends Microinstruction> clazz) {
-            this.name = name;
-            this.instructionType = clazz;
-        }
-
-        /**
-         * Get the {@link MicroClass} from the value stored from {@link #getName()}.
-         * @param name Name to find
-         * @return
-         *
-         * @throws NoSuchElementException if the {@code name} does not exist.
-         */
-        public static MicroClass fromName(final String name) {
-            final MicroClass m = FROM_NAME.get(name);
-            if (m == null) {
-                throw new NoSuchElementException("Name does not exist: " + name);
-            }
-
-            return m;
-        }
-
-        /**
-         * Get the {@link MicroClass} from the value stored from {@link #getName()}.
-         * @param clazz Corresponding class.
-         * @return
-         *
-         * @throws NoSuchElementException if the {@code clazz} does not exist.
-         */
-        public static MicroClass fromClass(final Class<? extends Microinstruction> clazz) {
-            final MicroClass m = FROM_CLASS.get(clazz);
-            if (m == null) {
-                throw new NoSuchElementException("Class does not exist: " + clazz.getName());
-            }
-
-            return m;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Class<? extends Microinstruction> getInstructionType() {
-            return instructionType;
-        }
-    }
-//
-//    public enum ModuleClass {
-//
-//        ARITHMETIC("arithmetic", Arithmetic.class)
-//        , BRANCH("branch", Branch.class)
-//        , DECODE("decode", Decode.class)
-//        , END("end", End.class)
-//        , COMMENT("comment", Comment.class)
-//        , INCREMENT("increment", Increment.class)
-//        , IO("io", IO.class)
-//        , LOGICAL("logical", Logical.class)
-//        , MEMORY_ACCESS("memoryAccess", MemoryAccess.class)
-//        , SET("set", CpusimSet.class)
-//        , SET_COND_BIT("setCondBit", SetCondBit.class)
-//        , SHIFT("shift", Shift.class)
-//        , TEST("test", Test.class)
-//        , TRANSFER_R2R("transferRtoR", TransferRtoR.class)
-//        , TRANSFER_R2A("transferRtoA", TransferRtoA.class)
-//        , TRANSFER_A2R("transferAtoR", TransferAtoR.class);
-//
-//        private final String name;
-//        private final Class<? extends Module<?>> instructionType;
-//
-//        private static final ImmutableMap<Class<? extends Module<?>>, ModuleClass> FROM_CLASS
-//                = ImmutableMap.copyOf(Arrays.stream(ModuleClass.values())
-//                .collect(Collectors.toMap(ModuleClass::getInstructionType, Function.identity())));
-//
-//        private static final ImmutableMap<String, ModuleClass> FROM_NAME
-//                = ImmutableMap.copyOf(Arrays.stream(ModuleClass.values())
-//                .collect(Collectors.toMap(ModuleClass::getName, Function.identity())));
-//
-//        ModuleClass(final String name, final Class<? extends Module<?>> clazz) {
-//            this.name = name;
-//            this.instructionType = clazz;
-//        }
-//
-//        /**
-//         * Get the {@link MicroClass} from the value stored from {@link #getName()}.
-//         * @param name Name to find
-//         * @return
-//         *
-//         * @throws NoSuchElementException if the {@code name} does not exist.
-//         */
-//        public static ModuleClass fromName(final String name) {
-//            final ModuleClass m = FROM_NAME.get(name);
-//            if (m == null) {
-//                throw new NoSuchElementException("Name does not exist: " + name);
-//            }
-//
-//            return m;
-//        }
-//
-//        /**
-//         * Get the {@link MicroClass} from the value stored from {@link #getName()}.
-//         * @param clazz Corresponding class.
-//         * @return
-//         *
-//         * @throws NoSuchElementException if the {@code clazz} does not exist.
-//         */
-//        public static ModuleClass fromClass(final Class<? extends Module<?>> clazz) {
-//            final ModuleClass m = FROM_CLASS.get(clazz);
-//            if (m == null) {
-//                throw new NoSuchElementException("Class does not exist: " + clazz.getName());
-//            }
-//
-//            return m;
-//        }
-//
-//        public String getName() {
-//            return name;
-//        }
-//
-//        public Class<? extends Module<?>> getInstructionType() {
-//            return instructionType;
-//        }
-//    }
-
 
 
     /**
@@ -263,9 +111,9 @@ public class Machine extends Module<Machine> implements Serializable {
     // EQUs
     private ObservableList<EQU> EQUs;
     // key = micro name, value = list of microinstructions
-    private EnumMap<MicroClass, ObservableList<Microinstruction>> microMap;
-    // key = module name, value = list of modules
-    private Map<String, ObservableList<? extends Module<?>>> moduleMap;
+    private Map<Class<? extends Microinstruction>, ObservableList<? extends Microinstruction>> microMap;
+    // key = module type, value = list of modules
+    private Map<Class<? extends Module<?>>, ObservableList<? extends Module<?>>> moduleMap;
     // Control unit for keeping track of index of micro within machine instruction
     private ControlUnit controlUnit;
     // The machine's fetch sequence
@@ -304,7 +152,7 @@ public class Machine extends Module<Machine> implements Serializable {
                 StateWrapper(State.NEVER_RUN, ""));
 
         moduleMap = new HashMap<>();
-        microMap = new EnumMap<>(MicroClass.class);
+        microMap = new HashMap<>();
 
         instructions = new ArrayList<>();
         EQUs = FXCollections.observableArrayList(new ArrayList<EQU>());
@@ -549,20 +397,22 @@ public class Machine extends Module<Machine> implements Serializable {
      *
      * @param moduleType a String that describes the type of module
      * @return a Vector object
+     *
+     * @deprecated Use {@link #getModule(Class)}
      */
     public ObservableList<? extends Module<?>> getModule(String moduleType) {
-        return moduleMap.get(moduleType);
+        return moduleMap.get(ModuleClassMapping.fromName(moduleType));
     }
     
     /**
      * A getter method for all module objects
      *
-     * @param moduleType a String that describes the type of module
+     * @param moduleClazz a String that describes the type of module
      * @return a Vector object
      */
     @SuppressWarnings("unchecked")
-    public <T extends Module<T>> ObservableList<T> getModule(String moduleType, Class<T> clazz) {
-        return (ObservableList<T>)moduleMap.get(moduleType);
+    public <T extends Module<T>> ObservableList<T> getModule(@SuppressWarnings("unused") Class<T> moduleClazz) {
+        return (ObservableList<T>)moduleMap.get(moduleClazz);
     }
 
     /**
@@ -570,9 +420,11 @@ public class Machine extends Module<Machine> implements Serializable {
      *
      * @param micro a String that describes the microinstruction type
      * @return a Vector object
+     *
+     * @deprecated Use {@link #getMicros(Class)}
      */
-    public ObservableList<Microinstruction> getMicros(String micro) {
-        return microMap.get(MicroClass.fromName(micro).getName());
+    public ObservableList<? extends Microinstruction> getMicros(String micro) {
+        return microMap.get(MicroClassMapping.fromName(micro));
     }
     
     /**
@@ -580,10 +432,12 @@ public class Machine extends Module<Machine> implements Serializable {
      *
      * @param clazz Denotes the type stored
      * @return a Vector object
+     *
+     * @since 2016-11-20
      */
     @SuppressWarnings("unchecked")
     public <U extends Microinstruction> ObservableList<U> getMicros(Class<U> clazz) {
-        return (ObservableList<U>)microMap.get(MicroClass.fromClass(clazz).getName());
+        return (ObservableList<U>)microMap.get(clazz);
     }
 
     public List<MachineInstruction> getInstructions() {
@@ -636,18 +490,18 @@ public class Machine extends Module<Machine> implements Serializable {
     }
 
     private void initializeModuleMap() {
-        moduleMap.put("registers", registers);
-        moduleMap.put("registerArrays", registerArrays);
-        moduleMap.put("conditionBits", conditionBits);
-        moduleMap.put("rams", rams);
+        moduleMap.put(Register.class, registers);
+        moduleMap.put(RegisterArray.class, registerArrays);
+        moduleMap.put(ConditionBit.class, conditionBits);
+        moduleMap.put(RAM.class, rams);
     }
 
 
     private void initializeMicroMap() {
-        for (MicroClass aMicroClass : MicroClass.values())
-            microMap.put(aMicroClass, FXCollections.observableArrayList(new ArrayList<>()));
-        microMap.get(MicroClass.END).add(new End(this));
-        microMap.get(MicroClass.COMMENT).add(new Comment());
+        for (Class<? extends Microinstruction> microClazz : MICRO_CLASSES)
+            microMap.put(microClazz, FXCollections.observableArrayList(new ArrayList<>()));
+        getMicros(End.class).add(new End(this));
+        getMicros(Comment.class).add(new Comment());
     }
 
     //--------------------------------
@@ -713,7 +567,7 @@ public class Machine extends Module<Machine> implements Serializable {
     //-----------------------------------
     // returns a new observable list containing all the RAMs of the machine.
     public ObservableList<RAM> getAllRAMs() {
-        return getModule("rams", RAM.class);
+        return getModule(RAM.class);
     }
 
     //-------------------------------
@@ -792,10 +646,10 @@ public class Machine extends Module<Machine> implements Serializable {
     // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
     public Map<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module<?> m) {
-        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(MicroClass.values().length);
+        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(MICRO_CLASSES.size());
 
-        for (MicroClass mc : MicroClass.values()) {
-            ObservableList<Microinstruction> v = microMap.get(mc.getName());
+        for (Class<? extends Microinstruction> mc : MICRO_CLASSES) {
+            ObservableList<? extends Microinstruction> v = getMicros(mc);
             v.stream().filter(micro -> micro.uses(m))
                     .collect(Collectors.toMap(Function.identity(), _ignore -> v));
         }
@@ -803,10 +657,11 @@ public class Machine extends Module<Machine> implements Serializable {
         return result;
     }
 
-    //-------------------------------
-    // updates the End microinstruction
+    /**
+     * updates the {@link End} microinstruction
+     */
     public void setEnd(End end) {
-        ObservableList<Microinstruction> ends = microMap.get("end");
+        ObservableList<End> ends = getMicros(End.class);
         ends.clear();
         ends.add(end);
     }
@@ -817,31 +672,34 @@ public class Machine extends Module<Machine> implements Serializable {
         //first delete arithmetics, setCondBits, and increments that use
         //any deleted ConditionBits, including removing
         //these micros from all machine instructions that use them.
-        for (int i = getMicros("arithmetic").size() - 1; i >= 0; i--) {
-            Arithmetic micro = (Arithmetic) getMicros("arithmetic").get(i);
-            if (((!newConditionBits.contains(micro.getOverflowBit())) &&
+
+        final List<Arithmetic> arithmetics = getMicros(Arithmetic.class);
+        arithmetics.stream().filter(micro ->
+                (((!newConditionBits.contains(micro.getOverflowBit())) &&
                     (micro.getOverflowBit() != ConditionBit.none())) ||
                     ((!newConditionBits.contains(micro.getCarryBit())) &&
-                            (micro.getCarryBit() != ConditionBit.none()))) {
-                removeAllOccurencesOf(micro);
-                getMicros("arithmetic").remove(micro);
-            }
-        }
-        for (int i = getMicros("setCondBit").size() - 1; i >= 0; i--) {
-            SetCondBit micro = (SetCondBit) getMicros("setCondBit").get(i);
-            if (!newConditionBits.contains(micro.getBit())) {
-                removeAllOccurencesOf(micro);
-                getMicros("setCondBit").remove(micro);
-            }
-        }
-        for (int i = getMicros("increment").size() - 1; i >= 0; i--) {
-            Increment micro = (Increment) getMicros("increment").get(i);
-            if ((!newConditionBits.contains(micro.getOverflowBit())) &&
-                    (micro.getOverflowBit() != ConditionBit.none())) {
-                removeAllOccurencesOf(micro);
-                getMicros("increment").remove(micro);
-            }
-        }
+                            (micro.getCarryBit() != ConditionBit.none())))
+        ).forEach(m -> {
+            removeAllOccurencesOf(m);
+            arithmetics.remove(m);
+        });
+
+        final List<SetCondBit> setCondBits = getMicros(SetCondBit.class);
+        setCondBits.stream().filter(micro -> !newConditionBits.contains(micro.getBit()))
+                .forEach(micro -> {
+                    removeAllOccurencesOf(micro);
+                    setCondBits.remove(micro);
+                });
+
+        final List<Increment> increments = getMicros(Increment.class);
+        increments.stream().filter(micro ->
+                ((!newConditionBits.contains(micro.getOverflowBit())) &&
+                    (micro.getOverflowBit() != ConditionBit.none())))
+                .forEach(micro -> {
+                    removeAllOccurencesOf(micro);
+                    increments.remove(micro);
+                });
+
         conditionBits.clear();
         conditionBits.addAll(newConditionBits);
     }
@@ -868,49 +726,18 @@ public class Machine extends Module<Machine> implements Serializable {
     
     /**
      *
-     * @param microClass
+     * @param microClazz
      * @param newMicros
-     *
-     * @deprecated Use {@link #setMicros(Class, ObservableList)} instead.
      */
-    public void setMicros(MicroClass microClass, ObservableList<Microinstruction> newMicros) {
+    public <U extends Microinstruction> void setMicros(Class<U> microClazz, ObservableList<U> newMicros) {
         //first delete all references in machine instructions
         // to any old micros not in the new list
-        ObservableList<Microinstruction> oldMicros = microMap.get(microClass);
-        for (Microinstruction oldMicro : oldMicros) {
-            if (!newMicros.contains(oldMicro)) {
-                removeAllOccurencesOf(oldMicro);
-            }
-        }
+        getMicros(microClazz).stream()
+                .filter(oldMicro -> !newMicros.contains(oldMicro))
+                .forEach(this::removeAllOccurencesOf);
         
-        microMap.put(microClass, newMicros);
+        microMap.put(microClazz, newMicros);
     }
-    
-    
-    /**
-     * Delegates to {@link #setMicros(MicroClass, ObservableList)}
-     * @param microClass
-     * @param newMicros
-     * @param <T>
-     *
-     * @author Kevin Brightwell (@Nava2)
-     * @since 12 November 2016
-     */
-    public <T extends Microinstruction> void setMicros(Class<T> microClass, ObservableList<T> newMicros) {
-        final MicroClass mc = MicroClass.fromClass(microClass);
-        @SuppressWarnings("unchecked") ObservableList<Microinstruction> toInsert = (ObservableList<Microinstruction>)newMicros;
-    
-        ObservableList<Microinstruction> oldMicros = microMap.get(microClass);
-        for (Microinstruction oldMicro : oldMicros) {
-            if (!newMicros.contains(oldMicro)) {
-                removeAllOccurencesOf(oldMicro);
-            }
-        }
-    
-        microMap.put(mc, toInsert);
-    }
-
-    // other utility methods
 
     //--------------------------------
     // returns true if the given microinstruction is in the hash table
@@ -919,46 +746,51 @@ public class Machine extends Module<Machine> implements Serializable {
         return microMap.values().stream().anyMatch(v -> v.contains(micro));
     }
 
-    //--------------------------------
-    // resetAllChannels
+    /**
+     * Resets all {@link IO#getConnection()} channels.
+     */
     public void resetAllChannels() {
-        ObservableList ios = getMicros("io");
-        for (Object io : ios) {
-            ((IO) io).getConnection().reset();
-        }
+        getMicros(IO.class).stream()
+                .map(IO::getConnection)
+                .forEach(IOChannel::reset);
     }
 
+    /**
+     * Resets all of the channels except for the {@link StreamChannel#console()}.
+     */
     public void resetAllChannelsButConsole() {
-        ObservableList ios = getMicros("io");
-        for (Object io : ios) {
-            IOChannel channel = ((IO) io).getConnection();
-            if (channel != StreamChannel.console()) {
-                channel.reset();
-            }
-        }
+        getMicros(IO.class).stream()
+                .map(IO::getConnection)
+                .filter(c -> c != StreamChannel.console())
+                .forEach(IOChannel::reset);
     }
 
-    //--------------------------------
-    // JRL (11.3.00) clearAllRegisters
+    /**
+     * Calls {@link Register#clear()} on all {@link Register} values.
+     */
     public void clearAllRegisters() {
-        getModule("registers", Register.class).forEach(Register::clear);
+        getModule(Register.class).forEach(Register::clear);
     }
 
-    //--------------------------------
-    // JRL (11.3.00) clearAllRegisterArrays
+    /**
+     * Calls {@link Register#clear()} on all {@link Register} values.
+     */
     public void clearAllRegisterArrays() {
-        getModule("registerArrays", RegisterArray.class).forEach(RegisterArray::clear);
+        getModule(RegisterArray.class).forEach(RegisterArray::clear);
     }
 
-    //--------------------------------
-    // JRL (11.3.00) clearAllRAMs
+    /**
+     * clearAllRAMs
+     * @since 2000-11-03
+     */
     public void clearAllRAMs() {
-        getModule("rams", RAM.class).forEach(RAM::clear);
+        getModule(RAM.class).forEach(RAM::clear);
     }
 
-    //--------------------------------
-    // returns a Vector of all machine instructions that use m
-    public List<MachineInstruction> getInstructionsThatUse(Microinstruction m) {
+    /**
+     * @return {@link List} of all {@link Microinstruction}s that use m
+     */
+    public List<MachineInstruction> getInstructionsThatUse(final Microinstruction m) {
         List<MachineInstruction> result = instructions.stream()
                 .filter(instr -> instr.usesMicro(m))
                 .collect(Collectors.toList());
@@ -976,15 +808,17 @@ public class Machine extends Module<Machine> implements Serializable {
     public List<MachineInstruction> getInstructionsThatUse(final Field f) {
         checkNotNull(f);
         
-        List<MachineInstruction> result = instructions.stream()
+        return instructions.stream()
                 .filter(instr -> instr.usesField(f))
                 .collect(Collectors.toList());
-        return result;
     }
 
-    //--------------------------------
-    // deletes from all machine instructions every use of m
-    public void removeAllOccurencesOf(Microinstruction m) {
+    /**
+     * deletes from all machine instructions every use of m
+     * @param m The microinstruction to remove
+     */
+
+    private void removeAllOccurencesOf(Microinstruction m) {
         instructions.forEach(in -> in.removeMicro(m));
         fetchSequence.removeMicro(m);
     }
@@ -1162,9 +996,8 @@ public class Machine extends Module<Machine> implements Serializable {
 
                     // write buf to output file channel
                     if ((getStateWrapper().getState() == Machine.State.EXECUTION_HALTED &&
-                            ((boolean) getStateWrapper().getValue()) == true) ||
-                            getStateWrapper().getState() == Machine.State
-                                    .EXCEPTION_THROWN) {
+                            ((boolean) getStateWrapper().getValue())) ||
+                            getStateWrapper().getState() == Machine.State.EXCEPTION_THROWN) {
                         ObservableList<IO> ios = getMicros(IO.class);
                         for (IO io : ios) {
                             final IOChannel channel = io.getConnection();
@@ -1195,47 +1028,32 @@ public class Machine extends Module<Machine> implements Serializable {
      * Test micros
      */
     public void changeStartBits() {
-        for (Module m : this.getModule("conditionBits")) {
-            ConditionBit cb = (ConditionBit) m;
+        for (ConditionBit cb : getModule(ConditionBit.class)) {
             cb.setBit(cb.getRegister().getWidth() - cb.getBit() - 1);
         }
 
-        for (Microinstruction micro : this.getMicros("transferRtoR")) {
-            TransferRtoR tRtoR = (TransferRtoR) micro;
-            tRtoR.setDestStartBit(tRtoR.getDest().getWidth() - tRtoR.getNumBits() -
-                    tRtoR.getDestStartBit());
-            tRtoR.setSrcStartBit(tRtoR.getSource().getWidth() - tRtoR.getNumBits() -
-                    tRtoR.getSrcStartBit());
+        for (TransferRtoR tRtoR : getMicros(TransferRtoR.class)) {
+            tRtoR.setDestStartBit(tRtoR.getDest().getWidth() - tRtoR.getNumBits() - tRtoR.getDestStartBit());
+            tRtoR.setSrcStartBit(tRtoR.getSource().getWidth() - tRtoR.getNumBits() - tRtoR.getSrcStartBit());
         }
 
-        for (Microinstruction micro : this.getMicros("transferRtoA")) {
-            TransferRtoA tRtoA = (TransferRtoA) micro;
-            tRtoA.setDestStartBit(tRtoA.getDest().getWidth() - tRtoA.getNumBits() -
-                    tRtoA.getDestStartBit());
-            tRtoA.setSrcStartBit(tRtoA.getSource().getWidth() - tRtoA.getNumBits() -
-                    tRtoA.getSrcStartBit());
-            tRtoA.setIndexStart(tRtoA.getIndex().getWidth() - tRtoA.getIndexNumBits() -
-                    tRtoA.getIndexStart());
+        for (TransferRtoA tRtoA : getMicros(TransferRtoA.class)) {
+            tRtoA.setDestStartBit(tRtoA.getDest().getWidth() - tRtoA.getNumBits() - tRtoA.getDestStartBit());
+            tRtoA.setSrcStartBit(tRtoA.getSource().getWidth() - tRtoA.getNumBits() - tRtoA.getSrcStartBit());
+            tRtoA.setIndexStart(tRtoA.getIndex().getWidth() - tRtoA.getIndexNumBits() - tRtoA.getIndexStart());
         }
 
-        for (Microinstruction micro : this.getMicros("transferAtoR")) {
-            TransferAtoR tAtoR = (TransferAtoR) micro;
-            tAtoR.setDestStartBit(tAtoR.getDest().getWidth() - tAtoR.getNumBits() -
-                    tAtoR.getDestStartBit());
-            tAtoR.setSrcStartBit(tAtoR.getSource().getWidth() - tAtoR.getNumBits() -
-                    tAtoR.getSrcStartBit());
-            tAtoR.setIndexStart(tAtoR.getIndex().getWidth() - tAtoR.getIndexNumBits() -
-                    tAtoR.getIndexStart());
+        for (TransferAtoR tAtoR : this.getMicros(TransferAtoR.class)) {
+            tAtoR.setDestStartBit(tAtoR.getDest().getWidth() - tAtoR.getNumBits() - tAtoR.getDestStartBit());
+            tAtoR.setSrcStartBit(tAtoR.getSource().getWidth() - tAtoR.getNumBits() - tAtoR.getSrcStartBit());
+            tAtoR.setIndexStart(tAtoR.getIndex().getWidth() - tAtoR.getIndexNumBits() - tAtoR.getIndexStart());
         }
 
-        for (Microinstruction micro : this.getMicros("test")) {
-            Test test = (Test) micro;
-            test.setStart(test.getRegister().getWidth() - test.getNumBits() - test
-                    .getStart());
+        for (Test test : getMicros(Test.class)) {
+            test.setStart(test.getRegister().getWidth() - test.getNumBits() - test.getStart());
         }
 
-        for (Microinstruction micro : this.getMicros("set")) {
-            CpusimSet set = (CpusimSet) micro;
+        for (CpusimSet set : getMicros(CpusimSet.class)) {
             set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart());
         }
     }
@@ -1245,15 +1063,9 @@ public class Machine extends Module<Machine> implements Serializable {
     // specified by all Halt micros have value 1
 
     public List<ConditionBit> haltBitsThatAreSet() {
-    	
-        List<ConditionBit> result = Lists.newArrayListWithCapacity(getModule("conditionBits").size());
-        for (int i = 0; i < getModule("conditionBits").size(); i++) {
-            ConditionBit condBit = conditionBits.get(i);
-            if (condBit.getHalt() && condBit.isSet()) {
-                result.add(condBit);
-            }
-        }
-        return result;
+        return getModule(ConditionBit.class).stream()
+                .filter(c -> c.getHalt() && c.isSet())
+                .collect(Collectors.toList());
     }
 
     public ObservableList<Register> getRegisters() {
@@ -1272,26 +1084,13 @@ public class Machine extends Module<Machine> implements Serializable {
                 }
         }
         //now do the same for the fetch sequence
-        for (Microinstruction micro : fetchSequence.getMicros())
+        for (Microinstruction micro : fetchSequence.getMicros()) {
             if (micro instanceof Comment) {
                 result.add((Comment) micro);
             }
+        }
+
         return result;
-    }
-
-    //----------------------------------------
-    // Module abstract methods that are implemented here
-
-    public Object clone() {
-        return new Machine(getName());
-        // DJS Do more here?
-    }
-
-    @Deprecated
-    public void copyDataTo(Module<?> newModule) {
-        assert newModule instanceof Machine : "Passed non-Machine to Machine.copyDataTo" +
-                "()";
-        // DJS Do more here?
     }
 
 	@Override
@@ -1308,5 +1107,108 @@ public class Machine extends Module<Machine> implements Serializable {
 	public <U extends Machine> void copyTo(U other) {
 		throw new UnsupportedOperationException("Unimplemented.");
 	}
+
+
+	private static ImmutableList<Class<? extends Microinstruction>> MICRO_CLASSES;
+    {
+        ImmutableList.Builder<Class<? extends Microinstruction>> bld = ImmutableList.builder();
+        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType).forEach(bld::add);
+        MICRO_CLASSES = bld.build();
+    }
+
+
+    /**
+     * Type to map between older {@link String} names to {@link Class} instances. This is only for transitioning. Later,
+     * perhaps injection.
+     *
+     * @deprecated Do not use, transition to using {@link Class} values directly.
+     */
+    private enum MicroClassMapping {
+        ARITHMETIC("arithmetic", Arithmetic.class)
+        , BRANCH("branch", Branch.class)
+        , DECODE("decode", Decode.class)
+        , END("end", End.class)
+        , COMMENT("comment", Comment.class)
+        , INCREMENT("increment", Increment.class)
+        , IO("io", IO.class)
+        , LOGICAL("logical", Logical.class)
+        , MEMORY_ACCESS("memoryAccess", MemoryAccess.class)
+        , SET("set", CpusimSet.class)
+        , SET_COND_BIT("setCondBit", SetCondBit.class)
+        , SHIFT("shift", Shift.class)
+        , TEST("test", Test.class)
+        , TRANSFER_R2R("transferRtoR", TransferRtoR.class)
+        , TRANSFER_R2A("transferRtoA", TransferRtoA.class)
+        , TRANSFER_A2R("transferAtoR", TransferAtoR.class);
+
+        final String name;
+        final Class<? extends Microinstruction> instructionType;
+
+        private static final ImmutableMap<String, MicroClassMapping> FROM_NAME
+                = ImmutableMap.copyOf(Arrays.stream(MicroClassMapping.values())
+                .collect(Collectors.toMap(m -> m.name, Function.identity())));
+
+        MicroClassMapping(final String name, final Class<? extends Microinstruction> clazz) {
+            this.name = name;
+            this.instructionType = clazz;
+        }
+
+        /**
+         * Get the {@link MicroClassMapping} from the value stored from {@link #getName()}.
+         * @param name Name to find
+         *
+         * @throws NoSuchElementException if the {@code name} does not exist.
+         */
+        public static Class<? extends Microinstruction> fromName(final String name) {
+            final MicroClassMapping m = FROM_NAME.get(name);
+            if (m == null) {
+                throw new NoSuchElementException("Name does not exist: " + name);
+            }
+
+            return m.instructionType;
+        }
+    }
+
+
+    /**
+     *
+     * @deprecated This is a transition type between {@link String} values and {@link Class}-based {@link Map}.
+     */
+    private enum ModuleClassMapping {
+
+        REGISTER("arithmetic", Register.class)
+        , REGISTER_ARRAY("registerArrays", RegisterArray.class)
+        , RAM("rams", RAM.class)
+        , CONDITION_BIT("conditionBits", ConditionBit.class);
+
+        private final String name;
+        private final Class<? extends Module<?>> moduleType;
+
+
+        private static final ImmutableMap<String, ModuleClassMapping> FROM_NAME
+                = ImmutableMap.copyOf(Arrays.stream(ModuleClassMapping.values())
+                .collect(Collectors.toMap(m -> m.name, Function.identity())));
+
+        ModuleClassMapping(final String name, final Class<? extends Module<?>> clazz) {
+            this.name = name.toLowerCase();
+            this.moduleType = clazz;
+        }
+
+        /**
+         * Get the {@link ModuleClassMapping} from the value stored from {@link #getName()}.
+         * @param name Name to find
+         * @return
+         *
+         * @throws NoSuchElementException if the {@code name} does not exist.
+         */
+        public static Class<? extends Module<?>> fromName(final String name) {
+            final ModuleClassMapping m = FROM_NAME.get(name.toLowerCase());
+            if (m == null) {
+                throw new NoSuchElementException("Name does not exist: " + name);
+            }
+
+            return m.moduleType;
+        }
+    }
 
 }

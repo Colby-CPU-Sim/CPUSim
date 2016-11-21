@@ -12,6 +12,7 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
@@ -40,33 +41,22 @@ import java.util.ResourceBundle;
  */
 public class RAMsTableController
         extends ModuleController<RAM> implements Initializable {
-    @FXML TableView<RAM> table;
-    @FXML TableColumn<RAM,String> name;
-    @FXML TableColumn<RAM,Integer> length;
-    @FXML TableColumn<RAM,Integer> cellSize;
 
-    private ObservableList<RAM> currentRAMs;
-    private RAM prototype;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<RAM,String> name;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<RAM,Integer> length;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<RAM,Integer> cellSize;
 
     /**
      * Constructor
      * @param mediator holds the machine and information needed
      */
-    public RAMsTableController(Mediator mediator){
-        super(mediator, RAM.class);
-        this.currentRAMs = machine.getAllRAMs();
-        this.prototype = new RAM("???",128, 8);
-
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RamTable.fxml");
-
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            assert false : "Unable to load file: RamTable.fxml";
-        }
-
-        loadClonesIntoTableView(table);
+    RAMsTableController(Mediator mediator){
+        super(mediator, "RamTable.fxml", RAM.class);
     }
 
     /**
@@ -81,10 +71,10 @@ public class RAMsTableController
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        length.prefWidthProperty().bind(table.prefWidthProperty().divide(100/35.0));
-        cellSize.prefWidthProperty().bind(table.prefWidthProperty().divide(100/35.0));
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        length.prefWidthProperty().bind(prefWidthProperty().divide(100/35.0));
+        cellSize.prefWidthProperty().bind(prefWidthProperty().divide(100/35.0));
 
         Callback<TableColumn<RAM,String>,TableCell<RAM,String>> cellStrFactory =
                 setStringTableColumn -> new EditingStrCell<>();
@@ -97,19 +87,7 @@ public class RAMsTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                text -> {
-                    String newName = text.getNewValue();
-                    String oldName = text.getOldValue();
-                    ( text.getRowValue()).setName(newName);
-                    try{
-                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
-                    } catch (ValidationException ex){
-                        (text.getRowValue()).setName(oldName);
-                        updateTable();
-                    }
-                }
-        );
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         length.setCellFactory(cellIntFactory);
         length.setOnEditCommit(text -> text.getRowValue().setLength(text.getNewValue()));
@@ -122,41 +100,35 @@ public class RAMsTableController
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public RAM getPrototype()
-    {
-        return prototype;
-    }
-
-    /**
-     * getter for the current hardware module
-     * @return the current hardware module
-     */
-    public ObservableList<RAM> getCurrentModules() {
-        return currentRAMs;
+    @Override
+    public RAM getPrototype() {
+        return new RAM("???", 128, 8);
     }
 
     /**
      * returns a string of the types of the controller
      * @return a string of the types of the controller
      */
-    public String toString()
-    {
+    @Override
+    public String toString() {
         return "RAM";
     }
 
     /**
      * Check validity of array of Objects' properties.
      */
+    @Override
     public void checkValidity()
     {
         // check that all names are unique and nonempty
-        Validate.lengthsArePositive(table.getItems());
-        Validate.cellSizesAreValid(table.getItems());
+        Validate.lengthsArePositive(getItems());
+        Validate.cellSizesAreValid(getItems());
     }
 
     /**
      * returns true if new micros of this class can be created.
      */
+    @Override
     public boolean newModulesAreAllowed()
     {
         return true;
@@ -166,6 +138,7 @@ public class RAMsTableController
      * get the ID of the corresponding help page
      * @return the ID of the page
      */
+    @Override
     public String getHelpPageID()
     {
         return "RAMs";
@@ -175,13 +148,14 @@ public class RAMsTableController
      * updates the table by removing all the items and adding all back.
      * for refreshing the display.
      */
+    @Override
     public void updateTable()
     {
         name.setVisible(false);
         name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
+        double w =  getWidth();
+        setPrefWidth(w-1);
+        setPrefWidth(w);
     }
 
 }

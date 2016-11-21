@@ -8,7 +8,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 

@@ -156,8 +156,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
     public void setWidth(int width)
     {
         this.width.set(width);
-        for (Register register : registers)
-            register.setWidth(width);
+        registers.forEach(r -> r.setWidth(width));
     }
 
     /**
@@ -165,10 +164,10 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
      * used in a microinstruction or by a ConditionBit
      * @param newLength new length of the register array
      */
-    public void setLength(int newLength)
-    {
-        assert newLength > 0 :
-                "RegisterArray.setLength() called with length <= 0";
+    public void setLength(int newLength) {
+        if (newLength <= 0) {
+            throw new IllegalArgumentException("RegisterArray.setLength() called with length <= 0");
+        }
 
         //compute numIndexDigits instance variable for the new length
         updateNumIndexDigits(newLength);
@@ -192,8 +191,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
 //                        toStringOfLength(i, numIndexDigits) + "]");
             }
             for (int i = length.get(); i < newLength; i++) {
-                newRegisters.add(new Register(getName()+
-                        toStringOfLength(i, numIndexDigits), width.get()));
+                newRegisters.add(new Register(getName() + toStringOfLength(i, numIndexDigits), width.get()));
             }
             registers = newRegisters;
 //            deletedRegisters = null;
@@ -254,42 +252,12 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
     }
 
     /**
-     * clone the whole object
-     * @return a clone of this object
-     */
-    public Object clone()
-    {
-        //does not reuse the existing array of registers, but
-        //instead creates a new array of registers.
-        return new RegisterArray(getName(), length.get(), width.get(),registers());
-    }
-
-    /**
      * clear the value in the register in this array to 0
      */
     public void clear()
     {
-        ObservableList<Register> registersInArray = registers();
-        for (int j = 0; j < registersInArray.size(); j++) {
-            registersInArray.get(j).clear();
-        }
-
+        registers().forEach(Register::clear);
     } // end clear()
-
-    /**
-     * copies the data from the current module to a specific module
-     * @param module the micro instruction that will be updated
-     * 
-     * @deprecated Use {@link #copyTo(RegisterArray)} instead.
-     */
-    @Deprecated
-    public void copyDataTo(Module<?> module)
-    {
-    	checkArgument(module instanceof RegisterArray, "Passed non-RegisterArray to RegisterArray.copyDataTo()");
-    	
-        RegisterArray oldRegisterArray = (RegisterArray) module;
-        this.copyTo(oldRegisterArray);
-    }
 
     /**
      * returns a string rep of i preceded by enough spaces to make the total

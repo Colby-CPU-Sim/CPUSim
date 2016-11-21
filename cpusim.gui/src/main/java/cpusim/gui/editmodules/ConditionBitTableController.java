@@ -12,21 +12,17 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.model.Module;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
-import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -36,7 +32,6 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,17 +44,19 @@ import java.util.stream.Collectors;
  * To change this template use File | Settings | File Templates.
  */
 public class ConditionBitTableController extends ModuleController<ConditionBit> implements Initializable {
-    @FXML
-    TableView<ConditionBit> table;
-    @FXML
-    TableColumn<ConditionBit,String> name;
-    @FXML TableColumn<ConditionBit,Register> register;
-    @FXML TableColumn<ConditionBit,Integer> bit;
-    @FXML TableColumn<ConditionBit,Boolean> halt;
 
-    private ObservableList<ConditionBit> currentModules;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,String> name;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Register> register;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Integer> bit;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Boolean> halt;
+
     private RegistersTableController registerController;
     private RegisterArrayTableController arrayController;
+
     private ObservableList<Register> registerList;
 
     /**
@@ -68,25 +65,13 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      * @param registerController the controller holds registers
      * @param arrayController the controller holds register arrays
      */
-    public ConditionBitTableController(Mediator mediator,
-                                       RegistersTableController registerController,
-                                       RegisterArrayTableController arrayController){
-        super(mediator, ConditionBit.class);
-        this.currentModules = machine.getModule("conditionBits", ConditionBit.class);
+    ConditionBitTableController(Mediator mediator,
+                                RegistersTableController registerController,
+                                RegisterArrayTableController arrayController){
+        super(mediator, "ConditionBitTable.fxml", ConditionBit.class);
         this.registerController = registerController;
         this.arrayController = arrayController;
         fixClonesToUseCloneRegisters();
-
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ConditionBitTable.fxml");
-
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            throw new IllegalStateException("Unable to load file: conditionBitTable.fxml", exception);
-        }
-
-        loadClonesIntoTableView(table);
     }
 
     /**
@@ -101,28 +86,18 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/25.0));
-        register.prefWidthProperty().bind(table.prefWidthProperty().divide(100/25.0));
-        bit.prefWidthProperty().bind(table.prefWidthProperty().divide(100/25.0));
-        halt.prefWidthProperty().bind(table.prefWidthProperty().divide(100/25.0));
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        final double FACTOR = 100.0/25.0;
+        name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        register.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        bit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        halt.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
         Callback<TableColumn<ConditionBit,String>,TableCell<ConditionBit,String>> cellStrFactory =
-                new Callback<TableColumn<ConditionBit, String>, TableCell<ConditionBit, String>>() {
-                    @Override
-                    public TableCell<ConditionBit, String> call(
-                            TableColumn<ConditionBit, String> setStringTableColumn) {
-                        return new EditingStrCell<ConditionBit>();
-                    }
-                };
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<ConditionBit,Integer>,TableCell<ConditionBit,Integer>> cellIntFactory =
-                new Callback<TableColumn<ConditionBit, Integer>, TableCell<ConditionBit, Integer>>() {
-                    @Override
-                    public TableCell<ConditionBit, Integer> call(
-                            TableColumn<ConditionBit, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<ConditionBit>();
-                    }
-                };
+                setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
 
         registerList = FXCollections.observableArrayList();
         registerList.addAll(registerController.getItems());
@@ -130,81 +105,30 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
             registerList.addAll(((RegisterArray)r).registers());
 
         Callback<TableColumn<ConditionBit,Register>,TableCell<ConditionBit,Register>> cellRegFactory =
-                new Callback<TableColumn<ConditionBit, Register>, TableCell<ConditionBit, Register>>() {
-                    @Override
-                    public TableCell<ConditionBit, Register> call(
-                            TableColumn<ConditionBit, Register> conditionBitRegisterTableColumn) {
-                        return new ComboBoxTableCell<ConditionBit,Register>(
-                                registerList
-                        );
-                    }
-                };
+                conditionBitRegisterTableColumn -> new ComboBoxTableCell<>(
+                        registerList
+                );
 
         Callback<TableColumn<ConditionBit,Boolean>,TableCell<ConditionBit,Boolean>> cellHaltFactory =
-                new Callback<TableColumn<ConditionBit, Boolean>, TableCell<ConditionBit, Boolean>>() {
-                    @Override
-                    public TableCell<ConditionBit, Boolean> call(
-                            TableColumn<ConditionBit, Boolean> conditionBitBooleanTableColumn) {
-                        return new CheckBoxTableCell<ConditionBit,Boolean>();
-                    }
-                };
+                conditionBitBooleanTableColumn -> new CheckBoxTableCell<>();
 
-        name.setCellValueFactory(new PropertyValueFactory<ConditionBit, String>("name"));
-        register.setCellValueFactory(new PropertyValueFactory<ConditionBit, Register>("register"));
-        bit.setCellValueFactory(new PropertyValueFactory<ConditionBit, Integer>("bit"));
-        halt.setCellValueFactory(new PropertyValueFactory<ConditionBit, Boolean>("halt"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        register.setCellValueFactory(new PropertyValueFactory<>("register"));
+        bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
+        halt.setCellValueFactory(new PropertyValueFactory<>("halt"));
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<ConditionBit, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<ConditionBit, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
-                    }
-                }
-        );
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         register.setCellFactory(cellRegFactory);
-        register.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<ConditionBit, Register>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<ConditionBit, Register> text) {
-                        ((ConditionBit) text.getRowValue()).setRegister(
-                                text.getNewValue());
-                    }
-                }
-        );
+        register.setOnEditCommit(text -> text.getRowValue().setRegister(text.getNewValue()));
 
         bit.setCellFactory(cellIntFactory);
-        bit.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<ConditionBit, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<ConditionBit, Integer> text) {
-                        ((ConditionBit) text.getRowValue()).setBit(
-                                text.getNewValue());
-                    }
-                }
-        );
+        bit.setOnEditCommit(text -> text.getRowValue().setBit(text.getNewValue()));
 
         halt.setCellFactory(cellHaltFactory);
-        halt.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<ConditionBit, Boolean>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<ConditionBit, Boolean> text) {
-                        ((ConditionBit) text.getRowValue()).setHalt(
-                                text.getNewValue());
-                    }
-                }
-        );
+        halt.setOnEditCommit(text -> text.getRowValue().setHalt(text.getNewValue()));
     }
 
     /**
@@ -214,12 +138,12 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      */
     private void fixClonesToUseCloneRegisters()
     {
-        for (ConditionBit bit: clones) {
+        for (ConditionBit bit: getClones()) {
             Register originalRegister = bit.getRegister();
-            Register cloneRegister = registerController.getCloneOf(originalRegister);
+            Register cloneRegister = registerController.getAssociated(originalRegister)
+                    .orElseGet(() -> arrayController.getCloneOf(originalRegister));
+
             if (cloneRegister == null) {
-                cloneRegister = arrayController.getCloneOf(originalRegister);
-            } else {
                 throw new IllegalStateException("No clone register of register " + originalRegister +
                         " in ConditionBitController.fixClonesToUseCloneRegisters().");
             }
@@ -233,8 +157,8 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      * @return the prototype of the subclass
      */
     public ConditionBit getPrototype() {
-        ObservableList<Register> registers = registerController.getTable().getItems();
-        ObservableList<RegisterArray> arrays = arrayController.getTable().getItems();
+        ObservableList<Register> registers = registerController.getItems();
+        ObservableList<RegisterArray> arrays = arrayController.getItems();
         return new ConditionBit("???", machine,
                 (registers.size() > 0 ?
                         registers.get(0) :
@@ -247,21 +171,11 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
     /**
      * updates the registers shown in the combobox
      */
-    public void updateRegisters(){
+    void updateRegisters(){
         registerList.clear();
         registerList.addAll(registerController.getItems());
         for (Object r : arrayController.getItems())
             registerList.addAll(((RegisterArray)r).registers());
-    }
-
-
-    /**
-     * getter for the current hardware module
-     * @return the current hardware module
-     */
-    public ObservableList getCurrentModules()
-    {
-        return currentModules;
     }
 
     /**
@@ -273,15 +187,6 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
         return "ConditionBit";
     }
 
-    /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "amount"};
-//    }
 
     /**
      * Check validity of array of Objects' properties.
@@ -290,7 +195,7 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
     {
         // check that all names are unique and nonempty and that none of the registers
         // are read only
-        final List<ConditionBit> items = table.getItems();
+        final List<ConditionBit> items = getItems();
         Validate.bitInBounds(items);
         Validate.someNameIsNone(items);
         Validate.registersNotReadOnly(items);
@@ -301,8 +206,8 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      */
     public boolean newModulesAreAllowed()
     {
-        ObservableList registers = registerController.getTable().getItems();
-        ObservableList arrays = arrayController.getTable().getItems();
+        List<Register> registers = registerController.getItems();
+        List<RegisterArray> arrays = arrayController.getItems();
         //return true if there exists at least one register
         return (registers.size() > 0 || arrays.size() > 0);
     }
@@ -314,18 +219,18 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      * @param array A {@link RegisterArray} to check
      * @return a vector of the conditionBit clones
      */
-    public List<ConditionBit> getBitClonesThatUse(RegisterArray array)
+    List<ConditionBit> getBitClonesThatUse(RegisterArray array)
     {
         final Set<Register> arrSet = new HashSet<>();
         arrSet.addAll(array.registers());
 
-        return clones.stream()
+        return getClones().stream()
                 .filter(cl -> arrSet.contains(cl.getRegister()))
                 .collect(Collectors.toList());
     }
 
     public List<ConditionBit> getBitClonesThatUse(Register register) {
-        return clones.stream()
+        return getClones().stream()
                 .filter(cl -> cl.getRegister() == register)
                 .collect(Collectors.toList());
     }
@@ -341,42 +246,32 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
      * @param list a list of modules
      * @return a new list of updated ConditionBits
      */
-    public Vector createNewModulesList(Module[] list)
+    @Override
+    public List<ConditionBit> createNewModulesList(List<? extends ConditionBit> list)
     {
-        Vector newBits = new Vector();
-        for (int i = 0; i < list.length; i++) {
-            ConditionBit bit = (ConditionBit) list[i];
-            ConditionBit oldBit = (ConditionBit) assocList.get(bit);
-            if (oldBit != null) {
+        List<ConditionBit> newBits = new ArrayList<>();
+        for (ConditionBit bit : list) {
+            Optional<ConditionBit> o_oldBit = getAssociated(bit);
+            if (o_oldBit.isPresent()) {
+                final ConditionBit oldBit = o_oldBit.get();
                 //if the new bit is just an edited clone of an old bit,
                 //then just copy the new data to the old bit
                 bit.copyTo(oldBit);
+
                 //now fix it to refer to the original register instead of
                 //the clone.
-                Register oldRegister = (Register)
-                        registerController.getCurrentFromClone(bit.getRegister());
-                if (oldRegister != null)
-                    oldBit.setRegister(oldRegister);
-                else { //the old register must be part of a register array
-                    oldRegister = arrayController.getOriginalOf(bit.getRegister());
-                    if (oldRegister != null)
-                        oldBit.setRegister(oldRegister);
-                }
-                newBits.addElement(oldBit);
+                Register oldRegister = registerController.getAssociated(bit.getRegister())
+                        .orElseGet(() -> arrayController.getOriginalOf(bit.getRegister()));
+                oldBit.setRegister(oldRegister);
+                newBits.add(oldBit);
             }
             else { //bit is brand new
-                newBits.addElement(bit);
+                newBits.add(bit);
                 //now fix it to refer to the original register instead of
                 //the clone.
-                Register oldRegister = (Register)
-                        registerController.getCurrentFromClone(bit.getRegister());
-                if (oldRegister != null)
-                    bit.setRegister(oldRegister);
-                else { //the old register must be part of a register array
-                    oldRegister = arrayController.getOriginalOf(bit.getRegister());
-                    if (oldRegister != null)
-                        bit.setRegister(oldRegister);
-                }
+                Register oldRegister = registerController.getAssociated(bit.getRegister())
+                        .orElseGet(() -> arrayController.getOriginalOf(bit.getRegister()));
+                bit.setRegister(oldRegister);
             }
         }
         return newBits;
@@ -399,9 +294,9 @@ public class ConditionBitTableController extends ModuleController<ConditionBit> 
     {
         name.setVisible(false);
         name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
+        double w =  getWidth();
+        setPrefWidth(w-1);
+        setPrefWidth(w);
     }
 
 }

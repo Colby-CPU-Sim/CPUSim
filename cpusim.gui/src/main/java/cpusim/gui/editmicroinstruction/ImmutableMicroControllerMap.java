@@ -8,6 +8,7 @@ import cpusim.model.microinstruction.*;
 import cpusim.model.util.Copyable;
 import javafx.scene.control.TableView;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -18,9 +19,9 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Created by kevin on 2016-11-14.
  */
+@Immutable
 class ImmutableMicroControllerMap implements Map<Class<? extends Microinstruction>, MicroController<? extends Microinstruction>> {
-    
-    private final Mediator mediator;
+
     /**
      * An {@link ImmutableMap} that holds types as the keys and sub {@link MicroController} as types.
      */
@@ -31,7 +32,7 @@ class ImmutableMicroControllerMap implements Map<Class<? extends Microinstructio
      * @param mediator
      */
     ImmutableMicroControllerMap(final Mediator mediator) {
-        this.mediator = checkNotNull(mediator);
+        checkNotNull(mediator);
         
         typesMap = ImmutableMap.<Class<? extends Microinstruction>, MicroController<?>>builder()
                 .put(CpusimSet.class, new SetTableController(mediator))
@@ -73,6 +74,10 @@ class ImmutableMicroControllerMap implements Map<Class<? extends Microinstructio
     
     @Override
     public MicroController<?> get(final Object key) {
+        if (CharSequence.class.isAssignableFrom(key.getClass())) {
+
+        }
+
         return typesMap.get(key);
     }
     

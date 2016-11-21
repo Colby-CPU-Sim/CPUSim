@@ -8,6 +8,7 @@
 package cpusim.gui.editmodules;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.model.Microinstruction;
@@ -36,7 +37,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableView;
-import javafx.scene.input.InputEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -53,31 +53,31 @@ import java.util.*;
  * editing the properties of each register in a register array.
  */
 public class EditModulesController implements Initializable {
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private ComboBox<String> moduleCombo;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Pane tablePane;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button newButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button deleteButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button duplicateButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button okButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button cancelButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button helpButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button propertiesButton;
 
     private Mediator mediator;
@@ -86,7 +86,7 @@ public class EditModulesController implements Initializable {
 
     private Module<?> selectedSet = null;
     private TableView<Module<?>> activeTable;
-    private ChangeTable tableMap;
+    private ImmutableMap<Class<? extends Module<?>>, ModuleController<?>> controllerMap;
     private ContentChangeListener contentChangeListener;
     
     private static final String CURRENT_NAME = "Current";
@@ -96,8 +96,23 @@ public class EditModulesController implements Initializable {
         this.machine = mediator.getMachine();
         this.desktop = desktop;
         activeTable = null;
-        tableMap = new ChangeTable(mediator);
         contentChangeListener = new ContentChangeListener();
+
+        final RegistersTableController registerTableController = new RegistersTableController(mediator);
+        final RegisterArrayTableController registerArrayTableController = new RegisterArrayTableController(mediator);
+        final ConditionBitTableController conditionBitTableController = new ConditionBitTableController(mediator,
+                registerTableController,
+                registerArrayTableController);
+        final RAMsTableController ramTableController = new RAMsTableController(mediator);
+        registerTableController.setBitController(conditionBitTableController);
+        registerArrayTableController.setBitController(conditionBitTableController);
+
+        ImmutableMap.Builder<Class<? extends Module<?>>, ModuleController<?>> bld = ImmutableMap.builder();
+        controllerMap = bld.put(Register.class, registerTableController)
+            .put(RegisterArray.class, registerArrayTableController)
+            .put(ConditionBit.class, conditionBitTableController)
+            .put(RAM.class, ramTableController)
+            .build();
     }
 
     /**
@@ -173,19 +188,16 @@ public class EditModulesController implements Initializable {
                 });
 
         // Define an event filter for the ComboBox for Mouse_released events
-        EventHandler validityFilter = new EventHandler<InputEvent>() {
-            public void handle(InputEvent event) {
-                try {
-                    ((ModuleController) activeTable).checkValidity();
+        moduleCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            try {
+                ((ModuleController) activeTable).checkValidity();
 
-                } catch (ValidationException ex) {
-                    Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
-                            "Modules Error", ex.getMessage()).showAndWait();
-                    event.consume();
-                }
+            } catch (ValidationException ex) {
+                Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
+                        "Modules Error", ex.getMessage()).showAndWait();
+                event.consume();
             }
-        };
-        moduleCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
+        });
     }
 
     /**
@@ -639,25 +651,7 @@ public class EditModulesController implements Initializable {
          * @return the map that contains all the controllers
          */
         private Map<Class<? extends Module<?>>, ModuleController<?>> buildMap(Mediator mediator) {
-            final RegistersTableController registerTableController
-                    = new RegistersTableController(mediator);
-            final RegisterArrayTableController registerArrayTableController
-                    = new RegisterArrayTableController(mediator);
-            final ConditionBitTableController conditionBitTableController
-                    = new ConditionBitTableController(mediator,
-                    registerTableController,
-                    registerArrayTableController);
-            final RAMsTableController ramTableController
-                    = new RAMsTableController(mediator);
-            registerTableController.setBitController(conditionBitTableController);
-            registerArrayTableController.setBitController(conditionBitTableController);
 
-            Map<Class<? extends Module<?>>, ModuleController<?>> map = new HashMap<Class<? extends Module<?>>, ModuleController<?>>() {{
-                put(Register.class, registerTableController);
-                put(RegisterArray.class, registerArrayTableController);
-                put(ConditionBit.class, conditionBitTableController);
-                put(RAM.class, ramTableController);
-            }};
 
             return map;
         }

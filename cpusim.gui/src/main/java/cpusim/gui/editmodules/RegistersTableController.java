@@ -25,24 +25,20 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.microinstruction.TransferAtoR;
-import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 
 import cpusim.util.ValidateControllers;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -51,7 +47,6 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -60,37 +55,28 @@ import java.util.*;
  */
 public class RegistersTableController
         extends ModuleController<Register> implements Initializable {
-    @FXML
-    TableView<Register> table;
-    @FXML
-    TableColumn<Register,String> name;
-    @FXML TableColumn<Register,Integer> width;
-    @FXML TableColumn<Register,Long> initialValue;
-    @FXML TableColumn<Register,Boolean> readOnly;
 
-    private ObservableList<Register> currentModules;
-    private Register prototype;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Register,String> name;
+    
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Register,Integer> width;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Register,Long> initialValue;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Register,Boolean> readOnly;
+
     private ConditionBitTableController bitController;
 
     /**
      * Constructor
      * @param mediator holds the machine and information needed
      */
-    public RegistersTableController(Mediator mediator){
-        super(mediator, Register.class);
-        this.currentModules = machine.getModule("registers", Register.class);
-        this.prototype = new Register("???", 16, 0, false);
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RegistersTable.fxml");
-
-        try {
-            fxmlLoader.load();
-        } catch (IOException exception) {
-            // should never happen
-            assert false : "Unable to load file: RegistersTable.fxml";
-        }
-
-        loadClonesIntoTableView(table);
+    RegistersTableController(Mediator mediator){
+        super(mediator, "RegistersTable.fxml", Register.class);
     }
 
     /**
@@ -105,44 +91,20 @@ public class RegistersTableController
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        initialValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        readOnly.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        width.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
+        initialValue.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        readOnly.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
 
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStrFactory =
-                new Callback<TableColumn<Register, String>, TableCell<Register, String>>() {
-                    @Override
-                    public TableCell<Register, String> call(
-                            TableColumn<Register, String> setStringTableColumn) {
-                        return new EditingStrCell<Register>();
-                    }
-                };
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntFactory =
-                new Callback<TableColumn<Register, Integer>, TableCell<Register, Integer>>() {
-                    @Override
-                    public TableCell<Register, Integer> call(
-                            TableColumn<Register, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<Register>();
-                    }
-                };
+                setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellLongFactory =
-                new Callback<TableColumn<Register, Long>, TableCell<Register, Long>>() {
-                    @Override
-                    public TableCell<Register, Long> call(
-                            TableColumn<Register, Long> setLongTableColumn) {
-                        return new EditingLongCell<Register>();
-                    }
-                };
+                setLongTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Register,Boolean>,TableCell<Register,Boolean>> cellBooleanFactory =
-                new Callback<TableColumn<Register, Boolean>, TableCell<Register, Boolean>>() {
-                    @Override
-                    public TableCell<Register, Boolean> call(
-                            TableColumn<Register, Boolean> registerBooleanTableColumn) {
-                        return new CheckBoxTableCell<>();
-                    }
-                };
+                registerBooleanTableColumn -> new CheckBoxTableCell<>();
 
 
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -152,65 +114,16 @@ public class RegistersTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
-                    }
-                }
-        );
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         width.setCellFactory(cellIntFactory);
-        width.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Integer>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Integer> text) {
-                        ((Register)text.getRowValue()).setWidth(
-                                text.getNewValue());
-                    }
-                }
-        );
+        width.setOnEditCommit(text -> text.getRowValue().setWidth(text.getNewValue()));
 
         initialValue.setCellFactory(cellLongFactory);
-        initialValue.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Long>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Long> text) {
-                        ((Register)text.getRowValue()).setInitialValue(
-                                text.getNewValue());
-                    }
-                }
-        );
+        initialValue.setOnEditCommit(text -> text.getRowValue().setInitialValue(text.getNewValue()));
 
         readOnly.setCellFactory(cellBooleanFactory);
-        readOnly.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Boolean>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Boolean> text) {
-                        ((Register)text.getRowValue()).setReadOnly(
-                                text.getNewValue());
-                    }
-                }
-        );
-
-
-    }
-
-    /**
-     * gets the tableview object
-     * @return the tableview object
-     */
-    public TableView<Register> getTable() {
-        return table;
+        readOnly.setOnEditCommit(text -> text.getRowValue().setReadOnly(text.getNewValue()));
     }
 
     /**
@@ -226,42 +139,16 @@ public class RegistersTableController
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Register getPrototype()
-    {
-        return prototype;
-    }
-
-    /**
-     * returns the clone register associated with the given original register.
-     * @param original the original register to be cloned
-     * @return null if there is no such clone register.
-     */
-    public Register getCloneOf(Register original)
-    {
-        Set e = assocList.keySet();
-        Iterator it = e.iterator();
-        while(it.hasNext())
-        {
-            Register clone = (Register) it.next();
-            if (assocList.get(clone) == original)
-                return clone;
-        }
-        return null;
-    }
-
-    /**
-     * getter for the current hardware module
-     * @return the current hardware module
-     */
-    public ObservableList<Register> getCurrentModules()
-    {
-        return currentModules;
+    @Override
+    public Register getPrototype() {
+        return new Register("???", 16, 0, false);
     }
 
     /**
      * returns a string of the types of the controller
      * @return a string of the types of the controller
      */
+    @Override
     public String toString()
     {
         return "Register";
@@ -270,6 +157,7 @@ public class RegistersTableController
     /**
      * Check validity of array of Objects' properties.
      */
+    @Override
     public void checkValidity()
     {
         // convert the array to an array of Registers
@@ -278,10 +166,11 @@ public class RegistersTableController
         //build up a HashMap of old registers and new widths
         Map<Register, Integer> table = new HashMap<>();
         for (Register register : registers) {
-            Register oldRegister = getCurrentFromClone(register);
-            if (oldRegister != null && oldRegister.getWidth() != register.getWidth()) {
-                table.put(oldRegister, register.getWidth());
-            }
+            getAssociated(register).ifPresent(oldRegister -> {
+                if (oldRegister.getWidth() != register.getWidth()) {
+                    table.put(oldRegister, register.getWidth());
+                }
+            });
         }
 
         // check that all names are unique and nonempty
@@ -302,6 +191,7 @@ public class RegistersTableController
     /**
      * returns true if new micros of this class can be created.
      */
+    @Override
     public boolean newModulesAreAllowed()
     {
         return true;
@@ -320,13 +210,13 @@ public class RegistersTableController
      * updates the table by removing all the items and adding all back.
      * for refreshing the display.
      */
-    public void updateTable()
-    {
+    @Override
+    public void updateTable() {
         name.setVisible(false);
         name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
+        double w =  getWidth();
+        setPrefWidth(w-1);
+        setPrefWidth(w);
     }
 
 }

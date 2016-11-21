@@ -10,7 +10,7 @@ import java.math.BigInteger;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Provides conversion utilities for <code>byte[]</code> values.

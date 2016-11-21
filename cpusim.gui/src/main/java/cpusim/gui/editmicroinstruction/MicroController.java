@@ -20,15 +20,12 @@ import cpusim.model.MachineInstruction;
 import cpusim.model.Microinstruction;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
-import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
 import java.io.IOException;
@@ -50,19 +47,15 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
     private final Class<T> microClass;
     
     private Node parentFrame;   //for the parent of the error dialog
-    
-    private ObservableList<T> currentMicros;
 
     /**
      * Constructor
      * @param mediator holds the information to be shown in tables
      */
-    MicroController(Mediator mediator, final String fxmlFile, Class<T> clazz)
-    {
+    MicroController(Mediator mediator, final String fxmlFile, Class<T> clazz) {
         this.mediator = mediator;
         this.machine = mediator.getMachine();
         this.microClass = clazz;
-        this.currentMicros = machine.getMicros(clazz);
         
         this.parentFrame = null;//subclasses must initialize clones by calling createClones()
     
@@ -113,18 +106,6 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
     {
         return "";
     }
-
-    //========================================
-    // public abstract methods to be overridden by each subclass
-
-//    /**
-//     * sets the clones to the new array.
-//     * It does not check for validity
-//     * @param clones the clones that will be set to the new array.
-//     */
-//    protected void setClones(ObservableList<T> clones) {
-//        this.clones = checkNotNull(clones);
-//    }
     
     /**
      * update the machine's micros from {@link #getItems()}
@@ -275,26 +256,6 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
         }
         else{
             getSelectionModel().select(index - 1);
-        }
-    }
-    
-    /**
-     * Implements an {@link EventHandler} for the {@link TableColumn.CellEditEvent} for handling
-     * {@link NamedObject}-based types.
-     */
-    class NameColumnHandler implements EventHandler<TableColumn.CellEditEvent<T, String>> {
-        @Override
-        public void handle(final TableColumn.CellEditEvent<T, String> text) {
-            String newName = text.getNewValue();
-            String oldName = text.getOldValue();
-            text.getRowValue().setName(newName);
-            
-            try {
-                NamedObject.validateUniqueAndNonempty(getItems());
-            } catch (ValidationException ex) {
-                text.getRowValue().setName(oldName);
-                updateTable();
-            }
         }
     }
 

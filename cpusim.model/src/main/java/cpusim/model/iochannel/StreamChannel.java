@@ -55,9 +55,9 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	 * Constructor for CommandLineChannel. There is only
 	 * one CommandLineChannel channel that is ever used.
 	 * 
-	 * Delegates to {@link #CommandLineChannel(InputStream, PrintStream)} with {@link System#out} and {@link System#in}. 
+	 * Delegates to {@link #StreamChannel(InputStream, PrintStream)} with {@link System#out} and {@link System#in}.
 	 * 
-	 * @see #CommandLineChannel(InputStream, PrintStream)
+	 * @see #StreamChannel(InputStream, PrintStream)
 	 */
 	public StreamChannel() {
 		this(System.in, System.out);
@@ -162,8 +162,8 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	}
 	
 	@Override
-	public void writeAscii(char longValue) {
-		out.print(ArchType.Byte.of(1).mask() & longValue);
+	public void writeAscii(char character) {
+		out.print(character);
 	}
 	
 	@Override

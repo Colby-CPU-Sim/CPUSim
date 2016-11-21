@@ -30,12 +30,4 @@ public class FieldTest {
 		assertEquals("f2", f2.getName());
 	}
 
-	/**
-	 * Test method for {@link cpusim.model.Field#Field(String, cpusim.model.Field.Type, cpusim.model.util.units.ArchValue, cpusim.model.Field.Relativity, javafx.collections.ObservableMap, long, cpusim.model.Field.SignedType), long, cpusim.model.Field.SignedType)}.
-	 */
-	@Test
-	public void testFieldStringTypeArchValueRelativityObservableMapOfStringFieldValueLongSignedType() {
-		fail("Not yet implemented");
-	}
-
 }

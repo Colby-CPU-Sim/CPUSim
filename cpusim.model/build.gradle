@@ -1,20 +1,21 @@
-apply plugin: 'org.xtext.xtend'
-
-apply plugin: 'findbugs'
-
-xtend {
-    debugger {
-        hideSyntheticVariables = true
-    }
-    
-    generator {
-        javaSourceLevel = 8
-    }
-}
+//apply plugin: 'org.xtext.xtend'
+//
+//xtend {
+//    debugger {
+//        hideSyntheticVariables = true
+//    }
+//
+//    generator {
+//        javaSourceLevel = 8
+//    }
+//}
 
 dependencies {
     compile group: 'com.cathive.fx', name: 'fx-guice', version: '8.0.0'
-    
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.3'
     
@@ -36,19 +37,14 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-multibindings
     compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.1.0'
 
-	compile group: 'org.eclipse.xtend', name: 'org.eclipse.xtend.lib', version: '${xtextVersion}'
-	
-	// https://mvnrepository.com/artifact/com.github.oehme.xtend/xtend-contrib
-    compile group: 'com.github.oehme.xtend', name: 'xtend-contrib', version: '1.1.0'
-
-    // Declare the dependency for your favourite test framework you want to use in your tests.
-    // TestNG is also supported by the Gradle Test task. Just change the
-    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
-    // 'test.useTestNG()' to your build script.
-    
-    // Used because tests use xtend
-    testCompile "org.eclipse.xtext:org.eclipse.xtext.junit4:${xtextVersion}"
-    testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.junit:${xtextVersion}"
+//	compile group: 'org.eclipse.xtend', name: 'org.eclipse.xtend.lib', version: '${xtextVersion}'
+//
+//	// https://mvnrepository.com/artifact/com.github.oehme.xtend/xtend-contrib
+//    compile group: 'com.github.oehme.xtend', name: 'xtend-contrib', version: '1.1.0'
+//
+//    // Used because tests use xtend
+//    testCompile "org.eclipse.xtext:org.eclipse.xtext.junit4:${xtextVersion}"
+//    testCompile "org.eclipse.xtext:org.eclipse.xtext.xbase.junit:${xtextVersion}"
     
     // FIXME
     //testCompile project(':cpusim.gui')
@@ -59,14 +55,14 @@ sourceSets {
         java {
             srcDirs = ['src/main/java']
         }
-        xtendOutputDir = 'src/main/xtend-gen'
+//        xtendOutputDir = 'src/main/xtend-gen'
     }
 
     test {
         java {
             srcDirs = ['src/test/java']
         }
-        xtendOutputDir = 'src/test/xtend-gen'
+//        xtendOutputDir = 'src/test/xtend-gen'
     }
 }
 
@@ -77,7 +73,7 @@ buildscript {
         mavenCentral()
     }
     
-    dependencies {
-        classpath 'org.xtext:xtext-gradle-plugin:1.0.2'
-    }
+//    dependencies {
+//        classpath 'org.xtext:xtext-gradle-plugin:1.0.2'
+//    }
 }

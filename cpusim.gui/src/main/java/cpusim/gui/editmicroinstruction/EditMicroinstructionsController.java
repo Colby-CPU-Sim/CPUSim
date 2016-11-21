@@ -137,12 +137,10 @@ public class EditMicroinstructionsController implements Initializable {
         // the displayed micro instruction table accordingly.
         microinstructionCombo.getSelectionModel().selectedItemProperty().addListener(
                 (selected, oldType, newType) -> {
-                    activeTable.getSelectionModel().selectedItemProperty().
-                            removeListener(listener);
+                    activeTable.getSelectionModel().selectedItemProperty().removeListener(listener);
                     typesMap.get(oldType).getSelectionModel().clearSelection();
                     tablePane.getChildren().clear();
-                    tablePane.getChildren().add(
-                            typesMap.get(newType));
+                    tablePane.getChildren().add(typesMap.get(newType));
 
                     activeTable = typesMap.getController(Machine.MicroClass.fromName(newType).getInstructionType());
                     activeTable.setPrefWidth(tablePane.getWidth());

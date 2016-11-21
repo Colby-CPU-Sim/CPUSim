@@ -22,6 +22,7 @@ package cpusim.gui.editmachineinstruction.editfields;
 
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.FieldValue;
@@ -47,7 +48,6 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import org.controlsfx.control.CheckComboBox;
 
 import java.io.IOException;
 import java.net.URL;
@@ -247,8 +247,7 @@ public class EditFieldsController implements Initializable {
         type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         numBits.setCellFactory(cellIntFactory);
-        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue
-                ()));
+        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
 
         defaultValue.setCellFactory(cellLongFactory);
         defaultValue.setOnEditCommit(text ->
@@ -257,10 +256,7 @@ public class EditFieldsController implements Initializable {
         relativity.setCellFactory(cellRelFactory);
         relativity.setOnEditCommit(text -> text.getRowValue().setRelativity(text.getNewValue()));
 
-        signed.setCellFactory(v -> {
-            new TableCell<>()
-            new CheckComboBox<Field.SignedType>(FXCollections.observableArrayList(Field.SignedType.values()))
-        });
+        signed.setCellFactory(ComboBoxTableCell.forTableColumn(Field.SignedType.values()));
         signed.setOnEditCommit(text -> text.getRowValue().setSigned(text.getNewValue()));
 
         table.getSelectionModel().selectedItemProperty().addListener((ov, t, t1) -> {
@@ -299,7 +295,7 @@ public class EditFieldsController implements Initializable {
             newName = selectedField.getName()+"copy"+i;
             i++;
         }
-        Field duplicateField = (Field) selectedField.clone();
+        Field duplicateField = selectedField.cloneOf();
         duplicateField.setName(newName);
         allFields.add(0, duplicateField);
         table.scrollTo(0);
@@ -492,11 +488,8 @@ public class EditFieldsController implements Initializable {
      * @throws ValidationException if something is not valid
      */
     private void checkValidity(ObservableList<Field> list) {
-        Validate.allNamesAreNonEmpty(list.toArray());
-        Validate.allNamesAreUnique(list.toArray());
-        for(Field field : list) {
-            Validate.fieldIsValid(field);
-        }
+        NamedObject.validateUniqueAndNonempty(list);
+        list.forEach(Field::validate);
     }
 
     /**

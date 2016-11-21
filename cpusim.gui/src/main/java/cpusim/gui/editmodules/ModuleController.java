@@ -12,23 +12,20 @@
  */
 package cpusim.gui.editmodules;
 
+import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.model.Module;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.TableView;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.io.IOException;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -38,23 +35,26 @@ import static com.google.common.base.Preconditions.*;
  * @param <T>
  */
 abstract class ModuleController<T extends Module<T>>
-        extends TableView
+        extends TableView<T> implements NamedColumnHandler.HasUpdateTable<T>
 {
     protected Mediator mediator;
     protected Machine machine;      //the current machine being simulated
-    protected Map<T, T> assocList;  //associates the current modules
+
+
+    private ObservableList<T> currentModules;
+    private Map<T, T> assocList;  //associates the current modules
     //with the edited clones; key = new clone, value = original
-    protected ObservableList<T> clones;  //the current clones
-    protected Node parentFrame; //for the parent of error messages
-    
-    protected final Class<T> moduleClass;
+    private ObservableList<T> clones;  //the current clones
+    private Node parentFrame; //for the parent of error messages
+
+    private final Class<T> moduleClass;
 
     //-------------------------------
     /**
      * Constructor
      * @param mediator holds the information to be shown in tables
      */
-    public ModuleController(Mediator mediator, Class<T> moduleClass)
+    ModuleController(Mediator mediator, String fxmlPath, Class<T> moduleClass)
     {
         this.mediator = mediator;
         this.machine = mediator.getMachine();
@@ -63,6 +63,18 @@ abstract class ModuleController<T extends Module<T>>
         parentFrame = null;
         
         this.moduleClass = moduleClass;
+
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, fxmlPath);
+
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            // should never happen
+            throw new IllegalStateException("Unable to load file: " + fxmlPath, exception);
+        }
+
+        currentModules = machine.getModule(moduleClass);
+        loadClonesFromCurrentModules();
     }
 
 
@@ -92,15 +104,12 @@ abstract class ModuleController<T extends Module<T>>
     }
 
     /**
-     * returns the original module (in the machine) whose clone is given.
-     * @param clone the clone of the original module
-     * @return the original hardware module of the given clone.
+     * Get associated value for a clone.
+     * @param clone Clone to check against
+     * @return Possible {@link Optional#empty()} value if no association is made
      */
-    public T getCurrentFromClone(final Module<?> clone)
-    {
-        checkNotNull(clone);
-        
-        return assocList.get(clone);
+    public Optional<T> getAssociated(final T clone) {
+        return Optional.ofNullable(assocList.get(clone));
     }
 
     /**
@@ -154,7 +163,7 @@ abstract class ModuleController<T extends Module<T>>
      * @param list a list of modules
      * @return a list of updated modules
      */
-    public final List<T> createNewModulesList(List<? extends T> list)
+    public List<T> createNewModulesList(List<? extends T> list)
     {
         List<T> newModules = new ArrayList<>();
         
@@ -177,7 +186,7 @@ abstract class ModuleController<T extends Module<T>>
      *
      * @return Non-{@code null} {@link List} of the cloned objects.
      */
-    protected final List<T> loadClonesFromCurrentModules() {
+    private List<T> loadClonesFromCurrentModules() {
         List<T> currentModules = getCurrentModules();
         
         List<T> clones = new ArrayList<>();
@@ -227,7 +236,9 @@ abstract class ModuleController<T extends Module<T>>
      *
      * @return a list of the current modules
      */
-    public abstract ObservableList<T> getCurrentModules();
+    public ObservableList<T> getCurrentModules() {
+        return currentModules;
+    }
 
     /**
      * checks if new modules of this class can be created.
@@ -243,4 +254,8 @@ abstract class ModuleController<T extends Module<T>>
      */
     public abstract void updateTable();
 
+    @Override
+    public void updateTable(@SuppressWarnings("unused") TableView<T> table) {
+        this.updateTable();
+    }
 }
