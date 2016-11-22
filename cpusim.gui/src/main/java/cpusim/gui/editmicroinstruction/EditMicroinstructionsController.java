@@ -13,10 +13,8 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.model.Machine;
-import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.*;
-import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
@@ -24,7 +22,6 @@ import cpusim.util.Dialogs;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;

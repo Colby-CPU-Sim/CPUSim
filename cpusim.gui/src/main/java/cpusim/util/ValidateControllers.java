@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 import cpusim.gui.editmodules.ConditionBitTableController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.ConditionBit;

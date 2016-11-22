@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;

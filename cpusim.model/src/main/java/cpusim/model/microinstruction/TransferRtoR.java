@@ -6,15 +6,9 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
-import cpusim.model.Module;
 import cpusim.model.module.Register;
-
 import cpusim.model.util.Copyable;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import cpusim.model.util.ValidationException;
 
 /**
  * The TransferRtoR microinstruction transfers data from a register to a register.
@@ -147,5 +141,38 @@ public class TransferRtoR extends Transfer<Register, Register> implements Copyab
                 "</TD><TD>" + getDestStartBit() +
                 "</TD><TD>" + getNumBits() +
                 "</TD></TR>";
+    }
+    
+    @Override
+    protected void validateState() {
+        int srcStartBit = getSrcStartBit();
+        int destStartBit = getDestStartBit();
+        int numBits = getNumBits();
+        if (srcStartBit < 0 || destStartBit < 0 || numBits < 0) {
+            throw new ValidationException("You cannot specify a negative value for the " +
+                    "start and end bits, \nor the bitwise width of the TransferRtoR range.\n" +
+                    "Please fix this in the microinstruction \"" + getName() + ".\"");
+        }
+    
+    
+        String boundPhrase = null;
+        if (srcStartBit > getSource().getWidth()) {
+            boundPhrase = "srcStartBit";
+        }
+        else if (destStartBit > getDest().getWidth()) {
+            boundPhrase = "destStartBit";
+        }
+    
+        if (boundPhrase != null) {
+            throw new ValidationException(boundPhrase + " has an invalid index for the " +
+                    "specified register in instruction " + getName() +
+                    ".\nIt must be non-negative, and less than the register's length.");
+        }
+        else if (srcStartBit + numBits > getSource().getWidth() ||
+                destStartBit + numBits > getDest().getWidth()) {
+            throw new ValidationException("In the microinstruction \"" + getName() +
+                    "\",\nthe bitwise width of the transfer area is too large " +
+                    "to fit in \neither the source or the destination registers.");
+        }
     }
 }

@@ -24,9 +24,7 @@ import static com.google.common.base.Preconditions.*;
 /**
  * The Control Unit class
  */
-@SuppressWarnings("serial")
-public class ControlUnit extends Module<ControlUnit>
-        implements Serializable
+public class ControlUnit extends Module<ControlUnit> implements Serializable
 {
 
     private MachineInstruction currentInstruction;
@@ -103,25 +101,9 @@ public class ControlUnit extends Module<ControlUnit>
         currentInstruction = machine.getFetchSequence();
     }
 
-    //-----------------------------
-    // abstract Module methods that need to be implemented even if
-    // they are never used (maybe for future enhancements?)
-
-    /**
-     * clone the whole object
-     * @return a clone of this object
-     */
-    public Object clone()
-    {
-        ControlUnit clone = new ControlUnit(getName(), machine);
-        clone.setMicroIndex(getMicroIndex());
-        clone.setCurrentInstruction(getCurrentInstruction());
-        return clone;
-    }
-
     /**
      * copies the data from the current module to a specific module
-     * @param newModule the micro instruction that will be updated
+     * @param newControl the micro instruction that will be updated
      */
     @Override
     public void copyTo(ControlUnit newControl)
@@ -132,7 +114,12 @@ public class ControlUnit extends Module<ControlUnit>
         newControl.setCurrentInstruction(currentInstruction);
         newControl.machine = machine;
     }
-
+    
+    @Override
+    protected void validateState() {
+        // no-op
+    }
+    
     /**
      * returns the XML description
      * @return the XML description

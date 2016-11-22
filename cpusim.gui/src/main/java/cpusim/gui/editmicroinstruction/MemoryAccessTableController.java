@@ -15,6 +15,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
@@ -106,7 +107,7 @@ public class MemoryAccessTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         direction.setCellFactory(cellDircFactory);
         direction.setOnEditCommit(

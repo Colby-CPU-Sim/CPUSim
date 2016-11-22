@@ -8,7 +8,6 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;

@@ -23,6 +23,7 @@ package cpusim.model;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validatable;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 // the Module class
 
 public abstract class Module<T extends Module<T>>
-        implements NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>
+        implements NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>, Validatable
 {
     private SimpleStringProperty name;	//name of the module
     private String ID; //unique ID used when saving in XML
@@ -99,7 +100,19 @@ public abstract class Module<T extends Module<T>>
     {
         return ID;
     }
-
+    
+    /**
+     * Validate the internal state of a subclass.
+     */
+    protected abstract void validateState();
+    
+    @Override
+    public final void validate() {
+        NamedObject.super.validate();
+        
+        validateState();
+    }
+    
     /**
      * Simple {@link Comparator} that just checks the {@link #getName()} of {@link Module}.
      */

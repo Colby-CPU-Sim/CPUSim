@@ -5,7 +5,7 @@
  */
 package cpusim.gui.util;
 
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.Comment;
 import javafx.scene.control.ListCell;
 

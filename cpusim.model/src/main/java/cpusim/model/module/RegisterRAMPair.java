@@ -15,7 +15,6 @@
 
 package cpusim.model.module;
 
-import com.google.common.base.MoreObjects;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -37,7 +36,8 @@ public class RegisterRAMPair implements Cloneable {
      * if true, always highlight with the current value, not just at the start of a cycle
      *         otherwise, update highlighting only at the start of a cycle
      */
-	public SimpleBooleanProperty dynamic;
+	private SimpleBooleanProperty dynamic;
+    
     /**
      * the value in the register at the start of the current cycle.  It is preserved
      * here as the cycle is executed.

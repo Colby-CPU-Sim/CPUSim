@@ -19,11 +19,10 @@
 
 package cpusim.model.module;
 
-import java.util.List;
-
 import cpusim.model.ExecutionException;
 import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.util.ValidationException;
 import cpusim.util.LoadException;
 import cpusim.util.SourceLine;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -31,7 +30,9 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
  * This class models RAM.  All addressable units ("cells") have the same
@@ -417,7 +418,7 @@ public class RAM extends Module<RAM>
 
     /**
      * copies the data from the current module to a specific module
-     * @param comp the micro instruction that will be updated
+     * @param newRAM the micro instruction that will be updated
      */
     @Override
     public void copyTo(RAM newRAM) {
@@ -482,6 +483,23 @@ public class RAM extends Module<RAM>
     public void clearAllBreakpoints() {
         for (RAMLocation rLoc : this.data()) {
             rLoc.setBreak(false);
+        }
+    }
+    
+    @Override
+    protected void validateState() {
+        int size = getCellSize();
+        if (size <= 0 || size > 64) {
+            throw new ValidationException("The RAM module \"" + getName() +
+                    "\" has cell size " + getCellSize() +
+                    ".\nThe cell size must be an integer from 1 to 64.");
+        }
+    
+        // checks whether it has a positive length
+        if (getLength() <= 0) {
+            throw new ValidationException("The RAM module \"" + getName() +
+                    "\" has length " + getLength() +
+                    ".\nThe length must be a positive integer.");
         }
     }
 }

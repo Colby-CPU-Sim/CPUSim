@@ -4,6 +4,7 @@ import cpusim.Mediator;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.CpusimSet;
 import cpusim.model.module.Register;
 import javafx.collections.ObservableList;
@@ -21,11 +22,6 @@ import java.util.ResourceBundle;
 
 /**
  * The controller for editing the Set command in the EditMicroDialog.
- *
- * @author Jinghui Yu
- * @author Michael Goldenberg
- * @author Ben Borchard
- * @author Kevin Brightwell (Nava2)
  *
  * @since 2013-06-06
  */
@@ -94,7 +90,7 @@ class SetTableController extends MicroController<CpusimSet> implements Initializ
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         register.setCellFactory(cellComboFactory);
         register.setOnEditCommit(

@@ -24,11 +24,10 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
-import cpusim.model.util.Validate;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
@@ -87,35 +86,14 @@ public class TransferRtoRTableController
 
         Callback<TableColumn<TransferRtoR, String>,
                 TableCell<TransferRtoR, String>> cellStrFactory =
-                new Callback<TableColumn<TransferRtoR, String>,
-                        TableCell<TransferRtoR, String>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn setStringTableColumn) {
-                        return new cpusim.gui.util.EditingStrCell<TransferRtoR>();
-                    }
-                };
+                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<TransferRtoR>();
         Callback<TableColumn<TransferRtoR,Integer>,
                 TableCell<TransferRtoR,Integer>> cellIntFactory =
-                new Callback<TableColumn<TransferRtoR,Integer>,
-                        TableCell<TransferRtoR, Integer>>() {
-                    @Override
-                    public TableCell call(
-                            TableColumn<TransferRtoR, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<TransferRtoR>();
-                    }
-                };
+                setIntegerTableColumn -> new EditingNonNegativeIntCell<TransferRtoR>();
         Callback<TableColumn<TransferRtoR,Register>,
                 TableCell<TransferRtoR,Register>> cellRegFactory =
-                new Callback<TableColumn<TransferRtoR, Register>,
-                        TableCell<TransferRtoR, Register>>() {
-                    @Override
-                    public TableCell<TransferRtoR,Register> call(
-                            TableColumn<TransferRtoR, Register> setStringTableColumn) {
-                        return new ComboBoxTableCell<>(
-                                machine.getAllRegisters());
-                    }
-                };
+                setStringTableColumn -> new ComboBoxTableCell<>(
+                        machine.getAllRegisters());
 
         name.setCellValueFactory(
                 new PropertyValueFactory<>("name"));
@@ -132,66 +110,31 @@ public class TransferRtoRTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         source.setCellFactory(cellRegFactory);
         source.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferRtoR, Register>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferRtoR, Register> text) {
-                        ((TransferRtoR)text.getRowValue()).setSource(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setSource(text.getNewValue())
         );
 
         srcStartBit.setCellFactory(cellIntFactory);
         srcStartBit.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferRtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferRtoR, Integer> text) {
-                        ((TransferRtoR)text.getRowValue()).setSrcStartBit(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setSrcStartBit(text.getNewValue())
         );
 
         dest.setCellFactory(cellRegFactory);
         dest.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferRtoR, Register>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferRtoR, Register> text) {
-                        ((TransferRtoR)text.getRowValue()).setDest(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setDest(text.getNewValue())
         );
 
         destStartBit.setCellFactory(cellIntFactory);
         destStartBit.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferRtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferRtoR, Integer> text) {
-                        ((TransferRtoR)text.getRowValue()).setDestStartBit(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setDestStartBit(text.getNewValue())
         );
 
         numBits.setCellFactory(cellIntFactory);
         numBits.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<TransferRtoR, Integer>>() {
-                    @Override
-                    public void handle(
-                            TableColumn.CellEditEvent<TransferRtoR, Integer> text) {
-                        ((TransferRtoR)text.getRowValue()).setNumBits(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setNumBits(text.getNewValue())
         );
 
     }
@@ -238,14 +181,11 @@ public class TransferRtoRTableController
     public void checkValidity(ObservableList<TransferRtoR> micros)
     {
         // convert the array to an array of TransferRtoRs
-        TransferRtoR[] transferRtoRs = new TransferRtoR[micros.size()];
 
         for (TransferRtoR micro: micros) {
             Register.validateIsNotReadOnly(micro.getDest(), micro.getName());
+            micro.validateInRange();
         }
-
-        // check that all names are unique and nonempty
-        Validate.rangesAreInBound(transferRtoRs);
 
     }
 

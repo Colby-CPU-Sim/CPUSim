@@ -32,12 +32,14 @@
 package cpusim.model.module;
 
 import cpusim.model.Module;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.math.BigInteger;
 import java.util.EnumSet;
 
 import static com.google.common.base.Preconditions.*;
@@ -49,8 +51,7 @@ public class Register extends Module<Register> implements Sized<Register>
 {
 	/**
 	 * Memory Access specifier, usually used with an {@link EnumSet}.
-	 * 
-	 * @author Kevin Brightwell (Nava2)
+	 *
 	 * @since 2016-10-12
 	 */
 	public enum Access {
@@ -303,15 +304,6 @@ public class Register extends Module<Register> implements Sized<Register>
     public SimpleObjectProperty<EnumSet<Access>> accessProperty(){
         return access;
     }
-    
-    /**
-     * clone the whole object
-     * @return a clone of this object
-     */
-    public Object clone()
-    {
-        return new Register(getName(), width.get(),initialValue.get(),access.get(), nameDirty);
-    }
 
     /**
      * clear the value in the register to its initial value
@@ -320,20 +312,7 @@ public class Register extends Module<Register> implements Sized<Register>
     {
         setValue(initialValue.get());
     }
-
-    /**
-     * copies the data from the current module to a specific module
-     * @param comp the micro instruction that will be updated
-     * 
-     * @deprecated Use {@link #copyTo(Register)} instead
-     */
-    public void copyDataTo(Module<?> comp)
-    {
-        checkArgument(comp instanceof Register, 
-                "Passed non-Register to Register.copyDataTo()");
-        Register newRegister = (Register) comp;
-        this.copyTo(newRegister);
-    }
+    
 
     /**
      * sets the name dirty value
@@ -377,10 +356,36 @@ public class Register extends Module<Register> implements Sized<Register>
         newRegister.setNameDirty(nameDirty);
 	}
     
+    @Override
+    protected void validateState() {
+        
+        // Validate the width
+        final int width = getWidth();
+        if (width <= 0) {
+            throw new ValidationException("You must specify a positive value for the " +
+                    "bitwise width\nof the Register " + getName() + ".");
+        }
+        if (width > 64) {
+            throw new ValidationException("Register " + getName() +
+                    " can have a width of at most 64 bits.");
+        }
+        
+        // The intial value is within the set bounds:
+        BigInteger max = BigInteger.valueOf(2).pow(width - 1);
+        BigInteger initial = BigInteger.valueOf(getInitialValue());
+        BigInteger unsignedMax = max.shiftLeft(1).subtract(BigInteger.ONE);
+        if (!(max.negate().compareTo(initial) <= 0 &&
+                initial.compareTo(unsignedMax) <= 0)) {
+            throw new ValidationException("The initial value of register " + getName() +
+                    " is out of range. It must be set to a value greater than or equal to " + max.negate() +
+                    " and smaller than or equal to " + unsignedMax + ".");
+        }
+    }
+    
     /**
-     * checks if the dest register of the given {@link cpusim.model.Microinstruction} is read-only
+     * checks if the dest register of the given {@link Microinstruction} is read-only
      * @param r destination register to check
-     * @param microName name of the given {@link cpusim.model.Microinstruction}
+     * @param microName name of the given {@link Microinstruction}
      */
 	public static void validateIsNotReadOnly(final Register r, final String microName) {
         if (r.getAccess().equals(Access.readOnly())) {

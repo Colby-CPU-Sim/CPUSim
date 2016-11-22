@@ -29,15 +29,10 @@
 package cpusim.xml;
 
 
-import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
@@ -46,10 +41,12 @@ import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RegisterRAMPair;
-
-import com.google.common.collect.ImmutableList;
-
 import javafx.collections.ObservableList;
+
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 //import cpusim.gui.*;
 //import cpusim.scrollabledesktop.BaseInternalFrame;
@@ -240,32 +237,9 @@ public class MachineWriter
     // The module windows are the open windows for registers and rams
     public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out)
     {
-        List<ObservableList<? extends Module<?>>> moduleVectors = 
-    		ImmutableList.<ObservableList<? extends Module<?>>>builder()
-    			.add(machine.getModule("registers"))
-    			.add(machine.getModule("registerArrays"))
-    			.add(machine.getModule("conditionBits"))
-    			.add(machine.getModule("rams"))
-    			.build();
+        List<ObservableList<? extends Module<?>>> moduleVectors = machine.getAllModules();
+        List<ObservableList<? extends Microinstruction>> microVectors = machine.getAllMicros();
         
-        List<ObservableList<Microinstruction>> microVectors =
-        		ImmutableList.<ObservableList<Microinstruction>>builder()
-        			.add(machine.getMicros("set"))
-        			.add(machine.getMicros("test"))
-        			.add(machine.getMicros("increment"))
-        			.add(machine.getMicros("shift"))
-        			.add(machine.getMicros("logical"))
-        			.add(machine.getMicros("arithmetic"))
-        			.add(machine.getMicros("branch"))
-        			.add(machine.getMicros("transferRtoR"))
-        			.add(machine.getMicros("transferRtoA"))
-        			.add(machine.getMicros("transferAtoR"))
-        			.add(machine.getMicros("decode"))
-        			.add(machine.getMicros("setCondBit"))
-        			.add(machine.getMicros("io"))
-        			.add(machine.getMicros("memoryAccess"))
-        			.build();
-
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println(internalDTD);
         out.println();

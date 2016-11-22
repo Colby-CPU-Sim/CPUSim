@@ -5,15 +5,14 @@
 
 package cpusim.model.microinstruction;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ControlUnit;
 import cpusim.model.util.Copyable;
-
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The branch microinstruction is identical to the Test microinstruction except
@@ -33,7 +32,7 @@ public class Branch extends Microinstruction implements Copyable<Branch>
      * @param amount size of the relative jump.
      */
     public Branch(String name, Machine machine,
-                  Integer amount,
+                  int amount,
                   ControlUnit controlUnit)
     {
         super(name, machine);
@@ -46,7 +45,7 @@ public class Branch extends Microinstruction implements Copyable<Branch>
      *
      * @return the integer value of the field.
      */
-    public Integer getAmount()
+    public int getAmount()
     {
         return amount.get();
     }
@@ -56,7 +55,7 @@ public class Branch extends Microinstruction implements Copyable<Branch>
      *
      * @param newAmount the new value for the field.
      */
-    public void setAmount(Integer newAmount)
+    public void setAmount(int newAmount)
     {
         amount.set(newAmount);
     }
@@ -69,25 +68,23 @@ public class Branch extends Microinstruction implements Copyable<Branch>
     public String getMicroClass(){
         return "branch";
     }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     *
-     * @return a copy of the Set class
-     */
-    public Object clone()
-    {
-        return new Branch(getName(),machine,getAmount(),this.controlUnit);
-    }
-
+    
     /**
      * increment the micro index by the amount specified by the instruction
      */
+    @Override
     public void execute()
     {
         controlUnit.incrementMicroIndex(amount.get());
     }
-
+    
+    @Override
+    protected void validateState() {
+        if (controlUnit == null) {
+            throw new ValidationException("No control unit is set for Branch " + getName());
+        }
+    }
+    
     /**
      * copies the data from the current micro to a specific micro
      * @param oldMicro the micro instruction that will be updated
@@ -130,6 +127,7 @@ public class Branch extends Microinstruction implements Copyable<Branch>
      * @param m the module that holds the microinstruction
      * @return boolean value true if this micro used the module
      */
+    @Override
     public boolean uses(Module<?> m)
     {
         return false;

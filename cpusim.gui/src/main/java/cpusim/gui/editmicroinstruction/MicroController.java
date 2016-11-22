@@ -15,9 +15,10 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
 import cpusim.util.Dialogs;
@@ -40,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Kevin Brightwell (Nava2)
  */
 abstract class MicroController<T extends Microinstruction & Copyable<T>>
-        extends TableView<T>  {
+        extends TableView<T> implements NamedColumnHandler.HasUpdateTable<T>  {
     protected final Mediator mediator;
     protected final Machine machine;      //the current machine being simulated
     
@@ -258,5 +259,9 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
             getSelectionModel().select(index - 1);
         }
     }
-
+    
+    @Override
+    public void updateTable(@SuppressWarnings("unused") final TableView<T> table) {
+        updateTable();
+    }
 }

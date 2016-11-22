@@ -8,7 +8,7 @@ package cpusim.gui.desktop;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.StyledListCell;
 import cpusim.util.BackupManager;

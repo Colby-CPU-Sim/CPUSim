@@ -1,17 +1,11 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
 import cpusim.model.module.Sized;
-import cpusim.model.util.Copyable;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -187,46 +181,41 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
         other.setNumBits(getNumBits());
     }
     
-    /**
-     * check if the ranges are in bound.
-     * @param transfer A transfer to check against
-     * TransferRtoR objects with all ranges all in Bounds properly.
-     */
-    protected static void validateBaseInBounds(Transfer<?, ?> transfer)
-    {
+    @Override
+    protected void validateState() {
         String boundPhrase = "";
-        
-        int srcStartBit = transfer.getSrcStartBit();
-        int destStartBit = transfer.getDestStartBit();
-        int numBits = transfer.getNumBits();
-        
+    
+        int srcStartBit = getSrcStartBit();
+        int destStartBit = getDestStartBit();
+        int numBits = getNumBits();
+    
         if (srcStartBit < 0 || destStartBit < 0 || numBits < 0) {
             throw new ValidationException("You have a negative value for one of the " +
                     "start bits or the number of bits\nin the " +
-                    "microinstruction \"" + transfer.getName() + "\".");
+                    "microinstruction \"" + getName() + "\".");
         }
-        
-        if (srcStartBit > transfer.getSource().getWidth()) {
+    
+        if (srcStartBit > getSource().getWidth()) {
             boundPhrase = "srcStartBit";
-        } else if (destStartBit > transfer.getDest().getWidth()) {
+        } else if (destStartBit > getDest().getWidth()) {
             boundPhrase = "destStartBit";
         }
-        
+    
         if (!boundPhrase.isEmpty()) {
             throw new ValidationException(boundPhrase + " has an invalid value for the " +
-                    "specified register in instruction " + transfer.getName() +
+                    "specified register in instruction " + getName() +
                     ".\nIt must be non-negative, and less than the " +
                     "register's length.");
         }
-        
-        if (srcStartBit + numBits > transfer.getSource().getWidth() ||
-                destStartBit + numBits > transfer.getDest().getWidth()) {
+    
+        if (srcStartBit + numBits > getSource().getWidth() ||
+                destStartBit + numBits > getDest().getWidth()) {
             throw new ValidationException("The number of bits being transferred is " +
                     "too large to fit in the source register or the " +
                     "destination array.\n" +
                     "Please specify a new start bit or a smaller number " +
                     "of bits to copy in the microinstruction \"" +
-                    transfer.getName() + ".\"");
+                    getName() + ".\"");
         }
     }
 }

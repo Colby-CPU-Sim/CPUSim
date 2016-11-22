@@ -14,13 +14,14 @@
 
 package cpusim.model.module;
 
-import java.util.Optional;
-
 import cpusim.model.Machine;
 import cpusim.model.Module;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.Optional;
 
 
 /**
@@ -134,19 +135,24 @@ public class ConditionBit extends Module<ConditionBit>
     public SimpleBooleanProperty haltProperty(){
         return halt;
     }
-
-    /**
-     * clone the whole object
-     * @return a clone of this object
-     */
-    public Object clone()
-    {
-        return new ConditionBit(getName(), machine, register.get(), bit.get(), halt.get());
+    
+    @Override
+    protected void validateState() {
+        final int width = getRegister().getWidth();
+        final int bit = getBit();
+        if (bit < 0) {
+            throw new ValidationException("You cannot specify a negative value for the " +
+                    "bit index of the ConditionBit " + getName() + ".");
+        }
+        else if (bit >= width) {
+            throw new ValidationException("ConditionBit " + getName() +
+                    " must have an index less than the length of the register.");
+        }
     }
-
+    
     /**
      * copies the data from the current module to a specific module
-     * @param newConditionBit the micro instruction that will be updated
+     * @param newBit the micro instruction that will be updated
      */
     @Override
     public void copyTo(ConditionBit newBit)

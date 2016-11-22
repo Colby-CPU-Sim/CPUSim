@@ -92,21 +92,11 @@ import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
-import cpusim.model.microinstruction.CpusimSet;
-import cpusim.model.microinstruction.Decode;
-import cpusim.model.microinstruction.Logical;
-import cpusim.model.microinstruction.SetCondBit;
-import cpusim.model.microinstruction.Shift;
-import cpusim.model.microinstruction.Test;
-import cpusim.model.microinstruction.TransferAtoR;
-import cpusim.model.microinstruction.TransferRtoA;
-import cpusim.model.microinstruction.TransferRtoR;
+import cpusim.model.microinstruction.*;
 import cpusim.model.module.ConditionBit;
-import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
@@ -115,7 +105,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,8 +112,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.*;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
@@ -135,8 +122,12 @@ import static com.google.common.base.Preconditions.*;
  * elsewhere.
  * If any of the values is not valid, the method throws a ValidationException.
  */
-public class Validate
+public abstract class Validate
 {
+    private Validate() {
+        // no-op, stop construction
+    }
+    
     
     /**
      *     ------------------------------------
@@ -509,70 +500,25 @@ public class Validate
 
     /**
      * check if the ranges are in bound.
-     * @param transferAtoRs an array of TransferRtoRs to check.
-     * TransferRtoR objects with all ranges all in Bounds properly.
-     */
-    public static void rangesAreInBound(List<TransferAtoR> transferAtoRs)
-    {
-        
-    }
-
-    /**
-     * check if the ranges are in bound.
-     * @param transferRtoAs an array of TransferRtoRs to check.
+     * @param transferRtoAs an array of {@link TransferRtoA}s to check.
      * TransferRtoR objects with all ranges all in Bounds properly.
      *
-     * @deprecated Use {@link TransferRtoA#validateRangesInBounds(List)}
+     * @deprecated Use {@link Validatable#all(List)}
      */
     public static void rangesAreInBoundTransferRToA(List<TransferRtoA> transferRtoAs)
     {
-        TransferRtoA.validateRangesInBounds(transferRtoAs);
+        Validatable.all(transferRtoAs);
     }
 
     /**
      * check if the ranges are in bound.
      * @param transferRtoRs an array of TransferRtoRs to check.
-     * TransferRtoR objects with all ranges all in Bounds properly.
+     *
+     * @deprecated Use {@link Validatable#all(List)}
      */
-    public static void rangesAreInBound(TransferRtoR[] transferRtoRs)
+    public static void rangesAreInBound(List<TransferRtoR> transferRtoRs)
     {
-
-        int srcStartBit, destStartBit, numBits;
-        TransferRtoR temp;
-        boolean startProblem = false;
-        String boundPhrase = "";
-
-        for (TransferRtoR transferRtoR : transferRtoRs) {
-            temp = transferRtoR;
-            srcStartBit = temp.getSrcStartBit();
-            destStartBit = temp.getDestStartBit();
-            numBits = temp.getNumBits();
-            if (srcStartBit < 0 || destStartBit < 0 || numBits < 0) {
-                throw new ValidationException("You cannot specify a negative value for the " +
-                        "start and end bits, \nor the bitwise width of the TransferRtoR range.\n" +
-                        "Please fix this in the microinstruction \"" + temp.getName() + ".\"");
-            }
-            if (srcStartBit > temp.getSource().getWidth()) {
-                startProblem = true;
-                boundPhrase = "srcStartBit";
-            }
-            else if (destStartBit > temp.getDest().getWidth()) {
-                startProblem = true;
-                boundPhrase = "destStartBit";
-            }
-            if (startProblem) {
-                throw new ValidationException(boundPhrase + " has an invalid index for the " +
-                        "specified register in instruction " + temp.getName() +
-                        ".\nIt must be non-negative, and less than the register's length.");
-            }
-            else if (srcStartBit + numBits > temp.getSource().getWidth() ||
-                    destStartBit + numBits > temp.getDest().getWidth()) {
-                throw new ValidationException("In the microinstruction \"" + temp.getName() +
-                        "\",\nthe bitwise width of the transfer area is too large " +
-                        "to fit in \neither the source or the destination registers.");
-            }
-        }
-
+        Validatable.all(transferRtoRs);
     }
 
     /**
@@ -607,51 +553,12 @@ public class Validate
      * @param conditionBits an array of Registers to check
      * Register objects with all ranges all in bounds
      * properly
+     *
+     * @deprecated Use {@link Validatable#all(List)}
      */
     public static void bitInBounds(List<? extends ConditionBit> conditionBits)
     {
-        for (ConditionBit nextCB : conditionBits) {
-            final int width = nextCB.getRegister().getWidth();
-            final int bit = nextCB.getBit();
-            if (bit < 0) {
-                throw new ValidationException("You cannot specify a negative value for the " +
-                        "bit index of the ConditionBit " + nextCB.getName() + ".");
-            }
-            else if (bit >= width) {
-                throw new ValidationException("ConditionBit " + nextCB.getName() +
-                        " must have an index less than the length of the register.");
-            }
-        }
-    }
-
-    /**
-     * check if all the cells in the ram have the valid sizes
-     * @param rams the list of rams that will be checked
-     */
-    public static void cellSizesAreValid(final List<? extends RAM> rams) {
-        for (RAM ram : checkNotNull(rams)) {
-            int size = ram.getCellSize();
-            if (size <= 0 || size > 64) {
-                throw new ValidationException("The RAM module \"" + ram.getName() +
-                        "\" has cell size " + ram.getCellSize() +
-                        ".\nThe cell size must be an integer from 1 to 64.");
-            }
-        }
-    }
-
-    /**
-     * checks whether all the RAMs have  positive length
-     * @param rams an array of RAMs
-     * positive length
-     */
-    public static void lengthsArePositive(final List<? extends RAM> rams) {
-        for (RAM ram : checkNotNull(rams)) {
-            if (ram.getLength() <= 0) {
-                throw new ValidationException("The RAM module \"" + ram.getName() +
-                        "\" has length " + ram.getLength() +
-                        ".\nThe length must be a positive integer.");
-            }
-        }
+        Validatable.all(conditionBits);
     }
     
     /**
@@ -690,53 +597,6 @@ public class Validate
     }
     
     /**
-     * check whether array has Register objects with all widths
-     * all in bounds properly
-     *
-     * @param registers an array of Registers to check
-     * with all widths all in bounds properly
-     */
-    public static void widthsAreInBound(List<? extends Register> registers) {
-        checkNotNull(registers);
-
-        for (Register nextRegister : registers) {
-            final int width = nextRegister.getWidth();
-            if (width <= 0) {
-                throw new ValidationException("You must specify a positive value for the " +
-                        "bitwise width\nof the Register " + nextRegister.getName() + ".");
-            }
-            if (width > 64) {
-                throw new ValidationException("Register " + nextRegister.getName() +
-                        " can have a width of at most 64 bits.");
-            }
-        }
-
-    } // end rangesAreInBound()
-
-    /**
-     * Check of the initialValue of some registers are in the proper bound 
-     * @param registers registers to be checked
-     */
-    public static void initialValuesAreInbound(List<? extends Register> registers){
-
-        for (Register nextRegister : registers) {
-            final int width = nextRegister.getWidth();
-            BigInteger max = BigInteger.valueOf(2).pow(width - 1);
-            BigInteger initial = BigInteger.valueOf(nextRegister.getInitialValue());
-            BigInteger unsignedMax = max.shiftLeft(1).subtract(BigInteger.ONE);
-            if (!(max.negate().compareTo(initial) <= 0 &&
-                    initial.compareTo(unsignedMax) <= 0)) {
-                throw new ValidationException("The initial value of register " + nextRegister.getName() +
-                        " is out of range. It must be set to a value greater than or equal to " + max.negate() +
-                        " and smaller than or equal to " + unsignedMax + ".");
-            }
-        }
-    }
-
-
-    
-
-    /**
      * check if all registers have appropriate width for micro instructions.
      * @param h a HashMap of key = original Registers, value = new width
      * any micros to be invalid.
@@ -746,12 +606,12 @@ public class Validate
         //make a HashMap of old registers as keys and
         //old widths as Integer values
         Map<Module<?>, Integer> newWidths = new HashMap<>();
-        final List<Register> registers = machine.getModule("registers", Register.class);
+        final List<Register> registers = machine.getModule(Register.class);
         for (Register r: registers) {
             newWidths.put(r, r.getWidth());
         }
         
-        for (RegisterArray array: machine.getModule("registerArrays", RegisterArray.class)) {
+        for (RegisterArray array: machine.getModule(RegisterArray.class)) {
             for (Register r: array) {
                 newWidths.put(r, r.getWidth());
             }
@@ -765,16 +625,15 @@ public class Validate
         //		shift, logical, set, test, and the 3 transfers
         //Shifts and logicals are special since registers used
         //by them must be the same widths.
-        ObservableList<Microinstruction> shifts = machine.getMicros("shift");
-        for (Microinstruction shift1 : shifts) {
-            Shift shift = (Shift) shift1;
+        ObservableList<Shift> shifts = machine.getMicros(Shift.class);
+        for (Shift shift : shifts) {
             Register source = shift.getSource();
             int sourceWidth = newWidths.get(source);
-            int destWidth = newWidths.get(shift.getDestination());
+            int destWidth = newWidths.get(shift.getDest());
             if (sourceWidth != destWidth) {
                 throw new ValidationException("The new width " + sourceWidth +
                         " of register " + shift.getSource() + "\nand new width " +
-                        destWidth + " of register " + shift.getDestination() +
+                        destWidth + " of register " + shift.getDest() +
                         "\ncause microinstruction " + shift + " to be invalid.");
             }
         }
@@ -877,34 +736,7 @@ public class Validate
         */
 
     }
-
-    /**
-     * Checks whether array has Register objects with all
-     * ranges all in bounds properly
-     * @param registerArrays an array of Registers to check
-     * with all ranges all in bounds properly
-     */
-    public static void registerArraysRangesInBound(List<? extends RegisterArray> registerArrays) {
-        for (RegisterArray nextArray : registerArrays) {
-            final int width = nextArray.getWidth();
-            if (width <= 0) {
-                throw new ValidationException("You must specify a positive value for the " +
-                        "bitwise width\nof the registers in the RegisterArray " +
-                        nextArray.getName() + ".");
-            }
-            else if (width > 64) {
-                throw new ValidationException("The registers in RegisterArray " + nextArray.getName() +
-                        " can be at most 64 bits wide.");
-            }
-        }
-
-    } // end rangesAreInBound()
-
     
-
-    
-
-   
     /**
      * Check if the address in the Loading tab is valid and in bound.
      * @param address string of the address

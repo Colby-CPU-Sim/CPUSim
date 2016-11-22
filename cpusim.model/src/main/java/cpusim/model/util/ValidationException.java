@@ -11,4 +11,8 @@ public class ValidationException  extends RuntimeException
     {
         super(s);
     }
+    
+    public ValidationException(String s, Throwable cause) {
+        super(s, cause);
+    }
 }

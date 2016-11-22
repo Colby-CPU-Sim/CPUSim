@@ -9,6 +9,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Increment;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -89,7 +90,7 @@ class IncrementTableController
                 setStringTableColumn -> new ComboBoxTableCell<>(machine.getAllRegisters());
 
         final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.getModule("conditionBits", ConditionBit.class));
+        condBit.addAll(machine.getModule(ConditionBit.class));
         
         Callback<TableColumn<Increment,ConditionBit>,TableCell<Increment,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
@@ -102,7 +103,7 @@ class IncrementTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         register.setCellFactory(cellRegFactory);
         register.setOnEditCommit(

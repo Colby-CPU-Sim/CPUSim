@@ -22,7 +22,7 @@ package cpusim.gui.fetchsequence;
 
 import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.model.microinstruction.Comment;

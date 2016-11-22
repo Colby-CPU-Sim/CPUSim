@@ -1,25 +1,23 @@
 package cpusim.model.microinstruction;
 
+import com.google.common.base.Strings;
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.math.BigInteger;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The arithmetic microinstruction use three registers and optionally two condition
  * bits.
- *
- * @author Jinghui Yu
- * @author Kevin Brightwell (Nava2)
  *
  * @since 2013-06-06
  */
@@ -226,11 +224,21 @@ public class Arithmetic extends Microinstruction implements Copyable<Arithmetic>
         newArithmetic.setOverflowBit(getOverflowBit());
         newArithmetic.setCarryBit(getCarryBit());
     }
-
+    
+    @Override
+    public void validateState() {
+        if (Strings.isNullOrEmpty(type.getValue())) {
+            throw new ValidationException("The arithmetic operation is not specified.");
+        }
+        
+        
+    }
+    
     /**
      * returns the XML description
      * @return the XML description
      */
+    @Override
     public String getXMLDescription(String indent) {
         return indent + "<Arithmetic name=\"" + getHTMLName() +
                 "\" type=\"" + getType() +

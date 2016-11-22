@@ -2,6 +2,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
@@ -111,7 +112,7 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         source.setCellFactory(cellComboFactory);
         source.setOnEditCommit(

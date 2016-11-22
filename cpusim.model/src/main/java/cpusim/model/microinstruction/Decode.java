@@ -3,10 +3,10 @@ package cpusim.model.microinstruction;
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.List;
@@ -17,7 +17,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The branch microinstruction is identical to the Test microinstruction except
  * that it is an unconditional jump.
  *
- * @author Jinghui Yu
  * @since 2013-06-06
  */
 public class Decode extends Microinstruction implements Copyable<Decode> {
@@ -55,14 +54,6 @@ public class Decode extends Microinstruction implements Copyable<Decode> {
     public void setIr(Register newIr){
         ir.set(newIr);
     }
-
-    public Machine getMachine(){
-        return this.machine;
-    }
-
-    public void setMachine(Machine newMachine){
-        this.machine = newMachine;
-    }
     
     /**
      * returns the class of the microinstruction
@@ -98,6 +89,13 @@ public class Decode extends Microinstruction implements Copyable<Decode> {
         //if we get this far, there was no machine instruction found
         throw new ExecutionException("No opcode matched the bits in " +
                 "the register: " + ir.get() + ".");
+    }
+    
+    @Override
+    protected void validateState() {
+        if (ir.getValue() == null) {
+            throw new ValidationException("No IR register set for Decode instruction, " + getName());
+        }
     }
     
     @Override

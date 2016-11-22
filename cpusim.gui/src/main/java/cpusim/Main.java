@@ -23,7 +23,7 @@ import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
 import cpusim.model.assembler.Token;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.iochannel.FileChannel;

@@ -13,6 +13,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -110,7 +111,7 @@ public class TransferRtoATableController
         Callback<TableColumn<TransferRtoA,RegisterArray>,
                 TableCell<TransferRtoA,RegisterArray>> cellRegAFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getModule("registerArrays", RegisterArray.class));
+                        machine.getModule(RegisterArray.class));
 
         name.setCellValueFactory(
                 new PropertyValueFactory<>("name"));
@@ -133,61 +134,53 @@ public class TransferRtoATableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
-
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
+        
         source.setCellFactory(cellRegFactory);
         source.setOnEditCommit(
-                text -> text.getRowValue().setSource(
-                        text.getNewValue())
+                text -> text.getRowValue().setSource(text.getNewValue())
         );
 
         srcStartBit.setCellFactory(cellIntFactory);
         srcStartBit.setOnEditCommit(
-                text -> text.getRowValue().setSrcStartBit(
-                        text.getNewValue())
+                text -> text.getRowValue().setSrcStartBit(text.getNewValue())
         );
 
         dest.setCellFactory(cellRegAFactory);
         dest.setOnEditCommit(
-                text -> text.getRowValue().setDest(
-                        text.getNewValue())
+                text -> text.getRowValue().setDest(text.getNewValue())
         );
 
         destStartBit.setCellFactory(cellIntFactory);
         destStartBit.setOnEditCommit(
-                text -> text.getRowValue().setDestStartBit(
-                        text.getNewValue())
+                text -> text.getRowValue().setDestStartBit(text.getNewValue())
         );
 
         numBits.setCellFactory(cellIntFactory);
         numBits.setOnEditCommit(
-                text -> text.getRowValue().setNumBits(
-                        text.getNewValue())
+                text -> text.getRowValue().setNumBits(text.getNewValue())
         );
 
         index.setCellFactory(cellRegFactory);
         index.setOnEditCommit(
-                text -> text.getRowValue().setIndex(
-                        text.getNewValue())
+                text -> text.getRowValue().setIndex(text.getNewValue())
         );
 
         indexStart.setCellFactory(cellIntFactory);
         indexStart.setOnEditCommit(
-                text -> text.getRowValue().setIndexStart(
-                        text.getNewValue())
+                text -> text.getRowValue().setIndexStart(text.getNewValue())
         );
 
         indexNumBits.setCellFactory(cellIntFactory);
         indexNumBits.setOnEditCommit(
-                text -> text.getRowValue().setIndexNumBits(
-                        text.getNewValue())
+                text -> text.getRowValue().setIndexNumBits(text.getNewValue())
         );
     }
     
     @Override
     public TransferRtoA getPrototype() {
-        final RegisterArray a = (machine.getModule("registerArrays").size() == 0 ? null :
-                machine.getModule("registerArrays", RegisterArray.class).get(0));
+        final RegisterArray a = (machine.getModule(RegisterArray.class).size() == 0 ? null :
+                machine.getModule(RegisterArray.class).get(0));
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new TransferRtoA("???", machine, r, 0, a, 0, 0, r,0, 0);
@@ -221,7 +214,7 @@ public class TransferRtoATableController
     @Override
     public boolean newMicrosAreAllowed()
     {
-        return (machine.getModule("registerArrays").size() > 0);
+        return (machine.getModule(RegisterArray.class).size() > 0);
     }
 
     /**

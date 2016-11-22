@@ -12,23 +12,16 @@
 
 package cpusim.model.microinstruction;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.Register.Access;
 import cpusim.model.module.RegisterArray;
-
 import cpusim.model.util.Copyable;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.util.List;
 
 /**
  * The TransferRtoA microinstruction transfers data from a register to a register array.
@@ -283,7 +276,39 @@ public class TransferRtoA extends Transfer<Register, RegisterArray> implements C
                 "</TD><TD>" + getIndexNumBits() +
                 "</TD></TR>";
     }
-
+    
+    @Override
+    protected void validateState() {
+        super.validateState();
+    
+        int indexNumBits = getIndexNumBits();
+        int indexStart = getIndexStart();
+        if (indexStart < 0) {
+            throw new ValidationException("You have a negative value for the index start bit in " +
+                    "microinstruction \"" + getName() + "\".");
+        }
+    
+        if (indexStart > getIndex().getWidth()) {
+            throw new ValidationException("Index start bit has an invalid value for the " +
+                    "specified register in instruction " + getName() +
+                    ".\nIt must be non-negative, and less than the " +
+                    "register's length.");
+        }
+    
+        if (indexNumBits <= 0) {
+            throw new ValidationException("A positive number of bits must be specified " +
+                    "for the index register.");
+        }
+        else if (indexStart + indexNumBits > getIndex().getWidth()) {
+            throw new ValidationException("The number of bits specified in the index " +
+                    "register is " +
+                    "too large to fit in the index register.\n" +
+                    "Please specify a new start bit or a smaller number " +
+                    "of bits in the microinstruction \"" +
+                    getName() + ".\"");
+        }
+    }
+    
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.
@@ -294,45 +319,4 @@ public class TransferRtoA extends Transfer<Register, RegisterArray> implements C
     public boolean uses(Module<?> m){
         return super.uses(m) || m == index.get();
     }
-    
-    /**
-     * check if the ranges are in bound.
-     * @param transferRtoAs an array of TransferRtoRs to check.
-     * TransferRtoR objects with all ranges all in Bounds properly.
-     */
-    public static void validateRangesInBounds(List<TransferRtoA> transferRtoAs)
-    {
-        for (TransferRtoA transferRtoA : transferRtoAs) {
-            validateBaseInBounds(transferRtoA);
-            
-            int indexNumBits = transferRtoA.getIndexNumBits();
-            int indexStart = transferRtoA.getIndexStart();
-            if (indexStart < 0) {
-                throw new ValidationException("You have a negative value for the index start bit in " +
-                        "microinstruction \"" + transferRtoA.getName() + "\".");
-            }
-            
-            if (indexStart > transferRtoA.getIndex().getWidth()) {
-                throw new ValidationException("Index start bit has an invalid value for the " +
-                        "specified register in instruction " + transferRtoA.getName() +
-                        ".\nIt must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            
-            if (indexNumBits <= 0) {
-                throw new ValidationException("A positive number of bits must be specified " +
-                        "for the index register.");
-            }
-            else if (indexStart + indexNumBits > transferRtoA.getIndex().getWidth()) {
-                throw new ValidationException("The number of bits specified in the index " +
-                        "register is " +
-                        "too large to fit in the index register.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits in the microinstruction \"" +
-                        transferRtoA.getName() + ".\"");
-            }
-        }
-        
-    }
-
 }

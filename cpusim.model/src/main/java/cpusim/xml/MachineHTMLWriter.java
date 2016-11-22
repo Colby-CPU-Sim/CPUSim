@@ -32,6 +32,7 @@ import cpusim.model.*;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 
+import cpusim.model.microinstruction.Microinstruction;
 import javafx.collections.ObservableList;
 
 import java.io.PrintWriter;

@@ -7,7 +7,6 @@ package cpusim.model.microinstruction;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -15,10 +14,6 @@ import cpusim.model.util.Copyable;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The TransferRtoA microinstruction transfers data from a register to a register array.
@@ -130,7 +125,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
 
     /**
      * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
+     * @param newTransferAtoR the micro instruction that will be updated
      */
     public <U extends TransferAtoR> void copyTo(U newTransferAtoR)
     {
@@ -268,43 +263,37 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
         return super.uses(m) || m == index.get();
     }
     
-    /**
-     * Validate that the {@link TransferAtoR} value are valid within their bounds.
-     * @param transferAtoRs
-     */
-    public static void validateRangesInBound(List<? extends TransferAtoR> transferAtoRs) {
-        
-        for (TransferAtoR temp : transferAtoRs) {
-            validateBaseInBounds(temp);
-            
-            int indexNumBits = temp.getIndexNumBits();
-            int indexStart = temp.getIndexStart();
-            
-            if (indexStart < 0) {
-                throw new ValidationException("You have a negative value for one of the " +
-                        "start bits or the number of bits\nin the " +
-                        "microinstruction \"" + temp.getName() + "\".");
-            }
+    @Override
+    protected void validateState() {
+        super.validateState();
     
-            if (indexStart > temp.getIndex().getWidth()) {
-                throw new ValidationException("indexStart has an invalid value for the " +
-                        "specified register in instruction " + temp.getName() +
-                        ".\nIt must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            
-            if (indexNumBits <= 0) {
-                throw new ValidationException("A positive number of bits must be specified " +
-                        "for the index register.");
-            }
-            else if (indexStart + indexNumBits > temp.getIndex().getWidth()) {
-                throw new ValidationException("The number of bits specified in the index " +
-                        "register is " +
-                        "too large to fit in the index register.\n" +
-                        "Please specify a new start bit or a smaller number " +
-                        "of bits in the microinstruction \"" +
-                        temp.getName() + ".\"");
-            }
+        int indexNumBits = getIndexNumBits();
+        int indexStart = getIndexStart();
+    
+        if (indexStart < 0) {
+            throw new ValidationException("You have a negative value for one of the " +
+                    "start bits or the number of bits\nin the " +
+                    "microinstruction \"" + getName() + "\".");
+        }
+    
+        if (indexStart > getIndex().getWidth()) {
+            throw new ValidationException("indexStart has an invalid value for the " +
+                    "specified register in instruction " + getName() +
+                    ".\nIt must be non-negative, and less than the " +
+                    "register's length.");
+        }
+    
+        if (indexNumBits <= 0) {
+            throw new ValidationException("A positive number of bits must be specified " +
+                    "for the index register.");
+        }
+        else if (indexStart + indexNumBits > getIndex().getWidth()) {
+            throw new ValidationException("The number of bits specified in the index " +
+                    "register is " +
+                    "too large to fit in the index register.\n" +
+                    "Please specify a new start bit or a smaller number " +
+                    "of bits in the microinstruction \"" +
+                    getName() + ".\"");
         }
     }
 

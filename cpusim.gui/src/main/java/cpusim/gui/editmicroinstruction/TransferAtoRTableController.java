@@ -19,11 +19,10 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.ValidationException;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -110,7 +109,7 @@ class TransferAtoRTableController
         
         Callback<TableColumn<TransferAtoR,RegisterArray>,
                 TableCell<TransferAtoR,RegisterArray>> cellRegAFactory =
-                    _ignore -> new ComboBoxTableCell<>(machine.getModule("registerArrays", RegisterArray.class));
+                    _ignore -> new ComboBoxTableCell<>(machine.getModule(RegisterArray.class));
 
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
@@ -124,17 +123,7 @@ class TransferAtoRTableController
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(_ignore -> new cpusim.gui.util.EditingStrCell<>());
-        name.setOnEditCommit(text -> {
-                String newName = text.getNewValue();
-                String oldName = text.getOldValue();
-                text.getRowValue().setName(newName);
-                try{
-                    NamedObject.validateUniqueAndNonempty(getItems());
-                } catch (ValidationException ex){
-                    (text.getRowValue()).setName(oldName);
-                    updateTable();
-                }
-            });
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         source.setCellFactory(cellRegAFactory);
         source.setOnEditCommit(text -> text.getRowValue().setSource(text.getNewValue()));

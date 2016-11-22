@@ -1,7 +1,6 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.Copyable;
@@ -12,7 +11,6 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-import java.util.List;
 import java.util.function.BiPredicate;
 
 import static com.google.common.base.Preconditions.*;
@@ -217,6 +215,7 @@ public class Test extends Microinstruction implements Copyable<Test> {
     /**
      * execute the micro instruction from machine
      */
+    @Override
     public void execute()
     {
         Operation comparison = this.comparison.get();
@@ -277,6 +276,28 @@ public class Test extends Microinstruction implements Copyable<Test> {
         }
     }
     
+    @Override
+    protected void validateState() {
+        final int start = getStart();
+        final int numBits = getNumBits();
+    
+        if (start < 0 || numBits < 0) {
+            throw new ValidationException("You cannot specify a negative value for the " +
+                    "start bits,\nor the bitwise width of the test range\n" +
+                    "in the microinstruction " + getName() + ".");
+        }
+        else if (start >= getRegister().getWidth()) {
+            throw new ValidationException("The start bit in the microinstruction "
+                    + getName() + " is out of range.\n" +
+                    "It must be non-negative, and less than the " +
+                    "register's length.");
+        }
+        else if ((start + numBits) > getRegister().getWidth()) {
+            throw new ValidationException("The bits specified in the Test " +
+                    "microinstruction " + getName() +
+                    " are too large to fit in the register.");
+        }
+    }
     
     @Override
     public <U extends Test> void copyTo(U newTest)
@@ -322,34 +343,4 @@ public class Test extends Microinstruction implements Copyable<Test> {
                 "</TD><TD>" + getComparison() + "</TD><TD>" + getValue() +
                 "</TD><TD>" + getOmission() + "</TD></TR>";
 	}
-    
-    /**
-     * checks if the objects with all ranges all in Bounds properly
-     * @param tests an array of Sets to check
-     * the objects with all ranges all in Bounds properly
-     */
-    public static void validateRangeInBound(List<Test> tests)
-    {
-        for (Test test : tests) {
-            final int start = test.getStart();
-            final int numBits = test.getNumBits();
-            
-            if (start < 0 || numBits < 0) {
-                throw new ValidationException("You cannot specify a negative value for the " +
-                        "start bits,\nor the bitwise width of the test range\n" +
-                        "in the microinstruction " + test.getName() + ".");
-            }
-            else if (start >= test.getRegister().getWidth()) {
-                throw new ValidationException("The start bit in the microinstruction "
-                        + test.getName() + " is out of range.\n" +
-                        "It must be non-negative, and less than the " +
-                        "register's length.");
-            }
-            else if ((start + numBits) > test.getRegister().getWidth()) {
-                throw new ValidationException("The bits specified in the Test " +
-                        "microinstruction " + test.getName() +
-                        " are too large to fit in the register.");
-            }
-        }
-    }
 }

@@ -8,7 +8,6 @@
 
 package cpusim.model.microinstruction;
 
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.xml.HtmlEncoder;
 
@@ -40,18 +39,6 @@ public class Comment extends Microinstruction
     }
 
     /**
-     * duplicate the set class and return a copy of the original Set class.
-     *
-     * @return a copy of the Set class
-     */
-    public Object clone()
-    {
-        throw new UnsupportedOperationException("Comment.clone() was called.");
-    } // end clone()
-
-
-
-    /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.
      * @param m the module that holds the microinstruction
@@ -68,7 +55,12 @@ public class Comment extends Microinstruction
     {
         //do nothing
     }
-
+    
+    @Override
+    protected void validateState() {
+        // nothing to validate
+    }
+    
     /**
      * returns the HTML description
      * @return the HTML description

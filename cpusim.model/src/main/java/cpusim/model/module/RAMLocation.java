@@ -15,9 +15,9 @@ import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 /**
- * A lind of address and data in the RAM
+ * A kind of address and data in the RAM
  */
-public class RAMLocation{
+public class RAMLocation {
     private SimpleLongProperty address;
     private SimpleLongProperty value;
     private RAM ram;

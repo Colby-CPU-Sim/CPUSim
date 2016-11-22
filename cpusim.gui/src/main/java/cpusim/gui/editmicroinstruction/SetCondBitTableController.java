@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -74,7 +75,7 @@ class SetCondBitTableController extends MicroController<SetCondBit> implements I
                                 "1"
                         ));
         Callback<TableColumn<SetCondBit,ConditionBit>,TableCell<SetCondBit,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.getModule("conditionBits", ConditionBit.class));
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.getModule(ConditionBit.class));
 
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
@@ -82,7 +83,7 @@ class SetCondBitTableController extends MicroController<SetCondBit> implements I
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         bit.setCellFactory(cellCondFactory);
         bit.setOnEditCommit(
@@ -100,8 +101,8 @@ class SetCondBitTableController extends MicroController<SetCondBit> implements I
     @Override
     public SetCondBit getPrototype()
     {
-        ConditionBit cBit = (machine.getModule("conditionBits").size() == 0 ?
-                null : machine.getModule("conditionBits", ConditionBit.class).get(0));
+        ConditionBit cBit = (machine.getModule(ConditionBit.class).size() == 0 ?
+                null : machine.getModule(ConditionBit.class).get(0));
         return new SetCondBit("???", machine, cBit, "0");
     }
 

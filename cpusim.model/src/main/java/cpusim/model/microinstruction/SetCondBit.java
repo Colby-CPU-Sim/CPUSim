@@ -5,11 +5,12 @@
 
 package cpusim.model.microinstruction;
 
+import com.google.common.base.Strings;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -117,11 +118,17 @@ public class SetCondBit extends Microinstruction implements Copyable<SetCondBit>
     }
     
     @Override
+    protected void validateState() {
+        if (Strings.isNullOrEmpty(value.get())) {
+            throw new ValidationException("No value set for " + SetCondBit.class.getSimpleName() + " microinstruction.");
+        }
+    }
+    
+    @Override
     public <U extends SetCondBit> void copyTo(final U other) {
         checkNotNull(other);
         
         other.setName(getName());
-        
         other.setValue(getValue());
         other.setBit(getBit());
     }

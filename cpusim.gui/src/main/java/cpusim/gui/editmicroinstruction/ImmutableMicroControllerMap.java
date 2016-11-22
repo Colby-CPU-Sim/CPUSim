@@ -1,12 +1,10 @@
 package cpusim.gui.editmicroinstruction;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.*;
 import cpusim.model.util.Copyable;
-import javafx.scene.control.TableView;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Collection;
@@ -17,10 +15,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Created by kevin on 2016-11-14.
+ * Mapping from a {@link Microinstruction} sub-type to a {@link MicroController} instance.
  */
 @Immutable
-class ImmutableMicroControllerMap implements Map<Class<? extends Microinstruction>, MicroController<? extends Microinstruction>> {
+final class ImmutableMicroControllerMap implements Map<Class<? extends Microinstruction>, MicroController<? extends Microinstruction>> {
 
     /**
      * An {@link ImmutableMap} that holds types as the keys and sub {@link MicroController} as types.
@@ -75,10 +73,19 @@ class ImmutableMicroControllerMap implements Map<Class<? extends Microinstructio
     @Override
     public MicroController<?> get(final Object key) {
         if (CharSequence.class.isAssignableFrom(key.getClass())) {
-
+            String strKey = key.toString();
+            
+            try {
+                return typesMap.get(Class.forName(strKey));
+            } catch (ClassNotFoundException cnfe) {
+                // The Map#get(Object) format says to return null, not throw an exception. :(
+                return null;
+            }
+        } else if (key instanceof Class) {
+            return typesMap.get(key);
+        } else {
+            throw new IllegalArgumentException("Unknown type passed: " + key.getClass().getName());
         }
-
-        return typesMap.get(key);
     }
     
     @Override
@@ -148,7 +155,5 @@ class ImmutableMicroControllerMap implements Map<Class<? extends Microinstructio
     public void clear() {
         throw new UnsupportedOperationException("#clear() is unsupported, this class is Immutable.");
     }
-    
-    
     
 }

@@ -239,7 +239,7 @@ import cpusim.gui.options.OptionsController;
 import cpusim.gui.preferences.PreferencesController;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.assembler.Token;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.ConditionBit;

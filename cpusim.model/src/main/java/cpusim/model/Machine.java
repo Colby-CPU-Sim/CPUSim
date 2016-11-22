@@ -12,17 +12,9 @@
  */
 package cpusim.model;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.assembler.PunctChar.Use;
@@ -36,12 +28,25 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-
+import cpusim.model.util.Validatable;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
  * This file contains the class for Machines created using CPU Sim
@@ -89,7 +94,26 @@ public class Machine extends Module<Machine> implements Serializable {
         BREAK,
         HALTED_STEP_BY_MICRO
     }
-
+    
+    /**
+     * Get all of the supported implementing {@link Class} values for the {@link Microinstruction}.
+     * @return
+     */
+    public static ImmutableList<Class<? extends Microinstruction>> getMicroClasses() {
+        ImmutableList.Builder<Class<? extends Microinstruction>> bld = ImmutableList.builder();
+        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType).forEach(bld::add);
+        return bld.build();
+    }
+    
+    /**
+     * Get all of the supported implementing {@link Class} values for {@link Module} instances.
+     * @return
+     */
+    public static ImmutableList<Class<? extends Module<?>>> getModuleClasses() {
+        ImmutableList.Builder<Class<? extends Module<?>>> bld = ImmutableList.builder();
+        Arrays.stream(ModuleClassMapping.values()).map(v -> v.moduleType).forEach(bld::add);
+        return bld.build();
+    }
 
 
     /**
@@ -411,8 +435,29 @@ public class Machine extends Module<Machine> implements Serializable {
      * @return a Vector object
      */
     @SuppressWarnings("unchecked")
-    public <T extends Module<T>> ObservableList<T> getModule(@SuppressWarnings("unused") Class<T> moduleClazz) {
+    public <T extends Module<T>> ObservableList<T> getModule(final Class<T> moduleClazz) {
         return (ObservableList<T>)moduleMap.get(moduleClazz);
+    }
+    
+    /**
+     * A getter method for all module objects
+     *
+     * @param moduleClazz a String that describes the type of module
+     * @return a Vector object
+     */
+    @SuppressWarnings("unchecked")
+    public ObservableList<? extends Module<?>> getModuleUnchecked(final Class<? extends Module<?>> moduleClazz) {
+        return moduleMap.get(moduleClazz);
+    }
+    
+    /**
+     * Gets all of the modules into a single {@link ImmutableList}.
+     * @return
+     */
+    public ImmutableList<ObservableList<? extends Module<?>>> getAllModules() {
+        ImmutableList.Builder<ObservableList<? extends Module<?>>> moduleBuilder = ImmutableList.builder();
+        Machine.getModuleClasses().stream().map(c -> machine.getModuleUnchecked(c)).forEach(moduleBuilder::add);
+        return moduleBuilder.build();
     }
 
     /**
@@ -438,6 +483,17 @@ public class Machine extends Module<Machine> implements Serializable {
     @SuppressWarnings("unchecked")
     public <U extends Microinstruction> ObservableList<U> getMicros(Class<U> clazz) {
         return (ObservableList<U>)microMap.get(clazz);
+    }
+    
+    /**
+     * Get all of the loaded {@link Microinstruction} in the {@link Machine}.
+     * @return
+     */
+    public List<ObservableList<? extends Microinstruction>> getAllMicros() {
+        ImmutableList.Builder<ObservableList<? extends Microinstruction>> microBuilder = ImmutableList.builder();
+        getMicroClasses().stream().map(c -> machine.getMicros(c)).forEach(microBuilder::add);
+    
+        return microBuilder.build();
     }
 
     public List<MachineInstruction> getInstructions() {
@@ -498,58 +554,18 @@ public class Machine extends Module<Machine> implements Serializable {
 
 
     private void initializeMicroMap() {
-        for (Class<? extends Microinstruction> microClazz : MICRO_CLASSES)
+        for (Class<? extends Microinstruction> microClazz : getMicroClasses())
             microMap.put(microClazz, FXCollections.observableArrayList(new ArrayList<>()));
         getMicros(End.class).add(new End(this));
         getMicros(Comment.class).add(new Comment());
     }
-
-    //--------------------------------
-    // copyFrom:  Copies the data from the newMachine into this machine
-    /*public void copyFrom(Machine newMachine) {
-        if (newMachine.equals(this)) {
-            return; //no need to copy--occurs in
-        }
-        //case of command line loading
-
-        this.registers.clear();
-        this.registers.addAll(newMachine.registers);
-        this.registerArrays.clear();
-        this.registerArrays.addAll(newMachine.registerArrays);
-        this.conditionBits.clear();
-        this.conditionBits.addAll(newMachine.conditionBits);
-        this.rams.clear();
-        this.rams.addAll(newMachine.rams);
-        this.fields.clear();
-        this.fields.addAll(newMachine.fields);
-
-        for (String aMicroClass : MICRO_CLASSES) {
-            ObservableList<Microinstruction> newMicros =
-                    newMachine.microMap.get(aMicroClass);
-            microMap.put(aMicroClass, newMicros);
-        }
-
-        this.instructions = newMachine.instructions;
-        for (MachineInstruction instr : instructions)
-            instr.setMachine(this);
-        this.EQUs = newMachine.EQUs;
-        this.controlUnit = newMachine.controlUnit;
-        this.fetchSequence = newMachine.fetchSequence;
-        this.codeStore = newMachine.codeStore;
-        this.startingAddressForLoading = newMachine.startingAddressForLoading;
-        this.setName(newMachine.getName());
-        this.punctChars = newMachine.punctChars;
-
-        //fix the Decode & End micros to refer to this
-        //machine instead of the newMachine.
-        this.getEnd().setMachine(this);
-        for (int i = 0; i < getMicros("decode").size(); i++) {
-            ((Decode) getMicros("decode").get(i)).setMachine(this);
-        }
-    }*/
-
-    //-----------------------------------
-    // returns a new Vector containing all the registers of the machine
+    
+    
+    /**
+     *
+     * @return a new {@link ObservableList} containing all the registers of the machine
+     */
+    
     // with the registers coming from register arrays at the end of the vector.
     public ObservableList<Register> getAllRegisters() {
         ObservableList<Register> allRegisters = FXCollections.observableArrayList();
@@ -561,17 +577,21 @@ public class Machine extends Module<Machine> implements Serializable {
         for (RegisterArray registerArray : registerArrays) {
             allRegisters.addAll(registerArray.registers());
         }
+        
         return allRegisters;
     }
-
-    //-----------------------------------
-    // returns a new observable list containing all the RAMs of the machine.
+    
+    /**
+     * @returns a new observable list containing all the RAMs of the machine.
+     */
     public ObservableList<RAM> getAllRAMs() {
         return getModule(RAM.class);
     }
-
-    //-------------------------------
-    // updates machine instructions
+    
+    /**
+     * Updates the machine instructions.
+     * @param newInstructions
+     */
     public void setInstructions(List<MachineInstruction> newInstructions) {
         instructions = newInstructions;
     }
@@ -646,9 +666,9 @@ public class Machine extends Module<Machine> implements Serializable {
     // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
     public Map<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module<?> m) {
-        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(MICRO_CLASSES.size());
+        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(getMicroClasses().size());
 
-        for (Class<? extends Microinstruction> mc : MICRO_CLASSES) {
+        for (Class<? extends Microinstruction> mc : getMicroClasses()) {
             ObservableList<? extends Microinstruction> v = getMicros(mc);
             v.stream().filter(micro -> micro.uses(m))
                     .collect(Collectors.toMap(Function.identity(), _ignore -> v));
@@ -1107,16 +1127,14 @@ public class Machine extends Module<Machine> implements Serializable {
 	public <U extends Machine> void copyTo(U other) {
 		throw new UnsupportedOperationException("Unimplemented.");
 	}
-
-
-	private static ImmutableList<Class<? extends Microinstruction>> MICRO_CLASSES;
-    {
-        ImmutableList.Builder<Class<? extends Microinstruction>> bld = ImmutableList.builder();
-        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType).forEach(bld::add);
-        MICRO_CLASSES = bld.build();
+    
+    @Override
+    protected void validateState() {
+        // Validate all of the internal state
+        moduleMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
+        microMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
     }
-
-
+    
     /**
      * Type to map between older {@link String} names to {@link Class} instances. This is only for transitioning. Later,
      * perhaps injection.

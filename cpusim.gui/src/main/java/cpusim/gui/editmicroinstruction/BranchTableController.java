@@ -3,6 +3,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Branch;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,11 +16,6 @@ import java.util.ResourceBundle;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
- *
- * @author Jinghui Yu
- * @author Michael Goldenberg
- * @author Ben Borchard
- * @author Kevin Brightwell (Nava2)
  *
  * @since 2013-10-27
  */
@@ -62,7 +58,7 @@ class BranchTableController extends MicroController<Branch> implements Initializ
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory((setStringTableColumn) -> new EditingStrCell<>());
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         amount.setCellFactory(setIntegerTableColumn -> new EditingNonNegativeIntCell<>());
         amount.setOnEditCommit(

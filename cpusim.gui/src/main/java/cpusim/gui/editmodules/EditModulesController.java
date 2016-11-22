@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.Module;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
@@ -97,6 +97,8 @@ public class EditModulesController implements Initializable {
         this.desktop = desktop;
         activeTable = null;
         contentChangeListener = new ContentChangeListener();
+        
+        // Initialize the controller map
 
         final RegistersTableController registerTableController = new RegistersTableController(mediator);
         final RegisterArrayTableController registerArrayTableController = new RegisterArrayTableController(mediator);
@@ -560,7 +562,7 @@ public class EditModulesController implements Initializable {
         machine.setConditionBits(sortModulesByName(
                 tableMap.get(ConditionBit.class).createNewModulesList(tableMap.get(ConditionBit.class).getClones())));
         
-        List<RAM> rams = machine.getModule("rams", RAM.class);
+        List<RAM> rams = machine.getModule(RAM.class);
         if (!rams.contains(machine.getCodeStore())) {
             //the code store was deleted so set a different
             //RAM to be the code store

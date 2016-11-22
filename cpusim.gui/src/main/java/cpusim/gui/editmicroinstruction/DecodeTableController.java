@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
 import javafx.fxml.FXML;
@@ -68,7 +69,7 @@ class DecodeTableController extends MicroController<Decode> implements Initializ
 
         //Add for EdiCell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         ir.setCellFactory(cellRegFactory);
         ir.setOnEditCommit(

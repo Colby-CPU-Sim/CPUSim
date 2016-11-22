@@ -1,7 +1,6 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;

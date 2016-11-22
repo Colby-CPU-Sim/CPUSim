@@ -19,7 +19,7 @@ import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.fetchsequence.EditFetchSequenceController;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;

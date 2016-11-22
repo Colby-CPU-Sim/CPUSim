@@ -34,7 +34,7 @@ import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;

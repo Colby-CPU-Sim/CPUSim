@@ -6,7 +6,7 @@
 package cpusim.util;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.ControlUnit;
 import javafx.application.Platform;

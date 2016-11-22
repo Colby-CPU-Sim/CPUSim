@@ -24,6 +24,8 @@
 package cpusim.model.module;
 
 import cpusim.model.Module;
+import cpusim.model.util.Validatable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -297,6 +299,21 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         oldRegisterArray.setRegisters(registers);
 		
 	}
-
-
+    
+    @Override
+    protected void validateState() {
+        final int width = getWidth();
+        if (width <= 0) {
+            throw new ValidationException("You must specify a positive value for the " +
+                    "bitwise width\nof the registers in the RegisterArray " +
+                    getName() + ".");
+        }
+        else if (width > 64) {
+            throw new ValidationException("The registers in RegisterArray " + getName() +
+                    " can be at most 64 bits wide.");
+        }
+        
+        
+        registers.forEach(Validatable::validate);
+    }
 } //end class RegisterArray

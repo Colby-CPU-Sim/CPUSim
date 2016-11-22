@@ -1,27 +1,25 @@
 package cpusim.model.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
+import javafx.collections.ObservableList;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
-import javafx.collections.ObservableList;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Defines that an object has a `name` and `ID` property.
  * @author Josh Ladieu
  * @since 2000-11-01
  */
-public interface NamedObject extends Cloneable
+public interface NamedObject extends Validatable
 {
 	/**
      * Get the name of a component
@@ -53,13 +51,18 @@ public interface NamedObject extends Cloneable
         }
     }
     
+    @Override
+    public default void validate() {
+        NamedObject.validateName(getName());
+    }
+    
     /**
      * Converts a collection of {@link NamedObject} instances into a {@link Map} from {@link #getName()} to the values.
      * 
      * @param in non-<code>null</code> collection
      * @return Mapping between {@link #getName()} to value. 
      */
-    public static <T extends NamedObject> Map<String, T> toNamedMap(final 	Iterable<? extends T> in) {
+    public static <T extends NamedObject> Map<String, T> toNamedMap(final Iterable<? extends T> in) {
     	return StreamSupport.stream(checkNotNull(in).spliterator(), true)
     			.collect(Collectors.toMap(NamedObject::getName, Function.identity()));
     }

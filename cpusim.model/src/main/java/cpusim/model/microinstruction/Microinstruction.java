@@ -22,21 +22,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 // the package in which our project resides
 
-package cpusim.model;
+package cpusim.model.microinstruction;
 
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import cpusim.model.util.Copyable;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
-import cpusim.xml.HTMLEncodable;
-import cpusim.xml.HtmlEncoder;
 
 import com.google.common.base.Strings;
-
+import cpusim.model.Machine;
+import cpusim.model.Module;
+import cpusim.model.util.LegacyXMLSupported;
+import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validatable;
+import cpusim.xml.HTMLEncodable;
+import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
+
+import static com.google.common.base.Preconditions.*;
 
 
 
@@ -44,7 +43,7 @@ import javafx.beans.property.SimpleStringProperty;
 // the Microinstruction class
 
 public abstract class Microinstruction
-        implements NamedObject, LegacyXMLSupported, HTMLEncodable
+        implements NamedObject, LegacyXMLSupported, HTMLEncodable, Validatable
 {
 	
     // name of the microinstruction
@@ -79,6 +78,7 @@ public abstract class Microinstruction
      *
      * @return the name of the set microinstruction.
      */
+    @Override
     public String getName() {
         return name.get();
     }
@@ -94,6 +94,7 @@ public abstract class Microinstruction
      *
      * @param newName the new name for the set microinstruction.
      */
+    @Override
     public void setName(String newName){
         name.set(newName);
     }
@@ -123,6 +124,18 @@ public abstract class Microinstruction
      * @throws NullPointerException if <code>m</code> is <code>null</code>.
      */
     public abstract boolean uses(Module<?> m);
-
-
+    
+    /**
+     * Should perform the actions described by {@link Validatable#validate()}. This allows common
+     * {@link Microinstruction} validation to live inside {@link #validate()}.
+     */
+    protected abstract void validateState();
+    
+    @Override
+    public final void validate() {
+        NamedObject.super.validate();
+        
+        this.validateState();
+    }
+    
 }  // end of class Microinstruction

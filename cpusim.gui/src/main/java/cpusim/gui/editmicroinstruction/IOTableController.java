@@ -17,6 +17,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
@@ -106,7 +107,7 @@ class IOTableController extends MicroController<IO> implements Initializable {
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
+        name.setOnEditCommit(new NamedColumnHandler<>(this));
 
         type.setCellFactory(cellTypeFactory);
         type.setOnEditCommit(

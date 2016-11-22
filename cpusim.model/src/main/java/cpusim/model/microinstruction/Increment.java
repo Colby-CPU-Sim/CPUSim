@@ -1,7 +1,6 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -100,7 +99,7 @@ public class Increment extends Microinstruction implements Copyable<Increment> {
      * returns the fixed value stored in the set microinstruction.
      * @return the integer value of the field.
      */
-    public Long getDelta(){
+    public long getDelta(){
         return delta.get();
     }
 
@@ -108,7 +107,7 @@ public class Increment extends Microinstruction implements Copyable<Increment> {
      * updates the fixed value stored in the set microinstruction.
      * @param newDelta the new value for the field.
      */
-    public void setDelta(Long newDelta){
+    public void setDelta(long newDelta){
         delta.set(newDelta);
     }
     
@@ -130,7 +129,12 @@ public class Increment extends Microinstruction implements Copyable<Increment> {
         newIncr.setCarryBit(getCarryBit());
         newIncr.setDelta(getDelta());
     }
-
+    
+    @Override
+    protected void validateState() {
+        
+    }
+    
     /**
      * execute the micro instruction from machine
      */

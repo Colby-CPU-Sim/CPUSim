@@ -30,7 +30,7 @@ import cpusim.Mediator;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.model.Machine;
-import cpusim.model.Microinstruction;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
