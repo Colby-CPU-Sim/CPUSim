@@ -237,8 +237,8 @@ public class MachineWriter
     // The module windows are the open windows for registers and rams
     public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out)
     {
-        List<ObservableList<? extends Module<?>>> moduleVectors = machine.getAllModules();
-        List<ObservableList<? extends Microinstruction>> microVectors = machine.getAllMicros();
+        List<List<? extends Module<?>>> moduleVectors = machine.getAllModules();
+        List<List<? extends Microinstruction>> microVectors = machine.getAllMicros();
         
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println(internalDTD);

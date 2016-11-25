@@ -24,22 +24,20 @@
  */
 package cpusim.gui.editmodules;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.NamedColumnHandler;
+import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoR;
+import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
-
+import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -47,26 +45,29 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The controller for editing the Registers in the EditModules dialog.
  */
-public class RegistersTableController
-        extends ModuleController<Register> implements Initializable {
+public class RegistersTableController extends ModuleTableController<Register> {
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Register,String> name;
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Register,Integer> width;
+    static final String FX_ID = "registersTab";
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Register,Long> initialValue;
+    @FXML
+    private TableColumn<Register, Integer> width;
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Register,Boolean> readOnly;
+    @FXML
+    private TableColumn<Register, Long> initialValue;
+
+    @FXML
+    private TableColumn<Register, Boolean> readOnly;
 
     private ConditionBitTableController bitController;
 
@@ -77,28 +78,22 @@ public class RegistersTableController
 
     RegistersTableController(Mediator mediator){
         super(mediator, "RegistersTable.fxml", Register.class);
+
+        width = new TableColumn<>("Width");
+        initialValue = new TableColumn<>("Initial Value");
+        readOnly = new TableColumn<>("Read Only");
+
+        super.loadFXML();
     }
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
-        width.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
-        initialValue.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
-        readOnly.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
+    public void initializeTable(TableView<Register> table) {
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
+        initialValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+        readOnly.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
 
-        Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStrFactory =
-                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellLongFactory =
@@ -107,15 +102,11 @@ public class RegistersTableController
                 registerBooleanTableColumn -> new CheckBoxTableCell<>();
 
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         width.setCellValueFactory(new PropertyValueFactory<>("width"));
         initialValue.setCellValueFactory(new PropertyValueFactory<>("initialValue"));
         readOnly.setCellValueFactory(new PropertyValueFactory<>("readOnly"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         width.setCellFactory(cellIntFactory);
         width.setOnEditCommit(text -> text.getRowValue().setWidth(text.getNewValue()));
 
@@ -126,13 +117,59 @@ public class RegistersTableController
         readOnly.setOnEditCommit(text -> text.getRowValue().setReadOnly(text.getNewValue()));
     }
 
+    @Override
+    protected ImmutableList<TableColumn<Register, ?>> getSubTableColumns() {
+        return ImmutableList.of(name, width, initialValue, readOnly);
+    }
+    
+    @Override
+    protected ControlButtonController<Register> createControlButtonController() {
+        return new ControlButtonController<Register>(this, this, false) {
+            @Override
+            protected boolean checkDelete(final Register toDelete) {
+                boolean shouldDelete = super.checkDelete(toDelete);
+                if (!shouldDelete) return false; // short circuit
+                
+                //see if it is a register used for a ConditionBit and,
+                //if so, warn the user and return.
+                List<ConditionBit> cBitsThatUseIt = bitController.getBitClonesThatUse(toDelete);
+                
+                if (cBitsThatUseIt.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Register ");
+                    sb.append(toDelete.getName());
+                    sb.append(" is used by the following condition bits: \n  ");
+                    
+                    Joiner.on(", ").appendTo(sb, cBitsThatUseIt);
+                    sb.append(".\nYou need to delete those condition bits first.");
+                    Dialogs.createErrorDialog(getScene().getWindow(),
+                            "Deletion Error",
+                            sb.toString()).showAndWait();
+                    shouldDelete = false;
+                }
+                
+                return shouldDelete;
+            }
+        };
+    }
+    
     /**
-     * assigns the given bitController to the instance variable by that name
-     * @param bitController the bitController used for this controller
+     * Sets the {@link ConditionBitTableController} stored.
+     * @param ctrl Sets the {@link ConditionBitTableController}
      */
-    public void setBitController(ConditionBitTableController bitController)
-    {
-        this.bitController = bitController;
+    void setConditionBitController(ConditionBitTableController ctrl) {
+        bitController = checkNotNull(ctrl);
+    }
+    
+    /**
+     * Searches through the current {@link #getItems()} to see if the {@code original} {@link Register} was cloned.
+     * @param original The {@link Register} from the underlying {@link cpusim.model.Machine}.
+     * @return Non-{@link Optional#empty()} is found.
+     */
+    Optional<Register> getRegisterClone(Register original) {
+        return getItems().stream()
+                .filter(r -> r.equals(original))
+                .findFirst();
     }
 
     /**
@@ -162,39 +199,18 @@ public class RegistersTableController
     {
         // convert the array to an array of Registers
 
-        List<Register> registers = getCurrentModules();
+        List<Register> registers = getItems();
         //build up a HashMap of old registers and new widths
-        Map<Register, Integer> table = new HashMap<>();
-        for (Register register : registers) {
-            getAssociated(register).ifPresent(oldRegister -> {
-                if (oldRegister.getWidth() != register.getWidth()) {
-                    table.put(oldRegister, register.getWidth());
-                }
-            });
-        }
-
-        // check that all names are unique and nonempty
-        Validate.widthsAreInBound(registers);
-        Validate.initialValuesAreInbound(registers);
+        Map<Register, Integer> table = registers.stream()
+                .collect(Collectors.toMap(Function.identity(), Register::getWidth));
         
-        //Validate.registersNotReadOnly();
-
+        Validate.registerWidthsAreOkayForMicros(machine, table);
+        
         ValidateControllers.registerWidthsAreOkay(bitController,registers);
-        Validate.registerWidthsAreOkayForMicros(machine,table);
         Validate.readOnlyRegistersAreImmutable(registers,
                 machine.getMicros(TransferAtoR.class),
                 machine.getMicros(TransferRtoR.class),
                 machine.getMicros(SetCondBit.class));
-
-    }
-
-    /**
-     * returns true if new micros of this class can be created.
-     */
-    @Override
-    public boolean newModulesAreAllowed()
-    {
-        return true;
     }
 
     /**
@@ -204,19 +220,6 @@ public class RegistersTableController
     public String getHelpPageID()
     {
         return "Registers";
-    }
-
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
-    @Override
-    public void updateTable() {
-        name.setVisible(false);
-        name.setVisible(true);
-        double w =  getWidth();
-        setPrefWidth(w-1);
-        setPrefWidth(w);
     }
 
 }

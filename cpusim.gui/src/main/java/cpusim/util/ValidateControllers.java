@@ -1,11 +1,4 @@
-/**
- * 
- */
 package cpusim.util;
-
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import cpusim.gui.editmodules.ConditionBitTableController;
 import cpusim.gui.editmodules.RegisterArrayTableController;
@@ -17,8 +10,15 @@ import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.ValidationException;
-
 import javafx.collections.ObservableList;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Contains methods for Validation in the User Interface.
@@ -89,21 +89,20 @@ public class ValidateControllers {
             List<? extends RegisterArray> arrays,
             RegisterArrayTableController controller)
     {
+        // FIXME controller?
+        
         //make a HashMap of old arrays as keys and new widths as
         //Integer values
         final Map<RegisterArray, Integer> newWidths = new HashMap<>();
 
         newWidths.putAll(
-                machine.getModule("registerArrays", RegisterArray.class).stream()
+                machine.getModule(RegisterArray.class).stream()
                     .collect(Collectors.toMap(Function.identity(), RegisterArray::getWidth)));
 
 
         //now adjust the HashMap to use the new proposed widths
         for (RegisterArray array : arrays) {
-            RegisterArray oldArray = controller.getCurrentFromClone(array);
-            if (oldArray != null) {
-                newWidths.put(oldArray, array.getWidth());
-            }
+            newWidths.put(array, array.getWidth());
         }
 
         //now go through all transfers to see if width changes will make them

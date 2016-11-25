@@ -139,7 +139,9 @@ public class EditMicroinstructionsController implements Initializable {
                     tablePane.getChildren().clear();
                     tablePane.getChildren().add(typesMap.get(newType));
 
-                    activeTable = typesMap.getController(Machine.MicroClass.fromName(newType).getInstructionType());
+                    activeTable = typesMap.getController(Machine.getMicroClasses()
+                            .stream().filter(c -> c.getSimpleName().equals(newType))
+                            .findAny().get());
                     activeTable.setPrefWidth(tablePane.getWidth());
                     activeTable.setPrefHeight(tablePane.getHeight());
                     activeTable.setColumnResizePolicy(TableView
@@ -268,7 +270,7 @@ public class EditMicroinstructionsController implements Initializable {
      * @return  the table view object that is current being edited in the window.
      */
     public MicroController getCurrentController() {
-        return typesMap.get(Machine.MicroClass.fromName(microinstructionCombo.getValue()).getInstructionType());
+        return typesMap.get(Machine.getMicroClassByName(microinstructionCombo.getValue()).get());
     }
     
     /**

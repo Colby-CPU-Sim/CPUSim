@@ -108,18 +108,30 @@ public interface NamedObject extends Validatable
      * @return the unique name
      */
     public static String createUniqueName(ObservableList<? extends NamedObject> list, int modChar) {
-        
-        final StringBuilder current = new StringBuilder();
         final char[] chars = Character.toChars(modChar);
-        current.append(chars);
-    
+        return createUniqueName(list, new String(chars));
+    }
+
+    /**
+     * returns a String that is different from all names of
+     * existing objects in the given list.  It checks whether proposedName
+     * is unique and if so, it returns it.  Otherwise, it
+     * proposes a new name of proposedName + "?" and tries again.
+     *
+     * @param list         list of existing objects
+     * @param mod Character used to make the name "unique", defaults to '?'
+     * @return the unique name
+     */
+    public static String createUniqueName(ObservableList<? extends NamedObject> list, final String mod) {
+
+        final StringBuilder current = new StringBuilder(mod);
         final Set<String> allNames = list.stream().map(NamedObject::getName).collect(Collectors.toSet());
-        
+
         // iterate until we get a unique name
         while (allNames.contains(current.toString())) {
-            current.append(chars);
+            current.append(mod);
         }
-        
+
         return current.toString();
     }
     
@@ -164,6 +176,12 @@ public interface NamedObject extends Validatable
     public static void validateName(String name) {
         if (Strings.isNullOrEmpty(name)) {
             throw new ValidationException("A name must have at least one character.");
+        }
+    
+        if (name.trim().equals("<none>")) {
+            throw new ValidationException("A ConditionBit has been given the " +
+                    "name \"<none>\".\nThat name is reserved to indicate" +
+                    " that no condition bit is desired.");
         }
     }
     

@@ -12,41 +12,41 @@
 
 package cpusim.gui.editmodules;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.EditingStrCell;
-import cpusim.gui.util.NamedColumnHandler;
+import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
-
+import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.event.ActionEvent;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
  */
-public class RegisterArrayTableController
-        extends ModuleController<RegisterArray> implements Initializable {
+public class RegisterArrayTableController extends ModuleTableController<RegisterArray> {
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<RegisterArray,String> name;
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<RegisterArray,Integer> length;
+    static final String FX_ID = "registerArraysTab";
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<RegisterArray,Integer> width;
+    private final TableColumn<RegisterArray,Integer> length;
+
+    private final TableColumn<RegisterArray,Integer> width;
 
     private ConditionBitTableController bitController;
 
@@ -55,57 +55,91 @@ public class RegisterArrayTableController
      * @param mediator holds the machine and information needed
      */
     RegisterArrayTableController(Mediator mediator){
-        super(mediator, "RegisterArrayTable.fxml", RegisterArray.class);
+        super(mediator,"RegisterArrayTable.fxml", RegisterArray.class);
+
+        length = new TableColumn<>("Length");
+        width = new TableColumn<>("Width");
+
+        super.loadFXML();
     }
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(prefWidthProperty().divide(100/34.0));
-        length.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
-        width.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
+    public void initializeTable(TableView<RegisterArray> table) {
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
+        length.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
 
-        Callback<TableColumn<RegisterArray,String>,TableCell<RegisterArray,String>> cellStrFactory =
-                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<RegisterArray,Integer>,TableCell<RegisterArray,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         length.setCellValueFactory(new PropertyValueFactory<>("length"));
         width.setCellValueFactory(new PropertyValueFactory<>("width"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         length.setCellFactory(cellIntFactory);
         length.setOnEditCommit(text -> text.getRowValue().setLength(text.getNewValue()));
 
         width.setCellFactory(cellIntFactory);
-        width.setOnEditCommit(
-                text -> text.getRowValue().setWidth(text.getNewValue())
-        );
+        width.setOnEditCommit(text -> text.getRowValue().setWidth(text.getNewValue()));
     }
-
+    
     /**
-     * assigns the given bitController to the instance variable by that name
-     * @param bitController the bitController used for this controller
+     * Sets the {@link ConditionBitTableController} stored.
+     * @param ctrl Sets the {@link ConditionBitTableController}
      */
-    public void setBitController(ConditionBitTableController bitController)
-    {
-        this.bitController = bitController;
+    void setConditionBitController(ConditionBitTableController ctrl) {
+        bitController = checkNotNull(ctrl);
     }
 
+    @Override
+    protected ImmutableList<TableColumn<RegisterArray, ?>> getSubTableColumns() {
+        return ImmutableList.of(name, length, width);
+    }
+    
+    @Override
+    protected ControlButtonController<RegisterArray> createControlButtonController() {
+        return new ControlButtonController<RegisterArray>(this, this, true) {
+            @Override
+            void onPropertiesButtonClick(final ActionEvent e) {
+                super.onPropertiesButtonClick(e);
+                
+                // FIXME
+            }
+    
+            @Override
+            protected boolean checkDelete(final RegisterArray toDelete) {
+                boolean shouldDelete = super.checkDelete(toDelete);
+                if (!shouldDelete) return false; // short circuit
+    
+                //see if a RegisterArray is used for a ConditionBit and,
+                //if so, warn the user and return false
+                List<ConditionBit> cBitsThatUseIt = bitController.getBitClonesThatUse(toDelete);
+    
+                if (cBitsThatUseIt.size() > 0) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Register Array ");
+                    sb.append(toDelete.getName());
+                    sb.append(" is used by the following condition bits: \n  ");
+        
+                    Joiner.on(", ").appendTo(sb, cBitsThatUseIt);
+                    sb.append(".\nYou need to delete those condition bits first.");
+                    Dialogs.createErrorDialog(getScene().getWindow(),
+                            "Deletion Error",
+                            sb.toString()).showAndWait();
+                    shouldDelete = false;
+                }
+    
+                return shouldDelete;
+            }
+        };
+    }
+    
+    @Override
+    public boolean isPropButtonEnabled() {
+        return !getSelectionModel().isEmpty();
+    }
+    
     /**
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
@@ -130,102 +164,34 @@ public class RegisterArrayTableController
      */
     public void checkValidity()
     {
-        // convert the array to an array of RegisterArrays
-
+        List<RegisterArray> registerArrays = getItems();
         //build up a HashMap of old registers and new widths
-        final Map<Register, Integer> h = new HashMap<>();
-        final List<RegisterArray> registerArrays = getItems();
-        for (final RegisterArray array : registerArrays) {
-            getAssociated(array).ifPresent(oldArray -> {
-                if (array.getWidth() != oldArray.getWidth()) {
-                    for (int j = 0; j < Math.min(array.getLength(), oldArray.getLength()); j++) {
-                        h.put(oldArray.registers().get(j), array.getWidth());
-                    }
-                }
-            });
-        }
-
+        final Map<Register, Integer> regWidths = registerArrays.stream()
+                .flatMap(r -> r.registers().stream()) // get all of the registers in the arrays
+                .distinct() // remove any duplicates (possibility)
+                .collect(Collectors.toMap(Function.identity(), Register::getWidth)); // map them to their widths
+        
         //now do all the tests
-        for (RegisterArray registerArray : registerArrays) {
-            Validate.initialValuesAreInbound(registerArray.registers());
-        }
-        Validate.registerArraysRangesInBound(registerArrays);
-        Validate.registerWidthsAreOkayForMicros(machine, h);
+        Validate.registerWidthsAreOkayForMicros(machine, regWidths);
         
         ValidateControllers.registerArrayWidthsAreOkay(bitController, registerArrays);
         ValidateControllers.registerArrayWidthsAreOkayForTransferMicros(machine, registerArrays, this);
     }
-
-
-
+    
     /**
-     * returns true if new micros of this class can be created.
+     * Runs through all of the known {@link RegisterArray} components and searches for a copy of the original
+     * {@link Register} passed. If the value is found, it returns {@link Optional#of(Object)}.
+     *
+     * @param original The original {@link Register} from the {@link cpusim.model.Machine}.
+     * @return {@link Optional#of(Object)} or {@link Optional#empty()} if not found.
      */
-    public boolean newModulesAreAllowed()
-    {
-        return true;
+    Optional<Register> getRegisterClone(Register original) {
+        return getItems().stream()
+                .flatMap(arr -> arr.registers().stream())
+                .filter(r -> r.equals(original))
+                .findFirst();
     }
-
-    /**
-     * returns the original register associated with the given clone register
-     * in one of the arrays.
-     * @param cloneRegister the clone of the register to be returned
-     * @return the original register associated with the given clone register
-     */
-    public Register getOriginalOf(Register cloneRegister) {
-        checkNotNull(cloneRegister);
-
-        //first find the clone array that contains the clone register
-        for (RegisterArray cloneArray : getClones()) {
-            Optional<RegisterArray> opt_originalArray = getAssociated(cloneArray);
-            if (opt_originalArray.isPresent()) {
-                RegisterArray originalArray = opt_originalArray.get();
-
-                for (int i = 0; i < cloneArray.registers().size(); i++) {
-                    final Register clone = cloneArray.registers().get(i);
-                    if (clone == cloneRegister) {
-                        //we found the clone register!!
-                        if (originalArray.registers().size() > i) {
-                            return originalArray.registers().get(i);
-                        } else {
-                            return null;  //the clone is part of a new longer array
-                        }
-                    }
-                }
-            }
-
-        }
-        return null;
-    }
-
-    /**
-     * returns the clone register associated with the given original register.
-     * @param originalRegister the original register to be cloned
-     * @return null if there is no such clone register.
-     */
-    public Register getCloneOf(Register originalRegister)
-    {
-        //first find the original array that contains the original register
-        for (RegisterArray cloneArray : getClones()) {
-            Optional<RegisterArray> opt_originalArray = getAssociated(cloneArray);
-            if (opt_originalArray.isPresent()) {
-                RegisterArray originalArray = opt_originalArray.get();
-
-                for (int i = 0; i < originalArray.registers().size(); i++) {
-                    if (originalArray.registers().get(i) == originalRegister) {
-                        //we found the original register!!
-                        if (cloneArray.registers().size() > i)
-                            return cloneArray.registers().get(i);
-                        else
-                            return null;  //it no longer has a clone
-                    }
-                }
-            }
-
-        }
-        return null;
-    }
-
+    
     /**
      * get the ID of the corresponding help page
      * @return the ID of the page
@@ -239,13 +205,12 @@ public class RegisterArrayTableController
      * updates the table by removing all the items and adding all back.
      * for refreshing the display.
      */
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        double w =  getWidth();
-        setPrefWidth(w-1);
-        setPrefWidth(w);
+    public void updateTable() {
+//        name.setVisible(false);
+//        name.setVisible(true);
+//        double w =  getWidth();
+//        setPrefWidth(w-1);
+//        setPrefWidth(w);
     }
 
 }

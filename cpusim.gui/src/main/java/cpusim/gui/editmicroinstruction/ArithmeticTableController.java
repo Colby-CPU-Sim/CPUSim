@@ -101,11 +101,10 @@ class ArithmeticTableController extends MicroController<Arithmetic> implements I
                         machine.getAllRegisters());
 
         final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.getModule("conditionBits", ConditionBit.class));
+        condBit.addAll(machine.getModule(ConditionBit.class));
         Callback<TableColumn<Arithmetic,ConditionBit>,TableCell<Arithmetic,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         source1.setCellValueFactory(new PropertyValueFactory<>("source1"));
         source2.setCellValueFactory(new PropertyValueFactory<>("source2"));
@@ -114,38 +113,23 @@ class ArithmeticTableController extends MicroController<Arithmetic> implements I
         carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
 
         //Add for EdiCell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NameColumnHandler());
-
         type.setCellFactory(cellTypeFactory);
-        type.setOnEditCommit(
-                text -> text.getRowValue().setType(text.getNewValue())
-        );
+        type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         source1.setCellFactory(cellRegFactory);
-        source1.setOnEditCommit(
-                text -> text.getRowValue().setSource1(text.getNewValue())
-        );
+        source1.setOnEditCommit(text -> text.getRowValue().setSource1(text.getNewValue()));
 
         source2.setCellFactory(cellRegFactory);
-        source2.setOnEditCommit(
-                text -> text.getRowValue().setSource2(text.getNewValue())
-        );
+        source2.setOnEditCommit(text -> text.getRowValue().setSource2(text.getNewValue()));
 
         destination.setCellFactory(cellRegFactory);
-        destination.setOnEditCommit(
-                text -> text.getRowValue().setDestination(text.getNewValue())
-        );
+        destination.setOnEditCommit(text -> text.getRowValue().setDestination(text.getNewValue()));
 
         overflowBit.setCellFactory(cellCondFactory);
-        overflowBit.setOnEditCommit(
-                text -> text.getRowValue().setOverflowBit(text.getNewValue())
-        );
+        overflowBit.setOnEditCommit(text -> text.getRowValue().setOverflowBit(text.getNewValue()));
 
         carryBit.setCellFactory(cellCondFactory);
-        carryBit.setOnEditCommit(
-                text -> text.getRowValue().setCarryBit(text.getNewValue())
-        );
+        carryBit.setOnEditCommit(text -> text.getRowValue().setCarryBit(text.getNewValue()));
     }
 
     /**

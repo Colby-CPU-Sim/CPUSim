@@ -194,31 +194,19 @@ public class Logical extends Microinstruction implements Copyable<Logical> {
     public boolean uses(Module<?> m){
         return (m == source1.get() || m == source2.get() || m == destination.get());
     }
-    
-    /**
-     * checks if the registers have equal widths
-     * @param logicals an array of Logicals to check
-     * Logical objects with all equal width registers
-     */
-    public static void validateRegistersHaveEqualWidths(List<Logical> logicals)
-    {
-        for (Logical logical : logicals) {
-            // get width of the source1, source2, and destination
-            // registers, if they are different, then the validity
-            // test fails
-            if (logical.getSource1().getWidth() ==
-                    logical.getSource2().getWidth() &&
-                    logical.getSource2().getWidth() ==
-                            logical.getDestination().getWidth()) {
-                continue;
-            }
-            else {
-                throw new ValidationException("At least one of the registers in the " +
-                        "microinstruction \"" + logical.getName() +
-                        "\" has\na bit width that is different than one " +
-                        "or more of the others.\nAll registers must have " +
-                        "the same number of bits.");
-            }
+
+    @Override
+    protected void validateState() {
+        // get width of the source1, source2, and destination
+        // registers, if they are different, then the validity
+        // test fails
+        if (!(getSource1().getWidth() == getSource2().getWidth() &&
+                getSource2().getWidth() == getDestination().getWidth())) {
+            throw new ValidationException("At least one of the registers in the " +
+                    "microinstruction \"" + getName() +
+                    "\" has\na bit width that is different than one " +
+                    "or more of the others.\nAll registers must have " +
+                    "the same number of bits.");
         }
     }
 

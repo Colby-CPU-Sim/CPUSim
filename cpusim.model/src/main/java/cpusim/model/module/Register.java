@@ -180,6 +180,24 @@ public class Register extends Module<Register> implements Sized<Register>
         nameDirty = dirty;
         setValue(initialValue);
     }
+    
+    /**
+     * Copy constructor!
+     * @param other
+     */
+    public Register(Register other) {
+        super(other.getName());
+        
+        this.value = new SimpleLongProperty();
+        this.width = new SimpleIntegerProperty(other.getWidth());
+        this.initialValue = new SimpleLongProperty();
+        this.access = new SimpleObjectProperty<>(other.getAccess());
+        
+        this.nameDirty = other.nameDirty;
+        
+        this.setValue(other.getValue());
+        this.setInitialValue(other.getInitialValue());
+    }
 
     /**
      * getter of the width
@@ -358,7 +376,6 @@ public class Register extends Module<Register> implements Sized<Register>
     
     @Override
     protected void validateState() {
-        
         // Validate the width
         final int width = getWidth();
         if (width <= 0) {

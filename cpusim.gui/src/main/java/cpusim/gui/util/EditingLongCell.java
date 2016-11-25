@@ -7,6 +7,7 @@ package cpusim.gui.util;
 
 import cpusim.model.util.Convert;
 import cpusim.model.util.ValidationException;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.Dialogs;
 
 import javafx.scene.control.TableCell;
@@ -100,7 +101,7 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
                                     textField.getScene().getWindow();
             if (!arg2) { // focus moved away from this field
                 try {
-                    long newLong = Convert.fromAnyBaseStringToLong(textField.getText());
+                    long newLong = ConvertStrings.toLong(textField.getText());
                     commitEdit(newLong);
                 } catch (NumberFormatException e) {
                     //didn't work because of issues with the focus
@@ -116,7 +117,7 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
         textField.setOnKeyPressed(t -> {
             if (t.getCode() == KeyCode.ENTER) {
                 try {
-                    long newLong = Convert.fromAnyBaseStringToLong(textField.getText());
+                    long newLong = ConvertStrings.toLong(textField.getText());
                     commitEdit(newLong);
                 } catch (NumberFormatException e) {
                     textField.setStyle("-fx-background-color:red;");

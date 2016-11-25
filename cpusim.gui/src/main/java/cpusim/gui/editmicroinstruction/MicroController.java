@@ -15,12 +15,12 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validatable;
 import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -33,15 +33,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
- * MicroController class parent of all the microinstruction controller
- *
- * @author Kevin Brightwell (Nava2)
+ * MicroController class parent of all the microinstruction controllers
  */
 abstract class MicroController<T extends Microinstruction & Copyable<T>>
-        extends TableView<T> implements NamedColumnHandler.HasUpdateTable<T>  {
+        extends TableView<T> {
     protected final Mediator mediator;
     protected final Machine machine;      //the current machine being simulated
     
@@ -120,6 +118,8 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
     public void checkValidity(ObservableList<T> micros) {
         // check that all names are unique and nonempty
         NamedObject.validateUniqueAndNonempty(micros);
+
+        Validatable.all(micros);
     }
     
     /**
@@ -206,7 +206,7 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
     
         // A really ugly hack to fromRootController a unique opcode
         // required by InstructionDialog
-        /**
+        /*
          if (EditDialog.this instanceof InstructionDialog) {
          MachineInstruction instr = (MachineInstruction) newObject;
          long uniqueOpcode =
@@ -258,10 +258,5 @@ abstract class MicroController<T extends Microinstruction & Copyable<T>>
         else{
             getSelectionModel().select(index - 1);
         }
-    }
-    
-    @Override
-    public void updateTable(@SuppressWarnings("unused") final TableView<T> table) {
-        updateTable();
     }
 }

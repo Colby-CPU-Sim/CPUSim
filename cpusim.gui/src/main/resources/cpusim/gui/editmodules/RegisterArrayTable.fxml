@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.control.TableColumn?>
 
-<fx:root type="javafx.scene.control.TableView" id="registerArrayTable"
-           fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+<fx:root id="registerArrayTable" fx:id="table" editable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="300.0" prefHeight="400.0" prefWidth="350.0" type="javafx.scene.control.TableView" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
   <columns>
-    <TableColumn text="name" fx:id="name" />
-    <TableColumn text="length" fx:id="length" />
-    <TableColumn text="width" fx:id="width"/>
+    <TableColumn fx:id="name" text="name" />
+    <TableColumn fx:id="length" text="length" />
+    <TableColumn fx:id="width" text="width" />
   </columns>
 </fx:root>

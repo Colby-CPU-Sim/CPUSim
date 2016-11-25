@@ -79,56 +79,70 @@ import java.util.List;
 public class EditMachineInstructionController {
 
     @FXML
+    private
     ListView<String> instructionList;
 
     @FXML
+    private
     TextField opcodeTextField;
 
     @FXML
+    private
     AnchorPane instructionFormatPane;
     @FXML
+    private
     AnchorPane assemblyFormatPane;
     @FXML
+    private
     AnchorPane fieldPane;
     @FXML
+    private
     BorderPane mainPane;
     @FXML
+    private
     AnchorPane implementationFormatPane;
     @FXML
     ScrollPane implementationFormatScrollPane;
 
     @FXML
+    private
     VBox fieldsList;
     @FXML
+    private
     Label lengthLabel;
     @FXML
+    private
     VBox noFieldsLabel;
     @FXML
+    private
     Button newButton;
     @FXML
+    private
     Button dupButton;
     @FXML
+    private
     Button deleteButton;
     @FXML
+    private
     TreeView<String> microInstrTreeView;
 
-    Mediator mediator;
-    MachineInstruction currentInstr;
-    Field draggingField;
-    String draggingColor;
-    Pane originPane;
-    Microinstruction currentCommentMicro;
-    TextField commentEditor;
-    List<MachineInstruction> instructions;
-    ObservableList<Field> allFields;
-    boolean dragging;
-    boolean dropped;
-    boolean exited;
+    private Mediator mediator;
+    private MachineInstruction currentInstr;
+    private Field draggingField;
+    private String draggingColor;
+    private Pane originPane;
+    private Microinstruction currentCommentMicro;
+    private TextField commentEditor;
+    private List<MachineInstruction> instructions;
+    private ObservableList<Field> allFields;
+    private boolean dragging;
+    private boolean dropped;
+    private boolean exited;
 
-    int draggingIndex;
-    int currInstrIndex;
-    ObservableList<String> instrNames;
-    ObservableList<String> fieldNames;
+    private int draggingIndex;
+    private int currInstrIndex;
+    private ObservableList<String> instrNames;
+    private ObservableList<String> fieldNames;
 
     public EditMachineInstructionController(Mediator mediator) {
         this.mediator = mediator;
@@ -375,8 +389,8 @@ public class EditMachineInstructionController {
                 String className = db.getString().substring(lastComma + 1);
                 Microinstruction micro = null;
 
-                for (Machine.MicroClass mc : Machine.MicroClass.values()) {
-                    for (Microinstruction instr : mediator.getMachine().getMicros(mc.getInstructionType())) {
+                for (Class<? extends Microinstruction> mc : Machine.getMicroClasses()) {
+                    for (Microinstruction instr : mediator.getMachine().getMicros(mc)) {
                         if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
                             micro = instr;
                         }
@@ -1252,9 +1266,9 @@ public class EditMachineInstructionController {
 
         rootNode.setExpanded(true);
 
-        for (Machine.MicroClass microClass : Machine.MicroClass.values()) {
-            TreeItem<String> classNode = new TreeItem<>(microClass.getName());
-            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass.getInstructionType())) {
+        for (Class<? extends Microinstruction> microClass : Machine.getMicroClasses()) {
+            TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
+            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass)) {
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }
@@ -1359,7 +1373,7 @@ public class EditMachineInstructionController {
      * @param proposedName a given proposed name
      * @return the unique name
      */
-    public String createUniqueName(ObservableList list, String proposedName) {
+    private String createUniqueName(ObservableList list, String proposedName) {
         String oldName;
         for (Object obj : list) {
             oldName = obj.toString();
@@ -1376,7 +1390,7 @@ public class EditMachineInstructionController {
      *
      * @return a unique opcode
      */
-    public int getUniqueOpcode() {
+    private int getUniqueOpcode() {
         int opcode = 0;
         while (true) {
             boolean opcodeTaken = false;

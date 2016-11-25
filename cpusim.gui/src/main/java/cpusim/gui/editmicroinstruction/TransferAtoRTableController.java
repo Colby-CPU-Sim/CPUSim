@@ -191,9 +191,6 @@ class TransferAtoRTableController
         for (TransferAtoR check: micros) {
             Register.validateIsNotReadOnly(check.getDest(), check.getName());
         }
-        
-        // check that all names are unique and nonempty
-        TransferAtoR.validateRangesInBound(micros);
     }
 
     /**

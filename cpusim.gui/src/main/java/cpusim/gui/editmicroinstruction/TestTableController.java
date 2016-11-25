@@ -24,6 +24,7 @@ import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -202,16 +203,9 @@ class TestTableController
     }
 
     @Override
-    public void checkValidity(ObservableList<Test> micros) {
-        super.checkValidity(micros);
-        
-        Test.validateRangeInBound(micros);
-    }
-
-    @Override
     public boolean newMicrosAreAllowed() {
-        return (machine.getModule("registers").size() > 0 ||
-                machine.getModule("registerArrays").size() > 0);
+        return (machine.getModule(Register.class).size() > 0 ||
+                machine.getModule(RegisterArray.class).size() > 0);
     }
 
     /**

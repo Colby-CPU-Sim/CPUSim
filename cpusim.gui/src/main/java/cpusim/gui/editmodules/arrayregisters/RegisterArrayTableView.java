@@ -13,6 +13,8 @@ import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.model.module.Modules;
 import cpusim.model.module.Register;
+import cpusim.model.module.RegisterArray;
+import cpusim.model.util.Validatable;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.collections.ObservableList;
@@ -109,80 +111,40 @@ public class RegisterArrayTableView extends TableView<Register> implements Initi
         readOnly.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
 
         Callback<TableColumn<Register,String>,TableCell<Register,String>> cellStrFactory =
-                new Callback<TableColumn<Register, String>, TableCell<Register, String>>() {
-                    @Override
-                    public TableCell<Register, String> call(
-                            TableColumn<Register, String> setStringTableColumn) {
-                        return new EditingStrCell<Register>();
-                    }
-                };
-        Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntFactory =
-                new Callback<TableColumn<Register, Integer>, TableCell<Register, Integer>>() {
-                    @Override
-                    public TableCell<Register, Integer> call(
-                            TableColumn<Register, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<>();
-                    }
-                };
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<Register,Long>,TableCell<Register,Long>> cellLongFactory =
-                new Callback<TableColumn<Register, Long>, TableCell<Register, Long>>() {
-                    @Override
-                    public TableCell<Register, Long> call(
-                            TableColumn<Register, Long> setLongTableColumn) {
-                        return new EditingLongCell<Register>();
-                    }
-                };
+                setLongTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Register,Boolean>,TableCell<Register,Boolean>> cellBooleanFactory =
-                new Callback<TableColumn<Register, Boolean>, TableCell<Register, Boolean>>() {
-                    @Override
-                    public TableCell<Register, Boolean> call(
-                            TableColumn<Register, Boolean> registerBooleanTableColumn) {
-                        return new CheckBoxTableCell<Register,Boolean>();
-                    }
-                };
+                registerBooleanTableColumn -> new CheckBoxTableCell<>();
 
-        name.setCellValueFactory(new PropertyValueFactory<Register, String>("name"));
-        initialValue.setCellValueFactory(new PropertyValueFactory<Register, Long>("initialValue"));
-        readOnly.setCellValueFactory(new PropertyValueFactory<Register, Boolean>("readOnly"));
+        name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        initialValue.setCellValueFactory(new PropertyValueFactory<>("initialValue"));
+        readOnly.setCellValueFactory(new PropertyValueFactory<>("readOnly"));
 
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, String>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, String> text) {
-                        String newName = text.getNewValue();
-                        String oldName = text.getOldValue();
-                        ( text.getRowValue()).setName(newName);
-                        try{
-                            Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
-                        } catch (ValidationException ex){
-                            (text.getRowValue()).setName(oldName);
-                            updateTable();
-                        }
+                text -> {
+                    String newName = text.getNewValue();
+                    String oldName = text.getOldValue();
+                    ( text.getRowValue()).setName(newName);
+                    try{
+                        Validate.namedObjectsAreUniqueAndNonempty(table.getItems());
+                    } catch (ValidationException ex){
+                        (text.getRowValue()).setName(oldName);
+                        updateTable();
                     }
                 }
         );
 
         initialValue.setCellFactory(cellLongFactory);
         initialValue.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Long>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Long> text) {
-                        ((Register)text.getRowValue()).setInitialValue(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setInitialValue(text.getNewValue())
         );
         readOnly.setCellFactory(cellBooleanFactory);
         readOnly.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Register, Boolean>>() {
-                    @Override
-                    public void handle(TableColumn.CellEditEvent<Register, Boolean> text) {
-                        ((Register)text.getRowValue()).setReadOnly(
-                                text.getNewValue());
-                    }
-                }
+                text -> text.getRowValue().setReadOnly(
+                        text.getNewValue())
         );
     }
 
@@ -248,16 +210,6 @@ public class RegisterArrayTableView extends TableView<Register> implements Initi
     }
 
     /**
-     * gets properties
-     * @return an array of String representations of the
-     * various properties of this type of microinstruction
-     */
-//    public String[] getProperties()
-//    {
-//        return new String[]{"name", "amount"};
-//    }
-
-    /**
      * Set the clones to the new array passed as a parameter.
      * Does not check for validity.
      *
@@ -266,25 +218,6 @@ public class RegisterArrayTableView extends TableView<Register> implements Initi
     public void setClones(ObservableList<Register> newClones)
     {
         clones = new ArrayList<>(newClones);
-    }
-
-    /**
-     * Check validity of array of Objects' properties.
-     * @param modules an array of Objects to check.
-     * @return boolean denoting whether array has objects with
-     * valid properties or not
-     */
-    public void checkValidity(ObservableList modules)
-    {
-        // convert the array to an array of Registers
-        Register[] registers = new Register[modules.size()];
-        for (int i = 0; i < modules.size(); i++) {
-            registers[i] = (Register) modules.get(i);
-        }
-
-        // check that all names are unique and nonempty
-        Validate.initialValuesAreInbound(getItems());
-
     }
 
     /**

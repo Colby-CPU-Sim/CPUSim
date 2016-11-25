@@ -96,10 +96,10 @@ import cpusim.model.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.*;
-import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchValue;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
@@ -520,46 +520,6 @@ public abstract class Validate
     {
         Validatable.all(transferRtoRs);
     }
-
-    /**
-     * check if one or more names is "<none>"   (ConditionBit)
-     * @param list a list of module objects
-     * 
-     * @deprecated Use {@link #someNameIsNone(List)}
-     */
-    public static void someNameIsNone(Module<?>[] list)
-    {
-        someNameIsNone(Arrays.asList(list));
-    }
-    
-    /**
-     * check if one or more names is "<none>"   (ConditionBit)
-     * @param list a list of module objects
-     */
-    public static void someNameIsNone(List<? extends Module<?>> list)
-    {
-        //find if any existing micro already has the name "<none>"
-        for (Module<?> aList : list) {
-            if (aList.getName().equals("<none>")) {
-                throw new ValidationException("A ConditionBit has been given the " +
-                        "name \"<none>\".\nThat name is reserved to indicate" +
-                        " that no condition bit is desired.");
-            }
-        }
-    }
-
-    /**
-     * check if all the bis are in bounds
-     * @param conditionBits an array of Registers to check
-     * Register objects with all ranges all in bounds
-     * properly
-     *
-     * @deprecated Use {@link Validatable#all(List)}
-     */
-    public static void bitInBounds(List<? extends ConditionBit> conditionBits)
-    {
-        Validatable.all(conditionBits);
-    }
     
     /**
      * checks if a given string is a legal binary, decimal, and/or hexadecimal number
@@ -567,10 +527,9 @@ public abstract class Validate
      */
     public static void stringIsLegalBinHexOrDecNumber(String string){
         try{
-            Convert.fromAnyBaseStringToLong(string);
-        }
-        catch(NumberFormatException ex){
-            throw new ValidationException(ex.getMessage());
+            ConvertStrings.toLong(string);
+        } catch(NumberFormatException ex) {
+            throw new ValidationException(ex);
         }
     }
     
@@ -777,7 +736,7 @@ public abstract class Validate
      */
     public static void startingAddressIsValid(String startAddr, int ramLength){
         stringIsLegalBinHexOrDecNumber(startAddr);
-        startingAddressInRAMRange(Convert.fromAnyBaseStringToLong(startAddr), ramLength);
+        startingAddressInRAMRange(ConvertStrings.toLong(startAddr), ramLength);
     }
     
     /**
@@ -860,22 +819,6 @@ public abstract class Validate
                     throw new ValidationException("The register " + o.getBit().getRegister() + " is used as the " +
                             "condition flag reigster in the microinstruction setCondBit " + o.getName() + ". " +
                             "You should change the microinstruction before setting the register to read-only.");
-            }
-        }
-    }
-
-    /**
-     * Validates that the registers containing condition bits are not read only.
-     * Otherwise it throws a validation exception
-     * @param conditionBits the condition bits to check
-     */
-    public static void registersNotReadOnly(List<? extends ConditionBit> conditionBits) {
-        for(ConditionBit cb : conditionBits){
-            if(cb.getRegister().getAccess().equals(Register.Access.readOnly())) {
-                throw new ValidationException("The register \""+cb.getRegister().getName()+
-                        "\" contains the halt bit \""+cb.getName()+"\".  This is not allowed. "
-                        + "Any register containing a condition bit must be able to be written"
-                        + " to.");
             }
         }
     }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root id="controlsBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0" prefWidth="400.0" spacing="15.0" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="newButton" disable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onNewButtonClick" text="New" HBox.hgrow="ALWAYS" />
+      <Button fx:id="deleteButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="Delete" HBox.hgrow="ALWAYS" />
+      <Button fx:id="duplicateButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onDuplicateButtonClick" text="Duplicate" HBox.hgrow="ALWAYS" />
+      <Button fx:id="propertiesButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onPropertiesButtonClick" text="Properties..." HBox.hgrow="ALWAYS" />
+   </children>
+   <padding>
+      <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+   </padding>
+</fx:root>

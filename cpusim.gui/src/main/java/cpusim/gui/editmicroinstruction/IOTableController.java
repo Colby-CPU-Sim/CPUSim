@@ -154,14 +154,6 @@ class IOTableController extends MicroController<IO> implements Initializable {
         machine.setMicros(IO.class, getItems());
     }
     
-    @Override
-    public void checkValidity(ObservableList<IO> micros)
-    {
-        super.checkValidity(micros);
-        
-        IO.validateBuffersAreWideEnough(micros);
-    }
-    
     /**
      * returns true if new micros of this class can be created.
      */

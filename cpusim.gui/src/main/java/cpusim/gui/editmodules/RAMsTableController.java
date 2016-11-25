@@ -11,39 +11,24 @@
  */
 package cpusim.gui.editmodules;
 
+import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
-import cpusim.gui.util.NamedColumnHandler;
-import cpusim.model.Module;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.EditingStrCell;
-import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.module.RAM;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
 
-import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
  */
-public class RAMsTableController
-        extends ModuleController<RAM> implements Initializable {
+public class RAMsTableController extends ModuleTableController<RAM> {
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<RAM,String> name;
+    static final String FX_ID = "ramTab";
 
     @FXML @SuppressWarnings("unused")
     private TableColumn<RAM,Integer> length;
@@ -57,43 +42,43 @@ public class RAMsTableController
      */
     RAMsTableController(Mediator mediator){
         super(mediator, "RamTable.fxml", RAM.class);
+
+        length = new TableColumn<>("Length");
+        cellSize = new TableColumn<>("Cell Size");
+
+        super.loadFXML();
     }
 
     /**
      * initializes the dialog window after its root element has been processed.
      * makes all the cells editable and the use can edit the cell directly and
      * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
      */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
-        length.prefWidthProperty().bind(prefWidthProperty().divide(100/35.0));
-        cellSize.prefWidthProperty().bind(prefWidthProperty().divide(100/35.0));
+    public void initializeTable(TableView<RAM> table) {
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
+        length.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+        cellSize.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
 
-        Callback<TableColumn<RAM,String>,TableCell<RAM,String>> cellStrFactory =
-                setStringTableColumn -> new EditingStrCell<>();
-        Callback<TableColumn<RAM,Integer>,TableCell<RAM,Integer>> cellIntFactory =
+        Callback<TableColumn<RAM, Integer>, TableCell<RAM, Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         length.setCellValueFactory(new PropertyValueFactory<>("length"));
         cellSize.setCellValueFactory(new PropertyValueFactory<>("cellSize"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
+        
         length.setCellFactory(cellIntFactory);
         length.setOnEditCommit(text -> text.getRowValue().setLength(text.getNewValue()));
 
         cellSize.setCellFactory(cellIntFactory);
         cellSize.setOnEditCommit(text -> text.getRowValue().setCellSize(text.getNewValue()));
+    }
+
+    @Override
+    protected ImmutableList<TableColumn<RAM, ?>> getSubTableColumns() {
+        return ImmutableList.of(name, length, cellSize);
     }
 
     /**
@@ -115,26 +100,6 @@ public class RAMsTableController
     }
 
     /**
-     * Check validity of array of Objects' properties.
-     */
-    @Override
-    public void checkValidity()
-    {
-        // check that all names are unique and nonempty
-        Validate.lengthsArePositive(getItems());
-        Validate.cellSizesAreValid(getItems());
-    }
-
-    /**
-     * returns true if new micros of this class can be created.
-     */
-    @Override
-    public boolean newModulesAreAllowed()
-    {
-        return true;
-    }
-
-    /**
      * get the ID of the corresponding help page
      * @return the ID of the page
      */
@@ -143,19 +108,5 @@ public class RAMsTableController
     {
         return "RAMs";
     }
-
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
-    @Override
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        double w =  getWidth();
-        setPrefWidth(w-1);
-        setPrefWidth(w);
-    }
-
+    
 }

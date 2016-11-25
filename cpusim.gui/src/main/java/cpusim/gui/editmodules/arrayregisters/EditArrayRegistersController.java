@@ -13,6 +13,7 @@ import cpusim.gui.help.HelpController;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
@@ -40,24 +41,20 @@ import java.util.stream.Collectors;
 
 public class EditArrayRegistersController implements Initializable {
     @FXML
-    private
-    ComboBox<String> arrayCombo;
+    private ComboBox<String> arrayCombo;
     @FXML
-    private
-    Pane tablePane;
+    private Pane tablePane;
     @FXML
-    private
-    Button okButton;
+    private Button okButton;
     @FXML
-    private
-    Button cancelButton;
+    private Button cancelButton;
     @FXML
-    Button helpButton;
+    private Button helpButton;
 
     private Mediator mediator;
     private RegistersTableController registerController;
     private ObservableList<RegisterArray> registerArrays;
-    private TableView<Register> activeTable;
+    private RegisterArrayTableView activeTable;
     private ChangeTable tableMap;
     private String selection;
 
@@ -120,43 +117,32 @@ public class EditArrayRegistersController implements Initializable {
         // listen for changes to the instruction combo box selection and update
         // the displayed micro instruction table accordingly.
         arrayCombo.getSelectionModel().selectedItemProperty().addListener(
-                new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> selected,
-                                        String oldType, String newType) {
-                        ((RegisterArrayTableView) activeTable).setClones(activeTable
-                                .getItems());
-                        activeTable = tableMap.getMap().get(newType);
-                        tableMap.getMap().get(oldType).getSelectionModel()
-                                .clearSelection();
-                        tablePane.getChildren().clear();
-                        tablePane.getChildren().add(
-                                tableMap.getMap().get(newType));
-                        activeTable.setPrefWidth(tablePane.getWidth());
-                        activeTable.setPrefHeight(tablePane.getHeight());
-                        activeTable.setColumnResizePolicy(TableView
-                                .CONSTRAINED_RESIZE_POLICY);
+                (selected, oldType, newType) -> {
+                    activeTable.setClones(activeTable.getItems());
+                    activeTable = tableMap.getMap().get(newType);
+                    tableMap.getMap().get(oldType).getSelectionModel().clearSelection();
+                    tablePane.getChildren().clear();
+                    tablePane.getChildren().add(tableMap.getMap().get(newType));
+                    activeTable.setPrefWidth(tablePane.getWidth());
+                    activeTable.setPrefHeight(tablePane.getHeight());
+                    activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-                    }
                 });
 
         // Define an event filter for the ComboBox for Mouse_released events
-        EventHandler validityFilter = new EventHandler<InputEvent>() {
-            public void handle(InputEvent event) {
-                try {
-                    ObservableList<Register> list = FXCollections.observableArrayList();
-                    list.addAll(registerController.getItems());
-                    for (RegisterArrayTableView r : tableMap.getMap().values()) {
-                        list.addAll(r.getItems());
-                    }
-    
-                    NamedObject.validateUniqueAndNonempty(list);
-                    ((RegisterArrayTableView) activeTable).checkValidity(list);
-                } catch (ValidationException ex) {
-                    Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
-                            "Registers Error", ex.getMessage()).showAndWait();
-                    event.consume();
+        EventHandler validityFilter = (EventHandler<InputEvent>) event -> {
+            try {
+                ObservableList<Register> list = FXCollections.observableArrayList();
+                list.addAll(registerController.getItems());
+                for (RegisterArrayTableView r : tableMap.getMap().values()) {
+                    list.addAll(r.getItems());
                 }
+
+                Validatable.all(list);
+            } catch (ValidationException ex) {
+                Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
+                        "Registers Error", ex.getMessage()).showAndWait();
+                event.consume();
             }
         };
         arrayCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
@@ -167,18 +153,18 @@ public class EditArrayRegistersController implements Initializable {
      *
      * @param e a type of action when a button is clicked.
      */
-    @FXML
+    @FXML @SuppressWarnings("unused")
     public void onOKButtonClick(ActionEvent e) {
         //get the current edited clones
-        ObservableList objList = activeTable.getItems();
+        ObservableList<Register> objList = activeTable.getItems();
         try {
             ObservableList<Register> list = FXCollections.observableArrayList();
             list.addAll(registerController.getItems());
             for (RegisterArrayTableView r : tableMap.getMap().values()) {
                 list.addAll(r.getItems());
             }
-            NamedObject.validateUniqueAndNonempty(list);
-            getCurrentController().checkValidity(objList);
+
+            Validatable.all(objList);
             //update the machine with the new values
             updateRegisters();
             //get a handle to the stage.

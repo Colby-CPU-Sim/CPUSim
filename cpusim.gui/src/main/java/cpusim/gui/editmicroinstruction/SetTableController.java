@@ -139,21 +139,11 @@ class SetTableController extends MicroController<CpusimSet> implements Initializ
     {
         machine.setMicros(CpusimSet.class, getItems());
     }
-
-    @Override
-    public void checkValidity(ObservableList<CpusimSet> micros)
-    {
-        // check that all names are unique and nonempty
-        CpusimSet.validateRangeInBound(micros);
-        CpusimSet.validateValueFitsInNumBitsForSetMicros(micros);
-        
-        super.checkValidity(micros);
-    }
     
     @Override
     public boolean newMicrosAreAllowed()
     {
-        return (machine.getModule("registers").size() > 0);
+        return (machine.getModule(Register.class).size() > 0);
     }
     
     @Override

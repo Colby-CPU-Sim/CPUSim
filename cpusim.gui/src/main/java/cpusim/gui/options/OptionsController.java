@@ -345,7 +345,7 @@ public class OptionsController implements Initializable {
             ObservableList<IO> ios = mediator.getMachine().getMicros(IO.class);
             ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
             for (IOOptionsData d : data) {
-                IO micro = (IO) ios.get(ios.indexOf(d.getIo()));
+                IO micro = ios.get(ios.indexOf(d.getIo()));
                 micro.setConnection(d.getChannel());
             }
             mediator.getMachine().setMicros(IO.class, ios);
@@ -692,9 +692,9 @@ public class OptionsController implements Initializable {
                 GUIChannels.DIALOG,
                 GUIChannels.FILE);
 
-        ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
-        for (int i = 0; i < ios.size(); i++) {
-            IOChannel channel = ((IO) ios.get(i)).getConnection();
+        ObservableList<IO> ios = mediator.getMachine().getMicros(IO.class);
+        for (IO io : ios) {
+            IOChannel channel = io.getConnection();
             if (channel instanceof FileChannel) {
                 allChannels.add(channel);
             }
@@ -736,7 +736,7 @@ public class OptionsController implements Initializable {
         // Load in rows
         ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
         for (int i = 0; i < ios.size(); i++) {
-            IO channel = ((IO) ios.get(i));
+            IO channel = ios.get(i);
             data.add(new IOOptionsData(channel, channel.getConnection()));
         }
         IOOptionsTable.setItems(data);

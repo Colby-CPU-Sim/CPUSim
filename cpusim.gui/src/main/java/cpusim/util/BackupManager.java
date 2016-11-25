@@ -92,6 +92,9 @@ import java.util.Stack;
 public class BackupManager
             implements ChangeListener<Object>
 {
+	// FIXME Create a Machine#ChangeSet or something similar that can then be stored, this current setup
+	// FIXME is not good enough and creates some scary type issues.
+
 	//instance variables
     private boolean listening; //if false, ignore property changes
     private Stack<Stack<HashMap>> machineInstructionStack;
@@ -101,7 +104,7 @@ public class BackupManager
 
 	public BackupManager()
 	{
-        this.machineInstructionStack = new Stack<Stack<HashMap>>();
+        this.machineInstructionStack = new Stack<>();
         listening = false;
     }
 
@@ -219,7 +222,7 @@ public class BackupManager
 	//	C.T. Refactored: Javadoc comment, renamed method, modified
 	public void startNewBackupInstructionState()
 	{
-		machineInstructionStack.push(new Stack<HashMap>());
+		machineInstructionStack.push(new Stack<>());
 	}
 
 	/**

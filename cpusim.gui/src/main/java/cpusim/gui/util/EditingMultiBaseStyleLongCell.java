@@ -148,22 +148,18 @@ public class EditingMultiBaseStyleLongCell<T> extends TableCell<T, Long> {
         // if user takes focus from the textField, check the validity of its
         // contents and, if valid, save the changes, else, put up an error dialog.
         // This listener actually does nothing, because
-        textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean arg1, Boolean arg2) {
-                if (!arg2) {
-                    try {
-                        commitEdit(convertString(prepareString(textField.getText())));
-                    } catch (NumberFormatException exc) {
-                        if (textField.getScene() != null) {
-                            textField.setStyle("-fx-background-color:red;");
-                            textField.setTooltip(new Tooltip(exc.getMessage()));
-                            textField.requestFocus();
+        textField.focusedProperty().addListener((arg0, arg1, arg2) -> {
+            if (!arg2) {
+                try {
+                    commitEdit(convertString(prepareString(textField.getText())));
+                } catch (NumberFormatException exc) {
+                    if (textField.getScene() != null) {
+                        textField.setStyle("-fx-background-color:red;");
+                        textField.setTooltip(new Tooltip(exc.getMessage()));
+                        textField.requestFocus();
 //                          Dialogs.createErrorDialog(textField.getScene().getWindow(),
 //                                    "Number Format Error", errorMessage).showAndWait();
 //                          cancelEdit();
-                        }
                     }
                 }
             }

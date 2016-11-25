@@ -37,6 +37,21 @@ public abstract class ConvertLongs {
 	}
 
 	/**
+	 * Returns a string representing the long value
+	 * in two's complement using the given number of bits
+	 * It assumes that the value can be expressed in the given
+	 * number of bits.
+	 *
+	 * @throws NullPointerException if <code>numBits</code> is <code>null</code>
+	 *
+	 * @deprecated use {@link #to2sComplementString(long, ArchValue)}
+	 */
+	public static String to2sComplementString(long value, int numBits)
+	{
+		return to2sComplementString(value, ArchValue.bits(numBits));
+	}
+
+	/**
      * Returns a string representing the long value
      * in two's complement using the given number of bits
      * It assumes that the value can be expressed in the given
@@ -154,7 +169,7 @@ public abstract class ConvertLongs {
 	 * and converts each group to the corresponding ascii character.  If the character
 	 * is unprintable (has an ascii value between 0 and 31), a box is printed out.
 	 *
-	 * @param l the long to be converted to an ascii string
+	 * @param value the long to be converted to an ascii string
 	 * @param numBits number of bits of the long to be converted, starting at the right
 	 * @return the String with the ascii characters
 	 * @deprecated Use {@link #toAsciiString(long,ArchValue)} instead
@@ -171,7 +186,7 @@ public abstract class ConvertLongs {
 	 * and converts each group to the corresponding ascii character.  If the character
 	 * is unprintable (has an ascii value between 0 and 31), a box is printed out.
 	 *
-	 * @param l the long to be converted to an ascii string
+	 * @param value the long to be converted to an ascii string
 	 * @param numBits number of bits of the long to be converted, starting at the right
 	 * @return the String with the ascii characters
 	 */

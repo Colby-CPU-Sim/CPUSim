@@ -8,8 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Denotes that an instance can be copied to
- * 
- * @author Kevin Brightwell
+ *
  * @since 2016-09-20
  */
 public interface Copyable<T extends Copyable<T>> {

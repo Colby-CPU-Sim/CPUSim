@@ -13,23 +13,10 @@ import javafx.scene.control.TableView;
 public class NamedColumnHandler<T extends NamedObject>
         implements EventHandler<TableColumn.CellEditEvent<T, String>> {
 
-    public interface HasUpdateTable<T extends NamedObject> {
-
-        void updateTable(TableView<T> table);
-
-    }
-
-    private final HasUpdateTable<T> updater;
     private final TableView<T> table;
 
-    public NamedColumnHandler(TableView<T> table, HasUpdateTable<T> updater) {
+    public NamedColumnHandler(TableView<T> table) {
         this.table = table;
-        this.updater = updater;
-    }
-
-    public <V extends TableView<T> & HasUpdateTable<T>> NamedColumnHandler(V both) {
-        this.table = both;
-        this.updater = both;
     }
 
     @Override
@@ -42,7 +29,6 @@ public class NamedColumnHandler<T extends NamedObject>
             NamedObject.validateUniqueAndNonempty(table.getItems());
         } catch (ValidationException ex) {
             text.getRowValue().setName(oldName);
-            updater.updateTable(table);
         }
     }
 }

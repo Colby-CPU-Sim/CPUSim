@@ -74,13 +74,11 @@ final class ImmutableMicroControllerMap implements Map<Class<? extends Microinst
     public MicroController<?> get(final Object key) {
         if (CharSequence.class.isAssignableFrom(key.getClass())) {
             String strKey = key.toString();
-            
-            try {
-                return typesMap.get(Class.forName(strKey));
-            } catch (ClassNotFoundException cnfe) {
-                // The Map#get(Object) format says to return null, not throw an exception. :(
-                return null;
-            }
+
+            return typesMap.keySet().stream()
+                    .filter(c -> c.getSimpleName().equals(strKey))
+                    .findFirst()
+                    .map(c -> typesMap.get(c)).get();
         } else if (key instanceof Class) {
             return typesMap.get(key);
         } else {

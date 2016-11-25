@@ -238,7 +238,7 @@ public class MachineReader {
 
 		// set the code store if not already set
 		if (machine.getModule("rams").size() > 0 && machine.getCodeStore() == null) {
-			machine.setCodeStore(machine.getModule("rams", RAM.class).get(0));
+			machine.setCodeStore(machine.getModule(RAM.class).get(0));
 		}
 	}
 
@@ -381,7 +381,7 @@ public class MachineReader {
 			currentRegisterArrayIndex++;
 		} else {
 			r = new Register(name, width, initialValue, readOnly);
-			machine.getModule("registers", Register.class).add(r);
+			machine.getModule(Register.class).add(r);
 		}
 		components.put(id, r);
 	}
@@ -417,7 +417,7 @@ public class MachineReader {
 		RegisterArray r = new RegisterArray(name, length, width);
 		String id = attrs.getValue("id");
 		components.put(id, r);
-		machine.getModule("registerArrays", RegisterArray.class).add(r);
+		machine.getModule(RegisterArray.class).add(r);
 
 		// now prepare for reading in the registers
 		currentRegisterArray = r;
@@ -459,7 +459,7 @@ public class MachineReader {
 		ConditionBit c = new ConditionBit(name, machine, register, bit, halt);
 		String id = attrs.getValue("id");
 		components.put(id, c);
-		machine.getModule("conditionBits", ConditionBit.class).add(c);
+		machine.getModule(ConditionBit.class).add(c);
 	}
 
 	// --------------------------
@@ -497,7 +497,7 @@ public class MachineReader {
 		RAM ram = new RAM(name, length, cellSize);
 		String id = attrs.getValue("id");
 		components.put(id, ram);
-		machine.getModule("rams", RAM.class).add(ram);
+		machine.getModule(RAM.class).add(ram);
 	}
 
 	// --------------------------

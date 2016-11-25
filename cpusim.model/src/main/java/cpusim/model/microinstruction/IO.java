@@ -32,7 +32,7 @@ public class IO extends Microinstruction implements Copyable<IO> {
     
     private SimpleStringProperty type; // FIXME Enum
     private SimpleObjectProperty<Register> buffer;
-    private SimpleStringProperty direction;
+    private SimpleStringProperty direction; // FIXME Enum
     private IOChannel connection;
 
     /**
@@ -256,28 +256,23 @@ public class IO extends Microinstruction implements Copyable<IO> {
                 "</TD><TD>" + HtmlEncoder.sEncode(getConnection().toString()) +
                 "</TD></TR>";
 	}
-    
+
     /**
      * check if the ios of type ascii have 8-bit-wide
      * (or greater) buffers and ios of type unicode have
      * 16-bit-wide (or greater) buffers.
-     * @param ios array of ios microinstruction
      */
-    public static void validateBuffersAreWideEnough(List<IO> ios)
-    {
-        for (IO io : ios) {
-            if (io.getType().equals("ascii") &&
-                    io.getBuffer().getWidth() < 1) {
-                throw new ValidationException("IO \"" + io + "\" is of type " +
-                        "ascii and so needs a\nbuffer register at least " +
-                        "8 bits wide.");
-            }
-            else if (io.getType().equals("unicode") &&
-                    io.getBuffer().getWidth() < 2) {
-                throw new ValidationException("IO \"" + io + "\" is of type " +
-                        "unicode and so needs a\nbuffer register at least " +
-                        "16 bits wide.");
-            }
+    @Override
+    protected void validateState() {
+        if (getType().equals("ascii") && getBuffer().getWidth() < 1) {
+            throw new ValidationException("IO \"" + this + "\" is of type " +
+                    "ascii and so needs a\nbuffer register at least " +
+                    "8 bits wide.");
+        }
+        else if (getType().equals("unicode") && getBuffer().getWidth() < 2) {
+            throw new ValidationException("IO \"" + this + "\" is of type " +
+                    "unicode and so needs a\nbuffer register at least " +
+                    "16 bits wide.");
         }
     }
 }

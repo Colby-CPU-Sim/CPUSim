@@ -164,8 +164,6 @@ public class DragTreeCell extends TreeCell<String> {
         });
     }
 
-    private String item;
-
     /**
      * updates the String in the table cell
      *
@@ -175,8 +173,7 @@ public class DragTreeCell extends TreeCell<String> {
     @Override
     protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
-        this.item = item;
-        String text = (item == null) ? null : item.toString();
+        String text = (item == null) ? null : item;
         setText(text);
 
         isClass = false;
@@ -185,8 +182,8 @@ public class DragTreeCell extends TreeCell<String> {
         treeItem = this.getTreeItem();
 
         if (treeItem != null) {
-            for (Machine.MicroClass microClass : Machine.MicroClass.values()) {
-                if ((treeItem.getValue().equals(microClass.getName()) &&
+            for (Class<? extends Microinstruction> microClass : Machine.getMicroClasses()) {
+                if ((treeItem.getValue().equals(microClass.getSimpleName()) &&
                         treeItem.getParent().getValue().equals("MicroInstructions"))
                         || (treeItem.getValue().equals("MicroInstructions") &&
                         this.getTreeItem().getParent() == null)) {

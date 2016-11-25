@@ -289,7 +289,7 @@ public abstract class Convert
      * @return the long value of the string
      * @throws NumberFormatException if the string cannot be parsed as a long
      * 
-     * @see ConvertStrings#toLong(String)
+     * @see ConvertStrings#toLong(CharSequence)
      */
     @Deprecated
     public static long fromAnyBaseStringToLong(String string)

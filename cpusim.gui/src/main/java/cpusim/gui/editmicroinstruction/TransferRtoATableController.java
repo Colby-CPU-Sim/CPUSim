@@ -204,8 +204,6 @@ public class TransferRtoATableController
     public void checkValidity(ObservableList<TransferRtoA> micros)
     {
         super.checkValidity(micros);
-        // convert the array to an array of TransferRtoAs
-        TransferRtoA.validateRangesInBounds(micros);
     }
 
     /**

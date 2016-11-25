@@ -36,13 +36,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -103,6 +97,10 @@ public class Machine extends Module<Machine> implements Serializable {
         ImmutableList.Builder<Class<? extends Microinstruction>> bld = ImmutableList.builder();
         Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType).forEach(bld::add);
         return bld.build();
+    }
+
+    public static Optional<Class<? extends Microinstruction>> getMicroClassByName(String name) {
+        return getMicroClasses().stream().filter(c -> c.getSimpleName().equals(name)).findFirst();
     }
     
     /**
@@ -454,8 +452,8 @@ public class Machine extends Module<Machine> implements Serializable {
      * Gets all of the modules into a single {@link ImmutableList}.
      * @return
      */
-    public ImmutableList<ObservableList<? extends Module<?>>> getAllModules() {
-        ImmutableList.Builder<ObservableList<? extends Module<?>>> moduleBuilder = ImmutableList.builder();
+    public ImmutableList<List<? extends Module<?>>> getAllModules() {
+        ImmutableList.Builder<List<? extends Module<?>>> moduleBuilder = ImmutableList.builder();
         Machine.getModuleClasses().stream().map(c -> machine.getModuleUnchecked(c)).forEach(moduleBuilder::add);
         return moduleBuilder.build();
     }
@@ -489,8 +487,8 @@ public class Machine extends Module<Machine> implements Serializable {
      * Get all of the loaded {@link Microinstruction} in the {@link Machine}.
      * @return
      */
-    public List<ObservableList<? extends Microinstruction>> getAllMicros() {
-        ImmutableList.Builder<ObservableList<? extends Microinstruction>> microBuilder = ImmutableList.builder();
+    public List<List<? extends Microinstruction>> getAllMicros() {
+        ImmutableList.Builder<List<? extends Microinstruction>> microBuilder = ImmutableList.builder();
         getMicroClasses().stream().map(c -> machine.getMicros(c)).forEach(microBuilder::add);
     
         return microBuilder.build();

@@ -146,11 +146,11 @@ public class Main {
 
         //update all io micros with non-file channels
         //to input/output to the command line
-        ObservableList<Microinstruction> ioMicros = machine.getMicros("io");
+        ObservableList<IO> ioMicros = machine.getMicros(IO.class);
         BufferedChannel commandLineChannel = new BufferedChannel(new StreamChannel());
-        for(Microinstruction io : ioMicros) {
-            if(! (((IO) io).getConnection() instanceof FileChannel))
-                ((IO) io).setConnection(commandLineChannel);
+        for(final IO io : ioMicros) {
+            if(!(io.getConnection() instanceof FileChannel))
+                io.setConnection(commandLineChannel);
         }
 
         //run the program

@@ -162,6 +162,11 @@ public class MemoryAccess extends Microinstruction implements Copyable<MemoryAcc
         }
     }
 
+    @Override
+    protected void validateState() {
+        // currently no-op
+    }
+
     /**
      * returns the XML description
      * @return the XML description

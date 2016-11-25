@@ -112,8 +112,8 @@ public class EditFetchSequenceController implements Initializable {
             String className = db.getString().split(",")[1];
             Microinstruction micro = null;
 
-            for (Machine.MicroClass mc : Machine.MicroClass.values()) {
-                for (Microinstruction instr : mediator.getMachine().getMicros(mc.getInstructionType())) {
+            for (Class<? extends Microinstruction> mc : Machine.getMicroClasses()) {
+                for (Microinstruction instr : mediator.getMachine().getMicros(mc)) {
                     if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
                         micro = instr;
                     }
@@ -218,8 +218,7 @@ public class EditFetchSequenceController implements Initializable {
                 microLabel.setOnMouseClicked(mouseEvent -> {
                     if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
                             && mouseEvent.getClickCount() == 2 ){
-                        ObservableList<TreeItem<String>> list =
-                                          microInstrTreeView.getRoot().getChildren();
+                        ObservableList<TreeItem<String>> list = microInstrTreeView.getRoot().getChildren();
 
                         for (TreeItem<String> t : list){
                             if (t.getValue().equals(micro.getMicroClass())){
@@ -281,9 +280,9 @@ public class EditFetchSequenceController implements Initializable {
 
         rootNode.setExpanded(true);
 
-        for(Machine.MicroClass microClass : Machine.MicroClass.values()){
-            TreeItem<String> classNode = new TreeItem<>(microClass.getName());
-            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass.getInstructionType())){
+        for(Class<? extends Microinstruction> microClass : Machine.getMicroClasses()){
+            TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
+            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass)){
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }

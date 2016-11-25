@@ -2082,10 +2082,9 @@ public class DesktopController implements Initializable
         // if using the console for IO, then set the console's background to yellow
         // during input and set it to white during output and at the end.
         inRunningMode.addListener((arg0, wasDebugMode, nowDebugMode) -> {
-            ObservableList<Microinstruction> ios = mediator.getMachine().getMicros("io");
+            ObservableList<IO> ios = mediator.getMachine().getMicros(IO.class);
             boolean consoleIsInputOrOutputChannel = false;
-            for (Microinstruction micro : ios) {
-                IO io = (IO) micro;
+            for (IO io : ios) {
                 if (io.getConnection().equals(GUIChannels.CONSOLE)) {
                     consoleIsInputOrOutputChannel = true;
                 }
@@ -2218,7 +2217,7 @@ public class DesktopController implements Initializable
         if (0 <= initialSection && initialSection <= 3) {
             EditModulesController controller = new EditModulesController(mediator, this);
             openModalDialog("Edit Modules", controller, "EditModules.fxml");
-            controller.selectSection(initialSection);
+//            controller.selectSection(initialSection);
         }
         else {
             openHardwareModulesDialog(0);
@@ -2664,8 +2663,8 @@ public class DesktopController implements Initializable
      * for each RAM in the current machine
      */
     private void updateRamMenus() {
-        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
-                .getModule("rams");
+        ObservableList<RAM> rams = mediator.getMachine()
+                .getModule(RAM.class);
         saveRamMenu.getItems().clear();
         openRamMenu.getItems().clear();
 
@@ -2829,8 +2828,8 @@ public class DesktopController implements Initializable
 
         updateStyleOfTables();
 
-        ObservableList<Register> registers = (ObservableList<Register>) mediator
-                .getMachine().getModule("registers");
+        ObservableList<Register> registers = mediator
+                .getMachine().getModule(Register.class);
 
         RegisterTableController registerTableController =
                 new RegisterTableController(this, registers, "Registers");
@@ -2847,13 +2846,12 @@ public class DesktopController implements Initializable
         }
         registerTableController.setDataBase(regDataBase);
 
-        regVbox.setVgrow(regSplitPane, Priority.ALWAYS);
+        VBox.setVgrow(regSplitPane, Priority.ALWAYS);
 
         regSplitPane.getItems().add(registerTableRoot);
 
 
-        ObservableList<RegisterArray> registerArrays = (ObservableList<RegisterArray>)
-                mediator.getMachine().getModule("registerArrays");
+        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModule(RegisterArray.class);
 
         Pane registerArrayTableRoot = null;
 
@@ -2890,8 +2888,8 @@ public class DesktopController implements Initializable
             regSplitPane.setDividerPosition(i, regdpos);
         }
 
-        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
-                .getModule("rams");
+        ObservableList<RAM> rams = mediator.getMachine()
+                .getModule(RAM.class);
 
         if (!rams.isEmpty()) {
             ramVbox.getChildren().remove(noRAMLabel);
@@ -2911,7 +2909,7 @@ public class DesktopController implements Initializable
                 ramControllers.add(ramTableController);
 
                 try {
-                    ramTableRoot = (Pane) ramFxmlLoader.load();
+                    ramTableRoot = ramFxmlLoader.load();
                 } catch (IOException e) {
                     // should never happen
                     assert false : "Unable to load file: RamTable.fxml";
@@ -2964,8 +2962,7 @@ public class DesktopController implements Initializable
         }
         registerControllers.remove(1, registerControllers.size());
 
-        ObservableList<RegisterArray> registerArrays = (ObservableList<RegisterArray>)
-                mediator.getMachine().getModule("registerArrays");
+        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModule(RegisterArray.class);
 
         Pane registerArrayTableRoot = null;
 
@@ -3001,8 +2998,7 @@ public class DesktopController implements Initializable
         }
 
         ramSplitPane.getItems().clear();
-        ObservableList<RAM> rams = (ObservableList<RAM>) mediator.getMachine()
-                .getModule("rams");
+        ObservableList<RAM> rams = mediator.getMachine().getModule(RAM.class);
         ramControllers.clear();
 
         if (!rams.isEmpty()) {
@@ -3077,7 +3073,7 @@ public class DesktopController implements Initializable
                     "Do you want to quit the running program?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
-            if (result.get() == buttonTypeNo || result.get() == buttonTypeCancel) {
+            if (result.isPresent() && (result.get() == buttonTypeNo || result.get() == buttonTypeCancel)) {
                 return false;
             }
         }
@@ -3087,11 +3083,12 @@ public class DesktopController implements Initializable
                     + "Would you like to save it before you close?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
-            if (result.get() == buttonTypeYes) {
-                mediator.saveMachine();
-            }
-            else if (result.get() == buttonTypeCancel) {
-                return false;
+            if (result.isPresent()) {
+                if (result.get() == buttonTypeYes) {
+                    mediator.saveMachine();
+                } else if (result.get() == buttonTypeCancel) {
+                    return false;
+                }
             }
         }
         for (Tab tab : textTabPane.getTabs()) {
@@ -3103,11 +3100,13 @@ public class DesktopController implements Initializable
                 dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
                         buttonTypeCancel);
                 Optional<ButtonType> result = dialog.showAndWait();
-                if (result.get() == buttonTypeYes) {
-                    save(tab);
-                }
-                else if (result.get() == buttonTypeCancel) {
-                    return false;
+                if (result.isPresent()) {
+                    if (result.get() == buttonTypeYes) {
+                        save(tab);
+                    }
+                    else if (result.get() == buttonTypeCancel) {
+                        return false;
+                    }
                 }
             }
         }

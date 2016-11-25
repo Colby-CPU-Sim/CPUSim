@@ -82,6 +82,7 @@ package cpusim;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;
+import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
@@ -156,19 +157,17 @@ public class Mediator {
      * PropertyChangeListener to each of them.
      */
     public void addPropertyChangeListenerToAllModules(ChangeListener listener) {
-        ObservableList registerList = machine.get().getModule("registers");
-        for (Object o : registerList) {
-            Register register = (Register) o;
+        // FIXME Fix type safe data
+        ObservableList<Register> registerList = machine.get().getModule(Register.class);
+        for (Register register : registerList) {
             register.valueProperty().removeListener(listener);
             //the preceding statement does nothing if the listener
             //is not currently a listener of the register
             register.valueProperty().addListener(listener);
         }
-        ObservableList arrays = machine.get().getModule("registerArrays");
-        for (Object array : arrays) {
-            ObservableList<Register> registers =
-                    ((RegisterArray) array).registers();
-            for (Register register : registers) {
+        ObservableList<RegisterArray> arrays = machine.get().getModule(RegisterArray.class);
+        for (RegisterArray array : arrays) {
+            for (Register register : array) {
                 register.valueProperty().removeListener(listener);
                 register.valueProperty().addListener(listener);
             }
@@ -727,11 +726,10 @@ public class Mediator {
                     continue;
                 } else {
                     if (dataChunkBeginAddress != -1) {
-                        ramInMIF += "[" + ConvertLongs.fromLongToHexadecimalString(
-                                dataChunkBeginAddress, ram.getCellSize()) + ".." +
-                                ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
-                                ConvertLongs.fromLongToTwosComplementString(ramLoc.getValue(),
-                                        ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
+                        ramInMIF += "[" + ConvertLongs.toHexString(dataChunkBeginAddress, ram.getCellSize()) + ".." +
+                                ConvertLongs.toHexString(i, ram.getNumAddrBits()) + "]:  " +
+                                ConvertLongs.to2sComplementString(ramLoc.getValue(), ram.getCellSize())
+                                + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
                         dataChunkBeginAddress = -1;
                     } else {
                         ramInMIF += ConvertLongs.fromLongToHexadecimalString(i, ram.getNumAddrBits())

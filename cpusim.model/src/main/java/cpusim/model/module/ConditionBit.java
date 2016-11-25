@@ -136,8 +136,27 @@ public class ConditionBit extends Module<ConditionBit>
         return halt;
     }
     
-    @Override
-    protected void validateState() {
+    /**
+     * Checks if the register stored is read-only, throws if it is.
+     *
+     * @throws ValidationException if the internal state is invalid.
+     */
+    public void validateNotReadOnlyRegister() {
+        
+        if(getRegister().getAccess().equals(Register.Access.readOnly())) {
+            throw new ValidationException("The register \""+ getRegister().getName() +
+                    "\" contains the halt bit \""+ getName() + "\".  This is not allowed. "
+                    + "Any register containing a condition bit must be able to be written"
+                    + " to.");
+        }
+    }
+    
+    /**
+     * Checks if the bit set is valid within the {@link Register} that is set.
+     *
+     * @throws ValidationException if the bit is outside the width of the {@link Register}
+     */
+    public void validateBitWithinRegisterWidth() {
         final int width = getRegister().getWidth();
         final int bit = getBit();
         if (bit < 0) {
@@ -148,6 +167,16 @@ public class ConditionBit extends Module<ConditionBit>
             throw new ValidationException("ConditionBit " + getName() +
                     " must have an index less than the length of the register.");
         }
+    }
+    
+    @Override
+    protected void validateState() {
+        if (getRegister() == null) {
+            throw new ValidationException("ConditionBit " + getName() + " does not have a register set.");
+        }
+    
+        validateBitWithinRegisterWidth();
+        validateNotReadOnlyRegister();
     }
     
     /**
@@ -228,8 +257,7 @@ public class ConditionBit extends Module<ConditionBit>
      * @return the HTML description
      */
     @Override
-    public String getHTMLDescription(String indent)
-    {
+    public String getHTMLDescription(String indent) {
         return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
                 "</TD><TD>" + getBit() + "</TD><TD>" + getHalt() + "</TD></TR>";
     }

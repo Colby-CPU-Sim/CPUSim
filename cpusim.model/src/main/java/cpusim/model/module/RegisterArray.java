@@ -312,8 +312,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
             throw new ValidationException("The registers in RegisterArray " + getName() +
                     " can be at most 64 bits wide.");
         }
-        
-        
+
         registers.forEach(Validatable::validate);
     }
 } //end class RegisterArray

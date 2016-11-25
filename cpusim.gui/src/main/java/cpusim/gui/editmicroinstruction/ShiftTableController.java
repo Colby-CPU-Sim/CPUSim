@@ -121,10 +121,7 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
         );
 
         destination.setCellFactory(cellComboFactory);
-        destination.setOnEditCommit(
-                text -> text.getRowValue().setDestination(
-                        text.getNewValue())
-        );
+        destination.setOnEditCommit(text -> text.getRowValue().setDest(text.getNewValue()));
 
         type.setCellFactory(cellTypeFactory);
         type.setOnEditCommit(
@@ -166,14 +163,6 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
     public void updateMachineFromItems()
     {
         machine.setMicros(Shift.class, getItems());
-    }
-    
-    @Override
-    public void checkValidity(ObservableList<Shift> micros)
-    {
-        //check that all names are unique and nonempty
-        Shift.validateNoNegativeDistances(micros);
-        Shift.validateRegistersHaveEqualWidths(micros);
     }
     
     @Override

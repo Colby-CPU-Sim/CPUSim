@@ -28,10 +28,12 @@
 package cpusim.xml;
 
 
-import cpusim.model.*;
+import cpusim.model.Field;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
-
 import cpusim.model.microinstruction.Microinstruction;
 import javafx.collections.ObservableList;
 
@@ -43,15 +45,15 @@ import java.util.List;
 
 public class MachineHTMLWriter
 {
-    private final String HEADER_PREFIX =
+    private static final String HEADER_PREFIX =
             "<TR VALIGN=\"middle\"><TD bgcolor=\"#C08060\" COLSPAN=\"";
-    private final String HEADER_MIDDLE =
+    private static final String HEADER_MIDDLE =
             "\" HEIGHT=\"35\"><FONT " + //
             " SIZE=\"+2\"><B>&nbsp;";
-    private final String HEADER_SUFFIX = "</B></font></TD></TR>";
-    private final String COL_HEADER_PREFIX = "<TR><TD><B>Name</B></TD><TD><B>";
-    private final int[] MODULE_COLUMNS = {4, 4, 4, 3};
-    private final int[] MICRO_COLUMNS = {5, 7, 5, 6, 5, 7, 2, 6, 9, 9, 2, 3, 5, 5};
+    private static final String HEADER_SUFFIX = "</B></font></TD></TR>";
+    private static final String COL_HEADER_PREFIX = "<TR><TD><B>Name</B></TD><TD><B>";
+    private static final int[] MODULE_COLUMNS = {4, 4, 4, 3};
+    private static final int[] MICRO_COLUMNS = {5, 7, 5, 6, 5, 7, 2, 6, 9, 9, 2, 3, 5, 5};
 
     private String[] moduleHeaders, moduleColumnHeaders,
     microHeaders, microColumnHeaders;
@@ -162,28 +164,8 @@ public class MachineHTMLWriter
     // the PrintWriter
     public void writeMachineInHTML(Machine machine, PrintWriter out)
     {
-        ObservableList[]  moduleVectors = {
-            machine.getModule("registers"),
-            machine.getModule("registerArrays"),
-            machine.getModule("conditionBits"),
-            machine.getModule("rams")
-        };
-        ObservableList[] microVectors = {
-            machine.getMicros("set"),
-            machine.getMicros("test"),
-            machine.getMicros("increment"),
-            machine.getMicros("shift"),
-            machine.getMicros("logical"),
-            machine.getMicros("arithmetic"),
-            machine.getMicros("branch"),
-            machine.getMicros("transferRtoR"),
-            machine.getMicros("transferRtoA"),
-            machine.getMicros("transferAtoR"),
-            machine.getMicros("decode"),
-            machine.getMicros("setCondBit"),
-            machine.getMicros("io"),
-            machine.getMicros("memoryAccess")
-        };
+        List<List<? extends Module<?>>> moduleVectors = machine.getAllModules();
+        List<List<? extends Microinstruction>> microVectors = machine.getAllMicros();
 
         out.println("<HTML><HEAD>");
         out.println("<TITLE>" + machine.getHTMLName() + "</TITLE></HEAD>");
@@ -206,24 +188,23 @@ public class MachineHTMLWriter
                     "<CENTER>(none)</CENTER></TD></TR>");
         else
             for (PunctChar c : chars)
-                out.println(c.getHTMLDescription());
+                out.println(c.getHTMLDescription("  "));
         out.println("</TABLE><P></P>");
 
         //print the modules
-        for (int i = 0; i < moduleVectors.length; i++) {
+        for (int i = 0; i < moduleVectors.size(); i++) {
             out.println();
             out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
                     "CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
             out.println(moduleHeaders[i]);
             out.println(moduleColumnHeaders[i]);
-            if (moduleVectors[i].size() == 0)
+            if (moduleVectors.get(i).size() == 0)
                 out.println("<TR VALIGN=\"middle\"><TD COLSPAN=\"" +
                         MODULE_COLUMNS[i] +
                         "\"><CENTER>(none)</CENTER></TD></TR>");
             else
-                for (int j = 0; j < moduleVectors[i].size(); j++)
-                    out.println(((Module) moduleVectors[i].get(j)
-                            ).getHTMLDescription());
+                for (int j = 0; j < moduleVectors.get(i).size(); j++)
+                    out.println(moduleVectors.get(i).get(j).getHTMLDescription("  "));
             out.println("</TABLE><P></P>");
         }
 
@@ -247,20 +228,19 @@ public class MachineHTMLWriter
         out.println("</TABLE><P></P>");
 
         //print the micros except for End
-        for (int i = 0; i < microVectors.length; i++) {
+        for (int i = 0; i < microVectors.size(); i++) {
             out.println();
             out.println("<TABLE bgcolor=\"#FFC0A0\" BORDER=\"1\"" +
                     " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
             out.println(microHeaders[i]);
             out.println(microColumnHeaders[i]);
-            if (microVectors[i].size() == 0)
+            if (microVectors.get(i).size() == 0)
                 out.println("<TR VALIGN=\"middle\"><TD COLSPAN=\"" +
                         MICRO_COLUMNS[i] +
                         "\"><CENTER>(none)</CENTER></TD></TR>");
             else
-                for (int j = 0; j < microVectors[i].size(); j++)
-                    out.println(((Microinstruction)
-                            microVectors[i].get(j)).getHTMLDescription());
+                for (int j = 0; j < microVectors.get(i).size(); j++)
+                    out.println(microVectors.get(i).get(j).getHTMLDescription("  "));
             out.println("</TABLE><P></P>");
         }
 
@@ -277,9 +257,8 @@ public class MachineHTMLWriter
             out.println("<TR VALIGN=\"middle\"><TD COLSPAN=\"2\">" +
                     "<CENTER>(none)</CENTER></TD></TR>");
         else
-            for (int j = 0; j < EQUs.size(); j++)
-                out.println(((EQU)
-                        EQUs.get(j)).getHTMLDescription());
+            for (cpusim.model.assembler.EQU EQU : EQUs)
+                out.println(EQU.getHTMLDescription());
         out.println("</TABLE><P></P>");
 
         //print the fetch sequence
@@ -318,7 +297,7 @@ public class MachineHTMLWriter
                     "<CENTER>(none)</CENTER></TD></TR>");
         else
             for (Field field : fields)
-                out.println(field.getHTMLDescription());
+                out.println(field.getHTMLDescription("  "));
         out.println("</TABLE><P></P>");
 
         //print the machine instructions
@@ -340,7 +319,7 @@ public class MachineHTMLWriter
         else
             for (MachineInstruction instruction : instructions) {
                 out.println();
-                out.println(instruction.getHTMLDescription());
+                out.println(instruction.getHTMLDescription("  "));
             }
         out.println("</TABLE><P></P>");
 
