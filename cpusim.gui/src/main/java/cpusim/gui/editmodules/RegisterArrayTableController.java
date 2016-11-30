@@ -13,9 +13,11 @@
 package cpusim.gui.editmodules;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
+import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
+import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -23,19 +25,28 @@ import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
@@ -44,31 +55,31 @@ public class RegisterArrayTableController extends ModuleTableController<Register
 
     static final String FX_ID = "registerArraysTab";
 
-    private final TableColumn<RegisterArray,Integer> length;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<RegisterArray,Integer> length;
 
-    private final TableColumn<RegisterArray,Integer> width;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<RegisterArray,Integer> width;
 
+    private final RegistersTableController registersTableController;
     private ConditionBitTableController bitController;
 
     /**
      * Constructor
      * @param mediator holds the machine and information needed
      */
-    RegisterArrayTableController(Mediator mediator){
+    RegisterArrayTableController(Mediator mediator, RegistersTableController registersTableController){
         super(mediator,"RegisterArrayTable.fxml", RegisterArray.class);
 
-        length = new TableColumn<>("Length");
-        width = new TableColumn<>("Width");
-
-        super.loadFXML();
+        this.registersTableController = registersTableController;
     }
 
     @Override
-    public void initializeTable(TableView<RegisterArray> table) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
-        length.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+    public void initializeTable() {
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/40.0));
+        length.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        width.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
 
         Callback<TableColumn<RegisterArray,Integer>,TableCell<RegisterArray,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
@@ -93,18 +104,54 @@ public class RegisterArrayTableController extends ModuleTableController<Register
     }
 
     @Override
-    protected ImmutableList<TableColumn<RegisterArray, ?>> getSubTableColumns() {
-        return ImmutableList.of(name, length, width);
-    }
-    
-    @Override
     protected ControlButtonController<RegisterArray> createControlButtonController() {
-        return new ControlButtonController<RegisterArray>(this, this, true) {
+        return new ModuleControlButtonController<RegisterArray>(this, true) {
             @Override
-            void onPropertiesButtonClick(final ActionEvent e) {
-                super.onPropertiesButtonClick(e);
-                
-                // FIXME
+            protected void onPropertiesButtonClick(final ActionEvent e) {
+                EditArrayRegistersController controller;
+                RegisterArray selectedItem = getSelectionModel().getSelectedItem();
+
+                // FIXME this method is nasty
+                if (selectedItem == null) {
+                    controller = new EditArrayRegistersController(mediator,
+                            RegisterArrayTableController.this.registersTableController,
+                            RegisterArrayTableController.this);
+                }
+                else {
+                    controller = new EditArrayRegistersController(mediator,
+                            RegisterArrayTableController.this.registersTableController,
+                            RegisterArrayTableController.this,
+                            selectedItem.getName());
+                }
+
+                Pane dialogRoot;
+                final FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(controller, "EditRegisters.fxml");
+                try {
+                     dialogRoot = fxmlLoader.load();
+                } catch (IOException ex) {
+                    // should never happen
+                    throw new IllegalStateException("Unable to load file: EditRegisters.fxml", ex);
+                }
+
+                Stage dialogStage = new Stage();
+                Scene dialogScene = new Scene(dialogRoot);
+                dialogStage.setScene(dialogScene);
+                dialogStage.initOwner(RegisterArrayTableController.this.getScene().getWindow());
+                dialogStage.initModality(Modality.WINDOW_MODAL);
+                dialogStage.setTitle("Edit Register Arrays");
+
+                dialogScene.addEventFilter(
+                        KeyEvent.KEY_RELEASED, event -> {
+                            if (event.getCode().equals(KeyCode.ESCAPE)) {
+                                if (dialogStage.isFocused()) {
+                                    dialogStage.close();
+                                }
+                            }
+                        });
+
+                dialogStage.show();
+
+                updateControlButtonStatus();
             }
     
             @Override
@@ -145,7 +192,7 @@ public class RegisterArrayTableController extends ModuleTableController<Register
      * @return the prototype of the subclass
      */
     @Override
-    public RegisterArray getPrototype() {
+    public RegisterArray createInstance() {
         return new RegisterArray("???",4, 32);
     }
 

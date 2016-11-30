@@ -2,13 +2,10 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -16,24 +13,20 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
  * The controller for editing the shift command in the EditMicroDialog
  *
- * @author Jinghui Yu
- * @author Michael Goldenberg
- * @author Ben Borchard
- * @author Kevin Brightwell (Nava2)
- *
  * @since 2013-06-06
  */
-class ShiftTableController extends MicroController<Shift> implements Initializable {
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Shift,String> name;
-    
+class ShiftTableController extends MicroinstructionTableController<Shift> {
+
+    /**
+     * Marker used when building tabs.
+     *
+     * @see #getFxId()
+     */
+    final static String FX_ID = "shiftTab";
+
     @FXML @SuppressWarnings("unused")
     private TableColumn<Shift,Register> source;
     
@@ -55,20 +48,11 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
      */
     ShiftTableController(Mediator mediator){
         super(mediator, "ShiftTable.fxml", Shift.class);
+        loadFXML();
     }
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initializeTable() {
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
        
         final double FACTOR = 100.0/17.0;
@@ -79,9 +63,6 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
         direction.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         distance.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        // TODO cleanup with lambdas and remove wasteful casts
-        Callback<TableColumn<Shift,String>,TableCell<Shift,String>> cellStrFactory =
-                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
         Callback<TableColumn<Shift,String>,TableCell<Shift,String>> cellTypeFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
                         FXCollections.observableArrayList(
@@ -103,7 +84,6 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
                 setStringTableColumn -> new ComboBoxTableCell<>(
                         machine.getAllRegisters());
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
@@ -111,80 +91,47 @@ class ShiftTableController extends MicroController<Shift> implements Initializab
         distance.setCellValueFactory(new PropertyValueFactory<>("distance"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         source.setCellFactory(cellComboFactory);
-        source.setOnEditCommit(
-                text -> text.getRowValue().setSource(
-                        text.getNewValue())
-        );
+        source.setOnEditCommit(text -> text.getRowValue().setSource(text.getNewValue()));
 
         destination.setCellFactory(cellComboFactory);
         destination.setOnEditCommit(text -> text.getRowValue().setDest(text.getNewValue()));
 
         type.setCellFactory(cellTypeFactory);
-        type.setOnEditCommit(
-                text -> text.getRowValue().setType(
-                        text.getNewValue())
-        );
+        type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         direction.setCellFactory(cellDircFactory);
-        direction.setOnEditCommit(
-                text -> text.getRowValue().setDirection(
-                        text.getNewValue())
-        );
+        direction.setOnEditCommit(text -> text.getRowValue().setDirection(text.getNewValue()));
 
         distance.setCellFactory(cellIntFactory);
-        distance.setOnEditCommit(
-                text -> text.getRowValue().setDistance(
-                        text.getNewValue())
-        );
+        distance.setOnEditCommit(text -> text.getRowValue().setDistance(text.getNewValue()));
+    }
+
+    @Override
+    String getFxId() {
+        return FX_ID;
     }
     
     @Override
-    public Shift getPrototype()
-    {
+    public Shift createInstance() {
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new Shift("???", machine, r, r,"logical", "left", 1);
     }
 
-    /**
-     * returns a string about the type of the 
-     * @return a string about the type of the 
-     */
+    @Override
+    public boolean isNewButtonEnabled() {
+        return areRegistersAvailable();
+    }
+
+    @Override
     public String toString()
     {
         return "Shift";
     }
-    
+
     @Override
-    public void updateMachineFromItems()
-    {
-        machine.setMicros(Shift.class, getItems());
-    }
-    
-    @Override
-    public boolean newMicrosAreAllowed()
-    {
-        return (machine.getModule("registers").size() > 0 ||
-                machine.getModule("registerArrays").size() > 0);
-    }
-    
-    @Override
-    public String getHelpPageID()
-    {
+    public String getHelpPageID() {
         return "Shift";
     }
-    
-    @Override
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        
-        super.updateTable();
-    }
-
 }

@@ -1,335 +1,318 @@
-/**
- * auther: Jinghui Yu
- * last edit date: 6/5/2013
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Removed one try catch and allOkay variable and replaced it with a try catch for a validation exception
- */
 package cpusim.gui.editmicroinstruction;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import cpusim.Mediator;
-import cpusim.model.Machine;
+import cpusim.gui.util.ControlButtonController;
+import cpusim.gui.util.DialogButtonController;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.microinstruction.*;
-import cpusim.model.util.ValidationException;
-import cpusim.gui.help.HelpController;
-import cpusim.gui.util.DragTreeCell;
-import cpusim.util.Dialogs;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
+import cpusim.model.util.Copyable;
+import javafx.beans.binding.DoubleBinding;
+import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.input.InputEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
-import java.net.URL;
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class is the controller for the dialog box that is used for
  * editing microinstructions.
+ *
+ * @since 2013-06-05
  */
-public class EditMicroinstructionsController implements Initializable {
+public class EditMicroinstructionsController extends BorderPane implements DialogButtonController.InteractionHandler {
     
-    @FXML
-    private ComboBox<String> microinstructionCombo;
+    @FXML @SuppressWarnings("unused")
+    private TabPane contentPane;
     
-    @FXML
-    private Pane tablePane;
-    
-    @FXML
-    private Button newButton;
-    
-    @FXML
-    private Button deleteButton;
-    
-    @FXML
-    private Button duplicateButton;
-    
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button okButton;
     
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button cancelButton;
     
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button helpButton;
 
-    private Mediator mediator;
+    private final Mediator mediator;
 
-    private Microinstruction selectedSet = null;
-    private MicroController<? extends Microinstruction> activeTable;
-    private ContentChangeListener listener;
-    private DragTreeCell parent;
-    private ImmutableMicroControllerMap typesMap;
-    
+    private final DialogButtonController dialogButtonController;
+
+    // List of all Contollers, it's long and nasty, but has to live somewhere. Try to keep in lexographic order
+    // for maintainability sake.
+    private final ArithmeticTableController arithmeticTableController;
+    private final BranchTableController branchTableController;
+    private final DecodeTableController decodeTableController;
+    private final IncrementTableController incrementTableController;
+    private final IOTableController ioTableController;
+    private final LogicalTableController logicalTableController;
+    private final MemoryAccessTableController memoryAccessTableController;
+    private final SetCondBitTableController setCondBitTableController;
+    private final SetTableController setTableController;
+    private final ShiftTableController shiftTableController;
+    private final TestTableController testTableController;
+    private final TransferAtoRTableController transferAtoRTableController;
+    private final TransferRtoATableController transferRtoATableController;
+    private final TransferRtoRTableController transferRtoRTableController;
+
+    private ImmutableMap<Class<? extends Microinstruction>, MicroinstructionTab<?>> classMicroinstructionTabMap;
+
     public EditMicroinstructionsController(Mediator mediator) {
-        this(mediator, null);
-    }
+        this.mediator = checkNotNull(mediator);
 
-    public EditMicroinstructionsController(Mediator mediator, DragTreeCell parent) {
-        this.mediator = mediator;
-        activeTable = null;
-        listener = new ContentChangeListener();
-        this.parent = parent;
-        typesMap = new ImmutableMicroControllerMap(mediator);
-    }
-    
-    /**
-     * sets the parents frame for each controller.
-     * @param tables the controller to be edited.
-     */
-    public void setParents(Node tables) {
-        for (MicroController microController : typesMap.values()) {
-            microController.setParentFrame(tables);
-        }
+        this.arithmeticTableController = new ArithmeticTableController(mediator);
+        this.branchTableController = new BranchTableController(mediator);
+        this.decodeTableController = new DecodeTableController(mediator);
+        this.incrementTableController = new IncrementTableController(mediator);
+        this.ioTableController = new IOTableController(mediator);
+        this.logicalTableController = new LogicalTableController(mediator);
+        this.memoryAccessTableController = new MemoryAccessTableController(mediator);
+        this.setCondBitTableController = new SetCondBitTableController(mediator);
+        this.setTableController = new SetTableController(mediator);
+        this.shiftTableController = new ShiftTableController(mediator);
+        this.testTableController = new TestTableController(mediator);
+        this.transferAtoRTableController = new TransferAtoRTableController(mediator);
+        this.transferRtoATableController = new TransferRtoATableController(mediator);
+        this.transferRtoRTableController = new TransferRtoRTableController(mediator);
+
+        ImmutableList<MicroinstructionTableController<?>> allControllers = ImmutableList.of(arithmeticTableController,
+                branchTableController,
+                decodeTableController,
+                incrementTableController,
+                ioTableController,
+                logicalTableController,
+                memoryAccessTableController,
+                setCondBitTableController,
+                setTableController,
+                shiftTableController,
+                testTableController,
+                transferAtoRTableController,
+                transferRtoATableController,
+                transferRtoRTableController);
+
+        this.dialogButtonController = new DialogButtonController(mediator, this, allControllers);
     }
     
     /**
      * initializes the dialog window after its root element has been processed.
      * contains a listener to the combo box, so that the content of the table will
      * change according to the selected type of microinstruction.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-
-        microinstructionCombo.setVisibleRowCount(14); // show all micros at once
-
-        setParents(tablePane);
-        tablePane.getChildren().clear();
-        activeTable = typesMap.getController(TransferRtoR.class);
-        tablePane.getChildren().add(activeTable);
-
-        activeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
-        newButton.setDisable(!((MicroController)activeTable).newMicrosAreAllowed());
-
-        activeTable.getSelectionModel().selectedItemProperty().addListener(listener);
-
-        // resizes the width and height of the table to match the dialog
-        tablePane.widthProperty().addListener((observableValue, oldValue, newValue) ->
-                    activeTable.setPrefWidth((Double) newValue)
-        );
-        tablePane.heightProperty().addListener((observableValue, oldValue, newValue) ->
-                    activeTable.setPrefHeight((Double)newValue)
-        );
-
-        // listen for changes to the instruction combo box selection and update
-        // the displayed micro instruction table accordingly.
-        microinstructionCombo.getSelectionModel().selectedItemProperty().addListener(
-                (selected, oldType, newType) -> {
-                    activeTable.getSelectionModel().selectedItemProperty().removeListener(listener);
-                    typesMap.get(oldType).getSelectionModel().clearSelection();
-                    tablePane.getChildren().clear();
-                    tablePane.getChildren().add(typesMap.get(newType));
-
-                    activeTable = typesMap.getController(Machine.getMicroClasses()
-                            .stream().filter(c -> c.getSimpleName().equals(newType))
-                            .findAny().get());
-                    activeTable.setPrefWidth(tablePane.getWidth());
-                    activeTable.setPrefHeight(tablePane.getHeight());
-                    activeTable.setColumnResizePolicy(TableView
-                            .CONSTRAINED_RESIZE_POLICY);
-
-
-                    newButton.setDisable(!((MicroController) activeTable).newMicrosAreAllowed());
-
-                    selectedSet = null;
-                    deleteButton.setDisable(true);
-                    duplicateButton.setDisable(true);
-
-                    activeTable.getSelectionModel().selectedItemProperty().
-                            addListener(listener);
-                });
-
+    @FXML @SuppressWarnings("unused")
+    private void initialize() {
         // Define an event filter for the ComboBox for Mouse_released events
-        EventHandler validityFilter = new EventHandler<InputEvent>() {
-            public void handle(InputEvent event) {
-                try{
-                    ((MicroController<?>)activeTable).checkValidity();
+        final EventHandler<Event> selectionHandler = event -> {
+            // When we change tabs, make sure the current tab is valid. If it fails, we don't change tabs.
+            final MicroinstructionTab<?> source = (MicroinstructionTab<?>)event.getSource();
+            if (source != null && !source.isSelected()) {
+                // This means the source is LEAVING
+                source.getTableController().checkValidity();
+            }
 
-                } catch (ValidationException ex){
-                    Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
-                            "Microinstruction Error", ex.getMessage()).showAndWait();
-
-                    event.consume();
-                }
+            final MicroinstructionTab<?> target = (MicroinstructionTab<?>) event.getTarget();
+            if (target != null && target.isSelected()) {
+                target.onTabSelected();
             }
         };
-        microinstructionCombo.addEventFilter(MouseEvent.MOUSE_RELEASED, validityFilter);
+
+
+        ImmutableMap.Builder<Class<? extends Microinstruction>, MicroinstructionTab<?>> microinstructionTabMapBuilder =
+                ImmutableMap.builder();
+
+        ObservableList<Tab> tabs = contentPane.getTabs();
+        for (int i = 0; i < tabs.size(); ++i) {
+            Tab tab = tabs.get(i);
+
+            MicroinstructionTab<?> newTab;
+
+            // Nasty, nasty switch created by copying the fields and then applying a search/replace
+            // with the following regex:
+            // find: private final (\w+TableController)\s(\w+);
+            // replace: case $1.FX_ID:\nnewTab = new MicroinstructionTab<>(tab.getText(), $2);\nbreak;
+
+            switch (tab.getId()) {
+                case ArithmeticTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), arithmeticTableController);
+                    break;
+
+                case BranchTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), branchTableController);
+                    break;
+
+                case DecodeTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), decodeTableController);
+                    break;
+
+                case IncrementTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), incrementTableController);
+                    break;
+
+                case IOTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), ioTableController);
+                    break;
+
+                case LogicalTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), logicalTableController);
+                    break;
+
+                case MemoryAccessTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), memoryAccessTableController);
+                    break;
+
+                case SetCondBitTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), setCondBitTableController);
+                    break;
+
+                case SetTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), setTableController);
+                    break;
+
+                case ShiftTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), shiftTableController);
+                    break;
+
+                case TestTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), testTableController);
+                    break;
+
+                case TransferAtoRTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), transferAtoRTableController);
+                    break;
+
+                case TransferRtoATableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), transferRtoATableController);
+                    break;
+
+                case TransferRtoRTableController.FX_ID:
+                    newTab = new MicroinstructionTab<>(tab.getText(), transferRtoRTableController);
+                    break;
+
+                default:
+                    throw new IllegalStateException("Unknown tab found: " + tab.getId());
+            }
+
+            newTab.setOnSelectionChanged(selectionHandler);
+
+            tabs.set(i, newTab);
+            microinstructionTabMapBuilder.put(newTab.getTableController().getMicroClass(), newTab);
+        }
+        classMicroinstructionTabMap = microinstructionTabMapBuilder.build();
+
+        // Select the first tab, seems like a good default.
+        contentPane.getSelectionModel().select(0);
+
+        // Set the item bottom of the dialog with the controllers.
+        setBottom(dialogButtonController);
     }
 
     /**
-     * creates a new set instruction when clicking on New button.
-     *
-     * @param e a type of action when a button is clicked.
+     * Given a {@link Microinstruction} instance, this method will cause the correct tab to be shown and the requested
+     * {@link Microinstruction} will be selected in the table by default.
+     * @param micro The instruction that is currently in focus.
      */
-    @FXML
-    protected void onNewButtonClick(ActionEvent e) {
-        activeTable.createNewEntry();
-    }
+    public void showTabForMicroinstruction(final Microinstruction micro) {
+        MicroinstructionTab<?> tab = classMicroinstructionTabMap.get(micro.getClass());
+        if (tab == null) {
+            throw new IllegalArgumentException("Unknown micro passed: " + micro);
+        }
 
-    /**
-     * deletes an existing set instruction when clicking on Delete button.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    public void onDeleteButtonClick(ActionEvent e) {
-        int selected = activeTable.getSelectionModel().getSelectedIndex();
-        activeTable.deleteEntry(selected);
-    }
+        // Select the tab
+        contentPane.getSelectionModel().select(tab);
 
-    /**
-     * duplicates the selected set instruction when clicking on Duplicate button.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    public void onDuplicateButtonClick(ActionEvent e) {
-        //add a new item at the end of the list.
-        activeTable.createDuplicateEntry();
-    }
-
-    /**
-     * save the current changes and close the window when clicking on OK button.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    public void onOKButtonClick(ActionEvent e) {
-        //get the current edited clones
-        try{
-            getCurrentController().checkValidity();
-            //update the machine with the new values
-            updateMachine();
-            //get a handle to the stage.
-            Stage stage = (Stage) okButton.getScene().getWindow();
-            //close window.
-            stage.close();
-
-            if (parent != null)
-                parent.updateDisplay();
-        } catch (ValidationException ex){
-            Dialogs.createErrorDialog(tablePane.getScene().getWindow(),
-                    "Microinstruction Error", ex.getMessage()).showAndWait();
+        // Now, given the controller, find the item in the table and if it exists, show it.
+        MicroinstructionTableController<? extends Microinstruction> ctrl = tab.getTableController();
+        List<? extends Microinstruction> items = ctrl.getItems();
+        final int idx = items.indexOf(micro);
+        if (idx != -1) {
+            ctrl.getSelectionModel().select(idx);
+            ctrl.scrollTo(idx);
         }
     }
 
-    /**
-     * close the window without saving the changes.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    public void onCancelButtonClick(ActionEvent e) {
-        //get a handle to the stage.
-        Stage stage = (Stage) cancelButton.getScene().getWindow();
-        //close window.
-        stage.close();
+    @Override
+    public boolean onOkButtonClick() {
+        return true;
     }
 
-    /**
-     * open a help window when clicking on the help button.
-     *
-     * @param e a type of action when a button is clicked.
-     */
-    @FXML
-    public void onHelpButtonClick(ActionEvent e) {
-    	String startString = ((MicroController)activeTable).getHelpPageID();
-    	if (mediator.getDesktopController().getHelpController() == null) {
-			HelpController helpController = HelpController.openHelpDialog(
-					mediator.getDesktopController(), startString);
-			mediator.getDesktopController().setHelpController(helpController);
-		}
-		else {
-			HelpController hc = mediator.getDesktopController().getHelpController();
-			hc.getStage().toFront();
-			hc.selectTreeItem(startString);
-		}
-    }
-
-    /**
-     * gets the table view object that is current being edited in the window.
-     * @return  the table view object that is current being edited in the window.
-     */
-    public MicroController getCurrentController() {
-        return typesMap.get(Machine.getMicroClassByName(microinstructionCombo.getValue()).get());
-    }
-    
     /**
      * Called whenever the dialog is exited via the 'ok' button
      * and the machine needs to be updated based on the changes
-     * made while the dialog was open (JRL)
+     * made while the dialog was open
      */
-    protected void updateMachine() {
-        for (MicroController<?> controller : typesMap.values()) {
-            controller.updateMachineFromItems();
-        }
+    @Override
+    public void onMachineUpdated() {
         mediator.setMachineDirty(true);
     }
 
-    /**
-     * a listener listening for changes to the table selection and
-     * update the status of buttons.
-     */
-    class ContentChangeListener implements ChangeListener<Microinstruction> {
+    @Override
+    public boolean onHelpButtonClick() {
+        return true;
+    }
 
-        @Override
-        public void changed(ObservableValue<? extends Microinstruction> selected,
-                            Microinstruction oldMicro,
-                            Microinstruction newMicro) {
-            if (newMicro == null) {
-                selectedSet = null;
-                deleteButton.setDisable(true);
-                duplicateButton.setDisable(true);
-            }
-            else {
-                selectedSet = newMicro;
-                deleteButton.setDisable(false);
-                duplicateButton.setDisable(false);
-            }
-        }
+    @Override
+    public boolean onCancelButtonClick() {
+        return true;
     }
 
     /**
-     * selects the section that will be shown
-     * @param microInstr the index of the section in the combo box
+     * Class combining a {@link ControlButtonController} and a {@link MicroinstructionTableController}.
+     * @param <T>
      */
-    public void selectSection(String microInstr) {
-        int index = -1;
-        for (String m : microinstructionCombo.getItems()){
-            if (m.equals(microInstr)){
-                index = microinstructionCombo.getItems().indexOf(m);
-            }
-        }
-        if (index != -1){
-            microinstructionCombo.getSelectionModel().select(index);
+    private class MicroinstructionTab<T extends Microinstruction & Copyable<T>> extends Tab {
+
+        private final ControlButtonController<T> buttonCtrlr;
+
+        private final MicroinstructionTableController<T> tableCtrlr;
+
+        private final VBox layout;
+
+        MicroinstructionTab(final String text, final MicroinstructionTableController<T> tableCtrlr) {
+            super(text);
+            this.tableCtrlr = checkNotNull(tableCtrlr);
+            this.buttonCtrlr = tableCtrlr.createControlButtonController();
+
+            layout = new VBox(12);
+
+            VBox.setVgrow(tableCtrlr, Priority.ALWAYS);
+            layout.getChildren().addAll(tableCtrlr, buttonCtrlr);
+
+            // when added to a TabPane, we set the internal TableView's preferred height to be the size of the
+            // table - the buttonCtrlr preferred height.
+            tabPaneProperty().addListener((observable, oldValue, newValue) -> {
+                final DoubleBinding diffBind = newValue.prefHeightProperty().subtract(buttonCtrlr.prefHeightProperty());
+                tableCtrlr.prefHeightProperty().bind(diffBind);
+            });
+
+            setContent(layout);
         }
 
-    }
+        /**
+         * Getter for {@link #tableCtrlr}.
+         * @return Current controller
+         */
+        MicroinstructionTableController<T> getTableController() {
+            return tableCtrlr;
+        }
 
-    /**
-     * getter of the table shown in the dialog
-     * @return the activetable item
-     */
-    public TableView getActiveTable(){
-        return activeTable;
+        /**
+         * Called when selecting a new tab
+         */
+        void onTabSelected() {
+            tableCtrlr.onTabSelected();
+            buttonCtrlr.updateControlButtonStatus();
+
+            // Tell the DialogButtonController that we have a helpable now.
+            dialogButtonController.setCurrentHelpable(tableCtrlr);
+        }
     }
 }

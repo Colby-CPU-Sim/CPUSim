@@ -11,7 +11,6 @@
  */
 package cpusim.gui.editmodules;
 
-import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.model.module.RAM;
@@ -42,11 +41,6 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      */
     RAMsTableController(Mediator mediator){
         super(mediator, "RamTable.fxml", RAM.class);
-
-        length = new TableColumn<>("Length");
-        cellSize = new TableColumn<>("Cell Size");
-
-        super.loadFXML();
     }
 
     /**
@@ -55,11 +49,11 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      * hit enter to save the changes.
      */
     @Override
-    public void initializeTable(TableView<RAM> table) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/40.0));
-        length.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        cellSize.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
+    public void initializeTable() {
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/40.0));
+        length.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        cellSize.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
 
         Callback<TableColumn<RAM, Integer>, TableCell<RAM, Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
@@ -76,17 +70,12 @@ public class RAMsTableController extends ModuleTableController<RAM> {
         cellSize.setOnEditCommit(text -> text.getRowValue().setCellSize(text.getNewValue()));
     }
 
-    @Override
-    protected ImmutableList<TableColumn<RAM, ?>> getSubTableColumns() {
-        return ImmutableList.of(name, length, cellSize);
-    }
-
     /**
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
     @Override
-    public RAM getPrototype() {
+    public RAM createInstance() {
         return new RAM("???", 128, 8);
     }
 

@@ -20,15 +20,10 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.EditingStrCell;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -36,19 +31,18 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
- * The controller for editing the Test command in the EditMicroDialog.
+ * The controller for editing the {@link Test} command in the {@link EditMicroinstructionsController}.
  */
-class TestTableController
-        extends MicroController<Test> implements Initializable {
-    
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,String> name;
-    
+class TestTableController extends MicroinstructionTableController<Test> {
+
+    /**
+     * Marker used when building tabs.
+     *
+     * @see #getFxId()
+     */
+    final static String FX_ID = "testTab";
+
     @FXML @SuppressWarnings("unused")
     private TableColumn<Test,Register> register;
     
@@ -74,20 +68,11 @@ class TestTableController
      */
     TestTableController(Mediator mediator){
         super(mediator, "TestTable.fxml", Test.class);
+        loadFXML();
     }
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initializeTable() {
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         final double FACTOR = 100/16.0;
@@ -99,8 +84,6 @@ class TestTableController
         value.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         omission.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<Test, String>, TableCell<Test, String>> cellStrFactory =
-                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<Test,Integer>,TableCell<Test,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Test,Long>,TableCell<Test,Long>> cellLongFactory =
@@ -121,7 +104,6 @@ class TestTableController
                         )
                 );
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
         numBits.setCellValueFactory(new PropertyValueFactory<>("numBits"));
@@ -130,82 +112,47 @@ class TestTableController
         omission.setCellValueFactory(new PropertyValueFactory<>("omission"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         register.setCellFactory(cellRegFactory);
-        register.setOnEditCommit(
-                text -> text.getRowValue().setRegister(
-                        text.getNewValue())
-        );
+        register.setOnEditCommit(text -> text.getRowValue().setRegister(text.getNewValue()));
 
         start.setCellFactory(cellIntFactory);
-        start.setOnEditCommit(
-                text -> text.getRowValue().setStart(
-                        text.getNewValue())
-        );
+        start.setOnEditCommit(text -> text.getRowValue().setStart(text.getNewValue()));
 
         numBits.setCellFactory(cellIntFactory);
-        numBits.setOnEditCommit(
-                text -> text.getRowValue().setNumBits(
-                        text.getNewValue())
-        );
+        numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
 
         comparison.setCellFactory(cellCompFactory);
         comparison.setOnEditCommit((text) ->
                 text.getRowValue().setComparison(Test.Operation.valueOf(text.getNewValue())));
 
         value.setCellFactory(cellLongFactory);
-        value.setOnEditCommit(
-                text -> text.getRowValue().setValue(
-                        text.getNewValue())
-        );
+        value.setOnEditCommit(text -> text.getRowValue().setValue(text.getNewValue()));
 
         omission.setCellFactory(cellIntFactory);
-        omission.setOnEditCommit(
-                text -> text.getRowValue().setOmission(
-                        text.getNewValue())
-        );
+        omission.setOnEditCommit(text -> text.getRowValue().setOmission(text.getNewValue()));
     }
 
-    /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
     @Override
-    public Test getPrototype()
-    {
+    String getFxId() {
+        return FX_ID;
+    }
+
+    @Override
+    public Test createInstance() {
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new Test("???", machine, r, 0, 1, "EQ", 0, 0);
     }
-    
-    /**
-     * returns a string about the type of the 
-     * @return a string about the type of the 
-     */
+
+    @Override
+    public boolean isNewButtonEnabled() {
+        return areRegistersAvailable();
+    }
+
     @Override
     public String toString()
     {
         return "Test";
-    }
-
-
-    /**
-     * use clones to replace existing Microinstructions
-     * in the machine, and update the machine to delete
-     * all references to the deleted Microinstructions.
-     */
-    @Override
-    public void updateMachineFromItems()
-    {
-        machine.setMicros(Test.class, getItems());
-    }
-
-    @Override
-    public boolean newMicrosAreAllowed() {
-        return (machine.getModule(Register.class).size() > 0 ||
-                machine.getModule(RegisterArray.class).size() > 0);
     }
 
     /**
@@ -216,17 +163,4 @@ class TestTableController
     {
         return "Test";
     }
-
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        
-        super.updateTable();
-    }
-
 }

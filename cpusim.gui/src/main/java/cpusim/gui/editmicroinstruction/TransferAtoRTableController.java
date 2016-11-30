@@ -19,13 +19,10 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -33,18 +30,21 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.List;
 
 /**
- * The controller for editing the TransferRtoA command in the EditMicroDialog.
+ * The controller for editing the {@link TransferAtoR} command in the {@link EditMicroinstructionsController}.
  */
 class TransferAtoRTableController
-        extends MicroController<TransferAtoR> implements Initializable {
-   
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<TransferAtoR,String> name;
-    
+        extends MicroinstructionTableController<TransferAtoR> {
+
+    /**
+     * Marker used when building tabs.
+     *
+     * @see #getFxId()
+     */
+    final static String FX_ID = "transferAtoRTab";
+
     @FXML @SuppressWarnings("unused")
     private TableColumn<TransferAtoR,RegisterArray> source;
     
@@ -75,20 +75,11 @@ class TransferAtoRTableController
      */
     TransferAtoRTableController(Mediator mediator){
         super(mediator, "TransferAtoRTable.fxml", TransferAtoR.class);
+        loadFXML();
     }
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    void initializeTable() {
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/12.0));
         source.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));
@@ -111,7 +102,6 @@ class TransferAtoRTableController
                 TableCell<TransferAtoR,RegisterArray>> cellRegAFactory =
                     _ignore -> new ComboBoxTableCell<>(machine.getModule(RegisterArray.class));
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
         dest.setCellValueFactory(new PropertyValueFactory<>("dest"));
@@ -122,9 +112,6 @@ class TransferAtoRTableController
         indexNumBits.setCellValueFactory(new PropertyValueFactory<>("indexNumBits"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(_ignore -> new cpusim.gui.util.EditingStrCell<>());
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         source.setCellFactory(cellRegAFactory);
         source.setOnEditCommit(text -> text.getRowValue().setSource(text.getNewValue()));
 
@@ -149,42 +136,24 @@ class TransferAtoRTableController
         indexNumBits.setCellFactory(cellIntFactory);
         indexNumBits.setOnEditCommit(text -> text.getRowValue().setIndexNumBits(text.getNewValue()));
     }
-    
-    /**
-     * returns a string about the type of the 
-     * @return a string about the type of the 
-     */
-    public String toString()
-    {
-        return "TransferAtoR";
-    }
+
     
     @Override
-    public TransferAtoR getPrototype() {
-        RegisterArray a = (machine.getModule("registerArrays").size() == 0 ? null :
-                (RegisterArray) machine.getModule("registerArrays").get(0));
-        Register r = (machine.getAllRegisters().size() == 0 ? null : machine.getAllRegisters().get(0));
+    public TransferAtoR createInstance() {
+        RegisterArray a = (machine.getModule(RegisterArray.class).isEmpty() ? null :
+                machine.getModule(RegisterArray.class).get(0));
+        Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
         return new TransferAtoR("???", machine, a, 0, r, 0, 0, r,0, 0);
     }
-    
-    /**
-     * use clones to replace existing Microinstructions
-     * in the machine, and update the machine to delete
-     * all references to the deleted Microinstructions.
-     */
+
     @Override
-    public void updateMachineFromItems()
-    {
-        machine.setMicros(TransferAtoR.class, getItems());
+    public boolean isNewButtonEnabled() {
+        // Need at least one RegisterArray AND Register
+        return !machine.getModule(RegisterArray.class).isEmpty();
     }
 
-    /**
-     * Check validity of array of Objects' properties.
-     * @param micros an array of Objects to check.
-     */
     @Override
-    public void checkValidity(ObservableList<TransferAtoR> micros)
-    {
+    public void checkValidity(List<TransferAtoR> micros) {
         super.checkValidity(micros);
         
         // convert the array to an array of TransferAtoRs
@@ -193,33 +162,21 @@ class TransferAtoRTableController
         }
     }
 
-    /**
-     * returns true if new micros of this class can be created.
-     */
-    public boolean newMicrosAreAllowed()
-    {
-        return (machine.getModule("registerArrays").size() > 0);
+    @Override
+    String getFxId() {
+        return FX_ID;
     }
 
-    /**
-     * get the ID of the corresponding help page
-     * @return the ID of the page
-     */
+    @Override
+    public String toString()
+    {
+        return "TransferAtoR";
+    }
+
+    @Override
     public String getHelpPageID()
     {
         return "Transfer";
     }
 
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
-    @Override
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        
-        super.updateTable();
-    }
 }

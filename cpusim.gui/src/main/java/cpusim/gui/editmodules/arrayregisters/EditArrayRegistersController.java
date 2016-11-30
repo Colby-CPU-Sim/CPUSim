@@ -40,8 +40,10 @@ import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class EditArrayRegistersController implements Initializable {
+
     @FXML
     private ComboBox<String> arrayCombo;
+
     @FXML
     private Pane tablePane;
     @FXML
@@ -236,6 +238,13 @@ public class EditArrayRegistersController implements Initializable {
 
     }
 
+    /**
+     * Get the table pane associated.
+     * @return
+     */
+    public Pane getTablePane() {
+        return tablePane;
+    }
 
     /**
      * a class that holds the current register array class

@@ -103,7 +103,7 @@ public class Dialogs {
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
-    public static Alert createWariningDialog(Window window, String header, String content) {
+    public static Alert createWarningDialog(Window window, String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.WARNING);
         initializeDialog(dialog, window, header, content);
 

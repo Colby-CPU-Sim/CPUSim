@@ -15,13 +15,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -29,17 +27,18 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-
 /**
- * The controller for editing the Logical command in the EditMicroDialog.
+ * The controller for editing the {@link MemoryAccess} command in the {@link EditMicroinstructionsController}.
  */
-public class MemoryAccessTableController
-        extends MicroController<MemoryAccess> implements Initializable {
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<MemoryAccess,String> name;
+class MemoryAccessTableController
+        extends MicroinstructionTableController<MemoryAccess> {
+
+    /**
+     * Marker used when building tabs.
+     *
+     * @see #getFxId()
+     */
+    final static String FX_ID = "memoryAccessTab";
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<MemoryAccess,String> direction;
@@ -57,23 +56,15 @@ public class MemoryAccessTableController
      * Constructor
      * @param mediator the mediator used to store the machine
      */
-     MemoryAccessTableController(Mediator mediator){
+
+    MemoryAccessTableController(Mediator mediator){
         super(mediator, "MemoryAccessTable.fxml", MemoryAccess.class);
+        loadFXML();
     }
 
 
-    /**
-     * initializes the dialog window after its root element has been processed.
-     * makes all the cells editable and the use can edit the cell directly and
-     * hit enter to save the changes.
-     *
-     * @param url the location used to resolve relative paths for the root
-     *            object, or null if the location is not known.
-     * @param rb  the resources used to localize the root object, or null if the root
-     *            object was not localized.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    void initializeTable() {
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         final double FACTOR = 100.0/20.0;
         name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
@@ -82,8 +73,6 @@ public class MemoryAccessTableController
         data.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         address.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<MemoryAccess,String>,TableCell<MemoryAccess,String>> cellStrFactory =
-                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
         Callback<TableColumn<MemoryAccess,Register>,TableCell<MemoryAccess,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
                         machine.getAllRegisters());
@@ -99,100 +88,51 @@ public class MemoryAccessTableController
                         machine.getAllRAMs()
                 );
 
-        name.setCellValueFactory(new PropertyValueFactory<>("name"));
         direction.setCellValueFactory(new PropertyValueFactory<>("direction"));
         memory.setCellValueFactory(new PropertyValueFactory<>("memory"));
         data.setCellValueFactory(new PropertyValueFactory<>("data"));
         address.setCellValueFactory(new PropertyValueFactory<>("address"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(new NamedColumnHandler<>(this));
-
         direction.setCellFactory(cellDircFactory);
-        direction.setOnEditCommit(
-                text -> text.getRowValue().setDirection(text.getNewValue())
-        );
+        direction.setOnEditCommit(text -> text.getRowValue().setDirection(text.getNewValue()));
 
         memory.setCellFactory(cellRAMFactory);
-        memory.setOnEditCommit(
-                text -> text.getRowValue().setMemory(text.getNewValue())
-        );
+        memory.setOnEditCommit(text -> text.getRowValue().setMemory(text.getNewValue()));
 
         data.setCellFactory(cellRegFactory);
-        data.setOnEditCommit(
-                text -> text.getRowValue().setData(text.getNewValue())
-        );
+        data.setOnEditCommit(text -> text.getRowValue().setData(text.getNewValue()));
 
         address.setCellFactory(cellRegFactory);
-        address.setOnEditCommit(
-                text -> text.getRowValue().setAddress(text.getNewValue())
-        );
-
+        address.setOnEditCommit(text -> text.getRowValue().setAddress(text.getNewValue()));
     }
 
-    /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
     @Override
-    public MemoryAccess getPrototype()
-    {
-        Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        RAM ram = (machine.getModule("rams").size() == 0 ? null :
-                (RAM) machine.getModule("rams").get(0));
+    String getFxId() {
+        return FX_ID;
+    }
+
+    @Override
+    public MemoryAccess createInstance() {
+        Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
+        RAM ram = (machine.getModule(RAM.class).isEmpty() ? null : machine.getModule(RAM.class).get(0));
         return new MemoryAccess("???", machine, "read", ram, r, r);
     }
 
-    /**
-     * returns a string about the type of the 
-     * @return a string about the type of the 
-     */
+    @Override
+    public boolean isNewButtonEnabled() {
+        return areRegistersAvailable() && !machine.getModule(RAM.class).isEmpty();
+    }
+
+    @Override
     public String toString()
     {
         return "MemoryAccess";
     }
 
-    /**
-     * use clones to replace existing Microinstructions
-     * in the machine, and update the machine to delete
-     * all references to the deleted Microinstructions.
-     */
     @Override
-    public void updateMachineFromItems()
-    {
-        machine.setMicros(MemoryAccess.class, getItems());
-    }
-
-    /**
-     * returns true if new micros of this class can be created.
-     */
-    public boolean newMicrosAreAllowed()
-    {
-        return (machine.getModule("registers").size() > 0 ||
-                machine.getModule("registerArrays").size() > 0);
-    }
-
-    /**
-     * get the ID of the corresponding help page
-     * @return the ID of the page
-     */
     public String getHelpPageID()
     {
         return "MemoryAccess";
     }
-
-    /**
-     * updates the table by removing all the items and adding all back.
-     * for refreshing the display.
-     */
-    public void updateTable()
-    {
-        name.setVisible(false);
-        name.setVisible(true);
-        
-        super.updateTable();
-    }
-
 }

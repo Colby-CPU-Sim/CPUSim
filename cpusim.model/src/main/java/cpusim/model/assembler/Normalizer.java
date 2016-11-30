@@ -43,7 +43,7 @@ public class Normalizer
     public Normalizer(Machine machine)
     {
         this.machine = machine;
-        labelHash = new HashMap<Token, Token>();
+        labelHash = new HashMap<>();
 
     }
 

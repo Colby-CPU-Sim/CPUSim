@@ -82,7 +82,6 @@ package cpusim;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;
-import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
@@ -886,7 +885,7 @@ public class Mediator {
         }
 
         if (depth > ram.getLength()) {
-            Dialogs.createWariningDialog(stage, "Warning",
+            Dialogs.createWarningDialog(stage, "Warning",
                     "There is more data being loaded into the ram"
                             + "than the ram has room for.  This means that not all of the information"
                             + "in the file will be loaded into ram").showAndWait();

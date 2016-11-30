@@ -112,15 +112,5 @@ public abstract class Module<T extends Module<T>>
         
         validateState();
     }
-    
-    /**
-     * Simple {@link Comparator} that just checks the {@link #getName()} of {@link Module}.
-     */
-    public static class NameComparator implements Comparator<Module<?>> {
-        @Override
-        public int compare(Module<?> o1, Module<?> o2) {
-            return checkNotNull(o1).getName().compareTo(checkNotNull(o2).getName());
-        }
-    }
 
 } //end of class Module

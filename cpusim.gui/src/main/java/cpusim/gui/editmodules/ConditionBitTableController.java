@@ -11,7 +11,6 @@
  */
 package cpusim.gui.editmodules;
 
-import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.model.module.ConditionBit;
@@ -19,6 +18,7 @@ import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,9 +40,14 @@ public class ConditionBitTableController extends ModuleTableController<Condition
 
     static final String FX_ID = "conditionBitsTab";
 
-    private final TableColumn<ConditionBit,Register> register;
-    private final TableColumn<ConditionBit,Integer> bit;
-    private final TableColumn<ConditionBit,Boolean> halt;
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Register> register;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Integer> bit;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<ConditionBit,Boolean> halt;
 
     private RegistersTableController registerController;
     private RegisterArrayTableController arrayController;
@@ -61,23 +66,17 @@ public class ConditionBitTableController extends ModuleTableController<Condition
         super(mediator, "ConditionBitTable.fxml", ConditionBit.class);
         this.registerController = registerController;
         this.arrayController = arrayController;
-
-        register = new TableColumn<>("Register");
-        bit = new TableColumn<>("Bit");
-        halt = new TableColumn<>("Halt");
-
-        super.loadFXML();
     }
 
 
     @Override
-    public void initializeTable(TableView<ConditionBit> table) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    public void initializeTable() {
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100.0/30.0));
-        register.prefWidthProperty().bind(table.prefWidthProperty().divide(100.0/30.0));
-        bit.prefWidthProperty().bind(table.prefWidthProperty().divide(100.0/20.0));
-        halt.prefWidthProperty().bind(table.prefWidthProperty().divide(100.0/20.0));
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100.0/30.0));
+        register.prefWidthProperty().bind(prefWidthProperty().divide(100.0/30.0));
+        bit.prefWidthProperty().bind(prefWidthProperty().divide(100.0/20.0));
+        halt.prefWidthProperty().bind(prefWidthProperty().divide(100.0/20.0));
 
         Callback<TableColumn<ConditionBit,Integer>,TableCell<ConditionBit,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
@@ -108,11 +107,6 @@ public class ConditionBitTableController extends ModuleTableController<Condition
         halt.setOnEditCommit(text -> text.getRowValue().setHalt(text.getNewValue()));
         
         this.fixItemsToUseClones();
-    }
-
-    @Override
-    protected ImmutableList<TableColumn<ConditionBit, ?>> getSubTableColumns() {
-        return ImmutableList.of(name, register, bit, halt);
     }
 
     @Override
@@ -155,7 +149,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public ConditionBit getPrototype() {
+    public ConditionBit createInstance() {
         ObservableList<Register> registers = registerController.getItems();
         ObservableList<RegisterArray> arrays = arrayController.getItems();
         return new ConditionBit("???", machine,

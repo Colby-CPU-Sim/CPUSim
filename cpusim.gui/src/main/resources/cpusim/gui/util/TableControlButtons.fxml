@@ -2,10 +2,14 @@
 
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
+<?import java.net.URL?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
 <fx:root id="controlsBox" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="40.0" prefHeight="40.0" prefWidth="400.0" spacing="15.0" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <stylesheets>
+      <URL value="@../css/Dialogs.css" />
+   </stylesheets>
    <children>
       <Button fx:id="newButton" disable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onNewButtonClick" text="New" HBox.hgrow="ALWAYS" />
       <Button fx:id="deleteButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onDeleteButtonClick" text="Delete" HBox.hgrow="ALWAYS" />

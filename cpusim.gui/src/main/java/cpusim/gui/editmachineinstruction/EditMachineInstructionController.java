@@ -1,29 +1,3 @@
-/*
- * Ben Borchard
- * 
- * Last Modified 6/4/13s
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) removed the isAbleToClose and checkValidity method
- * 2.) uses the validate method for nameable objects to validate the list before
- * closing instead of the isAbleToClose method
- * 3.) added the ability to dynamically check the validity of the opcodes as the user
- * inputs
- * them by calling two methods in the Validate class after there is a change event on the
- * opcode textField
- * 
- * on 11/25/13
- * 
- * 1.) added the comment microinstruction to the microInstrTreeView on the end
- * 2.) Added the functionality of the comment micro within the implementation format pane
- * by changing drag drop events and double clicking events on labels within the
- * implementation
- * format pane and the implementation format pane itself
- */
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.Mediator;
@@ -72,59 +46,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FXML Controller class
- *
- * @author Ben Borchard
+ * FXML Controller class for modifying {@link MachineInstruction} values.
  */
 public class EditMachineInstructionController {
 
     @FXML
-    private
-    ListView<String> instructionList;
+    private ListView<String> instructionList;
 
     @FXML
-    private
-    TextField opcodeTextField;
+    private TextField opcodeTextField;
 
     @FXML
-    private
-    AnchorPane instructionFormatPane;
-    @FXML
-    private
-    AnchorPane assemblyFormatPane;
-    @FXML
-    private
-    AnchorPane fieldPane;
-    @FXML
-    private
-    BorderPane mainPane;
-    @FXML
-    private
-    AnchorPane implementationFormatPane;
-    @FXML
-    ScrollPane implementationFormatScrollPane;
+    private AnchorPane instructionFormatPane;
 
     @FXML
-    private
-    VBox fieldsList;
+    private AnchorPane assemblyFormatPane;
+
     @FXML
-    private
-    Label lengthLabel;
+    private AnchorPane fieldPane;
+
     @FXML
-    private
-    VBox noFieldsLabel;
+    private BorderPane mainPane;
+
     @FXML
-    private
-    Button newButton;
+    private AnchorPane implementationFormatPane;
+
     @FXML
-    private
-    Button dupButton;
+    private ScrollPane implementationFormatScrollPane;
+
     @FXML
-    private
-    Button deleteButton;
+    private VBox fieldsList;
+
     @FXML
-    private
-    TreeView<String> microInstrTreeView;
+    private Label lengthLabel;
+
+    @FXML
+    private VBox noFieldsLabel;
+
+    @FXML
+    private Button newButton;
+
+    @FXML
+    private Button dupButton;
+
+    @FXML
+    private Button deleteButton;
+
+    @FXML
+    private TreeView<String> microInstrTreeView;
 
     private Mediator mediator;
     private MachineInstruction currentInstr;

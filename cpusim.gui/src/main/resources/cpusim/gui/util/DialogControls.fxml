@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.*?>
+<?import java.lang.*?>
+<?import java.net.URL?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Separator prefWidth="200.0" />
+      <HBox maxWidth="1.7976931348623157E308" prefHeight="30.0" prefWidth="462.0" spacing="15.0" VBox.vgrow="ALWAYS">
+          <stylesheets>
+              <URL value="@../css/Dialogs.css" />
+          </stylesheets>
+          <children>
+            <Button fx:id="helpButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#onHelpButtonClick" styleClass="helpButton" text="?" HBox.hgrow="NEVER" />
+            <Region maxWidth="1.7976931348623157E308" styleClass="helpButton" HBox.hgrow="ALWAYS" />
+            <Button fx:id="okButton" defaultButton="true" maxWidth="1.7976931348623157E308" minHeight="30" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOKButtonClick" prefHeight="30.0" prefWidth="120.0" styleClass="roundBlueButton" text="OK" HBox.hgrow="SOMETIMES" />
+            <Button fx:id="cancelButton" cancelButton="true" maxWidth="1.7976931348623157E308" minHeight="30" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCancelButtonClick" prefHeight="30.0" prefWidth="120.0" styleClass="roundButton" text="Cancel" HBox.hgrow="SOMETIMES" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

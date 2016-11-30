@@ -1,15 +1,3 @@
-/**
- * File: Machine
- * Last update: October 2013
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 12/5/13
- * with the following changes:
- *
- * 1.) Changed execute so it write to the output file when the state reaches the end of
-  * a program
- */
 package cpusim.model;
 
 import com.google.common.collect.ImmutableList;
@@ -53,6 +41,8 @@ import static com.google.common.base.Preconditions.*;
  * of a microinstruction. This property change is used to indicate when to put
  * a new microInstructionStack of HashMaps as an element in the
  * machineInstructionStack.
+ *
+ * @since 2013-10-01
  */
 public class Machine extends Module<Machine> implements Serializable {
 
@@ -861,6 +851,16 @@ public class Machine extends Module<Machine> implements Serializable {
     }
 
 
+    public void visitMicros(final MicroInstructionVisitor visitor) {
+        for (Class<? extends Microinstruction> mc: microMap.keySet()) {
+            switch (visitor.visitCategory(mc.getSimpleName())) {
+
+            }
+
+
+        }
+    }
+
     //--------------------------------
     // called by user when they want to halt execution
     public void setRunMode(RunModes newRunMode) {
@@ -1132,6 +1132,40 @@ public class Machine extends Module<Machine> implements Serializable {
         moduleMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
         microMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
     }
+
+    public interface MicroInstructionVisitor {
+
+        enum VisitResult {
+
+            /**
+             * Stop the traversal
+             */
+            Stop,
+
+            /**
+             * Skip children, but go to siblings
+             */
+            SkipChildren,
+
+            /**
+             * Skip the following siblings, this implies {@link #SkipChildren}.
+             */
+            SkipSiblings,
+
+            /**
+             * Continue with no changes.
+             */
+            Okay
+
+        }
+
+        VisitResult visitCategory(final String category);
+
+        VisitResult visitSubCategory(final String subcategory);
+
+        VisitResult visitMicro(final Microinstruction micro);
+
+    }
     
     /**
      * Type to map between older {@link String} names to {@link Class} instances. This is only for transitioning. Later,
@@ -1226,5 +1260,6 @@ public class Machine extends Module<Machine> implements Serializable {
             return m.moduleType;
         }
     }
+
 
 }

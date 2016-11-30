@@ -27,6 +27,7 @@ package cpusim.gui.editmodules;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
+import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.SetCondBit;
@@ -60,13 +61,13 @@ public class RegistersTableController extends ModuleTableController<Register> {
 
     static final String FX_ID = "registersTab";
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private TableColumn<Register, Integer> width;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private TableColumn<Register, Long> initialValue;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private TableColumn<Register, Boolean> readOnly;
 
     private ConditionBitTableController bitController;
@@ -78,21 +79,15 @@ public class RegistersTableController extends ModuleTableController<Register> {
 
     RegistersTableController(Mediator mediator){
         super(mediator, "RegistersTable.fxml", Register.class);
-
-        width = new TableColumn<>("Width");
-        initialValue = new TableColumn<>("Initial Value");
-        readOnly = new TableColumn<>("Read Only");
-
-        super.loadFXML();
     }
 
     @Override
-    public void initializeTable(TableView<Register> table) {
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        name.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        width.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
-        initialValue.prefWidthProperty().bind(table.prefWidthProperty().divide(100/30.0));
-        readOnly.prefWidthProperty().bind(table.prefWidthProperty().divide(100/20.0));
+    public void initializeTable() {
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        width.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
+        initialValue.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
+        readOnly.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
 
         Callback<TableColumn<Register,Integer>,TableCell<Register,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
@@ -116,15 +111,10 @@ public class RegistersTableController extends ModuleTableController<Register> {
         readOnly.setCellFactory(cellBooleanFactory);
         readOnly.setOnEditCommit(text -> text.getRowValue().setReadOnly(text.getNewValue()));
     }
-
-    @Override
-    protected ImmutableList<TableColumn<Register, ?>> getSubTableColumns() {
-        return ImmutableList.of(name, width, initialValue, readOnly);
-    }
     
     @Override
     protected ControlButtonController<Register> createControlButtonController() {
-        return new ControlButtonController<Register>(this, this, false) {
+        return new ModuleControlButtonController<Register>(this, false) {
             @Override
             protected boolean checkDelete(final Register toDelete) {
                 boolean shouldDelete = super.checkDelete(toDelete);
@@ -177,7 +167,7 @@ public class RegistersTableController extends ModuleTableController<Register> {
      * @return the prototype of the subclass
      */
     @Override
-    public Register getPrototype() {
+    public Register createInstance() {
         return new Register("???", 16, 0, false);
     }
 
