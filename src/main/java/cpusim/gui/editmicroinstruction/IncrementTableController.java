@@ -72,13 +72,13 @@ public class IncrementTableController
         this.prototype = new Increment("???", machine, r, NO_CONDITIONBIT, NO_CONDITIONBIT, Long.valueOf(1));
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "incrementTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "IncrementTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: incrementTable.fxml";
+            assert false : "Unable to load file: IncrementTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

@@ -69,13 +69,13 @@ public class SetCondBitTableController
         this.prototype = new SetCondBit("???", machine, cBit, "0");
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "setCondBitTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "SetCondBitTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: setCondBitTable.fxml";
+            assert false : "Unable to load file: SetCondBitTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

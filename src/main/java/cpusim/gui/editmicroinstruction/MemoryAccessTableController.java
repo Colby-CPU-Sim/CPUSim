@@ -70,13 +70,13 @@ public class MemoryAccessTableController
         this.prototype = new MemoryAccess("???", machine, "read", ram, r, r);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "memoryAccessTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "MemoryAccessTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: memoryAcessTable.fxml";
+            assert false : "Unable to load file: MemoryAccessTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

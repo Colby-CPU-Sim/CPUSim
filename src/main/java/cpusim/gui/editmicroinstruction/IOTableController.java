@@ -68,13 +68,13 @@ public class IOTableController
         this.prototype = new IO("???", machine, "integer", r, "input");
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ioTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "IOTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: ioTable.fxml";
+            assert false : "Unable to load file: IOTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

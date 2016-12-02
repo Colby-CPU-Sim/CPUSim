@@ -65,8 +65,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
 
         parentFrame = null;
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
-                "tables.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Tables.fxml"));
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
 
@@ -74,7 +73,7 @@ public class RegisterArrayTableView extends TableView implements Initializable {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: tables.fxml";
+            assert false : "Unable to load file: Tables.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

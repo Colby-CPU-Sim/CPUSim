@@ -79,13 +79,13 @@ public class RegistersTableController
         this.prototype = new Register("???", 16, 0, false);
         clones = (Module[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "registersTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RegistersTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: registersTable.fxml";
+            assert false : "Unable to load file: RegistersTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

@@ -50,13 +50,14 @@ public class GUIMain extends Application {
 		DesktopController deskController = new DesktopController(mediator, stage);
 		Pane mainPane = null;
 
-		FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(deskController, "desktop.fxml");
+		FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(deskController,
+                "Desktop.fxml");
 
         try {
             mainPane = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-           throw new IllegalStateException("Unable to load file: desktop.fxml", e);
+           throw new IllegalStateException("Unable to load file: Desktop.fxml", e);
         }
         Scene mainScene = new Scene(mainPane);
         stage.setScene(mainScene);
