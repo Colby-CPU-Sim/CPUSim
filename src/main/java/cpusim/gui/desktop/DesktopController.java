@@ -659,9 +659,9 @@ public class DesktopController implements Initializable
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
-                    "Machine", "The machine you are currently working on is unsaved.  "
-                    + "Would you like to save it before you open a new machine?");
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save Machine",
+                    "The machine you are currently working on is unsaved.  "
+                        + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
@@ -686,7 +686,7 @@ public class DesktopController implements Initializable
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
 
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "Machine", "The machine you are currently working on is unsaved.  "
                     + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -1462,7 +1462,7 @@ public class DesktopController implements Initializable
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "File", "Would you like to save your work before you close this " +
                     "tab?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -2619,10 +2619,9 @@ public class DesktopController implements Initializable
             menuItem.setMnemonicParsing(false);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
-                    Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage,
-                            "Save Machine", "The machine you are currently working on " +
-                            "is unsaved.  " + "Would you like to save it before" +
-                            " you open a new machine?");
+                    Alert dialog = Dialogs.createConfirmationDialog(stage, "Save Machine",
+                            "The machine you are currently working on is unsaved.  "
+                                    + "Would you like to save it before you open a new machine?");
                     dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
                             buttonTypeCancel);
                     Optional<ButtonType> result = dialog.showAndWait();
@@ -3058,7 +3057,7 @@ public class DesktopController implements Initializable
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Running "
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Running "
                     + "Program", "There is a program running. " +
                     "Closing the application will also quit the program. " +
                     "Do you want to quit the running program?");
@@ -3069,7 +3068,7 @@ public class DesktopController implements Initializable
             }
         }
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "Machine", "The machine you are currently working on is unsaved.  "
                     + "Would you like to save it before you close?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -3083,10 +3082,10 @@ public class DesktopController implements Initializable
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
-                        "" + "Text", "Would you like to save your work before you " +
-                        "close" +
-                        " " + tab.getText().substring(1) + "?");
+                Alert dialog = Dialogs.createConfirmationDialog(stage,
+                        "Save Text",
+                        "Would you like to save your work before you close" +
+                            " " + tab.getText().substring(1) + "?");
                 dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
                         buttonTypeCancel);
                 Optional<ButtonType> result = dialog.showAndWait();
