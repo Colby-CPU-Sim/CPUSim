@@ -3,15 +3,18 @@ package cpusim.gui.editmachineinstruction;
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.help.HelpController;
-import cpusim.gui.util.DragTreeCell;
+import cpusim.gui.util.MicroinstructionTreeView;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertLongs;
@@ -19,27 +22,31 @@ import cpusim.util.Dialogs;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +58,7 @@ import java.util.List;
 public class EditMachineInstructionController {
 
     @FXML
-    private ListView<String> instructionList;
+    private ListView<MachineInstruction> instructionList;
 
     @FXML
     private TextField opcodeTextField;
@@ -67,12 +74,6 @@ public class EditMachineInstructionController {
 
     @FXML
     private BorderPane mainPane;
-
-    @FXML
-    private AnchorPane implementationFormatPane;
-
-    @FXML
-    private ScrollPane implementationFormatScrollPane;
 
     @FXML
     private VBox fieldsList;
@@ -92,8 +93,14 @@ public class EditMachineInstructionController {
     @FXML
     private Button deleteButton;
 
-    @FXML
-    private TreeView<String> microInstrTreeView;
+    @FXML @SuppressWarnings("unused")
+    private HBox implHBox;
+    
+    @FXML @SuppressWarnings("unused")
+    private Region microinstTreeViewRegion;
+    
+    private final MachineInstructionImplTableController instImplTableController;
+    private final MicroinstructionTreeView microinstTreeView;
 
     private Mediator mediator;
     private MachineInstruction currentInstr;
@@ -102,7 +109,6 @@ public class EditMachineInstructionController {
     private Pane originPane;
     private Microinstruction currentCommentMicro;
     private TextField commentEditor;
-    private List<MachineInstruction> instructions;
     private ObservableList<Field> allFields;
     private boolean dragging;
     private boolean dropped;
@@ -110,32 +116,41 @@ public class EditMachineInstructionController {
 
     private int draggingIndex;
     private int currInstrIndex;
-    private ObservableList<String> instrNames;
     private ObservableList<String> fieldNames;
 
     public EditMachineInstructionController(Mediator mediator) {
         this.mediator = mediator;
         currentInstr = null;
         dragging = false;
+    
+        microinstTreeView = new MicroinstructionTreeView(mediator.getMachine());
+        instImplTableController = new MachineInstructionImplTableController(mediator.getMachine());
     }
 
     /**
      * Initializes the controller class.
      */
+    @FXML
     public void initialize() {
 
         //initialize fields
         currInstrIndex = -1;
 
-        instrNames = FXCollections.observableArrayList();
-
         fieldNames = FXCollections.observableArrayList();
+    
+        {
+            // Setup the view into the hbox
+            ObservableList<Node> children = implHBox.getChildren();
+            final int idx = children.indexOf(microinstTreeViewRegion);
+            children.set(idx, microinstTreeView);
+            HBox.setHgrow(microinstTreeView, Priority.ALWAYS);
+            
+            microinstTreeView.setMinHeight(500);
+        }
 
         initializeInstructionsAndFields();
 
         initializeInstructionList();
-
-        setUpMicroTreeView();
 
         initializeOpcodeTextField();
 
@@ -151,12 +166,14 @@ public class EditMachineInstructionController {
             updateInstructionDisplay();
             updateAssemblyDisplay();
         });
+        
+        
 
-        microInstrTreeView.setOnMousePressed(t -> {
-            if (commentEditor != null) {
-                commitCommentEdit();
-            }
-        });
+//        microInstrTreeView.setOnMousePressed(t -> {
+//            if (commentEditor != null) {
+//                commitCommentEdit();
+//            }
+//        });
 
         // set up listeners for the panes for drag & drop
         initializeInstructionFormatPane();
@@ -174,7 +191,7 @@ public class EditMachineInstructionController {
                 Validate.stringIsLegalBinHexOrDecNumber(newValue);
                 long newOpcode = Convert.fromAnyBaseStringToLong(newValue);
                 currentInstr.setOpcode(newOpcode);
-                Validate.instructionsOpcodeIsValid(instructions, currentInstr);
+                Validate.instructionsOpcodeIsValid(instructionList.getItems(), currentInstr);
                 opcodeTextField.setStyle("-fx-border-width:1;" +
                         "-fx-background-color:white; -fx-border-color:black; " +
                         "-fx-border-style:solid;");
@@ -198,11 +215,11 @@ public class EditMachineInstructionController {
      * Initializes drag events for the instructionFormatPane.
      */
     private void initializeInstructionFormatPane() {
-        implementationFormatPane.setOnMousePressed(t -> {
-            if (commentEditor != null) {
-                commitCommentEdit();
-            }
-        });
+//        implementationFormatPane.setOnMousePressed(t -> {
+//            if (commentEditor != null) {
+//                commitCommentEdit();
+//            }
+//        });
 
         instructionFormatPane.setOnDragOver(event -> {
             if (currentInstr != null && !originPane.equals(assemblyFormatPane) &&
@@ -339,53 +356,13 @@ public class EditMachineInstructionController {
      * Initializes drag events for the implementationFormatPane.
      */
     private void initializeImplementationFormatPane() {
-        implementationFormatPane.setOnDragOver(event -> {
-            if (currentInstr != null) {
-                event.acceptTransferModes(TransferMode.COPY);
-                double localY = implementationFormatPane.sceneToLocal(event
-                        .getSceneX(), event.getSceneY()).getY();
-                int index = getMicroinstrIndex(localY);
-                moveMicrosToMakeRoom(index);
-            }
-        });
-        implementationFormatPane.setOnDragDropped(event -> {
-            /* data dropped */
-            /* if there is a string data on dragboard, read it and use it */
-            if (currentInstr != null) {
-                Dragboard db = event.getDragboard();
-                int lastComma = db.getString().lastIndexOf(",");
-                String microName = db.getString().substring(0, lastComma);
-                String className = db.getString().substring(lastComma + 1);
-                Microinstruction micro = null;
-
-                for (Class<? extends Microinstruction> mc : Machine.getMicroClasses()) {
-                    for (Microinstruction instr : mediator.getMachine().getMicros(mc)) {
-                        if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
-                            micro = instr;
-                        }
-                    }
-                }
-                
-                if (className.equals("comment")) {
-                    // we want Comment micros used in only one place so create a new one
-                    micro = new Comment();
-                    micro.setName(microName);
-                }
-                double localY = implementationFormatPane.sceneToLocal(event
-                        .getSceneX(), event.getSceneY()).getY();
-                int index = getMicroinstrIndex(localY);
-
-                currentInstr.getMicros().add(index, micro);
-
-            }
-        });
-        implementationFormatPane.setOnDragExited(event -> {
-            if (currentInstr != null) {
-                updateMicros();
-            }
-        });
+        
     }
 
+    public List<MachineInstruction> getInstructions() {
+        return instructionList.getItems();
+    }
+    
     /**
      * Takes the real fields and instructions and makes copies of them that will be
      * manipulated in this dialog.  These copies will be made real if the okay button
@@ -393,9 +370,6 @@ public class EditMachineInstructionController {
      * the machine.
      */
     private void initializeInstructionsAndFields() {
-        List<MachineInstruction> realInstructions = mediator.getMachine()
-                .getInstructions();
-        instructions = new ArrayList<>();
 
         List<Field> realAllFields = mediator.getMachine().getFields();
         allFields = FXCollections.observableArrayList();
@@ -404,54 +378,55 @@ public class EditMachineInstructionController {
             allFields.add(new Field(field));
         }
 
-        for (MachineInstruction instr : realInstructions) {
-
-            List<Field> oldInstrFields = instr.getInstructionFields();
-            List<Field> newInstrFields = new ArrayList<>();
-            for (Field oldField : oldInstrFields) {
-                for (Field newField : allFields) {
-                    if (oldField.getName().equals(newField.getName())) {
-                        newInstrFields.add(newField);
-                    }
-                }
-            }
-
-            List<Field> oldAssemblyFields = instr.getAssemblyFields();
-            List<Field> newAssemblyFields = new ArrayList<>();
-            for (Field oldField : oldAssemblyFields) {
-                for (Field newField : allFields) {
-                    if (oldField.getName().equals(newField.getName())) {
-                        newAssemblyFields.add(newField);
-                    }
-                }
-            }
-
-            List<String> oldInstrColors = instr.getInstructionColors();
-            List<String> newInstrColors = new ArrayList<>();
-            for (String colors : oldInstrColors) {
-                newInstrColors.add(colors);
-            }
-
-            List<String> oldAssemblyColors = instr.getAssemblyColors();
-            List<String> newAssemblyColors = new ArrayList<>();
-            for (String colors : oldAssemblyColors) {
-                newAssemblyColors.add(colors);
-            }
-
-            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
-                    instr.getOpcode(),
-                    newInstrFields, newAssemblyFields, newInstrColors, newAssemblyColors,
-                    mediator.getMachine());
-
-            ObservableList<Microinstruction> newMicros = FXCollections.observableArrayList(new ArrayList<>());
-            ObservableList<Microinstruction> oldMicros = instr.getMicros();
-            for (Microinstruction micro : oldMicros) {
-                newMicros.add(micro);
-            }
-            instrToAdd.setMicros(newMicros);
-
-            instructions.add(instrToAdd);
-        }
+        ObservableList<MachineInstruction> insViewItems = instructionList.getItems();
+        insViewItems.clear();
+        getMachine().getInstructions().stream().map(Copyable::cloneOf).forEach(insViewItems::add);
+        
+        // FIXME Isn't this just cloning the array?
+//        for (MachineInstruction instr : instructions) {
+//
+//            List<Field> oldInstrFields = instr.getInstructionFields();
+//            List<Field> newInstrFields = new ArrayList<>();
+//            for (Field oldField : oldInstrFields) {
+//                for (Field newField : allFields) {
+//                    if (oldField.getName().equals(newField.getName())) {
+//                        newInstrFields.add(newField);
+//                    }
+//                }
+//            }
+//
+//            List<Field> oldAssemblyFields = instr.getAssemblyFields();
+//            List<Field> newAssemblyFields = new ArrayList<>();
+//            for (Field oldField : oldAssemblyFields) {
+//                for (Field newField : allFields) {
+//                    if (oldField.getName().equals(newField.getName())) {
+//                        newAssemblyFields.add(newField);
+//                    }
+//                }
+//            }
+//
+//            List<String> oldInstrColors = instr.getInstructionColors();
+//            List<String> newInstrColors = new ArrayList<>();
+//            for (String colors : oldInstrColors) {
+//                newInstrColors.add(colors);
+//            }
+//
+//            List<String> oldAssemblyColors = instr.getAssemblyColors();
+//            List<String> newAssemblyColors = new ArrayList<>();
+//            for (String colors : oldAssemblyColors) {
+//                newAssemblyColors.add(colors);
+//            }
+//
+//            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
+//                    IdentifiedObject.generateRandomID(), mediator.getMachine(), newAssemblyFields, newInstrColors, newAssemblyColors, instr.getOpcode(), newInstrFields
+//            );
+//
+//            ObservableList<Microinstruction<?>> newMicros = FXCollections.observableArrayList(new ArrayList<>());
+//            newMicros.setAll(instr.getMicros());
+//            instrToAdd.setMicros(newMicros);
+//
+//            instructions.add(instrToAdd);
+//        }
     }
 
     /**
@@ -459,16 +434,19 @@ public class EditMachineInstructionController {
      * and giving it a change listener
      */
     private void initializeInstructionList() {
-
-        instructionList.setItems(instrNames);
-
-        for (MachineInstruction instr : instructions) {
-            instrNames.add(instr.getName());
-        }
-
-        Callback<ListView<String>, ListCell<String>> cellStrFactory =
-                list -> new cpusim.gui.util.EditingStrListCell();
-        instructionList.setCellFactory(cellStrFactory);
+        instructionList.setCellFactory(list ->
+                new ListCell<MachineInstruction>() {
+                    @Override
+                    protected void updateItem(final MachineInstruction item, final boolean empty) {
+                        super.updateItem(item, empty);
+                
+                        if (empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.getName());
+                        }
+                    }
+                });
 
         instructionList.getSelectionModel().selectedIndexProperty().addListener(
                 (ov, value, new_value) -> {
@@ -480,10 +458,8 @@ public class EditMachineInstructionController {
 
                     currInstrIndex = new_value.intValue();
 
-                    updateInstrNames();
-
-                    if (!instructions.isEmpty() && new_value.intValue() != -1) {
-                        currentInstr = instructions.get(new_value.intValue());
+                    if (!instructionList.getItems().isEmpty() && new_value.intValue() != -1) {
+                        currentInstr = instructionList.getItems().get(new_value.intValue());
 
                         int numOpcodeBits;
                         if (currentInstr.getOpcode() != 0) {
@@ -551,14 +527,13 @@ public class EditMachineInstructionController {
     @FXML
     protected void handleNewInstruction(ActionEvent ae) {
         int opcode = getUniqueOpcode();
-        String uniqueName = createUniqueName(instructionList.getItems(), "?");
-        instructions.add(0, new MachineInstruction(uniqueName, opcode, new
-                ArrayList<>(),
+        String uniqueName = NamedObject.createUniqueName(instructionList.getItems(), "?");
+        instructionList.getItems().add(0, new MachineInstruction(uniqueName, IdentifiedObject.generateRandomID(),
+                mediator.getMachine(),
                 new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-                mediator.getMachine()));
-        instrNames.add(0, uniqueName);
-        //instructionList.scrollTo(0);
-        //instructionList.getSelectionModel().selectFirst();
+                opcode, new ArrayList<>()));
+        instructionList.scrollTo(0);
+        instructionList.getSelectionModel().selectFirst();
     }
 
     /**
@@ -569,12 +544,8 @@ public class EditMachineInstructionController {
     @FXML
     protected void handleDuplicateInstruction(ActionEvent ae) {
         int opcode = getUniqueOpcode();
-        String newName = currentInstr.getName() + "copy";
-        int i = 2;
-        while (instrNames.contains(newName)) {
-            newName = currentInstr.getName() + "copy" + i;
-            i++;
-        }
+        String newName = NamedObject.createUniqueDuplicatedName(instructionList.getItems(), currentInstr);
+        
         ArrayList<Field> instrFieldsCopy = new ArrayList<>();
         for (Field micro : currentInstr.getInstructionFields()) {
             instrFieldsCopy.add(micro);
@@ -592,24 +563,23 @@ public class EditMachineInstructionController {
             assembColorCopy.add(micro);
         }
 
-        MachineInstruction newMI = new MachineInstruction(newName, opcode,
-                instrFieldsCopy, assembFieldsCopy,
-                instrColorCopy, assembColorCopy, currentInstr.getMachine());
-        ObservableList<Microinstruction> microCopies = FXCollections
-                .observableArrayList();
-        for (Microinstruction micro : currentInstr.getMicros()) {
+        MachineInstruction newMI = new MachineInstruction(newName, IdentifiedObject.generateRandomID(),
+                currentInstr.getMachine(), assembFieldsCopy,
+                instrColorCopy, assembColorCopy,
+                opcode, instrFieldsCopy);
+        
+        ObservableList<Microinstruction<?>> microCopies = FXCollections.observableArrayList();
+        for (Microinstruction<?> micro : currentInstr.getMicros()) {
             if( micro instanceof Comment) {
                 // create a clone of it since we want each Comment used only one place
-                String contents = micro.getName();
-                micro = new Comment();
-                micro.setName(contents);
+                micro = new Comment((Comment)micro);
             }
             microCopies.add(micro);
         }
         newMI.setMicros(microCopies);
-        instructions.add(0, newMI);
+        
+        instructionList.getItems().add(0, newMI);
         instructionList.scrollTo(0);
-        instrNames.add(0, newName);
         instructionList.getSelectionModel().select(0);
     }
 
@@ -620,16 +590,16 @@ public class EditMachineInstructionController {
      */
     @FXML
     protected void handleDeleteInstruction(ActionEvent ae) {
-        int indx = instrNames.indexOf(currentInstr.getName());
-        instructions.remove(currentInstr);
-        instrNames.remove(currentInstr.getName());
+        int indx = instructionList.getSelectionModel().getSelectedIndex();
+        instructionList.getItems().remove(indx);
+        
         if (indx != 0) {
             instructionList.getSelectionModel().select(indx - 1);
         } else {
             instructionList.getSelectionModel().select(indx + 1);
             instructionList.getSelectionModel().select(indx);
-            if (instructions.size() != 0) {
-                currentInstr = instructions.get(indx);
+            if (!instructionList.getItems().isEmpty()) {
+                currentInstr = instructionList.getItems().get(indx);
             } else {
                 currentInstr = null;
                 dupButton.setDisable(true);
@@ -662,13 +632,12 @@ public class EditMachineInstructionController {
      */
     @FXML
     protected void handleOkay(ActionEvent ae) {
-        updateInstrNames();
         try {
-            Validate.machineInstructions(instructions, mediator.getMachine());
+            Validate.machineInstructions(instructionList.getItems(), mediator.getMachine());
             if (commentEditor != null) {
                 commitCommentEdit();
             }
-            mediator.getMachine().setInstructions(instructions);
+            mediator.getMachine().setInstructions(instructionList.getItems());
             mediator.getMachine().setFields(allFields);
             mediator.setMachineDirty(true);
             ((Stage) newButton.getScene().getWindow()).close();
@@ -1083,110 +1052,110 @@ public class EditMachineInstructionController {
             return;
         }
 
-        implementationFormatPane.getChildren().clear();
-        int newLabelHeight = 30;
-        int nextYPosition = 0;
-        for (final Microinstruction micro : currentInstr.getMicros()) {
-            final Label microLabel = new Label(micro.getName());
-            boolean commentLabel = false;
-            if (micro instanceof Comment){
-                microLabel.setStyle("-fx-font-family:Monaco; -fx-text-fill:gray; " +
-                        "-fx-font-style:italic;");
-                commentLabel = true;
-            }
-            else {
-                microLabel.setStyle("-fx-font-family:Courier;");
-            }
-            // The following line is commented out because it somehow causes the
-            // scroll pane's width to increase sometimes when dragging micros
-            //microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
-            microLabel.setPrefHeight(newLabelHeight);
-            microLabel.setLayoutY(nextYPosition);
-            microLabel.setTooltip(new Tooltip(micro.getMicroClass()));
-
-            //handles what happens when the label begins to get dragged
-            microLabel.setOnDragDetected(event -> {
-
-                //This is to make sure no error is thrown when the drag is detected
-                //while still editing the text of a comment
-                if (implementationFormatPane.getChildren().contains(microLabel)) {
-                    /* drag was detected, start a drag-and-drop gesture*/
-                    /* allow any transfer mode */
-                    Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
-
-                    // remove the micro at the current index
-                    currentInstr.getMicros().remove(
-                            implementationFormatPane.getChildren().indexOf(microLabel));
-                    updateMicros();
-
-                    ClipboardContent content = new ClipboardContent();
-                    content.putString(microLabel.getText() + "," + microLabel
-                            .getTooltip().getText());
-                    db.setContent(content);
-
-                    event.consume();
-                }
-            });
-
-            //determines what happens when the label is doubleClicked
-            if (!commentLabel) {
-                microLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent mouseEvent) {
-                        if (mouseEvent.getButton().equals(MouseButton.PRIMARY) &&
-                                mouseEvent.getClickCount() == 2) {
-                            ObservableList<TreeItem<String>> list = microInstrTreeView.getRoot().getChildren();
-
-                            for (TreeItem<String> t : list) {
-                                if (t.getValue().equals(micro.getMicroClass())) {
-                                    t.setExpanded(true);
-                                    microInstrTreeView.scrollTo(list.indexOf(t));
-                                    ObservableList<TreeItem<String>> nodes = t
-                                            .getChildren();
-
-                                    for (TreeItem<String> tt : nodes) {
-                                        if (tt.getValue().equals(micro.getName())) {
-                                            microInstrTreeView.getSelectionModel().select(
-                                                    list.indexOf(t) + nodes.indexOf(tt)
-                                                            + 2);
-                                        }
-                                    }
-                                } else {
-                                    t.setExpanded(false);
-                                }
-                            }
-                        }
-                    }
-                });
-            } else {
-                microLabel.setOnMouseClicked(mouseEvent -> {
-                    if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
-                            && mouseEvent.getClickCount() == 2) {
-                        commentEditor = new TextField(microLabel.getText());
-                        commentEditor.setStyle("-fx-font-family:Courier;-fx-font-size:14");
-                        commentEditor.setPrefWidth(implementationFormatPane
-                                .getWidth());
-                        commentEditor.setOnKeyPressed(t -> {
-                            if (t.getCode() == KeyCode.ENTER) {
-                                commitCommentEdit();
-                            }
-                        });
-                        int index = implementationFormatPane.getChildren().indexOf
-                                (microLabel);
-                        microLabel.setVisible(false);
-                        implementationFormatPane.getChildren().add(index,
-                                commentEditor);
-                        commentEditor.setPrefHeight(newLabelHeight);
-                        commentEditor.setLayoutY(index * newLabelHeight);
-                        currentCommentMicro = micro;
-                    }
-                });
-            }
-
-
-            nextYPosition += newLabelHeight;
-            implementationFormatPane.getChildren().add(microLabel);
-        }
+//        implementationFormatPane.getChildren().clear();
+//        int newLabelHeight = 30;
+//        int nextYPosition = 0;
+//        for (final Microinstruction<?> micro : currentInstr.getMicros()) {
+//            final Label microLabel = new Label(micro.getName());
+//            boolean commentLabel = false;
+//            if (Comment.class.isAssignableFrom(micro.getClass())) {
+//                microLabel.setStyle("-fx-font-family:Monaco; -fx-text-fill:gray; " +
+//                        "-fx-font-style:italic;");
+//                commentLabel = true;
+//            }
+//            else {
+//                microLabel.setStyle("-fx-font-family:Courier;");
+//            }
+//
+//            // The following line is commented out because it somehow causes the
+//            // scroll pane's width to increase sometimes when dragging micros
+//            //microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
+//            microLabel.setPrefHeight(newLabelHeight);
+//            microLabel.setLayoutY(nextYPosition);
+//            microLabel.setTooltip(new Tooltip(micro.getClass().getSimpleName()));
+//
+//            //handles what happens when the label begins to get dragged
+//            microLabel.setOnDragDetected(event -> {
+//
+//                //This is to make sure no error is thrown when the drag is detected
+//                //while still editing the text of a comment
+//                if (implementationFormatPane.getChildren().contains(microLabel)) {
+//                    /* drag was detected, start a drag-and-drop gesture*/
+//                    /* allow any transfer mode */
+//                    Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
+//
+//                    // remove the micro at the current index
+//                    currentInstr.getMicros().remove(
+//                            implementationFormatPane.getChildren().indexOf(microLabel));
+//                    updateMicros();
+//
+//                    ClipboardContent content = new ClipboardContent();
+//                    content.putString(microLabel.getText() + "," + microLabel.getTooltip().getText());
+//                    db.setContent(content);
+//
+//                    event.consume();
+//                }
+//            });
+//
+//            //determines what happens when the label is doubleClicked
+//            if (!commentLabel) {
+//                // FIXME KB
+////                microLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+////                    @Override
+////                    public void handle(MouseEvent mouseEvent) {
+////                        if (mouseEvent.getButton().equals(MouseButton.PRIMARY) &&
+////                                mouseEvent.getClickCount() == 2) {
+////                            ObservableList<TreeItem<String>> list = microInstrTreeView.getRoot().getChildren();
+////
+////                            for (TreeItem<String> t : list) {
+////                                if (t.getValue().equals(micro.getMicroClass())) {
+////                                    t.setExpanded(true);
+////                                    microInstrTreeView.scrollTo(list.indexOf(t));
+////                                    ObservableList<TreeItem<String>> nodes = t.getChildren();
+////
+////                                    for (TreeItem<String> tt : nodes) {
+////                                        if (tt.getValue().equals(micro.getName())) {
+////                                            microInstrTreeView.getSelectionModel().select(
+////                                                    list.indexOf(t) + nodes.indexOf(tt)
+////                                                            + 2);
+////                                        }
+////                                    }
+////                                } else {
+////                                    t.setExpanded(false);
+////                                }
+////                            }
+////                        }
+////                    }
+////                });
+//            } else {
+//                microLabel.setOnMouseClicked(mouseEvent -> {
+//                    if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
+//                            && mouseEvent.getClickCount() == 2) {
+//                        commentEditor = new TextField(microLabel.getText());
+//                        commentEditor.setStyle("-fx-font-family:Courier;-fx-font-size:14");
+//                        commentEditor.setPrefWidth(implementationFormatPane
+//                                .getWidth());
+//                        commentEditor.setOnKeyPressed(t -> {
+//                            if (t.getCode() == KeyCode.ENTER) {
+//                                commitCommentEdit();
+//                            }
+//                        });
+//                        int index = implementationFormatPane.getChildren().indexOf
+//                                (microLabel);
+//                        microLabel.setVisible(false);
+//                        implementationFormatPane.getChildren().add(index,
+//                                commentEditor);
+//                        commentEditor.setPrefHeight(newLabelHeight);
+//                        commentEditor.setLayoutY(index * newLabelHeight);
+//                        currentCommentMicro = micro;
+//                    }
+//                });
+//            }
+//
+//
+//            nextYPosition += newLabelHeight;
+//            implementationFormatPane.getChildren().add(microLabel);
+//        }
     }
 
     /**
@@ -1209,102 +1178,54 @@ public class EditMachineInstructionController {
         updateFieldNames();
     }
 
-    /**
-     * updates the observable list containing the names of the instructions (this updates
-     * the list view for the instructions)
-     */
-    private void updateInstrNames() {
-        int i = 0;
-        for (MachineInstruction instr : instructions) {
-            instr.setName(instrNames.get(i));
-            i++;
-        }
-    }
+//    /**
+//     * returns the index at which the micro being dragged would be inserted into the
+//     * currently selected instruction's micros if it were dropped
+//     *
+//     * @param localY the y position of the mouse from the perspective of the
+//     *               implementation format pane
+//     * @return the index at which the micro being dragged would be inserted into the
+//     * currently selected instruction's micros if it were dropped
+//     */
+//    private int getMicroinstrIndex(double localY) {
+//        List<Double> cutOffLocs = new ArrayList<>();
+//        cutOffLocs.add(0.0);
+//        for (Node instr : implementationFormatPane.getChildren()) {
+//            Label label = (Label) instr;
+//            cutOffLocs.add(label.getLayoutY() + .5 * label.getPrefHeight());
+//        }
+//        cutOffLocs.add(implementationFormatPane.getHeight());
+//        int index = 0;
+//        for (int i = 0; i < cutOffLocs.size() - 1; i++) {
+//            if (localY >= cutOffLocs.get(i) && localY < cutOffLocs.get(i + 1)) {
+//                index = i;
+//            }
+//        }
+//        return index;
+//    }
 
-    /**
-     * looks at all the micros in the tree and creates a tree view appropriately
-     */
-    public void setUpMicroTreeView() {
-
-        TreeItem<String> rootNode = new TreeItem<>("MicroInstructions");
-
-        microInstrTreeView.setCellFactory(param ->
-                new DragTreeCell(mediator,
-                        (Stage) implementationFormatPane.getScene().getWindow(),
-                        microInstrTreeView, EditMachineInstructionController.this.getClasses()));
-
-        rootNode.setExpanded(true);
-
-        for (Class<? extends Microinstruction> microClass : Machine.getMicroClasses()) {
-            TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
-            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass)) {
-                final TreeItem<String> microNode = new TreeItem<>(micro.getName());
-                classNode.getChildren().add(microNode);
-            }
-            rootNode.getChildren().add(classNode);
-        }
-
-        microInstrTreeView.setRoot(rootNode);
-
-    }
-
-    /**
-     * returns the index at which the micro being dragged would be inserted into the
-     * currently selected instruction's micros if it were dropped
-     *
-     * @param localY the y position of the mouse from the perspective of the
-     *               implementation format pane
-     * @return the index at which the micro being dragged would be inserted into the
-     * currently selected instruction's micros if it were dropped
-     */
-    private int getMicroinstrIndex(double localY) {
-        List<Double> cutOffLocs = new ArrayList<>();
-        cutOffLocs.add(0.0);
-        for (Node instr : implementationFormatPane.getChildren()) {
-            Label label = (Label) instr;
-            cutOffLocs.add(label.getLayoutY() + .5 * label.getPrefHeight());
-        }
-        cutOffLocs.add(implementationFormatPane.getHeight());
-        int index = 0;
-        for (int i = 0; i < cutOffLocs.size() - 1; i++) {
-            if (localY >= cutOffLocs.get(i) && localY < cutOffLocs.get(i + 1)) {
-                index = i;
-            }
-        }
-        return index;
-    }
-
-    /**
-     * updates the display of the implementation format pane by moving the
-     * other micros away from the given index
-     * at which the micro would be inserted if dropped
-     *
-     * @param index index at which the micro would be inserted if dropped
-     */
-    private void moveMicrosToMakeRoom(int index) {
-        int i = 0;
-//        currentInstr.getMicros().clear();
-//        currentInstr.getMicros().add(index, new Branch("",0,new ControlUnit("",
-// mediator.getMachine())));
-        updateMicros();
-        for (Node instr : implementationFormatPane.getChildren()) {
-            Label label = (Label) instr;
-            if (i >= index) {
-                label.setPrefHeight(3*label.getPrefHeight());
-            }
-            i++;
-        }
-
-    }
-
-    /**
-     * returns the instructions as they have been modified so far
-     *
-     * @return the instructions as they have been modified so far
-     */
-    public List<MachineInstruction> getInstructions() {
-        return instructions;
-    }
+//    /**
+//     * updates the display of the implementation format pane by moving the
+//     * other micros away from the given index
+//     * at which the micro would be inserted if dropped
+//     *
+//     * @param index index at which the micro would be inserted if dropped
+//     */
+//    private void moveMicrosToMakeRoom(int index) {
+//        int i = 0;
+////        currentInstr.getMicros().clear();
+////        currentInstr.getMicros().add(index, new Branch("",0,new ControlUnit("",
+//// mediator.getMachine())));
+//        updateMicros();
+//        for (Node instr : implementationFormatPane.getChildren()) {
+//            Label label = (Label) instr;
+//            if (i >= index) { // FIXME use a bind is this is actually needed..
+//                label.setPrefHeight(3*label.getPrefHeight());
+//            }
+//            i++;
+//        }
+//
+//    }
 
     /**
      * returns the machine
@@ -1313,44 +1234,6 @@ public class EditMachineInstructionController {
      */
     public Machine getMachine() {
         return mediator.getMachine();
-    }
-
-    /**
-     * sets the instructions as they have been changed so far and updates the displays
-     * appropriately
-     *
-     * @param instructions the instructions as they have been changed so far
-     */
-    public void setInstructions(List<MachineInstruction> instructions) {
-        this.instructions = instructions;
-        if (currentInstr != null) {
-            if (currInstrIndex != -1) {
-                currentInstr = this.instructions.get(currInstrIndex);
-            }
-            updateInstructionDisplay();
-            updateAssemblyDisplay();
-        }
-    }
-
-    /**
-     * returns a String that is different from all names of
-     * existing objects in the given list.  It checks whether proposedName
-     * is unique and if so, it returns it.  Otherwise, it
-     * proposes a new name of proposedName + "?" and tries again.
-     *
-     * @param list         list of existing objects
-     * @param proposedName a given proposed name
-     * @return the unique name
-     */
-    private String createUniqueName(ObservableList list, String proposedName) {
-        String oldName;
-        for (Object obj : list) {
-            oldName = obj.toString();
-            if (oldName != null && oldName.equals(proposedName)) {
-                return createUniqueName(list, proposedName + "?");
-            }
-        }
-        return proposedName;
     }
 
     /**
@@ -1363,7 +1246,7 @@ public class EditMachineInstructionController {
         int opcode = 0;
         while (true) {
             boolean opcodeTaken = false;
-            for (MachineInstruction instr : instructions) {
+            for (MachineInstruction instr : instructionList.getItems()) {
                 if (instr.getOpcode() == opcode) {
                     opcodeTaken = true;
                     break;
@@ -1384,9 +1267,5 @@ public class EditMachineInstructionController {
         currentCommentMicro.setName(commentEditor.getText());
         updateMicros();
         commentEditor = null;
-    }
-
-    private EditMachineInstructionController getClasses() {
-        return this;
     }
 }

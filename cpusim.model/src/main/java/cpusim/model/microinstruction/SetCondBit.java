@@ -1,26 +1,25 @@
-/**
- * Author: Jinghui Yu
- * Last editing date: 6/6/2013
- */
-
 package cpusim.model.microinstruction;
 
 import com.google.common.base.Strings;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
- * The branch microinstruction is identical to the Test microinstruction except
- * that it is an unconditional jump.
+ * Sets the value of a {@link ConditionBit} when called.
+ *
+ * @since 2013-06-06
  */
-public class SetCondBit extends Microinstruction implements Copyable<SetCondBit> {
+public class SetCondBit extends Microinstruction<SetCondBit> {
+    
     private SimpleStringProperty value;
     private SimpleObjectProperty<ConditionBit> bit;
 
@@ -33,10 +32,31 @@ public class SetCondBit extends Microinstruction implements Copyable<SetCondBit>
      * @param bit set the conditional bit.
      * @param value size of the relative jump.
      */
-    public SetCondBit(String name, Machine machine, ConditionBit bit, String value){
-        super(name, machine);
+    public SetCondBit(String name, UUID id, Machine machine, ConditionBit bit, String value){
+        super(name, id, machine);
         this.value = new SimpleStringProperty(value);
         this.bit = new SimpleObjectProperty<>(bit);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Branch object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param bit set the conditional bit.
+     * @param value size of the relative jump.
+     */
+    public SetCondBit(String name, Machine machine, ConditionBit bit, String value){
+        this(name, IdentifiedObject.generateRandomID(), machine, bit, value);
+    }
+    
+    /**
+     * Copy constructor
+     * @param other
+     */
+    public SetCondBit(SetCondBit other) {
+        this(other.getName(), other.machine, other.getBit(), other.getValue());
     }
 
     /**
@@ -75,15 +95,6 @@ public class SetCondBit extends Microinstruction implements Copyable<SetCondBit>
         value.set(newValue);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "setCondBit";
-    }
-
     /**
      * execute the micro instruction from machine
      */

@@ -23,6 +23,8 @@ class ModuleControlButtonController<T extends Module<T>> extends ControlButtonCo
                                   final boolean hasExtendedProperties) {
         super(hasExtendedProperties, moduleController);
         this.moduleController = moduleController;
+    
+        loadFXML();
     }
 
     @Override

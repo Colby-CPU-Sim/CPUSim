@@ -3,20 +3,20 @@ package cpusim.model.microinstruction;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.util.List;
+import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
  * NOR, or XOR on the specified registers.
  */
-public class Logical extends Microinstruction implements Copyable<Logical> {
+public class Logical extends Microinstruction<Logical> {
 	
 	// FIXME replace type with Enum
 	
@@ -27,7 +27,7 @@ public class Logical extends Microinstruction implements Copyable<Logical> {
 
     /**
      * Constructor
-     * creates a new Increment object with input values.
+     * creates a new {@link Logical} object with input values.
      *
      * @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
@@ -41,7 +41,29 @@ public class Logical extends Microinstruction implements Copyable<Logical> {
                    Register source1,
                    Register source2,
                    Register destination){
-        super(name, machine);
+        this(name, IdentifiedObject.generateRandomID(), machine, type, source1, source2, destination);
+    }
+    
+    /**
+     * Constructor
+     * creates a new {@link Logical} object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param id Unique ID of instruction
+     * @param machine the machine that the microinstruction belongs to.
+     * @param type type of logical microinstruction.
+     * @param source1 the source1 register.
+     * @param source2 the source2 register.
+     * @param destination the destination register.
+     */
+    public Logical(String name,
+                   UUID id,
+                   Machine machine,
+                   String type,
+                   Register source1,
+                   Register source2,
+                   Register destination){
+        super(name, id, machine);
         this.type = new SimpleStringProperty(type);
         this.source1 = new SimpleObjectProperty<>(source1);
         this.source2 = new SimpleObjectProperty<>(source2);
@@ -110,15 +132,6 @@ public class Logical extends Microinstruction implements Copyable<Logical> {
      */
     public void setType(String newType){
         type.set(newType);
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "logical";
     }
     
     @Override

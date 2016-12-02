@@ -21,9 +21,11 @@ import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -46,7 +48,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
@@ -72,6 +74,8 @@ public class RegisterArrayTableController extends ModuleTableController<Register
         super(mediator,"RegisterArrayTable.fxml", RegisterArray.class);
 
         this.registersTableController = registersTableController;
+    
+        loadFXML();
     }
 
     @Override
@@ -193,7 +197,8 @@ public class RegisterArrayTableController extends ModuleTableController<Register
      */
     @Override
     public RegisterArray createInstance() {
-        return new RegisterArray("???",4, 32);
+        return new RegisterArray("???", IdentifiedObject.generateRandomID(), machine,
+                4, 32, FXCollections.observableArrayList());
     }
 
     /**

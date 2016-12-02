@@ -1,30 +1,26 @@
-/**
- * auther: Jinghui Yu
- * last editing date: 6/5/2013
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import cpusim.xml.HTMLEncodable;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
 /**
  * The Set microinstruction allows the computer to set the contents
  * of any contiguous set of bits in any register to any fixed value.
+ *
+ * @since 2013-06-07
  */
-public class CpusimSet extends Microinstruction implements LegacyXMLSupported, NamedObject, HTMLEncodable, Copyable<CpusimSet> {
+public class CpusimSet extends Microinstruction<CpusimSet> {
 
     private SimpleObjectProperty<Register> register;
     private SimpleIntegerProperty start;
@@ -47,7 +43,34 @@ public class CpusimSet extends Microinstruction implements LegacyXMLSupported, N
                      int start,
                      int numBits,
                      long value){
-		super(name, machine);
+		this(name,
+                IdentifiedObject.generateRandomID(),
+                machine,
+                register,
+                start,
+                numBits,
+                value);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Set object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param register the register whose bits are to be set.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param start the leftmost or rightmost bit of the register that is to be set.
+     * @param numBits the number of consecutive bits in the register to be set.
+     * @param value the base-10 value to which the bits are to be set.
+     */
+    public CpusimSet(String name,
+                     UUID id,
+                     Machine machine,
+                     Register register,
+                     int start,
+                     int numBits,
+                     long value){
+        super(name, id, machine);
         
         this.register = new SimpleObjectProperty<>(register);
         this.start = new SimpleIntegerProperty(start);
@@ -58,7 +81,7 @@ public class CpusimSet extends Microinstruction implements LegacyXMLSupported, N
     
     /**
      * Copy constructor
-     * @param other
+     * @param other Implementation to copy from.
      * 
      * @throws NullPointerException if <code>other</code> is <code>null</code>
      */
@@ -132,15 +155,6 @@ public class CpusimSet extends Microinstruction implements LegacyXMLSupported, N
         value.set(newValue);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "set";
-    }
-
     /**
      * execute the micro instruction from machine
      */

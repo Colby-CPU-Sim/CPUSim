@@ -6,22 +6,23 @@ import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
 /**
  * The arithmetic microinstruction use three registers and optionally two condition
- * bits.
+ * bits performing arithmetic operations (e.g. add, subtract).
  *
  * @since 2013-06-06
  */
-public class Arithmetic extends Microinstruction implements Copyable<Arithmetic> {
+public class Arithmetic extends Microinstruction<Arithmetic> {
     
     private SimpleStringProperty type;
     private SimpleObjectProperty<Register> source1;
@@ -48,13 +49,57 @@ public class Arithmetic extends Microinstruction implements Copyable<Arithmetic>
                    Register destination,
                    ConditionBit overflowBit,
                    ConditionBit carryBit){
-        super(name, machine);
+        this(name, IdentifiedObject.generateRandomID(),
+                machine, type,
+                source1, source2,
+                destination, overflowBit,
+                carryBit);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param id UUID for the microinstruction
+     * @param machine machine that the microinstruction belongs to.
+     * @param type type of logical microinstruction.
+     * @param source1 the source1 register.
+     * @param source2 the source2 register.
+     * @param destination the destination register.
+     */
+    public Arithmetic(String name,
+                      UUID id,
+                      Machine machine,
+                      String type,
+                      Register source1,
+                      Register source2,
+                      Register destination,
+                      ConditionBit overflowBit,
+                      ConditionBit carryBit){
+        super(name, id, machine);
         this.type = new SimpleStringProperty(type);
         this.source1 = new SimpleObjectProperty<>(source1);
         this.source2 = new SimpleObjectProperty<>(source2);
         this.destination = new SimpleObjectProperty<>(destination);
         this.overflowBit = new SimpleObjectProperty<>(overflowBit);
         this.carryBit = new SimpleObjectProperty<>(carryBit);
+    }
+    
+    /**
+     * Copy constructor.
+     *
+     * @param other Copied from.
+     */
+    public Arithmetic(Arithmetic other) {
+        this(other.getName(),
+                other.machine,
+                other.getType(),
+                other.getSource1(),
+                other.getSource2(),
+                other.getDestination(),
+                other.getOverflowBit(),
+                other.getCarryBit());
     }
 
     /**
@@ -201,15 +246,6 @@ public class Arithmetic extends Microinstruction implements Copyable<Arithmetic>
         //save the result
         long longResult = result.longValue();
         destination.get().setValue((longResult << (64 - width)) >> (64 - width));
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass() {
-        return "arithmetic";
     }
     
     @Override

@@ -20,8 +20,10 @@
 package cpusim.model.module;
 
 import cpusim.model.ExecutionException;
+import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.util.LoadException;
 import cpusim.util.SourceLine;
@@ -31,6 +33,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -57,23 +60,13 @@ public class RAM extends Module<RAM>
     /**
      * Constructor
      * @param name name of the ram
-     * @param length a positive base-10 integer that specifies the number
-     *               of cells in the RAM.
-     */
-    public RAM(String name, int length) {
-        this(name, length, 5);
-    }
-
-    /**
-     * Constructor
-     * @param name name of the ram
      * @param length a positive integer that specifies the number
      *               of cells in the RAM.
      * @param cellSize the number of bits per cell. This must be a positive
      *                 integer up to 64.
      */
-    public RAM(String name, int length, int cellSize) {
-        super(name);
+    public RAM(String name, UUID id, Machine machine, int length, int cellSize) {
+        super(name, id, machine);
         this.cellSize = new SimpleIntegerProperty(cellSize);
         this.length = new SimpleIntegerProperty(length);
         this.data = FXCollections.observableArrayList();
@@ -83,9 +76,23 @@ public class RAM extends Module<RAM>
         }
         this.haltAtBreaks = false; //can only fromRootController RAM when not in debug mode
         cellMask = 0;
-        for (int i = 0; i < cellSize; i++)
+        for (int i = 0; i < cellSize; i++) {
             cellMask = (cellMask << 1) + 1;
+        }
     }
+    
+    /**
+     * Constructor
+     * @param name name of the ram
+     * @param length a positive integer that specifies the number
+     *               of cells in the RAM.
+     * @param cellSize the number of bits per cell. This must be a positive
+     *                 integer up to 64.
+     */
+    public RAM(String name, Machine machine, int length, int cellSize) {
+        this(name, IdentifiedObject.generateRandomID(), machine, length, cellSize);
+    }
+    
 
     //------------------------
     // utility methods
@@ -402,18 +409,6 @@ public class RAM extends Module<RAM>
                 cellIndex += instrLength - instrIndex;
             }
         }
-    }
-
-
-
-    /**
-     * clone the whole object
-     * @return a clone of this object
-     * 
-     * @deprecated Use {@link #copyTo(RAM)} instead.
-     */
-    public Object clone() {
-        return new RAM(getName(), data.size(), cellSize.get());
     }
 
     /**

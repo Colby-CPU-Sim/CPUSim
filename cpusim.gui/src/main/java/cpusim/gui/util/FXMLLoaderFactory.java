@@ -1,12 +1,12 @@
 package cpusim.gui.util;
 
+import com.google.common.base.Strings;
 import javafx.fxml.FXMLLoader;
 
 import java.net.URL;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.*;
-import com.google.common.base.Strings;
 
 /**
  * Factory for loading new instances of FXML files into an {@link javafx.fxml.FXMLLoader}.
@@ -52,15 +52,31 @@ public abstract class FXMLLoaderFactory {
      * @throws NullPointerException if the root is {@code null}
      */
     public static FXMLLoader fromRootController(Object controller, String name) {
+        return fromRootController(controller, controller.getClass(), name);
+    }
+    
+    /**
+     * Creates a new {@link FXMLLoader} instance. Setting
+     * {@link FXMLLoader#setRoot(Object)} and {@link FXMLLoader#setController(Object)}.
+     * @param controller The root for the new loader
+     * @param clazz The class/package where the fxml file lives.
+     * @param name The name of the fxml file, it must be located in the same package as the
+     *             root controller passed in is (as described by {@link Class#getPackage})
+     * @return new FXMLLoader instance
+     *
+     * @throws IllegalStateException if the resource is not found
+     * @throws NullPointerException if the root is {@code null}
+     */
+    public static <T> FXMLLoader fromRootController(T controller, Class<? extends T> clazz, String name) {
         checkNotNull(controller);
         checkArgument(!Strings.isNullOrEmpty(name));
-
-        final FXMLLoader loader = fromController(controller, name);
+        
+        final FXMLLoader loader = fromController(controller, clazz, name);
         loader.setRoot(controller);
-
+        
         return loader;
     }
-
+    
     /**
      * Creates a new {@link FXMLLoader} instance. Sets
      * {@link FXMLLoader#setController(Object)} to the passed controller.
@@ -74,19 +90,35 @@ public abstract class FXMLLoaderFactory {
      * @throws NullPointerException if the root is {@code null}
      */
     public static FXMLLoader fromController(final Object controller, final String name) {
+        return fromController(controller, controller.getClass(), name);
+    }
+    
+    /**
+     * Creates a new {@link FXMLLoader} instance. Sets
+     * {@link FXMLLoader#setController(Object)} to the passed controller.
+     *
+     * @param controller The root for the new loader
+     * @param name The name of the fxml file, it must be located in the same package as the
+     *             root controller passed in is (as described by {@link Class#getPackage})
+     * @return new FXMLLoader instance
+     *
+     * @throws IllegalStateException if the resource is not found
+     * @throws NullPointerException if the root is {@code null}
+     */
+    public static <T> FXMLLoader fromController(final T controller, final Class<? extends T> clazz, final String name) {
         checkNotNull(controller, "root == null");
         checkArgument(!Strings.isNullOrEmpty(name));
-
-        final Optional<URL> uri = getURL(controller.getClass(), name);
-
+        
+        final Optional<URL> uri = getURL(clazz, name);
+        
         if (!uri.isPresent()) {
             throw new IllegalStateException("Could not load resource for root. " +
                     "{ root = " + controller + ", name = " + name + " }");
         }
-
+        
         final FXMLLoader loader = new FXMLLoader(uri.get());
         loader.setController(controller);
-
+        
         return loader;
     }
 

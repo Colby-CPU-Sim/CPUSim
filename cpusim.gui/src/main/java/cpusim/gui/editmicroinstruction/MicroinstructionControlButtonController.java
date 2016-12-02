@@ -5,7 +5,6 @@ import cpusim.gui.editmodules.EditModulesController;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.Copyable;
 import cpusim.util.Dialogs;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,7 +16,7 @@ import java.util.Optional;
  * Implementation of {@link ControlButtonController} for the {@link EditModulesController} window.
  * @param <T>
  */
-class MicroinstructionControlButtonController<T extends Microinstruction & Copyable<T>>
+class MicroinstructionControlButtonController<T extends Microinstruction<T>>
         extends ControlButtonController<T> {
 
     private final MicroinstructionTableController<T> microinsController;
@@ -25,6 +24,8 @@ class MicroinstructionControlButtonController<T extends Microinstruction & Copya
     MicroinstructionControlButtonController(MicroinstructionTableController<T> microinsController) {
         super(false, microinsController);
         this.microinsController = microinsController;
+    
+        loadFXML();
     }
 
     @Override

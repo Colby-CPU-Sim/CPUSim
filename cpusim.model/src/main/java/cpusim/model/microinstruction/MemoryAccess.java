@@ -4,17 +4,20 @@ import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.*;
 
 /**
- * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
- * NOR, or XOR on the specified registers.
+ * Reads data from a {@link RAM} location and places it into a {@link Register}.
+ *
+ * @since 2015-02-12
  */
-public class MemoryAccess extends Microinstruction implements Copyable<MemoryAccess> {
+public class MemoryAccess extends Microinstruction<MemoryAccess> {
 	
     private SimpleStringProperty direction;
     private SimpleObjectProperty<RAM> memory;
@@ -27,6 +30,33 @@ public class MemoryAccess extends Microinstruction implements Copyable<MemoryAcc
      * creates a new Increment object with input values.
      *
      * @param name name of the microinstruction.
+     * @param id Unique ID for microinstruction
+     * @param machine the machine that the microinstruction belongs to.
+     * @param direction type of logical microinstruction.
+     * @param memory the RAM memory.
+     * @param data the register storing the data.
+     * @param address the register storing the address.
+     */
+    public MemoryAccess(String name,
+                        UUID id,
+                        Machine machine,
+                        String direction,
+                        RAM memory,
+                        Register data,
+                        Register address){
+        super(name, id, machine);
+        this.direction = new SimpleStringProperty(direction);
+        this.memory = new SimpleObjectProperty<>(memory);
+        this.data = new SimpleObjectProperty<>(data);
+        this.address = new SimpleObjectProperty<>(address);
+    }
+    
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
      * @param direction type of logical microinstruction.
      * @param memory the RAM memory.
@@ -34,17 +64,23 @@ public class MemoryAccess extends Microinstruction implements Copyable<MemoryAcc
      * @param address the register storing the address.
      */
     public MemoryAccess(String name, Machine machine,
-              String direction,
-              RAM memory,
-              Register data,
-              Register address){
-        super(name, machine);
-        this.direction = new SimpleStringProperty(direction);
-        this.memory = new SimpleObjectProperty<>(memory);
-        this.data = new SimpleObjectProperty<>(data);
-        this.address = new SimpleObjectProperty<>(address);
+                        String direction,
+                        RAM memory,
+                        Register data,
+                        Register address){
+        this(name, IdentifiedObject.generateRandomID(), machine, direction, memory, data, address);
     }
-
+    
+    /**
+     * Copy constructor
+     * @param other instance to copy
+     */
+    public MemoryAccess(MemoryAccess other) {
+        this(other.getName(), other.machine,
+                other.getDirection(), other.getMemory(),
+                other.getData(), other.getAddress());
+    }
+    
     /**
      * returns the register to be calculated.
      * @return the name of the register.
@@ -109,15 +145,6 @@ public class MemoryAccess extends Microinstruction implements Copyable<MemoryAcc
         direction.set(newDirection);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "memoryAccess";
-    }
-
     /**
      * execute the micro instruction from machine
      */

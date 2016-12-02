@@ -1,27 +1,8 @@
-/*
- * Ben Borchard
- * 
- * Last Modified 6/4/13s
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Removed the isAbleToClose and checkValidity method
- * 2.) Removed the validation of names upon closing becuase we now do that dynamically
- * 3.) Changed the onEditCommit for the name tableColumn so that it dynamically checks 
- * the validity of the name the user gives.  It will change the invalid name to the old
- * name as soon the user enters
- * 4.) Added an updateTable method so that to allow for dynamic validity checking of the
- * name tableColumn
- */
-
-
 package cpusim.gui.editmachineinstruction.editfields;
 
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
@@ -54,7 +35,9 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * @author Ben Borchard
+ * Dialog for adding/editing fields
+ *
+ * @since 2013-06/04
  */
 public class EditFieldsController implements Initializable {
 
@@ -107,9 +90,8 @@ public class EditFieldsController implements Initializable {
             for (FieldValue fieldValue : realFieldValues){
                 fieldValues.add(new FieldValue(fieldValue.getName(), fieldValue.getValue()));
             }
-            allFields.add(new Field(field.getName(), field.getType(), field.getNumBits(),
-                    field.getRelativity(), fieldValues, field.getDefaultValue(), 
-                    field.getSigned()));
+            allFields.add(new Field(field.getName(), IdentifiedObject.generateRandomID(), field.getNumBits(), field.getRelativity(), fieldValues, field.getDefaultValue(), field.getSigned(), field.getType()
+            ));
         }
 
         // clone the machine instructions using the cloned fields
@@ -135,9 +117,8 @@ public class EditFieldsController implements Initializable {
                 }
             }
             
-            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(), instr.getOpcode(),
-                newInstrFields, newAssemblyFields, instr.getInstructionColors(), instr.getAssemblyColors(),
-                    editMachineInstructionController.getMachine());
+            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(), IdentifiedObject.generateRandomID(), editMachineInstructionController.getMachine(), newAssemblyFields, instr.getInstructionColors(), instr.getAssemblyColors(), instr.getOpcode(), newInstrFields
+            );
             
             instrToAdd.setMicros(instr.getMicros());
             
@@ -276,7 +257,7 @@ public class EditFieldsController implements Initializable {
     @FXML
     protected void handleNew(ActionEvent ae){
         String uniqueName = createUniqueName(table.getItems(), "?");
-        Field newField = new Field(uniqueName);
+        Field newField = new Field(uniqueName, IdentifiedObject.generateRandomID());
         allFields.add(0, newField);
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
@@ -397,7 +378,8 @@ public class EditFieldsController implements Initializable {
         }
         
         editMachineInstructionController.setFields(allFields);
-        editMachineInstructionController.setInstructions(instructions);
+        // FIXME KB
+//        editMachineInstructionController.setInstructions(instructions);
         stage.close();
     }
 

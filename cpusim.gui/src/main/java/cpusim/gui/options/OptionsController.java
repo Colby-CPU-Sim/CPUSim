@@ -29,8 +29,6 @@ package cpusim.gui.options;
 import cpusim.Mediator;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.EditingStrCell;
-import cpusim.model.Machine;
-import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
@@ -51,7 +49,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
@@ -64,13 +61,11 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
-public class OptionsController implements Initializable {
+public class OptionsController {
 
     @FXML
     private BorderPane mainBorderPane;
@@ -171,12 +166,9 @@ public class OptionsController implements Initializable {
 
     /**
      * Initializes the options window.
-     *
-     * @param arg0 Standard URL
-     * @param arg1 Standard ResourceBundle
      */
-    @Override
-    public void initialize(URL arg0, ResourceBundle arg1) {
+    @FXML
+    public void initialize() {
         initializeIOOptionsTab();
         initializeHighlightingTab();
         initializeLoadingTab();
@@ -191,6 +183,7 @@ public class OptionsController implements Initializable {
      * Called whenever the Help ("?") button
      * is clicked.
      */
+    @FXML @SuppressWarnings("unused")
     public void onHelpButtonClicked() {
         String startString = "Options Dialog";
         String appendString = "";
@@ -219,6 +212,7 @@ public class OptionsController implements Initializable {
      * Called whenever the Apply button
      * is clicked.
      */
+    @FXML @SuppressWarnings("unused")
     public void onApplyButtonClicked() {
         if (highlightingTab.isSelected()) {
             saveHighlightingTab();
@@ -239,6 +233,7 @@ public class OptionsController implements Initializable {
      * Called whenever the OK button
      * is clicked.
      */
+    @FXML @SuppressWarnings("unused")
     public void onOKButtonClicked() {
         // Save individual tabs
 
@@ -264,6 +259,7 @@ public class OptionsController implements Initializable {
      * Called whenever the Close button
      * is clicked.
      */
+    @FXML @SuppressWarnings("unused")
     public void onCloseButtonClicked() {
          ((Stage) (helpButton.getScene().getWindow())).close();
     }
@@ -272,6 +268,7 @@ public class OptionsController implements Initializable {
      * Called whenever the New button is clicked.
      * Button is only within the highlighting tab.
      */
+    @FXML @SuppressWarnings("unused")
     public void onNewButtonClicked() {
         // Add newSet
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
@@ -291,6 +288,7 @@ public class OptionsController implements Initializable {
      * Called whenever the Delete button is clicked.
      * Button is only within the highlighting tab.
      */
+    @FXML @SuppressWarnings("unused")
     public void onDeleteButtonClicked() {
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
         int index = data.indexOf(highlightingSelectedSet);
@@ -313,12 +311,13 @@ public class OptionsController implements Initializable {
      * Called whenever the New button is clicked.
      * Button is only within the highlighting tab.
      */
+    @FXML @SuppressWarnings("unused")
     public void onDuplicateButtonClicked() {
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
         int index = data.indexOf(highlightingSelectedSet);
         if (index >= 0) {
             // Make newSet and add to table
-            RegisterRAMPair newSet = highlightingSelectedSet.clone();
+            RegisterRAMPair newSet = highlightingSelectedSet.cloneOf();
             data.add(0, newSet);
 
             // Select first and scroll to top
@@ -583,7 +582,7 @@ public class OptionsController implements Initializable {
         ObservableList<RegisterRAMPair> data = highlightingTable.getItems();
         ObservableList<RegisterRAMPair> regRamPairs = mediator.getRegisterRAMPairs();
         for (RegisterRAMPair rrp : regRamPairs) {
-            data.add(rrp.clone());
+            data.add(rrp.cloneOf());
         }
         highlightingTable.setItems(data);
     }
@@ -865,7 +864,6 @@ public class OptionsController implements Initializable {
         } else {
             ObservableList<Register> registers =
                                   FXCollections.observableArrayList(this.registers);
-            registers.add(0, Machine.PLACE_HOLDER_REGISTER);
             programCounterChoice.setItems(registers);
             programCounterChoice.setValue(mediator.getMachine().getProgramCounter());
         }

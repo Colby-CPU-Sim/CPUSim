@@ -26,6 +26,7 @@ import cpusim.model.microinstruction.Microinstruction;
 import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
@@ -64,7 +65,7 @@ public class EditFetchSequenceController implements Initializable {
 
     private Microinstruction currentCommentMicro;
 
-    private ObservableList<Microinstruction> micros;
+    private ObservableList<Microinstruction<?>> micros;
 
     public EditFetchSequenceController(Mediator mediator) {
         this.mediator = mediator;
@@ -112,19 +113,22 @@ public class EditFetchSequenceController implements Initializable {
             String className = db.getString().split(",")[1];
             Microinstruction micro = null;
 
-            for (Class<? extends Microinstruction> mc : Machine.getMicroClasses()) {
-                for (Microinstruction instr : mediator.getMachine().getMicros(mc)) {
-                    if (instr.getName().equals(microName) && instr.getMicroClass().equals(className)) {
-                        micro = instr;
+            Outer: for (Class<? extends Microinstruction<?>> mc : Machine.getMicroClasses()) {
+                if (mc.getSimpleName().toLowerCase().equals(className)) {
+                    // intelliJ says the following is an error, I have no idea why.
+                    for (Microinstruction<?> instr : mediator.getMachine().getMicrosUnsafe(mc)) {
+                        if (instr.getName().equals(microName)) {
+                            micro = instr;
+                            break Outer;
+                        }
                     }
                 }
             }
+            
             if (className.equals("comment")) {
-                micro = new Comment();
-                micro.setName(microName);
+                micro = new Comment(microName, IdentifiedObject.generateRandomID(), mediator.getMachine());
             }
-            double localY = implementationFormatPane.sceneToLocal(event.getSceneX()
-                    , event.getSceneY()).getY();
+            double localY = implementationFormatPane.sceneToLocal(event.getSceneX(), event.getSceneY()).getY();
             int index = getMicroinstrIndex(localY);
             micros.add(index, micro);
         });
@@ -188,7 +192,7 @@ public class EditFetchSequenceController implements Initializable {
             //microLabel.prefWidthProperty().bind(implementationFormatScrollPane.widthProperty());
             microLabel.setPrefHeight(labelHeight);
             microLabel.setLayoutY(nextYPosition);
-            microLabel.setTooltip(new Tooltip(micro.getMicroClass()));
+            microLabel.setTooltip(new Tooltip(micro.getClass().getSimpleName()));
 
             //makes the labels movable
             microLabel.setOnDragDetected(event -> {
@@ -221,7 +225,7 @@ public class EditFetchSequenceController implements Initializable {
                         ObservableList<TreeItem<String>> list = microInstrTreeView.getRoot().getChildren();
 
                         for (TreeItem<String> t : list){
-                            if (t.getValue().equals(micro.getMicroClass())){
+                            if (t.getValue().equals(micro.getClass().getSimpleName().toLowerCase())){
                                 t.setExpanded(true);
                                 microInstrTreeView.scrollTo(list.indexOf(t));
                                 ObservableList<TreeItem<String>> nodes = t.getChildren();
@@ -280,9 +284,9 @@ public class EditFetchSequenceController implements Initializable {
 
         rootNode.setExpanded(true);
 
-        for(Class<? extends Microinstruction> microClass : Machine.getMicroClasses()){
+        for(Class<? extends Microinstruction<?>> microClass : Machine.getMicroClasses()){
             TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
-            for (final Microinstruction micro : mediator.getMachine().getMicros(microClass)){
+            for (Microinstruction<?> micro : mediator.getMachine().getMicrosUnsafe(microClass)){
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }

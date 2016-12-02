@@ -1,19 +1,18 @@
 package cpusim.model.assembler;
 
 //import java.beans.*;
-import java.io.Serializable;
-
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.xml.HtmlEncoder;
-
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+import java.io.Serializable;
+
 //for Serializable and StreamTokenizer
 
-public class EQU implements Cloneable, Serializable, NamedObject, Copyable<EQU>, LegacyXMLSupported {
+public class EQU implements Serializable, NamedObject, Copyable<EQU>, LegacyXMLSupported {
 	private static final long serialVersionUID = 1L;
 	// instance variables
     private SimpleStringProperty name;
@@ -48,12 +47,6 @@ public class EQU implements Cloneable, Serializable, NamedObject, Copyable<EQU>,
     public SimpleLongProperty valueProperty() {
         return value;
     }
-
-    //////////////////// Other Helpful Methods ////////////////////
-    
-    public Object clone() {
-        return new EQU(getName(), getValue());
-    } 
 
     @Override
     public void copyTo(EQU newEQU) {

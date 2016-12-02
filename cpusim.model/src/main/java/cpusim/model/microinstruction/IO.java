@@ -1,10 +1,3 @@
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- *
- * 1) Added undoExecute to back up the IOChannel.
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
@@ -13,22 +6,21 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.util.List;
+import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
- * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
- * NOR, or XOR on the specified registers.
+ * Reads/writes to an {@link IOChannel}.
  */
-public class IO extends Microinstruction implements Copyable<IO> {
+public class IO extends Microinstruction<IO> {
     
     private SimpleStringProperty type; // FIXME Enum
     private SimpleObjectProperty<Register> buffer;
@@ -37,7 +29,7 @@ public class IO extends Microinstruction implements Copyable<IO> {
 
     /**
      * Constructor
-     * creates a new Increment object with input values.
+     * creates a new {@link IOChannel} object with input values.
      *
      * @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
@@ -51,7 +43,28 @@ public class IO extends Microinstruction implements Copyable<IO> {
               Register buffer,
               String direction,
               IOChannel connection){
-        super(name, machine);
+        this(name, IdentifiedObject.generateRandomID(), machine, type, buffer, direction, connection);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param type type of logical microinstruction.
+     * @param buffer the source1 register.
+     * @param direction the destination register.
+     * @param connection the IOChannel used
+     */
+    public IO(String name,
+              UUID id,
+              Machine machine,
+              String type,
+              Register buffer,
+              String direction,
+              IOChannel connection){
+        super(name, id, machine);
         this.type = new SimpleStringProperty(type);
         this.buffer = new SimpleObjectProperty<>(buffer);
         this.direction = new SimpleStringProperty(direction);
@@ -67,13 +80,21 @@ public class IO extends Microinstruction implements Copyable<IO> {
      * @param buffer the source1 register.
      * @param direction the destination register.
      */
-    public IO(String name, Machine machine, String type, Register buffer, String direction)
-    {
-        super(name, machine);
-        this.type = new SimpleStringProperty(type);
-        this.buffer = new SimpleObjectProperty<>(buffer);
-        this.direction = new SimpleStringProperty(direction);
-        this.connection = new StreamChannel();
+    public IO(String name, Machine machine, String type, Register buffer, String direction) {
+        this(name, IdentifiedObject.generateRandomID(), machine, type, buffer, direction, new StreamChannel());
+    }
+    
+    /**
+     * Copy constructor
+     * @param other instance to copy from
+     */
+    public IO(IO other) {
+        this(other.getName(),
+                other.machine,
+                other.getType(),
+                other.getBuffer(),
+                other.getDirection(),
+                other.getConnection());
     }
 
     /**
@@ -138,15 +159,6 @@ public class IO extends Microinstruction implements Copyable<IO> {
      */
     public void setConnection(IOChannel newConnection){
         this.connection = newConnection;
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "io";
     }
     
     @Override

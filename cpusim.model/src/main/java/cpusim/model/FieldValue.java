@@ -12,6 +12,7 @@ import java.util.Objects;
 
 import javax.annotation.Generated;
 
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.xml.HtmlEncoder;

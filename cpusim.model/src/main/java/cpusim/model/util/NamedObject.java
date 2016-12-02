@@ -16,43 +16,22 @@ import static com.google.common.base.Preconditions.*;
 
 /**
  * Defines that an object has a `name` and `ID` property.
- * @author Josh Ladieu
  * @since 2000-11-01
  */
-public interface NamedObject extends Validatable
-{
+public interface NamedObject extends Validatable {
 	/**
      * Get the name of a component
      */
 	@JsonProperty
-    public String getName();
+    String getName();
     
     /**
      * Set the name of a component
      */
-    public void setName(String name);
-    
-    /**
-     * Unique Identifier for a {@link NamedObject}
-     * @return
-     * 
-     * @author Kevin Brightwell
-     * @since 2016-09-20
-     */
-    @JsonProperty("id")
-    public default String getID() {
-	    final String s = this.toString();
-	    final int index = s.indexOf('@');
-	            
-        if(index == -1) { 
-            return s; 
-        } else  {
-            return s.substring(7, index) + s.substring(index + 1);
-        }
-    }
+    void setName(String name);
     
     @Override
-    public default void validate() {
+    default void validate() {
         NamedObject.validateName(getName());
     }
     
@@ -62,7 +41,7 @@ public interface NamedObject extends Validatable
      * @param in non-<code>null</code> collection
      * @return Mapping between {@link #getName()} to value. 
      */
-    public static <T extends NamedObject> Map<String, T> toNamedMap(final Iterable<? extends T> in) {
+    static <T extends NamedObject> Map<String, T> toNamedMap(final Iterable<? extends T> in) {
     	return StreamSupport.stream(checkNotNull(in).spliterator(), true)
     			.collect(Collectors.toMap(NamedObject::getName, Function.identity()));
     }
@@ -77,8 +56,8 @@ public interface NamedObject extends Validatable
      * @param object The {@link NamedObject} being cloned.
      * @return the unique name
      */
-    public static String createUniqueDuplicatedName(ObservableList<? extends NamedObject> list,
-                                                    NamedObject object) {
+    static String createUniqueDuplicatedName(ObservableList<? extends NamedObject> list,
+                                             NamedObject object) {
         
         int i = 1;
         final String base = object.getName() + "_copy";
@@ -107,7 +86,7 @@ public interface NamedObject extends Validatable
      * @param modChar Character used to make the name "unique", defaults to '?'
      * @return the unique name
      */
-    public static String createUniqueName(ObservableList<? extends NamedObject> list, int modChar) {
+    static String createUniqueName(ObservableList<? extends NamedObject> list, int modChar) {
         final char[] chars = Character.toChars(modChar);
         return createUniqueName(list, new String(chars));
     }
@@ -122,7 +101,7 @@ public interface NamedObject extends Validatable
      * @param mod Character used to make the name "unique", defaults to '?'
      * @return the unique name
      */
-    public static String createUniqueName(ObservableList<? extends NamedObject> list, final String mod) {
+    static String createUniqueName(ObservableList<? extends NamedObject> list, final String mod) {
 
         final StringBuilder current = new StringBuilder(mod);
         final Set<String> allNames = list.stream().map(NamedObject::getName).collect(Collectors.toSet());
@@ -143,7 +122,7 @@ public interface NamedObject extends Validatable
      *
      * @see #createUniqueName(ObservableList, int)
      */
-    public static String createUniqueName(ObservableList<? extends NamedObject> list) {
+    static String createUniqueName(ObservableList<? extends NamedObject> list) {
         return createUniqueName(list, '?');
     }
     
@@ -155,7 +134,7 @@ public interface NamedObject extends Validatable
      *
      * @since 2016-11-14
      */
-    public static void validateNamesUnique(List<? extends NamedObject> list)
+    static void validateNamesUnique(List<? extends NamedObject> list)
     {
         final Set<String> names = Sets.newHashSetWithExpectedSize(list.size());
         for (NamedObject obj: list) {
@@ -173,7 +152,7 @@ public interface NamedObject extends Validatable
      * checks if the name is a nonempty string
      * @param name string to check
      */
-    public static void validateName(String name) {
+    static void validateName(String name) {
         if (Strings.isNullOrEmpty(name)) {
             throw new ValidationException("A name must have at least one character.");
         }
@@ -191,7 +170,7 @@ public interface NamedObject extends Validatable
      * instances of NamedObject
      * @param objects the nameable objects to be checked
      */
-    public static void validateUniqueAndNonempty(List<? extends NamedObject> objects) {
+    static void validateUniqueAndNonempty(List<? extends NamedObject> objects) {
         validateNamesUnique(objects);
         objects.stream().map(NamedObject::getName).forEach(NamedObject::validateName);
     }

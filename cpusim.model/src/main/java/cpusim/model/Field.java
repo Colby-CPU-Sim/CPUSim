@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.MoreFXCollections;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -34,7 +35,7 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2013-08-01
  */
-public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXMLSupported, HTMLEncodable {
+public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable<Field>, LegacyXMLSupported, HTMLEncodable {
 
 	public enum Relativity {
 		absolute, 
@@ -66,6 +67,8 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     	}
     }
 
+    private final UUID id;
+    
     /**
      * The name of the field
      */
@@ -106,18 +109,19 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * Constructor for Field with name "?".
      */
     public Field() {
-        this("?");
+        this("?", IdentifiedObject.generateRandomID());
     }
     
     /**
      * Constructor for new Field with specified Name.
      * Other values are set to defaults.
-     * 
+     *
      * @param name - The name of the field.
+     * @param id
      */
-    public Field(String name) {
-        this(name, Type.required, 0, Relativity.absolute,
-             FXCollections.observableArrayList(), 0, SignedType.Signed);
+    public Field(String name, final UUID id) {
+        this(name, IdentifiedObject.generateRandomID(), 0, Relativity.absolute, FXCollections.observableArrayList(), 0, SignedType.Signed, Type.required
+        );
     }
     
     /**
@@ -127,53 +131,43 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
      * @throws NullPointerException if <code>other</code> is <code>null</code>.
      */
     public Field(final Field other) {
-    	checkNotNull(other);
-    	
-    	this.name = new SimpleStringProperty(other.name.getValue()); 
-    	this.type = new SimpleObjectProperty<>(other.type.getValue());
-        this.numBits = new SimpleIntegerProperty(other.numBits.getValue());
-        this.relativity = new SimpleObjectProperty<>(other.relativity.getValue());
-        this.defaultValue = new SimpleLongProperty(other.defaultValue.getValue());
-        this.signed = new SimpleObjectProperty<>(other.signed.getValue());
-    	this.values = MoreFXCollections.copyObservableList(other.getValues());
+        this(other.getName(), IdentifiedObject.generateRandomID(),
+                other.getNumBits(), other.getRelativity(),
+                other.getValues(), other.getDefaultValue(),
+                other.getSigned(), other.getType());
     }
     
     /**
      * Constructor for new Field with specified values.
      * 
      * @param name - Name of Field.
-     * @param type - Type of Field.
+     * @param id
      * @param length - Numbits of field.
      * @param relativity - Enum relativity type.
      * @param values - Map of name to {@link FieldValue}.
      * @param defaultValue - The default int value.
      * @param signed - Whether or not the Field is a signed int.
-     * 
+     * @param type - Type of Field.
+     *
      * @since 2016-09-20
-     * @author Kevin Brightwell (Nava2)
      */
     @JsonCreator
-    public Field(@JsonProperty("name") String name, 
-    			 @JsonProperty("type") Type type, 
-    			 @JsonProperty("numBits") int length, 
-    			 @JsonProperty("relativity") Relativity relativity,
-    			 @JsonProperty("values") ObservableList<FieldValue> values,
-    			 @JsonProperty("defaultValue") long defaultValue, 
-    			 @JsonProperty("signed") SignedType signed) {
-        this.name = new SimpleStringProperty();
-        this.type = new SimpleObjectProperty<>();
-        this.numBits = new SimpleIntegerProperty();
-        this.relativity = new SimpleObjectProperty<>();
-        this.defaultValue = new SimpleLongProperty();
-        this.signed = new SimpleObjectProperty<>();
+    public Field(@JsonProperty("name") String name,
+                 @JsonProperty("id") final UUID id,
+                 @JsonProperty("numBits") int length,
+                 @JsonProperty("relativity") Relativity relativity,
+                 @JsonProperty("values") ObservableList<FieldValue> values,
+                 @JsonProperty("defaultValue") long defaultValue,
+                 @JsonProperty("signed") SignedType signed,
+                 @JsonProperty("type") Type type) {
+        this.id = checkNotNull(id);
         
-        this.name.set(checkNotNull(name));
-        this.type.set(checkNotNull(type));
-        this.numBits.set(checkNotNull(length));
-        this.relativity.set(checkNotNull(relativity));
-        this.values = values;
-        this.defaultValue.set(defaultValue);
-        this.signed.set(checkNotNull(signed));
+        this.name = new SimpleStringProperty(checkNotNull(name));
+        this.type = new SimpleObjectProperty<>(checkNotNull(type));
+        this.numBits = new SimpleIntegerProperty(length);
+        this.relativity = new SimpleObjectProperty<>(checkNotNull(relativity));
+        this.defaultValue = new SimpleLongProperty(defaultValue);
+        this.signed = new SimpleObjectProperty<>(checkNotNull(signed));
     }
 
     ////////////////// Setters and getters //////////////////
@@ -187,7 +181,12 @@ public class Field implements NamedObject, Cloneable, Copyable<Field>, LegacyXML
     public void setName(String name) {
         this.name.set(name);
     }
-
+    
+    @Override
+    public UUID getID() {
+        return id;
+    }
+    
     @JsonProperty
     public Type getType() {
         return type.get();

@@ -23,7 +23,9 @@
 
 package cpusim.model.module;
 
+import cpusim.model.Machine;
 import cpusim.model.Module;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -32,6 +34,7 @@ import javafx.collections.ObservableList;
 
 import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.*;
@@ -48,19 +51,18 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
     private SimpleIntegerProperty width;
     private ObservableList<Register> registers;
     private int numIndexDigits;  //== floor(log10(length-1))+1
-
-    //------------------------
     
-    
-
     /**
      * Constructor
      * @param name name of the register array
+     * @param length a positive base-10 integer specifying the number of registers in the register array.
      * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
      */
-    public RegisterArray(String name, int width)
-    {
-        this(name, 1, width);
+    public RegisterArray(String name, UUID id, Machine machine, int length, int width, ObservableList<Register> registers) {
+        super(name, id, machine);
+        this.width = new SimpleIntegerProperty(width);  //used in setLength
+        this.length = new SimpleIntegerProperty(length);  //initial length value to be used in setLength
+        this.registers = checkNotNull(registers);
     }
 
     /**
@@ -69,27 +71,8 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
      * @param length a positive base-10 integer specifying the number of registers in the register array.
      * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
      */
-    public RegisterArray(String name, int length, int width)
-    {
-        super(name);
-        this.width = new SimpleIntegerProperty(width);  //used in setLength
-        this.length = new SimpleIntegerProperty(0);  //initial length value to be used in setLength
-        setLength(length);  //also sets the width
-    }
-
-    /**
-     * Constructor
-     * @param name name of the register array
-     * @param length a positive base-10 integer specifying the number of registers in the register array.
-     * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
-     */
-    public RegisterArray(String name, int length, int width, ObservableList<Register> registers)
-    {
-        super(name);
-        this.width = new SimpleIntegerProperty(width);  //used in setLength
-        this.length = new SimpleIntegerProperty(0);  //initial length value to be used in setLength
-        setLength(length);  //also sets the width
-        setRegisters(registers);
+    public RegisterArray(String name, Machine machine, int length, int width, ObservableList<Register> registers) {
+        this(name, IdentifiedObject.generateRandomID(), machine, length, width, registers);
     }
 
     //------------------------
@@ -146,8 +129,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         
         for (int i = 0; i < registers.size(); i++){
             final Register r = registers.get(i);
-            if (!r.getNameDirty())
-                r.setName(name + "[" + toStringOfLength(i, numIndexDigits) + "]");
+            r.setName(name + "[" + toStringOfLength(i, numIndexDigits) + "]");
         }
     }
 
@@ -179,24 +161,24 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         if (newLength < length.get()) {
             //copy the old registers in a new shorter array
             ObservableList<Register> newRegisters = FXCollections.observableArrayList();
-            for (int i = 0; i < newLength; i++)
-                newRegisters.add(registers.get(i));
+            registers.stream().limit(newLength).forEach(newRegisters::add);
 
             registers = newRegisters;
         }
         else if (newLength >= length.get()) {
             //save the old registers and add new ones on the end
             ObservableList<Register> newRegisters = FXCollections.observableArrayList();
-            for (int i = 0; i < length.get(); i++) {
-                newRegisters.add(registers.get(i));
-//                newRegisters.get(i).setName(getName() + "[" +
-//                        toStringOfLength(i, numIndexDigits) + "]");
-            }
+            registers.forEach(newRegisters::add);
+            
             for (int i = length.get(); i < newLength; i++) {
-                newRegisters.add(new Register(getName() + toStringOfLength(i, numIndexDigits), width.get()));
+                newRegisters.add(new Register(getName() + toStringOfLength(i, numIndexDigits),
+                        machine,
+                        width.get(),
+                        0,
+                        Register.Access.readWrite()));
             }
+            
             registers = newRegisters;
-//            deletedRegisters = null;
         }
 
         //adjust the length instance variable

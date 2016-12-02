@@ -31,18 +31,21 @@
 */  
 package cpusim.model.module;
 
-import cpusim.model.Module;
-import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.ValidationException;
-import cpusim.model.util.units.ArchType;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+    import cpusim.model.Machine;
+    import cpusim.model.Module;
+    import cpusim.model.microinstruction.Microinstruction;
+    import cpusim.model.util.IdentifiedObject;
+    import cpusim.model.util.ValidationException;
+    import cpusim.model.util.units.ArchType;
+    import javafx.beans.property.SimpleIntegerProperty;
+    import javafx.beans.property.SimpleLongProperty;
+    import javafx.beans.property.SimpleObjectProperty;
 
-import java.math.BigInteger;
-import java.util.EnumSet;
+    import java.math.BigInteger;
+    import java.util.EnumSet;
+    import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+    import static com.google.common.base.Preconditions.*;
 
 /**
  * Edit the parameters associated with any register or fromRootController new or delete old registers.
@@ -111,51 +114,11 @@ public class Register extends Module<Register> implements Sized<Register>
     private SimpleIntegerProperty width;	 //the number of bits in the register
     private SimpleLongProperty initialValue; // the initial value stored in the register
     private SimpleObjectProperty<EnumSet<Access>> access;
-   
-    private boolean nameDirty;
     
     // FIXME Why was this here?
 //    private boolean programCounter; // if true, program breaks when this register's value
 //                                    // matches the address of an instruction where a break
 //                                    // point has been set
-
-    /**
-     * Constructor
-     * @param name name of the register
-     * @param width a positive integer that specifies the number of bits in the register.
-     */
-    public Register(String name, int width)
-    {
-        this(name, width, 0, Access.readWrite(), false);
-    }
-
-    /**
-     * Constructor
-     * @param name name of the register
-     * @param width a positive integer that specifies the number of bits in the register.
-     * @param initialValue the initial value stored in the register
-     * @param readOnly the read only status of the register (if true, the value in
-     *                 the register cannot be changed)
-     */
-    public Register(String name, int width, long initialValue, boolean readOnly)
-    {
-        this(name, width, initialValue, Access.isReadOnly(readOnly), false);
-    }
-
-    /**
-     * Constructor
-     * @param name name of the register
-     * @param width a positive integer that specifies the number of bits in the register.
-     * @param initialValue the initial value stored in the register
-     * @param readOnly the read only status of the register (if true, the value in
-     *                 the register cannot be changed)
-     * @param dirty  whether the Register's name has changed since last displayed
-     * 
-     */
-    public Register(String name, int width, long initialValue, boolean readOnly, boolean dirty)
-    {
-        this(name, width, initialValue, Access.isReadOnly(readOnly), dirty);
-    }
     
     /**
      * Constructor
@@ -164,21 +127,32 @@ public class Register extends Module<Register> implements Sized<Register>
      * @param initialValue the initial value stored in the register
      * @param readOnly the read only status of the register (if true, the value in
      *                 the register cannot be changed)
-     * @param dirty  whether the Register's name has changed since last displayed
      * 
      * @since 2016-10-12
      */
-    public Register(String name, int width, long initialValue, EnumSet<Access> readOnly, boolean dirty)
-    {
-        super(name);
+    public Register(String name, UUID id, Machine machine, int width, long initialValue, EnumSet<Access> readOnly) {
+        super(name, id, machine);
         checkNotNull(readOnly);
         
         this.value = new SimpleLongProperty(this, "register value", 0);
         this.width = new SimpleIntegerProperty(width);
         this.initialValue = new SimpleLongProperty(initialValue);
         this.access = new SimpleObjectProperty<>(readOnly);
-        nameDirty = dirty;
         setValue(initialValue);
+    }
+    
+    /**
+     * Constructor
+     * @param name name of the register
+     * @param width a positive integer that specifies the number of bits in the register.
+     * @param initialValue the initial value stored in the register
+     * @param readOnly the read only status of the register (if true, the value in
+     *                 the register cannot be changed)
+     *
+     * @since 2016-10-12
+     */
+    public Register(String name, Machine machine, int width, long initialValue, EnumSet<Access> readOnly) {
+        this(name, IdentifiedObject.generateRandomID(), machine, width, initialValue, readOnly);
     }
     
     /**
@@ -186,17 +160,7 @@ public class Register extends Module<Register> implements Sized<Register>
      * @param other
      */
     public Register(Register other) {
-        super(other.getName());
-        
-        this.value = new SimpleLongProperty();
-        this.width = new SimpleIntegerProperty(other.getWidth());
-        this.initialValue = new SimpleLongProperty();
-        this.access = new SimpleObjectProperty<>(other.getAccess());
-        
-        this.nameDirty = other.nameDirty;
-        
-        this.setValue(other.getValue());
-        this.setInitialValue(other.getInitialValue());
+        this(other.getName(), other.machine, other.getWidth(), other.getInitialValue(), other.getAccess());
     }
 
     /**
@@ -330,23 +294,6 @@ public class Register extends Module<Register> implements Sized<Register>
     {
         setValue(initialValue.get());
     }
-    
-
-    /**
-     * sets the name dirty value
-     * @param dirty new boolean value
-     */
-    public void setNameDirty(boolean dirty){
-        this.nameDirty = dirty;
-    }
-
-    /**
-     * get the name dirty value
-     * @return the name dirty value
-     */
-    public boolean getNameDirty(){
-        return nameDirty;
-    }
 
 	@Override
 	public String getXMLDescription(String indent) {
@@ -371,7 +318,6 @@ public class Register extends Module<Register> implements Sized<Register>
         newRegister.setWidth(width.get());  //if a narrower width, the value is cleared
         newRegister.setInitialValue(initialValue.get());
         newRegister.setAccess(access.get());
-        newRegister.setNameDirty(nameDirty);
 	}
     
     @Override

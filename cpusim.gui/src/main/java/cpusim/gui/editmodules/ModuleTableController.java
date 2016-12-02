@@ -80,8 +80,6 @@ abstract class ModuleTableController<T extends Module<T>>
         ObservableList<T> items = getItems();
         items.clear();
         machine.getModule(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
-
-        loadFXML();
     }
     
     /**
@@ -106,7 +104,7 @@ abstract class ModuleTableController<T extends Module<T>>
     /**
      * Loads the FXML controller, running {@link FXMLLoader} pipeline.
      */
-    private void loadFXML() {
+    protected void loadFXML() {
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, fxmlTablePath);
 
         try {

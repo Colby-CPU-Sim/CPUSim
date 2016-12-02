@@ -1,10 +1,13 @@
 package cpusim.gui.util;
 
-import com.google.common.collect.ImmutableList;
-import cpusim.Mediator;
 import cpusim.gui.help.HelpController;
+import cpusim.model.Machine;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,9 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -23,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 30/11/2016.
  */
-public final class DialogButtonController extends VBox {
+public final class DialogButtonController extends VBox implements MachineBound {
 
     /**
      * FXML file loaded for the controls.
@@ -39,24 +42,33 @@ public final class DialogButtonController extends VBox {
     @FXML @SuppressWarnings("unused")
     private Button helpButton;
 
-    private final Mediator mediator;
+    private ObjectProperty<Machine> machine;
 
-    private final InteractionHandler interactionHandler;
+    private InteractionHandler interactionHandler;
 
     /**
      * {@link List} of {@link MachineModificationController}s that can be used to update the machine when the
      * dialog tries to close.
      */
-    private final ImmutableList<MachineModificationController<?>> controllers;
+    private Set<MachineModificationController<?>> controllers;
 
-    private HelpPageEnabled currentHelpable;
+    private final ObjectProperty<HelpPageEnabled> currentHelpable;
 
-    public DialogButtonController(Mediator mediator,
-                                  InteractionHandler interactionHandler,
-                                  Iterable<? extends MachineModificationController<?>> controllers) {
-        this.mediator = checkNotNull(mediator);
-        this.interactionHandler = checkNotNull(interactionHandler);
-        this.controllers = ImmutableList.copyOf(controllers);
+    /**
+     * After construction, the caller must set:
+     * <ul>
+     *     <li>{@link #setInteractionHandler(InteractionHandler)}</li>
+     *     <li>{@link #setControllers(Iterable)}</li>
+     *     <li>{@link #bindMachine(ObjectProperty)}</li>
+     * </ul>
+     *
+     * This must be done <strong>before</strong> any interactions occur, otherwise behaviour is undefined (likely
+     * causing {@link NullPointerException}s).
+     */
+    public DialogButtonController() {
+        this.interactionHandler = null;
+        this.currentHelpable = new SimpleObjectProperty<>(null);
+        this.controllers = new HashSet<>();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, FXML_FILE);
 
@@ -70,7 +82,59 @@ public final class DialogButtonController extends VBox {
 
     @FXML @SuppressWarnings("unused")
     private void initialize() {
-        // currently no-op, buttons are pretty easy
+        this.currentHelpable.addListener((observable, oldValue, newValue) -> {
+            helpButton.setDisable(newValue == null);
+        });
+        helpButton.setDisable(currentHelpable.get() == null);
+    }
+
+    @Override
+    public Optional<Machine> getMachine() {
+        return Optional.ofNullable(machine.get());
+    }
+
+    @Override
+    public void bindMachine(ObjectProperty<Machine> machineProperty) {
+        this.machine = checkNotNull(machineProperty);
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
+        return machine;
+    }
+
+    /**
+     * Get the property for the current instance that can be "helped".
+     * @return Read-only version of the property.
+     */
+    public ReadOnlyObjectProperty<HelpPageEnabled> currentHelpableProperty() {
+        return currentHelpable;
+    }
+
+    /**
+     * Sets the {@link InteractionHandler} for this controller. This must be set before interactions occur.
+     * @param interactionHandler new instance to handle interactions with this controller.
+     */
+    public void setInteractionHandler(InteractionHandler interactionHandler) {
+        this.interactionHandler = checkNotNull(interactionHandler);
+    }
+
+    /**
+     * Copy the parameter to the {@link Set} of controllers that will be updated when closing the dialog.
+     * @param controllers
+     */
+    public void setControllers(Iterable<? extends MachineModificationController<?>> controllers) {
+        this.controllers.clear();
+        controllers.forEach(this.controllers::add);
+    }
+
+    /**
+     * Get the {@link ObservableList} of controllers. Changing these values has no effect outside of when the
+     * "OK" button is pressed.
+     * @return List of controller values
+     */
+    public Set<MachineModificationController<?>> getControllers() {
+        return this.controllers;
     }
 
     /**
@@ -78,15 +142,15 @@ public final class DialogButtonController extends VBox {
      * @return Optional with content if an entity is present.
      */
     public Optional<HelpPageEnabled> getCurrentHelpable() {
-        return Optional.ofNullable(currentHelpable);
+        return Optional.ofNullable(currentHelpable.get());
     }
 
     /**
      * Sets the {@link HelpPageEnabled} entity, so when
      * @param currentHelpable Non-{@code null} {@code HelpPageEnabled} entity that will be used to show a help content.
      */
-    public void setCurrentHelpable(HelpPageEnabled currentHelpable) {
-        this.currentHelpable = checkNotNull(currentHelpable);
+    public void setCurrentHelpable(@Nullable HelpPageEnabled currentHelpable) {
+        this.currentHelpable.setValue(currentHelpable);
     }
 
     /**
@@ -122,7 +186,6 @@ public final class DialogButtonController extends VBox {
                     "Error",
                     ex.getMessage()).showAndWait();
         }
-
     }
 
     /**
@@ -139,32 +202,15 @@ public final class DialogButtonController extends VBox {
     }
 
     /**
-     * open the help window
-     */
-    public void showHelpDialog() {
-        getCurrentHelpable().ifPresent(helpable -> {
-            String startString = helpable.getHelpPageID();
-            if (mediator.getDesktopController().getHelpController() == null) {
-                HelpController helpController = HelpController.openHelpDialog(
-                        mediator.getDesktopController(), startString);
-                mediator.getDesktopController().setHelpController(helpController);
-            } else {
-                HelpController hc = mediator.getDesktopController().getHelpController();
-                hc.getStage().toFront();
-                hc.selectTreeItem(startString);
-            }
-        });
-    }
-
-    /**
-     * open a help window when clicking on the help button. Delegates to {@link #showHelpDialog()}.
+     * open a help window when clicking on the help button.
      *
      * @param e a type of action when a button is clicked.
      */
     @FXML @SuppressWarnings("unused")
     private void onHelpButtonClick(ActionEvent e) {
         if (interactionHandler.onHelpButtonClick()) {
-            showHelpDialog();
+            getCurrentHelpable().ifPresent(helpable ->
+                    interactionHandler.displayHelpDialog(helpable.getHelpPageID()));
         }
     }
 
@@ -192,6 +238,12 @@ public final class DialogButtonController extends VBox {
          * @return {@code true} to continue.
          */
         boolean onHelpButtonClick();
+
+        /**
+         * Displays the {@link HelpController} dialog over the current scene.
+         * @param helpPageId The ID of the help page requested.
+         */
+        void displayHelpDialog(final String helpPageId);
 
         /**
          * Called before running the content of {@link DialogButtonController#onCancelButtonClick(ActionEvent)}.

@@ -3,16 +3,23 @@ package cpusim.model.microinstruction;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.Sized;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.UUID;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Denotes common behavior for a Register transfer
+ * Denotes common behavior for a {@link cpusim.model.module.Register} transfer
+ *
+ * @since 2016-11-14
  */
-abstract class Transfer<From extends Module<From> & Sized<From>, To extends Module<To> & Sized<To>> extends Microinstruction {
+abstract class Transfer<From extends Module<From> & Sized<From>, To extends Module<To> & Sized<To>,
+        Sub extends Transfer<From, To, Sub>>
+        extends Microinstruction<Sub> {
     
     protected SimpleObjectProperty<From> source;
     protected SimpleIntegerProperty srcStartBit;
@@ -21,10 +28,6 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     protected SimpleIntegerProperty destStartBit;
     protected SimpleIntegerProperty numBits;
     
-    
-//    protected SimpleObjectProperty<Register> index;
-//    protected SimpleIntegerProperty indexStart;
-//    protected SimpleIntegerProperty indexNumBits;
     
     /**
      * Constructor
@@ -38,13 +41,42 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
      * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
      * @param numBits a non-negative integer indicating the number of bits to be tested.
      */
-    public Transfer(String name, Machine machine,
-                        From source,
-                        int srcStartBit,
-                        To dest,
-                        int destStartBit,
-                        int numBits){
-        super(name, machine);
+    public Transfer(String name,
+                    UUID id,
+                    Machine machine,
+                    From source,
+                    int srcStartBit,
+                    To dest,
+                    int destStartBit,
+                    int numBits){
+        super(name, id, machine);
+        this.source = new SimpleObjectProperty<>(source);
+        this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
+        this.dest = new SimpleObjectProperty<>(dest);
+        this.destStartBit = new SimpleIntegerProperty(destStartBit);
+        this.numBits = new SimpleIntegerProperty(numBits);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Transfer object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param source the register whose value is to be tested.
+     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be transfered.
+     * @param dest the destination register.
+     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
+     * @param numBits a non-negative integer indicating the number of bits to be tested.
+     */
+    public Transfer(String name,
+                    Machine machine,
+                    From source,
+                    int srcStartBit,
+                    To dest,
+                    int destStartBit,
+                    int numBits){
+        super(name, IdentifiedObject.generateRandomID(), machine);
         this.source = new SimpleObjectProperty<>(source);
         this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
         this.dest = new SimpleObjectProperty<>(dest);
@@ -56,7 +88,7 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
      * Copy constructor
      * @param other Copied instance
      */
-    public Transfer(final Transfer<From, To> other) {
+    public Transfer(final Transfer<From, To, Sub> other) {
         this(checkNotNull(other).getName(),
                 other.machine,
                 other.getSource(),
@@ -167,10 +199,7 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
         return (m == source.get() || m == dest.get());
     }
     
-    @Override
-    public abstract String getMicroClass();
-    
-    protected final <U extends Transfer<From, To>> void copyToHelper(final U other) {
+    protected final <U extends Sub> void copyToHelper(final U other) {
         checkNotNull(other);
     
         other.setName(getName());

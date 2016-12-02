@@ -1,15 +1,3 @@
-/**
- * Author: Jinghui Yu
- * LastEditingDate: 6/7/2013
- */
-
-/**
- * Edit by Jinghui Yu, Ben Borchard, and Michael Goldenberg on Nov 11, 2013.
- *
- * 1.) Edited execute(), so that it checks if the destination register is read-only at run time,
- * and an exception will be thrown to console if the destination register is immutable
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.ExecutionException;
@@ -18,20 +6,52 @@ import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.Register.Access;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.UUID;
+
 /**
  * The TransferRtoA microinstruction transfers data from a register to a register array.
+ *
+ * @since 2013-06-07
  */
-public class TransferRtoA extends Transfer<Register, RegisterArray> implements Copyable<TransferRtoA> {
+public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA> {
     
     private SimpleObjectProperty<Register> index;
     private SimpleIntegerProperty indexStart;
     private SimpleIntegerProperty indexNumBits;
 
+    /**
+     * Constructor
+     * creates a new Test object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param source the register whose value is to be tested.
+     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be tested.
+     * @param dest the destination register.
+     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
+     * @param numBits a non-negative integer indicating the number of bits to be tested.
+     */
+    public TransferRtoA(String name,
+                        UUID id,
+                        Machine machine,
+                        Register source,
+                        int srcStartBit,
+                        RegisterArray dest,
+                        int destStartBit,
+                        int numBits,
+                        Register index,
+                        int indexStart,
+                        int indexNumBits){
+        super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
+        this.index = new SimpleObjectProperty<>(index);
+        this.indexStart = new SimpleIntegerProperty(indexStart);
+        this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+    }
+    
     /**
      * Constructor
      * creates a new Test object with input values.
@@ -52,15 +72,17 @@ public class TransferRtoA extends Transfer<Register, RegisterArray> implements C
                         Register index,
                         int indexStart,
                         int indexNumBits){
-        super(name, machine, source, srcStartBit, dest, destStartBit, numBits);
-        this.index = new SimpleObjectProperty<>(index);
-        this.indexStart = new SimpleIntegerProperty(indexStart);
-        this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+        this(name, IdentifiedObject.generateRandomID(),
+                machine, source,
+                srcStartBit, dest,
+                destStartBit, numBits,
+                index, indexStart,
+                indexNumBits);
     }
     
     /**
      * Copy constructor, copies all <em>values</em> not property references.
-     * @param other
+     * @param other Instance to copy from.
      */
     public TransferRtoA(final TransferRtoA other){
 		super(other);
@@ -124,26 +146,6 @@ public class TransferRtoA extends Transfer<Register, RegisterArray> implements C
         indexNumBits.set(newIndexNumBits);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "transferRtoA";
-    }
-
-    /**
-     * duplicate the set class and return a copy of the original Set class.
-     *
-     * @return a copy of the Set class
-     *
-     * @deprecated Use {@link #TransferRtoA(TransferRtoA)}
-     */
-    public Object clone() {
-        return new TransferRtoA(this);
-    }
-
     @Override
     public <U extends TransferRtoA> void copyTo(U newTransferRtoA)
     {

@@ -3,7 +3,7 @@ package cpusim.model.microinstruction;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
@@ -11,6 +11,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.UUID;
 import java.util.function.BiPredicate;
 
 import static com.google.common.base.Preconditions.*;
@@ -19,10 +20,9 @@ import static com.google.common.base.Preconditions.*;
  * The Test microinstruction allows the computer to jump to other microinstructions
  * within the current fetch or execute sequence.
  *
- * @author Jinghui Yu
  * @since 2013-06-04
  */
-public class Test extends Microinstruction implements Copyable<Test> {
+public class Test extends Microinstruction<Test> {
 	
 	public enum Operation {
 		
@@ -54,29 +54,6 @@ public class Test extends Microinstruction implements Copyable<Test> {
     private final SimpleObjectProperty<Operation> comparison;
     private final SimpleLongProperty value;
     private final SimpleIntegerProperty omission;
-
-    /**
-     * Constructor
-     * creates a new Test object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param register the register whose value is to be tested.
-     * @param start an integer indicating the leftmost or rightmost bit to be tested.
-     * @param numBits a non-negative integer indicating the number of bits to be tested.
-     * @param comparison the type of comparison be done.
-     * @param value the integer to be compared with the part of the register.
-     * @param omission an integer indicating the size of the relative jump.
-     */
-    public Test(String name, Machine machine,
-               Register register,
-               int start,
-               int numBits,
-               String comparison,
-               long value,
-               int omission) {
-    	this(name, machine, register, start, numBits, Operation.valueOf(comparison), value, omission);
-    }
     
     /**
      * Constructor
@@ -91,20 +68,35 @@ public class Test extends Microinstruction implements Copyable<Test> {
      * @param value the integer to be compared with the part of the register.
      * @param omission an integer indicating the size of the relative jump.
      */
-    public Test(String name, Machine machine,
+    public Test(String name,
+                UUID id,
+                Machine machine,
                Register register,
                int start,
                int numBits,
                Operation comparison,
                long value,
                int omission) {
-    	super(name, machine);
+    	super(name, id, machine);
         this.register = new SimpleObjectProperty<>(register);
         this.start = new SimpleIntegerProperty(start);
         this.numBits = new SimpleIntegerProperty(numBits);
         this.comparison = new SimpleObjectProperty<>(comparison);
         this.value = new SimpleLongProperty(value);
         this.omission = new SimpleIntegerProperty(omission);
+    }
+    
+    /**
+     * Copy Constructor
+     * creates a new Test object with input values.
+     *
+     * @param other Instance to copy
+     */
+    public Test(Test other) {
+        this(other.getName(), IdentifiedObject.generateRandomID(), other.machine,
+                other.getRegister(), other.getStart(),
+                other.getNumBits(), other.getComparison(),
+                other.getValue(), other.getOmission());
     }
 
     /**
@@ -203,15 +195,6 @@ public class Test extends Microinstruction implements Copyable<Test> {
         omission.set(newOmission);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "test";
-    }
-
     /**
      * execute the micro instruction from machine
      */

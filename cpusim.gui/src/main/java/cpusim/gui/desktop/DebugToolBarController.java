@@ -52,7 +52,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
     @FXML
     Label currentInstrLabel;
     @FXML
-    ListView<Microinstruction> currentMicrosList;
+    private ListView<Microinstruction<?>> currentMicrosList;
 
     private static final KeyCodeCombination GO_ACCELERATOR = new KeyCodeCombination
             (KeyCode.G, KeyCombination.ALT_DOWN, KeyCombination.SHORTCUT_DOWN);
@@ -110,7 +110,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        currentMicrosList.setCellFactory(param -> new StyledListCell<Microinstruction>());
+        currentMicrosList.setCellFactory(param -> new StyledListCell<>());
     }
 
     /**

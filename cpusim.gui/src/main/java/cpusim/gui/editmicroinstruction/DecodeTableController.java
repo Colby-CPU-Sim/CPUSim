@@ -3,6 +3,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
+import cpusim.model.util.IdentifiedObject;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -64,7 +65,7 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
     public Decode createInstance() {
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
-        return new Decode("???", machine, r);
+        return new Decode("???", IdentifiedObject.generateRandomID(), machine, r);
     }
 
     @Override

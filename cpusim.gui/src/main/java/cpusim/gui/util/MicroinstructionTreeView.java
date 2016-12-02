@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package cpusim.gui.util;
 
 import com.google.common.base.Strings;
@@ -16,12 +10,12 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.util.Callback;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * This is a UI element to display a {@link Microinstruction} tree organized by
@@ -29,14 +23,14 @@ import static com.google.common.base.Preconditions.checkArgument;
  *
  * @since 2016-12-01
  */
-public class MicroinstructionTreeView extends TitledPane {
+public final class MicroinstructionTreeView extends TitledPane {
 
     private static final String FXML_FILE = "MicroinstructionTreeView.fxml";
 
     private final Machine machine;
 
-    @FXML
-    private TreeView<Microinstruction> treeView;
+    @FXML @SuppressWarnings("unused")
+    private TreeView<Microinstruction<?>> treeView;
 
     public MicroinstructionTreeView(Machine machine) {
         this.machine = machine;
@@ -49,18 +43,85 @@ public class MicroinstructionTreeView extends TitledPane {
         }
     }
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private void initialize() {
+        
+        // Setup the cell factory to display information properly.
+        treeView.setCellFactory(new Callback<TreeView<Microinstruction<?>>, TreeCell<Microinstruction<?>>>() {
+            @Override
+            public TreeCell<Microinstruction<?>> call(final TreeView<Microinstruction<?>> param) {
+                return new TreeCell<Microinstruction<?>>() {
+                    @Override
+                    protected void updateItem(final Microinstruction<?> value, final boolean empty) {
+                        super.updateItem(value, empty); // MUST BE CALLED, see super docs
+                        
+                        MicroinstructionTreeItem item = (MicroinstructionTreeItem)this.getTreeItem();
+                        
+                        if (empty || item == null) {
+                            // if it's empty, we need to rewrite the cell to be empty
+                            // see: http://stackoverflow.com/a/23205728/1748595
+                            setText("");
+                            setGraphic(null);
+                        } else {
+                            
+                            // We have an item, so add a better graphic and text
+                            if (value != null) {
+                                setText(value.getName());
+                            } else {
+                                item.getCategory().ifPresent(this::setText);
+                            }
 
-        // FIXME Make these names nicer or have a better hierarchy..
-        // FIXME an ideal scenario would be to have the Machine accept a visitor that would visit
-        // FIXME "Category" -> "sub cat" -> "instruction"
-
-
-
+                            setGraphic(item.getGraphic());
+                        }
+                    }
+                };
+            }
+        });
+        
+        reloadFromMachine();
+    }
+    
+    /**
+     * Reloads the content of the {@link TreeView} from the {@link Machine} backing.
+     */
+    public void reloadFromMachine() {
+        checkState(treeView != null, "Must be called AFTER #initialize()");
+    
+        treeView.setRoot(null);
+        
+        final MicroinstructionTreeItem root = MicroinstructionTreeItem.forCategory("Microinstructions");
+        root.setExpanded(true);
+        
+        machine.visitMicros(new Machine.MicroinstructionVisitor() {
+            private MicroinstructionTreeItem currentCategory;
+        
+            @Override
+            public VisitResult visitCategory(final String category) {
+                currentCategory = MicroinstructionTreeItem.forCategory(category);
+                root.getChildren().add(currentCategory);
+            
+                return VisitResult.Okay;
+            }
+        
+            @Override
+            public VisitResult visitSubCategory(final String subcategory) {
+                return VisitResult.Okay;
+            }
+        
+            @Override
+            public VisitResult visitMicro(final Microinstruction<?> micro) {
+                checkState(currentCategory != null);
+                
+                currentCategory.getChildren().add(MicroinstructionTreeItem.forLeaf(micro));
+            
+                return VisitResult.Okay;
+            }
+        });
+        
+        treeView.setRoot(root);
     }
 
-    private static class MicroinstructionTreeItem extends TreeItem<Microinstruction> {
+    private static class MicroinstructionTreeItem extends TreeItem<Microinstruction<?>> {
 
         private static ImageView getCategoryImage() {
             return new ImageView(MicroinstructionTreeItem.class.getResource(
@@ -71,8 +132,8 @@ public class MicroinstructionTreeView extends TitledPane {
             return new ImageView(MicroinstructionTreeItem.class.getResource(
                     "/images/icons/FileIcon16x16.png").toExternalForm());
         }
-
-        private final Microinstruction instruction;
+        
+        private final String category;
 
         /**
          * Creates a {@link TreeItem} showing children of a category
@@ -88,7 +149,7 @@ public class MicroinstructionTreeView extends TitledPane {
          * @param value The {@code Microinstruction} stored
          * @return New TreeItem
          */
-        static MicroinstructionTreeItem forLeaf(final Microinstruction value) {
+        static MicroinstructionTreeItem forLeaf(final Microinstruction<?> value) {
             return new MicroinstructionTreeItem(value);
         }
 
@@ -96,10 +157,10 @@ public class MicroinstructionTreeView extends TitledPane {
          * Constructs a leaf node, showing an image from {@link #getMicroImage()}.
          * @param value Data to store
          */
-        private MicroinstructionTreeItem(Microinstruction value) {
+        private MicroinstructionTreeItem(Microinstruction<?> value) {
             super(value);
-
-            this.instruction = value;
+            
+            this.category = null;
 
             setGraphic(getMicroImage());
         }
@@ -112,19 +173,17 @@ public class MicroinstructionTreeView extends TitledPane {
             super(null);
 
             checkArgument(!Strings.isNullOrEmpty(category));
-
-            this.instruction = null;
-
-
+            this.category = category;
+            
             setGraphic(getCategoryImage());
         }
-
+    
         /**
-         * Get the stored {@link Microinstruction}
-         * @return Present optional if {@link #isLeaf()} is {@code true}.
+         * Get the category stored if it is present.
+         * @return Optional that is empty or present if it is set.
          */
-        public Optional<Microinstruction> getInstruction() {
-            return Optional.ofNullable(instruction);
+        public Optional<String> getCategory() {
+            return Optional.ofNullable(category);
         }
     }
     

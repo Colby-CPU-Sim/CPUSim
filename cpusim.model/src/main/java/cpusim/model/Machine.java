@@ -16,7 +16,9 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validatable;
+import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -24,7 +26,15 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,10 +57,7 @@ import static com.google.common.base.Preconditions.*;
 public class Machine extends Module<Machine> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    public static final Register PLACE_HOLDER_REGISTER =
-                               new Register("(none)",64,Long.MAX_VALUE,true);
-
-
+ 
     /**
      * constants for different running modes
      */
@@ -83,13 +90,14 @@ public class Machine extends Module<Machine> implements Serializable {
      * Get all of the supported implementing {@link Class} values for the {@link Microinstruction}.
      * @return
      */
-    public static ImmutableList<Class<? extends Microinstruction>> getMicroClasses() {
-        ImmutableList.Builder<Class<? extends Microinstruction>> bld = ImmutableList.builder();
-        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType).forEach(bld::add);
+    public static ImmutableList<Class<? extends Microinstruction<?>>> getMicroClasses() {
+        ImmutableList.Builder<Class<? extends Microinstruction<?>>> bld = ImmutableList.builder();
+        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType)
+                .forEach(c -> bld.add((Class<? extends Microinstruction<?>>)c));
         return bld.build();
     }
 
-    public static Optional<Class<? extends Microinstruction>> getMicroClassByName(String name) {
+    public static Optional<Class<? extends Microinstruction<?>>> getMicroClassByName(String name) {
         return getMicroClasses().stream().filter(c -> c.getSimpleName().equals(name)).findFirst();
     }
     
@@ -119,7 +127,7 @@ public class Machine extends Module<Machine> implements Serializable {
     private SimpleObjectProperty<StateWrapper> wrappedState;
 
     // Machine instructions
-    private List<MachineInstruction> instructions;
+    private ObservableList<MachineInstruction> instructions;
     // EQUs
     private ObservableList<EQU> EQUs;
     // key = micro name, value = list of microinstructions
@@ -155,7 +163,7 @@ public class Machine extends Module<Machine> implements Serializable {
      * @param name - The name of the machine.
      */
     public Machine(String name) {
-        super(name);
+        super(name, IdentifiedObject.generateRandomID(), null);
         registers = FXCollections.observableArrayList();
         registerArrays = FXCollections.observableArrayList();
         conditionBits = FXCollections.observableArrayList();
@@ -166,16 +174,16 @@ public class Machine extends Module<Machine> implements Serializable {
         moduleMap = new HashMap<>();
         microMap = new HashMap<>();
 
-        instructions = new ArrayList<>();
+        instructions = FXCollections.observableArrayList();
         EQUs = FXCollections.observableArrayList(new ArrayList<EQU>());
         fields = new ArrayList<>();
         punctChars = Lists.newArrayList(getDefaultPunctChars());
 
-        fetchSequence = new MachineInstruction("Fetch sequence", 0, "", this);
+        fetchSequence = new MachineInstruction("Fetch sequence", IdentifiedObject.generateRandomID(), this, 0, "");
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
-        programCounter = PLACE_HOLDER_REGISTER;
+        programCounter = null;
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
         justBroke = false;
@@ -403,18 +411,6 @@ public class Machine extends Module<Machine> implements Serializable {
     public void setFields(List<Field> f) {
         fields = f;
     }
-
-    /**
-     * A getter method for all module objects
-     *
-     * @param moduleType a String that describes the type of module
-     * @return a Vector object
-     *
-     * @deprecated Use {@link #getModule(Class)}
-     */
-    public ObservableList<? extends Module<?>> getModule(String moduleType) {
-        return moduleMap.get(ModuleClassMapping.fromName(moduleType));
-    }
     
     /**
      * A getter method for all module objects
@@ -447,18 +443,6 @@ public class Machine extends Module<Machine> implements Serializable {
         Machine.getModuleClasses().stream().map(c -> machine.getModuleUnchecked(c)).forEach(moduleBuilder::add);
         return moduleBuilder.build();
     }
-
-    /**
-     * A getter method for all microinstructions
-     *
-     * @param micro a String that describes the microinstruction type
-     * @return a Vector object
-     *
-     * @deprecated Use {@link #getMicros(Class)}
-     */
-    public ObservableList<? extends Microinstruction> getMicros(String micro) {
-        return microMap.get(MicroClassMapping.fromName(micro));
-    }
     
     /**
      * A getter method for all microinstructions
@@ -469,22 +453,35 @@ public class Machine extends Module<Machine> implements Serializable {
      * @since 2016-11-20
      */
     @SuppressWarnings("unchecked")
-    public <U extends Microinstruction> ObservableList<U> getMicros(Class<U> clazz) {
+    public <U extends Microinstruction<U>> ObservableList<U> getMicros(Class<U> clazz) {
         return (ObservableList<U>)microMap.get(clazz);
     }
     
     /**
-     * Get all of the loaded {@link Microinstruction} in the {@link Machine}.
-     * @return
+     * A getter method for {@link Microinstruction} values
+     *
+     * @param clazz Denotes the type stored
+     * @return a Vector object
+     *
+     * @since 2016-12-01
      */
-    public List<List<? extends Microinstruction>> getAllMicros() {
-        ImmutableList.Builder<List<? extends Microinstruction>> microBuilder = ImmutableList.builder();
-        getMicroClasses().stream().map(c -> machine.getMicros(c)).forEach(microBuilder::add);
+    @SuppressWarnings("unchecked")
+    public ObservableList<Microinstruction<?>> getMicrosUnsafe(Class<? extends Microinstruction<?>> clazz) {
+        return (ObservableList<Microinstruction<?>>)microMap.get(clazz);
+    }
+    
+    /**
+     * Get all of the loaded {@link Microinstruction} in the {@link Machine}.
+     * @return List of all the {@link Microinstruction}s present
+     */
+    public List<List<Microinstruction<?>>> getAllMicros() {
+        ImmutableList.Builder<List<Microinstruction<?>>> microBuilder = ImmutableList.builder();
+        getMicroClasses().stream().map(c -> machine.getMicrosUnsafe(c)).forEach(microBuilder::add);
     
         return microBuilder.build();
     }
 
-    public List<MachineInstruction> getInstructions() {
+    public ObservableList<MachineInstruction> getInstructions() {
         return instructions;
     }
 
@@ -494,7 +491,7 @@ public class Machine extends Module<Machine> implements Serializable {
 
 
     public End getEnd() {
-        return (End) (microMap.get("end")).get(0);
+        return (End) (microMap.get(End.class)).get(0);
     }
 
     public int getStartingAddressForLoading() {
@@ -545,7 +542,7 @@ public class Machine extends Module<Machine> implements Serializable {
         for (Class<? extends Microinstruction> microClazz : getMicroClasses())
             microMap.put(microClazz, FXCollections.observableArrayList(new ArrayList<>()));
         getMicros(End.class).add(new End(this));
-        getMicros(Comment.class).add(new Comment());
+        getMicros(Comment.class).add(new Comment("Comment", IdentifiedObject.generateRandomID(),this));
     }
     
     
@@ -580,8 +577,9 @@ public class Machine extends Module<Machine> implements Serializable {
      * Updates the machine instructions.
      * @param newInstructions
      */
-    public void setInstructions(List<MachineInstruction> newInstructions) {
-        instructions = newInstructions;
+    public void setInstructions(Collection<? extends MachineInstruction> newInstructions) {
+        instructions.clear();
+        instructions.addAll(newInstructions);
     }
 
     //-------------------------------
@@ -623,8 +621,8 @@ public class Machine extends Module<Machine> implements Serializable {
 
         // test whether the program counter was deleted and, if so,
         // set the program counter to the place holder register
-        if(! newRegisters.contains(programCounter))
-            setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
+        if(!newRegisters.contains(programCounter))
+            setProgramCounter(null);
     }
 
     //-------------------------------
@@ -646,7 +644,7 @@ public class Machine extends Module<Machine> implements Serializable {
             if (array.registers().contains(programCounter))
                 return;
         }
-        setProgramCounter(Machine.PLACE_HOLDER_REGISTER);
+        setProgramCounter(null);
     }
 
     //--------------------------------
@@ -737,7 +735,7 @@ public class Machine extends Module<Machine> implements Serializable {
      * @param microClazz
      * @param newMicros
      */
-    public <U extends Microinstruction> void setMicros(Class<U> microClazz, ObservableList<U> newMicros) {
+    public <U extends Microinstruction<U>> void setMicros(Class<U> microClazz, ObservableList<U> newMicros) {
         //first delete all references in machine instructions
         // to any old micros not in the new list
         getMicros(microClazz).stream()
@@ -851,13 +849,47 @@ public class Machine extends Module<Machine> implements Serializable {
     }
 
 
-    public void visitMicros(final MicroInstructionVisitor visitor) {
-        for (Class<? extends Microinstruction> mc: microMap.keySet()) {
+    public void visitMicros(final MicroinstructionVisitor visitor) {
+        
+        final List<Class<? extends Microinstruction<?>>> classes = microMap.keySet()
+                .stream()
+                .sorted((l, r) -> l.getSimpleName().compareTo(r.getSimpleName()))
+                .map(c -> (Class<? extends Microinstruction<?>>)c)
+                .collect(Collectors.toList());
+        
+        CategoryLoop: for (Class<? extends Microinstruction<?>> mc: classes) {
             switch (visitor.visitCategory(mc.getSimpleName())) {
-
+            case SkipChildren:
+                // Just go to the next category
+                continue CategoryLoop;
+                
+            case SkipSiblings:
+            case Stop:
+                // If skipping siblings of a category, it's identical to stopping.
+                break CategoryLoop;
+                
+            case Okay:
+                break;
             }
 
-
+            List<Microinstruction<?>> sortedMicros = microMap.get(mc).stream()
+                    .sorted((l, r) -> l.getName().compareTo(r.getName()))
+                    .map(v -> (Microinstruction<?>)v)
+                    .collect(Collectors.toList());
+            
+            MicroLoop: for (Microinstruction<?> micro: sortedMicros) {
+                switch (visitor.visitMicro(micro)) {
+                case SkipChildren:
+                case Okay:
+                    continue MicroLoop;
+                    
+                case SkipSiblings:
+                    break MicroLoop;
+                    
+                case Stop:
+                    break CategoryLoop;
+                }
+            }
         }
     }
 
@@ -874,7 +906,6 @@ public class Machine extends Module<Machine> implements Serializable {
         return runMode;
     }
 
-
     /**
      * executes the machine using the given mode of execution.
      * The mode can be any of the following values in CPUSimConstants:
@@ -887,6 +918,8 @@ public class Machine extends Module<Machine> implements Serializable {
      * @param mode the run mode for execution.
      */
     public void execute(final RunModes mode) {
+        validate();
+        
         setRunMode(mode);
 
 
@@ -900,8 +933,7 @@ public class Machine extends Module<Machine> implements Serializable {
                     haltBitsThatAreSet().size() == 0) {
 
                 MachineInstruction currentInstruction = controlUnit.getCurrentInstruction();
-                List<Microinstruction> microInstructions =
-                        currentInstruction.getMicros();
+                List<Microinstruction<?>> microInstructions = currentInstruction.getMicros();
                 int currentIndex = controlUnit.getMicroIndex();
 
                 if (currentIndex < 0 || currentIndex >= microInstructions.size()) {
@@ -934,8 +966,7 @@ public class Machine extends Module<Machine> implements Serializable {
 
                         MachineInstruction currentInstruction =
                                 controlUnit.getCurrentInstruction();
-                        List<Microinstruction> microInstructions =
-                                currentInstruction.getMicros();
+                        List<Microinstruction<?>> microInstructions = currentInstruction.getMicros();
                         int currentIndex = controlUnit.getMicroIndex();
 
                         if (currentIndex < 0 ||
@@ -1095,7 +1126,7 @@ public class Machine extends Module<Machine> implements Serializable {
         //go through all the instrs and get their Comment micros in a list.
         List<Comment> result = new ArrayList<Comment>();
         for (MachineInstruction instr : instructions) {
-            List<Microinstruction> micros = instr.getMicros();
+            List<Microinstruction<?>> micros = instr.getMicros();
             for (Microinstruction micro : micros)
                 if (micro instanceof Comment) {
                     result.add((Comment) micro);
@@ -1131,9 +1162,13 @@ public class Machine extends Module<Machine> implements Serializable {
         // Validate all of the internal state
         moduleMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
         microMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
+        
+        if (programCounter == null) {
+            throw new ValidationException("Program counter Register is not set.");
+        }
     }
 
-    public interface MicroInstructionVisitor {
+    public interface MicroinstructionVisitor {
 
         enum VisitResult {
 
@@ -1163,7 +1198,7 @@ public class Machine extends Module<Machine> implements Serializable {
 
         VisitResult visitSubCategory(final String subcategory);
 
-        VisitResult visitMicro(final Microinstruction micro);
+        VisitResult visitMicro(final Microinstruction<?> micro);
 
     }
     

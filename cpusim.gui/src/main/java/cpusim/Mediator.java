@@ -82,6 +82,7 @@ package cpusim;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;
+import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
@@ -93,7 +94,11 @@ import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.units.ArchType;
-import cpusim.util.*;
+import cpusim.util.BackupManager;
+import cpusim.util.Dialogs;
+import cpusim.util.LoadException;
+import cpusim.util.MIFReaderException;
+import cpusim.util.SourceLine;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -171,9 +176,8 @@ public class Mediator {
                 register.valueProperty().addListener(listener);
             }
         }
-        ObservableList rams = machine.get().getModule("rams");
-        for (Object o : rams) {
-            RAM ram = (RAM) o;
+        ObservableList<RAM> rams = machine.get().getModule(RAM.class);
+        for (RAM ram : rams) {
             ram.dataProperty().removeListener(listener);
             ram.dataProperty().addListener(listener);
         }
@@ -187,8 +191,8 @@ public class Mediator {
         return this.desktopController;
     }
 
-    public ObservableList getModule(String moduleType) {
-        Machine machineObj = machine.get();
+    public <U extends Module<U>> ObservableList<U> getModule(Class<U> moduleType) {
+        final Machine machineObj = machine.get();
         return machineObj.getModule(moduleType);
     }
 
@@ -247,7 +251,7 @@ public class Mediator {
      *
      * @return the Mediator's current Machine Property.
      */
-    public SimpleObjectProperty<Machine> getMachineProperty() {
+    public SimpleObjectProperty<Machine> machineProperty() {
         return machine;
     }
 

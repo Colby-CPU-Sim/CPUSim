@@ -16,17 +16,19 @@
  */
 package cpusim.model.iochannel;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import cpusim.model.ExecutionException;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.PushBackReader;
 import cpusim.util.PushBackWriter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.UUID;
 
 
 /**
@@ -34,9 +36,11 @@ import cpusim.util.PushBackWriter;
  * It maintains PushBackReaders and FileWriters for each file
  * and maintains the data to and from the user.
  */
-public class FileChannel implements IOChannel, AutoCloseable  {
+public class FileChannel implements IOChannel, AutoCloseable, IdentifiedObject {
 	// Where to get or send the data
 	private File file;
+	
+	private final UUID id;
 	
 	// Reader for the file for input
 	private PushBackReader reader;
@@ -48,13 +52,28 @@ public class FileChannel implements IOChannel, AutoCloseable  {
 	 * constructor should probably not be used. The file channel
 	 * that is used is in the CPUSimConstants file, it is the only
 	 * one that is used.
-	 * 
+	 *
+     * @param id Unique identifier
 	 * @param file - The file for the channel to read from or write to.
 	 */
-    public FileChannel(File file) {
+    public FileChannel(UUID id, File file) {
         this.file = file;
         this.reader = null;
         this.writer = null;
+        
+        this.id = id;
+    }
+    
+    /**
+     * Creates a new File Channel. Note that this file channel
+     * constructor should probably not be used. The file channel
+     * that is used is in the CPUSimConstants file, it is the only
+     * one that is used.
+     *
+     * @param file - The file for the channel to read from or write to.
+     */
+    public FileChannel(File file) {
+        this(IdentifiedObject.generateRandomID(), file);
     }
     
     @Override
@@ -347,8 +366,8 @@ public class FileChannel implements IOChannel, AutoCloseable  {
      * only for backwards compatibility.
      * @return a String representation of the object.
      */
-    public String getID() {
-        return file.toString();
+    public UUID getID() {
+        return id;
     }
 
 	@Override

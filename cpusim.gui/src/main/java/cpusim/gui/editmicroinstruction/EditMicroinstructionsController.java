@@ -2,12 +2,15 @@ package cpusim.gui.editmicroinstruction;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
+import cpusim.gui.util.MachineBound;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.Copyable;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -20,9 +23,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * This class is the controller for the dialog box that is used for
@@ -30,7 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2013-06-05
  */
-public class EditMicroinstructionsController extends BorderPane implements DialogButtonController.InteractionHandler {
+public class EditMicroinstructionsController extends BorderPane
+        implements DialogButtonController.InteractionHandler, MachineBound {
     
     @FXML @SuppressWarnings("unused")
     private TabPane contentPane;
@@ -44,9 +47,12 @@ public class EditMicroinstructionsController extends BorderPane implements Dialo
     @FXML @SuppressWarnings("unused")
     private Button helpButton;
 
+    @FXML @SuppressWarnings("unused")
+    private DialogButtonController dialogButtonController;
+
+    private ObjectProperty<Machine> machine;
     private final Mediator mediator;
 
-    private final DialogButtonController dialogButtonController;
 
     // List of all Contollers, it's long and nasty, but has to live somewhere. Try to keep in lexographic order
     // for maintainability sake.
@@ -70,6 +76,8 @@ public class EditMicroinstructionsController extends BorderPane implements Dialo
     public EditMicroinstructionsController(Mediator mediator) {
         this.mediator = checkNotNull(mediator);
 
+        this.machine = mediator.machineProperty();
+
         this.arithmeticTableController = new ArithmeticTableController(mediator);
         this.branchTableController = new BranchTableController(mediator);
         this.decodeTableController = new DecodeTableController(mediator);
@@ -85,22 +93,7 @@ public class EditMicroinstructionsController extends BorderPane implements Dialo
         this.transferRtoATableController = new TransferRtoATableController(mediator);
         this.transferRtoRTableController = new TransferRtoRTableController(mediator);
 
-        ImmutableList<MicroinstructionTableController<?>> allControllers = ImmutableList.of(arithmeticTableController,
-                branchTableController,
-                decodeTableController,
-                incrementTableController,
-                ioTableController,
-                logicalTableController,
-                memoryAccessTableController,
-                setCondBitTableController,
-                setTableController,
-                shiftTableController,
-                testTableController,
-                transferAtoRTableController,
-                transferRtoATableController,
-                transferRtoRTableController);
 
-        this.dialogButtonController = new DialogButtonController(mediator, this, allControllers);
     }
     
     /**
@@ -211,8 +204,24 @@ public class EditMicroinstructionsController extends BorderPane implements Dialo
         // Select the first tab, seems like a good default.
         contentPane.getSelectionModel().select(0);
 
-        // Set the item bottom of the dialog with the controllers.
-        setBottom(dialogButtonController);
+        ImmutableSet<MicroinstructionTableController<?>> allControllers = ImmutableSet.of(arithmeticTableController,
+                branchTableController,
+                decodeTableController,
+                incrementTableController,
+                ioTableController,
+                logicalTableController,
+                memoryAccessTableController,
+                setCondBitTableController,
+                setTableController,
+                shiftTableController,
+                testTableController,
+                transferAtoRTableController,
+                transferRtoATableController,
+                transferRtoRTableController);
+
+        dialogButtonController.bindMachine(machine);
+        dialogButtonController.setInteractionHandler(this);
+        dialogButtonController.setControllers(allControllers);
     }
 
     /**
@@ -268,7 +277,7 @@ public class EditMicroinstructionsController extends BorderPane implements Dialo
      * Class combining a {@link ControlButtonController} and a {@link MicroinstructionTableController}.
      * @param <T>
      */
-    private class MicroinstructionTab<T extends Microinstruction & Copyable<T>> extends Tab {
+    private class MicroinstructionTab<T extends Microinstruction<T>> extends Tab {
 
         private final ControlButtonController<T> buttonCtrlr;
 

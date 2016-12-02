@@ -165,7 +165,7 @@ public class MachineHTMLWriter
     public void writeMachineInHTML(Machine machine, PrintWriter out)
     {
         List<List<? extends Module<?>>> moduleVectors = machine.getAllModules();
-        List<List<? extends Microinstruction>> microVectors = machine.getAllMicros();
+        List<List<Microinstruction<?>>> microVectors = machine.getAllMicros();
 
         out.println("<HTML><HEAD>");
         out.println("<TITLE>" + machine.getHTMLName() + "</TITLE></HEAD>");

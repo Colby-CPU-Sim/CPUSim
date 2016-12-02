@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.collections.*?>
-<?import javafx.collections.FXCollections?>
-<?import javafx.scene.control.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.layout.*?>
-<?import java.lang.String?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 
-<BorderPane prefHeight="600.0" prefWidth="600.0" styleClass="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="600.0" styleClass="root" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
     <center>
       <TabPane fx:id="modulePane" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -40,21 +37,6 @@
          </BorderPane.margin>
       </TabPane>
     </center>
-    <bottom>
-      <HBox maxWidth="1.7976931348623157E308" spacing="15.0" VBox.vgrow="NEVER">
-         <children>
-                    <Button fx:id="helpButton" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" onAction="#onHelpButtonClick" styleClass="helpButton" text="?" HBox.hgrow="NEVER" />
-            <Region maxWidth="1.7976931348623157E308" HBox.hgrow="ALWAYS" />
-                    <Button fx:id="okButton" defaultButton="true" maxWidth="1.7976931348623157E308" minHeight="30" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOKButtonClick" prefHeight="30.0" prefWidth="120.0" styleClass="roundBlueButton" text="OK" HBox.hgrow="SOMETIMES">
-                                </Button>
-                    <Button fx:id="cancelButton" cancelButton="true" maxWidth="1.7976931348623157E308" minHeight="30" minWidth="-Infinity" mnemonicParsing="false" onAction="#onCancelButtonClick" prefHeight="30.0" prefWidth="120.0" styleClass="roundButton" text="Cancel" HBox.hgrow="SOMETIMES">
-                                </Button>
-         </children>
-         <BorderPane.margin>
-            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
-         </BorderPane.margin>
-      </HBox>
-    </bottom>
     <stylesheets>
         <URL value="@../css/Dialogs.css" />
     </stylesheets>

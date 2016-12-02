@@ -7,7 +7,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableView;
@@ -45,10 +44,14 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
         this.hasExtendedProperties = hasExtendedProperties;
         this.interactionHandler = interactionHandler;
         this.buttonListener = new ButtonChangeListener();
-
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, FXML_PATH);
+    }
+    
+    /**
+     * Loads the buttons FXML file, see {@link #FXML_PATH} for the location.
+     */
+    protected void loadFXML() {
         try {
-            fxmlLoader.load();
+            FXMLLoaderFactory.fromRootController(this, ControlButtonController.class, FXML_PATH).load();
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }

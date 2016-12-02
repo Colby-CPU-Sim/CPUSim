@@ -5,24 +5,24 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.List;
+import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
- * The branch microinstruction is identical to the Test microinstruction except
- * that it is an unconditional jump.
+ * Decodes an instruction and stores it in a {@link Register}.
  *
  * @since 2013-06-06
  */
-public class Decode extends Microinstruction implements Copyable<Decode> {
+public class Decode extends Microinstruction<Decode> {
     
     private SimpleObjectProperty<Register> ir;
-
+    
     /**
      * Constructor
      * creates a new Branch object with input values.
@@ -31,10 +31,20 @@ public class Decode extends Microinstruction implements Copyable<Decode> {
      * @param machine the machine that the microinstruction belongs to.
      * @param ir size of the relative jump.
      */
-    public Decode(String name, Machine machine,
+    public Decode(String name,
+                  UUID id,
+                  Machine machine,
                   Register ir){
-        super(name, machine);
+        super(name, id, machine);
         this.ir = new SimpleObjectProperty<>(ir);
+    }
+    
+    /**
+     * Copy consturctor
+     * @param other Instance to copy from
+     */
+    public Decode(Decode other) {
+        this(other.getName(), IdentifiedObject.generateRandomID(), other.machine, other.getIr());
     }
 
     /**
@@ -55,15 +65,6 @@ public class Decode extends Microinstruction implements Copyable<Decode> {
         ir.set(newIr);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "decode";
-    }
-
     /**
      * execute the micro instruction from machine
      */

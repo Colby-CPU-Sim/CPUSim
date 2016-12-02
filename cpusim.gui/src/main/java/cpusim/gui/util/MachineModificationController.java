@@ -10,14 +10,7 @@ import java.util.List;
  *
  * @since 2016-11-30
  */
-public interface MachineModificationController<T extends Validatable> {
-
-
-    /**
-     * Access the stored machine.
-     * @return Non-{@code null} {@code Machine} stored by the controller.
-     */
-    Machine getMachine();
+public interface MachineModificationController<T extends Validatable> extends MachineBound {
 
     /**
      * Writes the content of the controller to the {@link Machine}.

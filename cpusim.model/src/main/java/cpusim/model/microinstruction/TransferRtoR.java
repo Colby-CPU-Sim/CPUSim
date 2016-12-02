@@ -1,19 +1,42 @@
-/**
- * author: Jinghui Yu
- * lastEditingDate: 6/7/2013
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
+
+import java.util.UUID;
 
 /**
  * The TransferRtoR microinstruction transfers data from a register to a register.
+ *
+ * @since 2013-06-07
  */
-public class TransferRtoR extends Transfer<Register, Register> implements Copyable<TransferRtoR> {
+public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
+    
+    /**
+     * Constructor
+     * creates a new Transfer object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param id Unique ID for the microinstruction
+     * @param machine the machine that the microinstruction belongs to.
+     * @param source the register whose value is to be tested.
+     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be transfered.
+     * @param dest the destination register.
+     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
+     * @param numBits a non-negative integer indicating the number of bits to be tested.
+     */
+    public TransferRtoR(String name,
+                        UUID id,
+                        Machine machine,
+                        Register source,
+                        int srcStartBit,
+                        Register dest,
+                        int destStartBit,
+                        int numBits){
+        super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
+    }
     
     /**
      * Constructor
@@ -28,12 +51,12 @@ public class TransferRtoR extends Transfer<Register, Register> implements Copyab
      * @param numBits a non-negative integer indicating the number of bits to be tested.
      */
     public TransferRtoR(String name, Machine machine,
-                Register source,
-                int srcStartBit,
-                Register dest,
-                int destStartBit,
-                int numBits){
-        super(name, machine, source, srcStartBit, dest, destStartBit, numBits);
+                        Register source,
+                        int srcStartBit,
+                        Register dest,
+                        int destStartBit,
+                        int numBits){
+        this(name, IdentifiedObject.generateRandomID(), machine, source, srcStartBit, dest, destStartBit, numBits);
     }
     
     /**
@@ -42,15 +65,6 @@ public class TransferRtoR extends Transfer<Register, Register> implements Copyab
      */
     public TransferRtoR(TransferRtoR other) {
         super(other);
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "transferRtoR";
     }
     
     @Override

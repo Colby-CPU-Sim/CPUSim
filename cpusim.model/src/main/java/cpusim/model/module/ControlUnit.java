@@ -17,7 +17,10 @@ package cpusim.model.module;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Module;
+import cpusim.model.util.IdentifiedObject;
+
 import java.io.Serializable;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -26,25 +29,34 @@ import static com.google.common.base.Preconditions.*;
  */
 public class ControlUnit extends Module<ControlUnit> implements Serializable
 {
-
-    private MachineInstruction currentInstruction;
+    
     //the instr currently or about to be executed
-    private int microIndex;
+    private MachineInstruction currentInstruction;
+    
     //the index of the micro sequence
-    private Machine machine;
+    private int microIndex;
+    
     //the machine of which this is the control unit
+    private Machine machine;
 
     /**
      * Constructor
      * @param name name of the control unit
      * @param machine machine that implement it
      */
-    public ControlUnit(String name, Machine machine)
-    {
-        super(name);
+    public ControlUnit(String name, UUID id, Machine machine) {
+        super(name, id, machine);
         microIndex = 0;
         currentInstruction = machine.getFetchSequence();
-        this.machine = machine;
+    }
+    
+    /**
+     * Constructor
+     * @param name name of the control unit
+     * @param machine machine that implement it
+     */
+    public ControlUnit(String name, Machine machine) {
+        this(name, IdentifiedObject.generateRandomID(), machine);
     }
 
     /**

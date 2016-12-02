@@ -15,10 +15,14 @@
 
 package cpusim.model.module;
 
+import cpusim.model.util.Copyable;
+import cpusim.model.util.LegacyXMLSupported;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -27,7 +31,7 @@ import java.util.Objects;
  * 
  * @since 2001-06-01
  */
-public class RegisterRAMPair implements Cloneable {
+public class RegisterRAMPair implements LegacyXMLSupported, Copyable<RegisterRAMPair> {
 	
 	private SimpleObjectProperty<Register> register;
 	private SimpleObjectProperty<RAM> ram;
@@ -50,6 +54,14 @@ public class RegisterRAMPair implements Cloneable {
         ram = new SimpleObjectProperty<>(theRAM);
         dynamic = new SimpleBooleanProperty(dyn);
         addressAtStart = 0;
+    }
+    
+    /**
+     * Copy constructor
+     * @param other instance to copy
+     */
+    public RegisterRAMPair(RegisterRAMPair other) {
+        this(other.getRegister(), other.getRam(), other.isDynamic());
     }
 
     //getters and setters
@@ -97,20 +109,18 @@ public class RegisterRAMPair implements Cloneable {
     public SimpleBooleanProperty dynamicProperty() {
     	return dynamic;
     }
-
-    /**
-     * Gives a clone of the current
-     * RegisterRAM pair. Must be casted from 
-     * an Object to RegisterRAMPair.
-     * 
-     * @return a clone of the current
-     * RegisterRAM pair
-     */
-    public RegisterRAMPair clone() {
-        return new RegisterRAMPair(register.get(), ram.get(), dynamic.get());
+    
+    @Override
+    public <U extends RegisterRAMPair> void copyTo(final U other) {
+        checkNotNull(other);
+        
+        other.setRegister(getRegister());
+        other.setDynamic(isDynamic());
+        other.setRam(getRam());
     }
-
-    public String getXMLDescription() {
+    
+    @Override
+    public String getXMLDescription(String indent) {
         return "<RegisterRAMPair register=\"" + register.get().getID() +
                 "\" ram=\"" + ram.get().getID() + "\" dynamic=\"" +
                 (dynamic.get() ? "true" : "false") + "\" />";

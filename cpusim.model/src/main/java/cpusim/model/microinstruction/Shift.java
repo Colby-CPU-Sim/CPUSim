@@ -1,23 +1,13 @@
-/**
- * Author: Jinghui Yu
- * last editing date: 6/6/2013
- */
-
-/*
- * Michael Goldenberg, Ben Borchard, and Jinghui Yu made the following changes in 11/6/13
- * 
- * 1.) Modified the getMicroClass() method so that it returns "shift" instead of "clone"
- * 
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -26,7 +16,7 @@ import static com.google.common.base.Preconditions.*;
  * specified source register to either the left ot the right and places the result
  * in the destination register.
  */
-public class Shift extends Transfer<Register, Register> implements Copyable<Shift> {
+public class Shift extends Transfer<Register, Register, Shift> {
     
     // TODO Enumeration
     private SimpleStringProperty type;
@@ -47,17 +37,50 @@ public class Shift extends Transfer<Register, Register> implements Copyable<Shif
      * @param direction left or right shift.
      * @param distance number of bits to be shifted.
      */
+    public Shift(String name,
+                 UUID id,
+                 Machine machine,
+                 Register source,
+                 Register destination,
+                 String type,
+                 String direction,
+                 int distance){
+        super(name, id, machine, source, 0, destination, 0, source.getWidth());
+        
+        this.type = new SimpleStringProperty(type);
+        this.direction = new SimpleStringProperty(direction);
+        this.distance = new SimpleIntegerProperty(distance);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param source the source register.
+     * @param destination the destination register.
+     * @param type type of shift.
+     * @param direction left or right shift.
+     * @param distance number of bits to be shifted.
+     */
     public Shift(String name, Machine machine,
                  Register source,
                  Register destination,
                  String type,
                  String direction,
                  int distance){
-        super(name, machine, source, 0, destination, 0, source.getWidth());
-        
-        this.type = new SimpleStringProperty(type);
-        this.direction = new SimpleStringProperty(direction);
-        this.distance = new SimpleIntegerProperty(distance);
+        this(name, IdentifiedObject.generateRandomID(), machine, source, destination, type, direction, distance);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param other instance to copy
+     */
+    public Shift(Shift other){
+        this(other.getName(), other.machine, other.getSource(), other.getDest(), other.getType(), other.getDirection(), other.getDistance());
     }
 
     /**
@@ -106,15 +129,6 @@ public class Shift extends Transfer<Register, Register> implements Copyable<Shif
      */
     public void setDistance(int newDistance){
         distance.set(newDistance);
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "shift";
     }
     
     @Override

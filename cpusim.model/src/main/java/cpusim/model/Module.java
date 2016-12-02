@@ -21,6 +21,7 @@ package cpusim.model;
 
 
 import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validatable;
@@ -28,7 +29,7 @@ import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.SimpleStringProperty;
 
-import java.util.Comparator;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -37,29 +38,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 // the Module class
 
 public abstract class Module<T extends Module<T>>
-        implements NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>, Validatable
+        implements IdentifiedObject, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>, Validatable
 {
     private SimpleStringProperty name;	//name of the module
-    private String ID; //unique ID used when saving in XML
+    private UUID id; //unique ID used when saving in XML
     protected Machine machine; //machine that holds the module
 
     //------------------------------
     // constructor
-
-    public Module(String name)
-    {
-        this.name = new SimpleStringProperty(name);
-
-        String s = super.toString();
-        int index = s.indexOf('@');
-        if (index == -1)
-            ID = s;
-        else
-            ID = s.substring(7, index) + s.substring(index + 1);
-    }
     
-    public Module(String name, Machine machine){
-        this(name);
+    protected Module(String name, UUID id, Machine machine) {
+        this.name = new SimpleStringProperty(name);
+        this.id = checkNotNull(id);
         this.machine = machine;
     }
 
@@ -91,14 +81,10 @@ public abstract class Module<T extends Module<T>>
         return name;
     }
     
-
-    // the ID is a unique identifier for each module.  It is
-    // used in the XML machine file.
-    // if the toString() method returns "cpusim.xxx.zzz@yyy",
-    // then this method returns "xxx.zzzyyy".
-    public String getID()
+    @Override
+    public UUID getID()
     {
-        return ID;
+        return id;
     }
     
     /**

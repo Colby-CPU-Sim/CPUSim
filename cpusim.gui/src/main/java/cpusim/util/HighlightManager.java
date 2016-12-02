@@ -69,9 +69,9 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
      */
     public void setRegisterRAMPairs(ObservableList<RegisterRAMPair> newPairs) {
         highlightingPairs.clear();
-        ObservableList rams = mediator.getMachine().getModule("rams");
-        for (Object ram : rams) {
-            highlightingPairs.put((RAM) ram, new Vector<>());
+        ObservableList<RAM> rams = mediator.getMachine().getModule(RAM.class);
+        for (RAM ram : rams) {
+            highlightingPairs.put(ram, new Vector<>());
         }
         for (RegisterRAMPair pair : newPairs) {
             highlightingPairs.get(pair.getRam()).addElement(pair);
@@ -98,12 +98,12 @@ public class HighlightManager implements ChangeListener<Machine.StateWrapper>
      * the machine via the Modules Dialog.
      */
     public void updatePairsForNewRegistersAndRAMs() {
-        ObservableList rams = mediator.getMachine().getModule("rams");
+        ObservableList<RAM> rams = mediator.getMachine().getModule(RAM.class);
 
         //update pairs for new RAMs
-        for (Object ram : rams) {
+        for (RAM ram : rams) {
             if (!highlightingPairs.containsKey(ram)) {
-                highlightingPairs.put((RAM) ram, new Vector<>());
+                highlightingPairs.put(ram, new Vector<>());
             }
         }
         //update pairs for deleted RAMs

@@ -238,7 +238,7 @@ public class MachineWriter
     public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out)
     {
         List<List<? extends Module<?>>> moduleVectors = machine.getAllModules();
-        List<List<? extends Microinstruction>> microVectors = machine.getAllMicros();
+        List<List<Microinstruction<?>>> microVectors = machine.getAllMicros();
         
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println(internalDTD);
@@ -282,7 +282,7 @@ public class MachineWriter
             for (FileChannel channel : fileChannelSet) {
                 out.println("\t<FileChannel file=\"" +
                         HtmlEncoder.sEncode(channel.toString()) +
-                        "\" id=\"" + HtmlEncoder.sEncode(channel.getID()) + "\" />");
+                        "\" id=\"" + HtmlEncoder.sEncode(channel.getID().toString()) + "\" />");
             }
         }
 
@@ -389,7 +389,7 @@ public class MachineWriter
         //print the program counter info
         out.println();
         out.println("\t<!--............. program counter info ..................-->");
-        if (machine.getProgramCounter() != Machine.PLACE_HOLDER_REGISTER) {
+        if (machine.getProgramCounter() != null) {
             out.println("\t<ProgramCounterInfo programCounter=\"" +
                     machine.getProgramCounter().getID() + "\" />");
         }

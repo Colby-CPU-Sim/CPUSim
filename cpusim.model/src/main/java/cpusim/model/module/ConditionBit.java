@@ -16,12 +16,14 @@ package cpusim.model.module;
 
 import cpusim.model.Machine;
 import cpusim.model.Module;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -30,28 +32,45 @@ import java.util.Optional;
  * or it can be set to 1 if an overflow or carry out occurs in an
  * Arithmetic or Increment microinstruction.
  */
-public class ConditionBit extends Module<ConditionBit>
-{
+public class ConditionBit extends Module<ConditionBit> {
 	
     private SimpleObjectProperty<Register> register;  //the register containing the bit
     private SimpleIntegerProperty bit;    //the index of the bit in the register, bit = 0
     //means the left-most or rightmost bit depending on the indexFromRight field in the machine.
     private SimpleBooleanProperty halt;  //should machine halt when this bit is set to 1?
-
-    private static final ConditionBit NONE_SET = new ConditionBit("(none)", new Machine("None"), new Register("", 1), 0, false);
     
     /**
      * Get the {@link ConditionBit} referring to having no condition bit set. This replaces the old <code>CpuSimConstants.NO_CONDITIONBIT</code>
      * field.
      * 
-     * @return {@link #NONE_SET}
+     * @return {@code null}
      * 
      * @since 2016-10-12
      * @deprecated Use an {@link Optional} instead to store if there maybe none set. 
      */
     @Deprecated
     public static ConditionBit none() {
-    	return NONE_SET;
+    	
+        return null;
+    }
+    
+    /**
+     * Constructor
+     * @param name name of the condition bit
+     * @param machine the machine that contains this condition bit
+     * @param register the register that contains the condition bit
+     * @param bit the bit of the register that is the condition bit.
+     * @param halt  a boolean value.
+     *              If this value is true, then the machine will halt
+     *              and display a message after the execution of any
+     *              microinstruction that causes the bit's value to
+     *              be set to 1.
+     */
+    public ConditionBit(String name, UUID id, Machine machine, Register register, int bit, boolean halt) {
+        super(name, id, machine);
+        this.register = new SimpleObjectProperty<>(register);
+        this.bit = new SimpleIntegerProperty(bit);
+        this.halt = new SimpleBooleanProperty(halt);
     }
     
     /**
@@ -68,10 +87,7 @@ public class ConditionBit extends Module<ConditionBit>
      */
     public ConditionBit(String name, Machine machine, Register register, int bit, boolean halt)
     {
-        super(name, machine);
-        this.register = new SimpleObjectProperty<>(register);
-        this.bit = new SimpleIntegerProperty(bit);
-        this.halt = new SimpleBooleanProperty(halt);
+        this(name, IdentifiedObject.generateRandomID(), machine, register, bit, halt);
     }
 
     /**

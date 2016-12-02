@@ -1,8 +1,3 @@
-/**
- * Author: Jinghui Yu
- * LastEditingDate: 6/7/2013
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.ExecutionException;
@@ -10,15 +5,18 @@ import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import java.util.UUID;
+
 /**
  * The TransferRtoA microinstruction transfers data from a register to a register array.
+ * @since 2013-06-07
  */
-public class TransferAtoR extends Transfer<RegisterArray, Register> implements Copyable<TransferAtoR> {
+public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR> {
     
     private SimpleObjectProperty<Register> index;
     private SimpleIntegerProperty indexStart;
@@ -26,7 +24,37 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
 
     /**
      * Constructor
-     * creates a new Test object with input values.
+     * creates a new TransferRtoA object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param id Unique ID
+     * @param machine the machine that the microinstruction belongs to.
+     * @param source the register whose value is to be tested.
+     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be tested.
+     * @param dest the destination register.
+     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
+     * @param numBits a non-negative integer indicating the number of bits to be tested.
+     */
+    public TransferAtoR(String name,
+                        UUID id,
+                        Machine machine,
+                        RegisterArray source,
+                        int srcStartBit,
+                        Register dest,
+                        int destStartBit,
+                        int numBits,
+                        Register index,
+                        int indexStart,
+                        int indexNumBits){
+        super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
+        this.index = new SimpleObjectProperty<>(index);
+        this.indexStart = new SimpleIntegerProperty(indexStart);
+        this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+    }
+    
+    /**
+     * Constructor
+     * creates a new TransferRtoA object with input values.
      *
      * @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
@@ -46,10 +74,12 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
                         Register index,
                         int indexStart,
                         int indexNumBits){
-        super(name, machine, source, srcStartBit, dest, destStartBit, numBits);
-        this.index = new SimpleObjectProperty<>(index);
-        this.indexStart = new SimpleIntegerProperty(indexStart);
-        this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+        this(name, IdentifiedObject.generateRandomID(),
+                machine, source,
+                srcStartBit, dest,
+                destStartBit, numBits,
+                index, indexStart,
+                indexNumBits);
     }
     
     /**
@@ -57,7 +87,11 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
      * @param other copied instance
      */
     public TransferAtoR(TransferAtoR other) {
-        super(other);
+        this(other.getName(), other.machine,
+                other.getSource(), other.getSrcStartBit(),
+                other.getDest(), other.getDestStartBit(),
+                other.getNumBits(), other.getIndex(),
+                other.getIndexStart(), other.getIndexNumBits());
     }
 
     /**
@@ -114,15 +148,6 @@ public class TransferAtoR extends Transfer<RegisterArray, Register> implements C
         indexNumBits.set(newIndexNumBits);
     }
     
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "transferAtoR";
-    }
-
     /**
      * copies the data from the current micro to a specific micro
      * @param newTransferAtoR the micro instruction that will be updated

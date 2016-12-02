@@ -5,7 +5,9 @@ import cpusim.model.Module;
 /**
  * Denotes that a {@link Module} has a bit width.
  *
- * @author Kevin Brightwell (Nava2)
+ * @param <T> Used to force this only be used on Module types. If {@link Module} was an interface, this should just
+ *           inherit from that, but it's not.
+ *
  * @since 2016-11-14
  */
 public interface Sized<T extends Module<T>> {

@@ -25,7 +25,6 @@
 package cpusim.gui.editmodules;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.EditingLongCell;
@@ -35,6 +34,7 @@ import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
@@ -79,6 +79,8 @@ public class RegistersTableController extends ModuleTableController<Register> {
 
     RegistersTableController(Mediator mediator){
         super(mediator, "RegistersTable.fxml", Register.class);
+    
+        loadFXML();
     }
 
     @Override
@@ -168,7 +170,7 @@ public class RegistersTableController extends ModuleTableController<Register> {
      */
     @Override
     public Register createInstance() {
-        return new Register("???", 16, 0, false);
+        return new Register("???", IdentifiedObject.generateRandomID(), machine,16, 0, Register.Access.readWrite());
     }
 
     /**

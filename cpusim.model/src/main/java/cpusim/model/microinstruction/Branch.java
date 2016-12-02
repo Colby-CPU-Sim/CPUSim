@@ -1,28 +1,27 @@
-/**
- * Author: Jinghui Yu
- * Last editing date: 6/6/2013
- */
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.ControlUnit;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.SimpleIntegerProperty;
+
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
 
 /**
- * The branch microinstruction is identical to the Test microinstruction except
+ * The branch microinstruction is identical to the {@link Test} microinstruction except
  * that it is an unconditional jump.
+ *
+ * @since 2013-06-07
  */
-public class Branch extends Microinstruction implements Copyable<Branch>
+public class Branch extends Microinstruction<Branch>
 {
-    private SimpleIntegerProperty amount;
+    private final SimpleIntegerProperty amount;
     private ControlUnit controlUnit;
-
+    
     /**
      * Constructor
      * creates a new Branch object with input values.
@@ -31,13 +30,37 @@ public class Branch extends Microinstruction implements Copyable<Branch>
      * @param machine the microinstruction belongs to.
      * @param amount size of the relative jump.
      */
-    public Branch(String name, Machine machine,
+    public Branch(String name,
+                  Machine machine,
                   int amount,
-                  ControlUnit controlUnit)
-    {
-        super(name, machine);
+                  ControlUnit controlUnit) {
+        this(name, IdentifiedObject.generateRandomID(), machine, amount, controlUnit);
+    }
+    
+    /**
+     * Constructor
+     * creates a new Branch object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the microinstruction belongs to.
+     * @param amount size of the relative jump.
+     */
+    public Branch(String name,
+                  UUID id,
+                  Machine machine,
+                  int amount,
+                  ControlUnit controlUnit) {
+        super(name, id, machine);
         this.amount = new SimpleIntegerProperty(amount);
         this.controlUnit = controlUnit;
+    }
+    
+    /**
+     * Copy constructor
+     * @param other instance copied from.
+     */
+    public Branch(Branch other) {
+        this(other.getName(), other.machine, other.getAmount(), other.controlUnit);
     }
 
     /**
@@ -58,15 +81,6 @@ public class Branch extends Microinstruction implements Copyable<Branch>
     public void setAmount(int newAmount)
     {
         amount.set(newAmount);
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "branch";
     }
     
     /**

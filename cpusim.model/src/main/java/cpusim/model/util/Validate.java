@@ -105,7 +105,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -161,19 +160,6 @@ public abstract class Validate
 
         allOpcodesAreUnique(instrs);
         namedObjectsAreUniqueAndNonempty(instrs);
-    }
-    
-    /**
-     * Validates the namedObjects whose names are not used in assembly code.
-     * Will throw a classCastException if the array of objects passed in are not
-     * instances of NamedObject
-     * @param objects the nameable objects to be checked
-     * 
-     * @deprecated Use {@link #namedObjectsAreUniqueAndNonempty(List)}
-     */
-    public static void namedObjectsAreUniqueAndNonempty(NamedObject[] objects)
-    {
-        namedObjectsAreUniqueAndNonempty(Arrays.asList(objects));
     }
     
     /**
@@ -283,19 +269,6 @@ public abstract class Validate
      * Will throw a classCastException if the array of objects passed in are not
      * instances of NamedObject
      * @param objects list of nameable objects
-     * 
-     * @deprecated use {@link #allNamesAreNonEmpty(List)}
-     */
-    public static void allNamesAreNonEmpty(NamedObject[] objects)
-    {
-        allNamesAreNonEmpty(Arrays.asList(objects));
-    }
-    
-    /**
-     * validates that all names in a list of nameable objects are not empty.
-     * Will throw a classCastException if the array of objects passed in are not
-     * instances of NamedObject
-     * @param objects list of nameable objects
      */
     public static void allNamesAreNonEmpty(List<? extends NamedObject> objects)
     {
@@ -326,20 +299,6 @@ public abstract class Validate
                 }
             }
         }
-    }
-
-    // 
-    /**
-     * checks if all the names in the array of machine instrs are unique.
-     * Will throw a classCastException if the array of objects passed in are not
-     * instances of NamedObject
-     * @param list array of namedObjects
-     * 
-     * @deprecated Use {@link NamedObject#validateNamesUnique(List)}
-     */
-    public static void allNamesAreUnique(NamedObject[] list)
-    {
-        NamedObject.validateNamesUnique(Arrays.<NamedObject>asList(list));
     }
     
     /**
@@ -756,9 +715,9 @@ public abstract class Validate
      * microinstruction
      * @param micros list of microinstructions
      */
-    public static void containsDecodeMicro(List<Microinstruction> micros){
+    public static void containsDecodeMicro(List<Microinstruction<?>> micros){
         boolean containsDecode = false;
-        for (Microinstruction micro : micros){
+        for (Microinstruction<?> micro : micros){
             if (micro instanceof Decode){
                 containsDecode = true;
                 break;

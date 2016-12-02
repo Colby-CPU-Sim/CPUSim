@@ -1,53 +1,46 @@
-///////////////////////////////////////////////////////////////////////////////
-// File:    	End.java
-// Type:    	java application file
-// Author:		Dale Skrien
-// Project: 	CPU Sim
-// Date:    	June, 2000
-//
-// Description:
-//   This file contains the code for the End microinstruction class.
-//
-// Things to do:
-//	1. Write the execute method.
-///////////////////////////////////////////////////////////////////////////////
-
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.Module;
+import cpusim.model.util.IdentifiedObject;
 
-//import cpusim.model.module.*;
+import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public class End extends Microinstruction
+/**
+ * Denotes the end of a sequence of {@link Microinstruction} values.
+ *
+ * @since 2000-06-01
+ */
+public class End extends Microinstruction<End>
 {
 
+    /**
+     * Constructor
+     * @param id Unique ID for the instruction
+     * @param machine the machine that holds the micro
+     */
+    public End(UUID id, Machine machine)
+    {
+        super("End", id, machine);
+    } // end constructor
+    
     /**
      * Constructor
      * @param machine the machine that holds the micro
      */
     public End(Machine machine)
     {
-        super("End", machine);
+        this(IdentifiedObject.generateRandomID(), machine);
     } // end constructor
     
-//    /**
-//     * Copy constructor
-//     * @param other
-//     */
-//    public End(End other) {
-//      No copy constructor allowed.
-//    	super(other.getName(), other.machine);
-//    }
-    
     /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
+     * Copy constructor
+     * @param other Instance to copy from
      */
-    @Override
-    public String getMicroClass(){
-        return "end";
+    public End(End other) {
+    	this(other.machine);
     }
     
     @Override
@@ -55,19 +48,17 @@ public class End extends Microinstruction
         // nothing to validate
     }
     
-    /**
-     * returns true if this microinstruction uses m
-     * (so if m is modified, this micro may need to be modified.
-     * @param m the module that holds the microinstruction
-     * @return boolean value true if this micro used the module
-     */
     @Override
     public boolean uses(Module<?> m)
     {
         return false;
     }
-
-
+    
+    @Override
+    public void copyTo(final End other) {
+        checkNotNull(other);
+    }
+    
     /**
      * execute the micro instruction from machine
      */

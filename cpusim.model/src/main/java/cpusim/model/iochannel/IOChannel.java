@@ -20,14 +20,7 @@ import cpusim.model.ExecutionException;
 /**
  * Interface that any channels we want to use for input or output
  * must implement.
- * 
- * @author Dale Skrien
- * @author Stephen Morse
- * @author Ian Tibbits
- * @author Terrence Tan
  *
- * @author Kevin Brightwell (Nava2)
- * 
  * @since 2013-08-01
  */
 public interface IOChannel {

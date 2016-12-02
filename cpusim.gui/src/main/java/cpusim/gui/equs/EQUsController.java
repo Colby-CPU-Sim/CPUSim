@@ -203,7 +203,7 @@ public class EQUsController implements Initializable {
         int index = data.indexOf(selectedSet);
         if (index >= 0) {
             // Make new EQU and add to table
-            EQU newSet = (EQU) (selectedSet.clone());
+            EQU newSet = selectedSet.cloneOf();
             String orig = newSet.getName() + "_copy";
             String s = newSet.getName() + "_copy";
             List<String> names = getNames();
@@ -317,7 +317,7 @@ public class EQUsController implements Initializable {
         ObservableList<EQU> equs = mediator.getMachine().getEQUs();
         ObservableList<EQU> data = equsTable.getItems();
         for (EQU equ : equs) {
-            data.add((EQU) (equ.clone()));
+            data.add(equ.cloneOf());
         }
         equsTable.setItems(data);
     }

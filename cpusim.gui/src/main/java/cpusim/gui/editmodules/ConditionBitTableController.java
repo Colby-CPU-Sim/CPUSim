@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Controller for the {@link ConditionBit} table
  */
@@ -64,8 +66,10 @@ public class ConditionBitTableController extends ModuleTableController<Condition
                                 RegistersTableController registerController,
                                 RegisterArrayTableController arrayController){
         super(mediator, "ConditionBitTable.fxml", ConditionBit.class);
-        this.registerController = registerController;
-        this.arrayController = arrayController;
+        this.registerController = checkNotNull(registerController);
+        this.arrayController = checkNotNull(arrayController);
+        
+        loadFXML();
     }
 
 

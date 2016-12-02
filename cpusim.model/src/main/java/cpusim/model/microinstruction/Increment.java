@@ -4,21 +4,21 @@ import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.math.BigInteger;
+import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
- * The increment microinstrucion adds an integer constant to the contents of a register.
+ * The increment microinstrucion adds an integer constant to the contents of a {@link Register}.
  *
- * @author Jinghui Yu
  * @since 2013-06-06
  */
-public class Increment extends Microinstruction implements Copyable<Increment> {
+public class Increment extends Microinstruction<Increment> {
     
     private SimpleObjectProperty<Register> register;
     private SimpleObjectProperty<ConditionBit> overflowBit;
@@ -30,23 +30,58 @@ public class Increment extends Microinstruction implements Copyable<Increment> {
      * creates a new Increment object with input values.
      *
      * @param name name of the microinstruction.
+     * @param id Unique ID for the machine
      * @param machine the machine that the microinstruction belongs to.
      * @param register the register whose value is to be incremented.
      * @param overflowBit a condition bit.
      * @param delta the integer value what will be added to the register contents.
      */
-    public Increment(String name, Machine machine,
+    public Increment(String name,
+                     UUID id,
+                     Machine machine,
                      Register register,
                      ConditionBit overflowBit,
                      ConditionBit carryBit,
                      long delta){
-        super(name, machine);
+        super(name, id, machine);
         this.register = new SimpleObjectProperty<>(register);
         this.overflowBit = new SimpleObjectProperty<>(overflowBit);
         this.carryBit = new SimpleObjectProperty<>(carryBit);
         this.delta = new SimpleLongProperty(delta);
     }
-
+    
+    /**
+     * Constructor
+     * creates a new Increment object with input values.
+     *
+     * @param name name of the microinstruction.
+     * @param machine the machine that the microinstruction belongs to.
+     * @param register the register whose value is to be incremented.
+     * @param overflowBit a condition bit.
+     * @param delta the integer value what will be added to the register contents.
+     */
+    public Increment(String name,
+                     Machine machine,
+                     Register register,
+                     ConditionBit overflowBit,
+                     ConditionBit carryBit,
+                     long delta){
+        this(name, IdentifiedObject.generateRandomID(), machine, register, overflowBit, carryBit, delta);
+    }
+    
+    /**
+     * Copy constructor
+     * @param other instance to copy from
+     */
+    public Increment(Increment other) {
+        this(other.getName(),
+                other.machine,
+                other.getRegister(),
+                other.getOverflowBit(),
+                other.getCarryBit(),
+                other.getDelta());
+    }
+    
     /**
      * returns the register to be incremented.
      * @return the name of the register.
@@ -109,15 +144,6 @@ public class Increment extends Microinstruction implements Copyable<Increment> {
      */
     public void setDelta(long newDelta){
         delta.set(newDelta);
-    }
-    
-    /**
-     * returns the class of the microinstruction
-     * @return the class of the microinstruction
-     */
-    @Override
-    public String getMicroClass(){
-        return "increment";
     }
     
     @Override

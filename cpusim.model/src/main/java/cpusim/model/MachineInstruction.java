@@ -1,49 +1,12 @@
-///////////////////////////////////////////////////////////////////////////////
-// File:    	MachineInstruction.java
-// Type:    	java application file
-// Author:		Dale Skrien
-// Project: 	CPU Sim
-// Date:    	June, 1999
-//
-// Description:
-//   This file contains the class for Machine Instructions created using CPU Sim
-
-
-///////////////////////////////////////////////////////////////////////////////
-// the package in which our project resides
-
-/*
- * Michael Goldenberg, Ben Borchard, and Jinghui Yu made the following changes 
- * 
- * on 11/6/13
- * 
- * 1.) Made it so that when the ignored fields are removed from the assemblyFields ArrayList, the
- * corresponding colors are removed from the assemblyColors array so that all the colors for 
- * the instruction and assembly fields match up and so that there aren't more assemblyColors than
- * there are assembly Fields
- * 2.) After making the first change, we needed to make sure that the instructionColor ArrayList
- * and the assemblyFields ArrayList were not pointing to the same ArrayList, so we modified
- * one of the overloaded constructors so that two seperate ArrayLists that are identical 
- * in what they contain are assigned to assemblyColors and instructionColors
- * 
- * on 11/11/13
- * 
- * 1.) Created the method getRelativeOrderOfFields() so that the fields will be in the
- * proper order as dictated by the order of the instructionFields and the assemblyFields
- * 2.) Created a getNumBits() method that determines the number of bits in the machine instruction
- * based on the instruction fields
- */
-
 package cpusim.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Colors;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.conversion.ConvertLongs;
@@ -52,23 +15,26 @@ import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-///////////////////////////////////////////////////////////////////////////////
-// the MachineInstruction class
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+/**
+ * This file contains the class for Machine Instructions created using CPU Sim
+ *
+ * @since 1999-06-01
+ */
 public class MachineInstruction
-        implements Cloneable, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<MachineInstruction>
-{
-
+        implements IdentifiedObject, NamedObject,
+                    LegacyXMLSupported, HTMLEncodable, Copyable<MachineInstruction> {
+    
     private String name;				//the name of the machine instruction
-    private ObservableList<Microinstruction> micros;	//all the microinstructions
+    private final UUID id;
+    private ObservableList<Microinstruction<?>> micros;	//all the microinstructions
     private long opcode;					//the opcode of the instruction
     private Machine machine;
     private String format; //the format String matching the list of fields
@@ -84,38 +50,35 @@ public class MachineInstruction
      * of fields.
      */
 
-    //===================================
-    // constructors
-
-    //for backward compatibility
-    public MachineInstruction(String name, long opcode, int[] fieldLengths,
-                              Machine machine)
+    public MachineInstruction(String name, final UUID id, Machine machine, long opcode, String format)
     {
-        this(name, opcode, Joiner.on(' ').join(Ints.asList(fieldLengths)), machine);
-    }
-
-    public MachineInstruction(String name, long opcode, String format,
-                              Machine machine)
-    {
-        this(name, opcode, 
-        		Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)), 
-        		Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
-                Colors.generateTwoListsOfRandomLightColors(format.split(" ").length), 
-                machine);
+        this(name, id, machine,
+                Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
+                Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
+                opcode,
+                Colors.generateTwoListsOfRandomLightColors(
+                    Splitter.on(' ')
+                            .omitEmptyStrings()
+                            .splitToList(format).size()));
     }
     
-    public MachineInstruction(String name, long opcode, ArrayList<Field> instructionFields,
-    		List<Field> assemblyFields, List<List<String>> colors,
-            Machine machine){
-        this(name, opcode, instructionFields, assemblyFields, colors.get(0), colors.get(1),
-                machine);
+    public MachineInstruction(String name, final UUID id, Machine machine, List<Field> assemblyFields, List<Field> instructionFields, long opcode,
+                              List<List<String>> colors){
+        this(name, IdentifiedObject.generateRandomID(), machine, assemblyFields,
+                colors.get(0), colors.get(1), opcode, instructionFields);
     }
     
-    public MachineInstruction(String name, long opcode, List<Field> newInstrFields,
-            List<Field> newAssemblyFields, List<String> newInstrColors,
-            List<String> newAssemblyColors, Machine machine)
+    public MachineInstruction(String name,
+                              final UUID id,
+                              Machine machine,
+                              List<Field> newAssemblyFields,
+                              List<String> newInstrColors,
+                              List<String> newAssemblyColors,
+                              long opcode,
+                              List<Field> newInstrFields)
     {
         this.name = name;
+        this.id = id;
         this.opcode = opcode;
         this.micros = FXCollections.observableArrayList();
         this.machine = machine;
@@ -139,13 +102,19 @@ public class MachineInstruction
     }
     
     public MachineInstruction(final MachineInstruction other){
-        this(other.name, other.opcode, other.instructionFields, other.assemblyFields, other.instructionColors,
-        		other.assemblyColors, other.machine);
+        this(other.name, IdentifiedObject.generateRandomID(), other.machine, other.assemblyFields, other.instructionColors, other.assemblyColors, other.opcode, other.instructionFields
+        );
     }
 
     //===================================
     // getters and setters
-
+    
+    
+    @Override
+    public UUID getID() {
+        return this.id;
+    }
+    
     public Machine getMachine() {
         return machine;
     }
@@ -207,8 +176,6 @@ public class MachineInstruction
 
     /**
      * @return an array of all the field lengths that are positive.
-     * 
-     * @author Kevin Brightwell (Nava2)
      */
     public List<Integer> getPositiveFieldLengths()
     {
@@ -307,12 +274,12 @@ public class MachineInstruction
         name = newName;
     }
 
-    public ObservableList<Microinstruction> getMicros()
+    public ObservableList<Microinstruction<?>> getMicros()
     {
         return micros;
     }
 
-    public void setMicros(ObservableList<Microinstruction> v)
+    public void setMicros(ObservableList<Microinstruction<?>> v)
     {
         micros = v;
     }
@@ -339,29 +306,7 @@ public class MachineInstruction
     {
         return name;
     }
-
-    //-----------------------------------
-    // clone:  
-    /**
-     * returns a copy of this instruction that shares microinstructions
-     * but creates a new microList vector and a new fields list.
-     * 
-     * @deprecated Use #copyTo
-     */
-    @Deprecated
-    public Object clone()
-    {
-        throw new UnsupportedOperationException("MachineInstruction is abstract, clone() does not make sense."); 
-    }
-
-    //-----------------------------------
-    //returns the total number of operands, including optional ones
-    //and ones of length 0.
-    //supposedly used in the parser for error checking but actually not
-//    public int numberOfOperands()
-//    {
-//        return machine.getFieldsFromFormat(format).size();
-//    }
+    
 
     //-----------------------------------
     //returns length in bits

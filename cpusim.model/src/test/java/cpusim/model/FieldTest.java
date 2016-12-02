@@ -5,6 +5,7 @@ package cpusim.model;
 
 import static org.junit.Assert.*;
 
+import cpusim.model.util.IdentifiedObject;
 import org.junit.Test;
 
 /**
@@ -18,7 +19,7 @@ public class FieldTest {
 	 * Test method for:
 	 * 
 	 *   * {@link cpusim.model.Field#Field()}.
-	 *   * {@link cpusim.model.Field#Field(java.lang.String)}.
+	 *   * {@link Field#Field(String, java.util.UUID)}.
 	 */
 	@Test
 	public void testField() {
@@ -26,7 +27,7 @@ public class FieldTest {
 		
 		assertEquals("?", f.getName());
 		
-		final Field f2 = new Field("f2");
+		final Field f2 = new Field("f2", IdentifiedObject.generateRandomID());
 		assertEquals("f2", f2.getName());
 	}
 

@@ -22,6 +22,7 @@ import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
+import cpusim.model.util.IdentifiedObject;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -141,7 +142,9 @@ class TestTableController extends MicroinstructionTableController<Test> {
     public Test createInstance() {
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
-        return new Test("???", machine, r, 0, 1, "EQ", 0, 0);
+        return new Test("???", IdentifiedObject.generateRandomID(), machine, r,
+                0, 1, Test.Operation.EQ,
+                0, 0);
     }
 
     @Override
