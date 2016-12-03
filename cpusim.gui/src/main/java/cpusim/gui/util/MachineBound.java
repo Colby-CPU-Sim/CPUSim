@@ -2,7 +2,6 @@ package cpusim.gui.util;
 
 import cpusim.model.Machine;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyProperty;
 
 import java.util.Optional;
@@ -15,22 +14,17 @@ import java.util.Optional;
 public interface MachineBound {
 
     /**
-     * Get the {@link Machine} property that this object is bound to. It is a {@link ReadOnlyProperty} as changing the
-     * value outside of {@link #bindMachine(ObjectProperty)} is unsupported.
+     * Get the {@link Machine} property that this object is bound to.
      *
      * @return Read-only property for the {@link Machine}, this may be empty, but never {@code null}.
      */
-    ReadOnlyProperty<Machine> machineProperty();
-
-    /**
-     * Causes this instance to be bound to the {@code machineProperty} passed.
-     * @param machineProperty Non-{@code null}, but possibly empty, property for a {@link Machine} value.
-     */
-    void bindMachine(ObjectProperty<Machine> machineProperty);
+    ObjectProperty<Machine> machineProperty();
 
     /**
      * Get the stored {@link Machine}, it will be {@link Optional#empty()} if no instance is present.
      * @return Non-{@code null}, but possibly empty, {@code Optional} value.
      */
-    Optional<Machine> getMachine();
+    default Optional<Machine> getMachine() {
+        return Optional.ofNullable(machineProperty().getValue());
+    }
 }

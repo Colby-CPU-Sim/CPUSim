@@ -1,7 +1,12 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.*;
+import cpusim.gui.util.ControlButtonController;
+import cpusim.gui.util.table.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.MachineBound;
+import cpusim.gui.util.MachineModificationController;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.module.Register;
@@ -9,9 +14,8 @@ import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.Validatable;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,10 +26,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * MicroinstructionTableController class parent of all the microinstruction controllers
@@ -33,11 +36,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract class MicroinstructionTableController<T extends Microinstruction<T>>
         extends TableView<T>
         implements ControlButtonController.InteractionHandler<T>,
-                    MachineModificationController<T>,
+                    MachineModificationController,
                     cpusim.gui.util.HelpPageEnabled,
                     MachineBound {
 
-    protected ObjectProperty<Machine> machine;      //the current machine being simulated
+    protected final ObjectProperty<Machine> machine;      //the current machine being simulated
 
     /**
      * The file that this table is loaded from.
@@ -54,11 +57,11 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
      * @param mediator holds the information to be shown in tables
      */
     MicroinstructionTableController(Mediator mediator, final String fxmlFile, Class<T> clazz) {
-        this.machine = mediator.machineProperty();
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(mediator.machineProperty());
+
         this.fxmlFile = checkNotNull(fxmlFile);
         this.microClass = checkNotNull(clazz);
-
-
     }
 
     final void loadFXML() {
@@ -109,13 +112,8 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
     abstract String getFxId();
 
     @Override
-    public ReadOnlyProperty<Machine> machineProperty() {
+    public ObjectProperty<Machine> machineProperty() {
         return machine;
-    }
-
-    @Override
-    public void bindMachine(ObjectProperty<Machine> machineProperty) {
-        this.machine = checkNotNull(machineProperty);
     }
 
     @Override
@@ -133,23 +131,14 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
 
     @Override
     public void updateMachine() {
-        checkValidity(getItems());
-
         ObservableList<T> machineMicros = machine.get().getMicros(microClass);
         machineMicros.clear();
         machineMicros.addAll(getItems());
     }
 
     @Override
-    public void checkValidity(List<T> micros) {
-        Validatable.all(micros);
-    }
-
-    /**
-     * Delegate method to {@link #checkValidity(List)} passing the result from {@link #getItems()}.
-     */
-    public final void checkValidity() {
-        checkValidity(getItems());
+    public void checkValidity() {
+        Validatable.all(getItems());
     }
 
     /**

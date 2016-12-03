@@ -1,5 +1,6 @@
 package cpusim.gui.editmachineinstruction.editfields;
 
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.util.IdentifiedObject;
@@ -9,8 +10,8 @@ import cpusim.model.util.ValidationException;
 import cpusim.model.FieldValue;
 import cpusim.model.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
-import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.util.Dialogs;
 
 import javafx.collections.FXCollections;
@@ -117,8 +118,13 @@ public class EditFieldsController implements Initializable {
                 }
             }
             
-            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(), IdentifiedObject.generateRandomID(), editMachineInstructionController.getMachine(), newAssemblyFields, instr.getInstructionColors(), instr.getAssemblyColors(), instr.getOpcode(), newInstrFields
-            );
+            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
+                    IdentifiedObject.generateRandomID(),
+                    editMachineInstructionController.getMachine().get(),
+                    newAssemblyFields, instr.getInstructionColors(),
+                    instr.getAssemblyColors(),
+                    instr.getOpcode(),
+                    newInstrFields);
             
             instrToAdd.setMicros(instr.getMicros());
             
@@ -187,7 +193,7 @@ public class EditFieldsController implements Initializable {
         typeBoxOptions.addAll(Field.Type.required, Field.Type.optional, Field.Type.ignored);
         
         Callback<TableColumn<Field, String>, TableCell<Field, String>> cellStrFactory =
-                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<Field,Integer>, TableCell<Field,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Field,Long>, TableCell<Field,Long>> cellLongFactory =

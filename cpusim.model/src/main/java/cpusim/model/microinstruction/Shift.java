@@ -47,9 +47,9 @@ public class Shift extends Transfer<Register, Register, Shift> {
                  int distance){
         super(name, id, machine, source, 0, destination, 0, source.getWidth());
         
-        this.type = new SimpleStringProperty(type);
-        this.direction = new SimpleStringProperty(direction);
-        this.distance = new SimpleIntegerProperty(distance);
+        this.type = new SimpleStringProperty(this, "type", type);
+        this.direction = new SimpleStringProperty(this, "direction", direction);
+        this.distance = new SimpleIntegerProperty(this, "distance", distance);
     }
     
     /**
@@ -133,9 +133,7 @@ public class Shift extends Transfer<Register, Register, Shift> {
     
     @Override
     public <U extends Shift> void copyTo(final U other) {
-        checkNotNull(other);
-    
-        copyToHelper(other);
+        super.copyTo(other);
     
         other.setType(getType());
         other.setDirection(getDirection());
@@ -143,8 +141,8 @@ public class Shift extends Transfer<Register, Register, Shift> {
     }
     
     @Override
-    protected void validateState() {
-        super.validateState();
+    public void validate() {
+        super.validate();
     
         // checks if the two registers specified in the shift microinstructions have the same width
         if (getSource().getWidth() !=

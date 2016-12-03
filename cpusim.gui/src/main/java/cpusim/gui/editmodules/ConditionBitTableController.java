@@ -12,11 +12,13 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import javafx.beans.property.ObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -33,7 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Controller for the {@link ConditionBit} table
@@ -51,23 +53,47 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     @FXML @SuppressWarnings("unused")
     private TableColumn<ConditionBit,Boolean> halt;
 
-    private RegistersTableController registerController;
-    private RegisterArrayTableController arrayController;
-
-    private ObservableList<Register> registerList;
+    private final ObjectProperty<ObservableList<Register>> ctrlRegisterListProperty;
+    private final ObjectProperty<ObservableList<RegisterArray>> ctrlRegisterArrayListProperty;
+    
+    private final ObservableList<Register> registerList;
+    
+    private final ListChangeListener<Register> registerListChangeListener = _ignore -> updateRegisters();
+    private final ListChangeListener<RegisterArray> registerArrListChangeListener = _ignore -> updateRegisters();
 
     /**
      * Constructor
      * @param mediator store the machine and other information needed
-     * @param registerController the controller holds registers
-     * @param arrayController the controller holds register arrays
+     * @param registerTableController Controller for {@link Register} table.
+     * @param registerArrayTableController Controller for {@link RegisterArray} table.
      */
     ConditionBitTableController(Mediator mediator,
-                                RegistersTableController registerController,
-                                RegisterArrayTableController arrayController){
+                                RegistersTableController registerTableController,
+                                RegisterArrayTableController registerArrayTableController){
         super(mediator, "ConditionBitTable.fxml", ConditionBit.class);
-        this.registerController = checkNotNull(registerController);
-        this.arrayController = checkNotNull(arrayController);
+        this.ctrlRegisterListProperty = checkNotNull(registerTableController).itemsProperty();
+        this.ctrlRegisterArrayListProperty = checkNotNull(registerArrayTableController).itemsProperty();
+    
+        registerList = FXCollections.observableArrayList();
+        
+        // Add some listeners so when they update, it will update the registers that condition bits can use
+    
+        this.ctrlRegisterListProperty.get().addListener(registerListChangeListener);
+        this.ctrlRegisterArrayListProperty.get().addListener(registerArrListChangeListener);
+    
+        this.ctrlRegisterListProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                newValue.addListener(registerListChangeListener);
+            }
+        });
+    
+        this.ctrlRegisterArrayListProperty.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                newValue.addListener(registerArrListChangeListener);
+            }
+        });
+        
+        fixItemsToUseClones(registerTableController, registerArrayTableController);
         
         loadFXML();
     }
@@ -84,12 +110,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
 
         Callback<TableColumn<ConditionBit,Integer>,TableCell<ConditionBit,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
-
-        registerList = FXCollections.observableArrayList();
-        registerList.addAll(registerController.getItems());
-        for (RegisterArray r : arrayController.getItems())
-            registerList.addAll(r.registers());
-
+        
         Callback<TableColumn<ConditionBit,Register>,TableCell<ConditionBit,Register>> cellRegFactory =
                 conditionBitRegisterTableColumn -> new ComboBoxTableCell<>(registerList);
 
@@ -110,7 +131,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
         halt.setCellFactory(cellHaltFactory);
         halt.setOnEditCommit(text -> text.getRowValue().setHalt(text.getNewValue()));
         
-        this.fixItemsToUseClones();
+        updateRegisters();
     }
 
     @Override
@@ -121,8 +142,6 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     @Override
     void onTabSelected() {
         super.onTabSelected();
-
-        updateRegisters();
     }
 
     /**
@@ -130,13 +149,14 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * they refer to the clones of the original registers instead of
      * the original registers themselves
      */
-    private void fixItemsToUseClones()
+    private void fixItemsToUseClones(RegistersTableController registersTableController,
+                                     RegisterArrayTableController registerArrayTableController)
     {
         getItems().forEach(bit -> {
             Register originalRegister = bit.getRegister();
             
-            Optional<Register> fromRegisterCtrl = registerController.getRegisterClone(originalRegister);
-            Optional<Register> fromArrayCtrl = arrayController.getRegisterClone(originalRegister);
+            Optional<Register> fromRegisterCtrl = registersTableController.getRegisterClone(originalRegister);
+            Optional<Register> fromArrayCtrl = registerArrayTableController.getRegisterClone(originalRegister);
 
             if (fromRegisterCtrl.isPresent()) {
                 bit.setRegister(fromRegisterCtrl.get());
@@ -154,24 +174,23 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * @return the prototype of the subclass
      */
     public ConditionBit createInstance() {
-        ObservableList<Register> registers = registerController.getItems();
-        ObservableList<RegisterArray> arrays = arrayController.getItems();
-        return new ConditionBit("???", machine,
-                (registers.size() > 0 ?
-                        registers.get(0) :
-                        (arrays.size() > 0 ?
-                                arrays.get(0).registers().get(0) :
-                                null))
-                , 0, false);
+        
+        Register defaultRegister = null;
+        if (!registerList.isEmpty()) {
+            defaultRegister = registerList.get(0);
+        }
+        
+        return new ConditionBit("???", machine.get(), defaultRegister, 0, false);
     }
 
     /**
-     * updates the registers shown in the combobox
+     * updates the registers shown in the {@link javafx.scene.control.ComboBox}, this reads from the
+     * {@link #ctrlRegisterArrayListProperty} and {@link #ctrlRegisterListProperty}.
      */
-    private void updateRegisters(){
+    private void updateRegisters() {
         registerList.clear();
-        registerList.addAll(registerController.getItems());
-        for (RegisterArray r : arrayController.getItems()) {
+        registerList.addAll(ctrlRegisterListProperty.getValue());
+        for (RegisterArray r : ctrlRegisterArrayListProperty.getValue()) {
             registerList.addAll(r.registers());
         }
     }

@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import static com.google.common.base.Preconditions.checkState;
+
 /*
  * Michael Goldenberg, Ben Borchard, and Jinghui Yu made the following changes in 12/4/13
  *
@@ -576,8 +578,9 @@ public class Parser {
     private void Instr() throws AssemblyException.NameSpaceError, AssemblyException
             .SyntaxError, InvalidTokenException, UndefinedOperandError, TypeError,
             AssemblyException.InvalidOperandError {
+        checkState(machine.getCodeStore().isPresent());
         InstructionCall node = new InstructionCall(
-                machine.getCodeStore().getCellSize());
+                machine.getCodeStore().get().getCellSize());
 
         //handle (Label Comments-and-EOLs)*
         while (token.type == Token.Type.LABEL) {
@@ -652,6 +655,8 @@ public class Parser {
     private void parseAsciiPseudoinstruction(InstructionCall node) throws
             AssemblyException.SyntaxError, InvalidTokenException, AssemblyException
             .InvalidOperandError {
+        checkState(machine.getCodeStore().isPresent());
+        
         node.sourceLine = new SourceLine(token.lineNumber, token.filename);
         if (node.comment.equals("")) {
             node.comment = "\t"; //indent lines with no labels
@@ -675,7 +680,7 @@ public class Parser {
         //save the quoted string characters as individual integer tokens
         // (operands), like in a .data pseudoinstruction
         int numChars = contentsWithEscapes.length() - 2;
-        int cellSize = machine.getCodeStore().getCellSize();
+        int cellSize = machine.getCodeStore().get().getCellSize();
         int numCellsPerChar = (8 + cellSize - 1) / cellSize;
         node.operands.add(new Token(null, Token.Type.CONSTANT, -1, -1, -1,
                 numChars * numCellsPerChar + "", true)); //number of cells of data

@@ -2,60 +2,48 @@ package cpusim.gui.editmachineinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
-import cpusim.gui.help.HelpController;
-import cpusim.gui.util.MicroinstructionTreeView;
+import cpusim.gui.util.*;
+import cpusim.gui.util.list.NameListCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.Colors;
-import cpusim.model.util.Convert;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
+import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.util.Dialogs;
+import javafx.beans.binding.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.TransferMode;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * FXML Controller class for modifying {@link MachineInstruction} values.
  */
-public class EditMachineInstructionController {
+public class EditMachineInstructionController
+        implements MachineBound,
+                    DialogButtonController.InteractionHandler,
+                    HelpPageEnabled,
+                    MachineModificationController {
 
     @FXML
     private ListView<MachineInstruction> instructionList;
@@ -75,8 +63,20 @@ public class EditMachineInstructionController {
     @FXML
     private BorderPane mainPane;
 
+    /**
+     * Pane labeled: "Format" holds fields and assembly layout.
+     */
+    @FXML @SuppressWarnings("unused")
+    private BorderPane formatTabPane;
+
+    /**
+     * The {@link VBox} containing fields to drag to create a format for laying out assembly
+     */
+    @FXML @SuppressWarnings("unused")
+    private VBox fieldsFormatVBox;
+
     @FXML
-    private VBox fieldsList;
+    private ListView<Field> fieldsList;
 
     @FXML
     private Label lengthLabel;
@@ -84,47 +84,47 @@ public class EditMachineInstructionController {
     @FXML
     private VBox noFieldsLabel;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
+    private TabPane implTabPane;
+
+    @FXML @SuppressWarnings("unused")
     private Button newButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button dupButton;
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private Button deleteButton;
 
     @FXML @SuppressWarnings("unused")
-    private HBox implHBox;
-    
+    private MachineInstructionImplTableController instImplTableController;
+
     @FXML @SuppressWarnings("unused")
-    private Region microinstTreeViewRegion;
-    
-    private final MachineInstructionImplTableController instImplTableController;
-    private final MicroinstructionTreeView microinstTreeView;
+    private MicroinstructionTreeView microinstTreeView;
+
+    @FXML @SuppressWarnings("unused")
+    private DialogButtonController dialogButtonController;
 
     private Mediator mediator;
-    private MachineInstruction currentInstr;
+    private ObjectProperty<MachineInstruction> currentInstr;
     private Field draggingField;
     private String draggingColor;
     private Pane originPane;
-    private Microinstruction currentCommentMicro;
-    private TextField commentEditor;
-    private ObservableList<Field> allFields;
-    private boolean dragging;
     private boolean dropped;
     private boolean exited;
 
     private int draggingIndex;
-    private int currInstrIndex;
-    private ObservableList<String> fieldNames;
+
+    private final ObjectProperty<Machine> machine;
 
     public EditMachineInstructionController(Mediator mediator) {
         this.mediator = mediator;
-        currentInstr = null;
-        dragging = false;
-    
-        microinstTreeView = new MicroinstructionTreeView(mediator.getMachine());
-        instImplTableController = new MachineInstructionImplTableController(mediator.getMachine());
+        this.currentInstr = new SimpleObjectProperty<>(this, "currentInstruction", null);
+
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(mediator.machineProperty());
+
+        this.machine.addListener((observable, oldValue, newValue) -> updateViewsFromMachine());
     }
 
     /**
@@ -134,40 +134,57 @@ public class EditMachineInstructionController {
     public void initialize() {
 
         //initialize fields
-        currInstrIndex = -1;
-
-        fieldNames = FXCollections.observableArrayList();
-    
-        {
-            // Setup the view into the hbox
-            ObservableList<Node> children = implHBox.getChildren();
-            final int idx = children.indexOf(microinstTreeViewRegion);
-            children.set(idx, microinstTreeView);
-            HBox.setHgrow(microinstTreeView, Priority.ALWAYS);
-            
-            microinstTreeView.setMinHeight(500);
-        }
-
-        initializeInstructionsAndFields();
 
         initializeInstructionList();
 
         initializeOpcodeTextField();
 
-        dupButton.setDisable(true);
-        deleteButton.setDisable(true);
+        BooleanBinding isInstructionSelected = instructionList.getSelectionModel().selectedItemProperty().isNull();
+        dupButton.disableProperty().bind(isInstructionSelected);
+        deleteButton.disableProperty().bind(isInstructionSelected);
+        implTabPane.disableProperty().bind(isInstructionSelected);
 
-        lengthLabel.setText("");
-        noFieldsLabel.setVisible(false);
+        currentInstr.bind(instructionList.getSelectionModel().selectedItemProperty());
+        instImplTableController.currentInstructionProperty().bind(currentInstr);
 
-        updateFieldNames();
+//         updates the length label for the selected instruction based on said
+//         instruction's field
+        StringBinding lengthTextBinding = Bindings.createStringBinding(() -> {
+                if (currentInstr.getValue() != null) {
+                    int sum = currentInstr.getValue().getInstructionFields().stream()
+                            .mapToInt(Field::getNumBits)
+                            .sum();
+
+                    if (sum > 0) {
+                        return Integer.toString(sum);
+                    }
+                }
+
+                return "";
+            }, currentInstr);
+
+        lengthLabel.textProperty().bind(lengthTextBinding);
+
+        BooleanBinding currentInstrHasAssocFields = Bindings.createBooleanBinding(() -> {
+            MachineInstruction inst = currentInstr.getValue();
+
+            return inst != null && (inst.getInstructionFields().size() > 0
+                    || inst.getAssemblyFields().size() > 0);
+        }, currentInstr);
+
+        noFieldsLabel.visibleProperty().bind(currentInstrHasAssocFields);
 
         mainPane.widthProperty().addListener((ov, t, t1) -> {
             updateInstructionDisplay();
             updateAssemblyDisplay();
         });
-        
-        
+
+        // Children's machines need to be bound as well.
+        this.microinstTreeView.machineProperty().bind(machine);
+        this.instImplTableController.machineProperty().bind(machine);
+
+        this.dialogButtonController.setRequired(machine, this, this);
+        this.dialogButtonController.setCurrentHelpable(this);
 
 //        microInstrTreeView.setOnMousePressed(t -> {
 //            if (commentEditor != null) {
@@ -178,20 +195,19 @@ public class EditMachineInstructionController {
         // set up listeners for the panes for drag & drop
         initializeInstructionFormatPane();
         initializeAssemblyFormatPane();
-        initializeImplementationFormatPane();
     }
 
     private void initializeOpcodeTextField() {
-
-        opcodeTextField.setDisable(true);
-
         opcodeTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+
+            MachineInstruction inst = currentInstr.getValue();
+            if (inst == null) return;
 
             try {
                 Validate.stringIsLegalBinHexOrDecNumber(newValue);
                 long newOpcode = Convert.fromAnyBaseStringToLong(newValue);
-                currentInstr.setOpcode(newOpcode);
-                Validate.instructionsOpcodeIsValid(instructionList.getItems(), currentInstr);
+                inst.setOpcode(newOpcode);
+                Validate.instructionsOpcodeIsValid(instructionList.getItems(), inst);
                 opcodeTextField.setStyle("-fx-border-width:1;" +
                         "-fx-background-color:white; -fx-border-color:black; " +
                         "-fx-border-style:solid;");
@@ -222,14 +238,14 @@ public class EditMachineInstructionController {
 //        });
 
         instructionFormatPane.setOnDragOver(event -> {
-            if (currentInstr != null && !originPane.equals(assemblyFormatPane) &&
+            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
                     draggingField.getNumBits() != 0) {
                 event.acceptTransferModes(TransferMode.COPY);
 
                 double localX = instructionFormatPane.sceneToLocal(event.getSceneX
                         (), event.getSceneY()).getX();
 
-                if (!currentInstr.getInstructionFields().isEmpty()) {
+                if (!currentInstr.getValue().getInstructionFields().isEmpty()) {
                     int index = getInstrFieldIndex(localX);
                     insertInstrField(draggingField, index);
                 }
@@ -242,20 +258,22 @@ public class EditMachineInstructionController {
         instructionFormatPane.setOnDragDropped(event -> {
             /* data dropped */
             /* if there is a string data on drag board, read it and use it */
-            if (currentInstr != null && !originPane.equals(assemblyFormatPane) &&
+            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
                     draggingField.getNumBits() != 0) {
+
+                final MachineInstruction inst = currentInstr.getValue();
+
                 double localX = instructionFormatPane.sceneToLocal(event.getSceneX
                         (), event.getSceneY()).getX();
                 int index = getInstrFieldIndex(localX);
-                currentInstr.getInstructionFields().add(index, draggingField);
-                currentInstr.getInstructionColors().add(index, draggingColor);
+                inst.getInstructionFields().add(index, draggingField);
+                inst.getInstructionColors().add(index, draggingColor);
 
                 if (draggingField.getType() != Type.ignored) {
-                    currentInstr.getAssemblyFields().add(draggingIndex,
-                            draggingField);
-                    currentInstr.getAssemblyColors().add(draggingIndex,
-                            draggingColor);
+                    inst.getAssemblyFields().add(draggingIndex, draggingField);
+                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
                 }
+
                 /* let the source know whether the string was successfully
                  * transferred and used */
                 event.setDropCompleted(true);
@@ -265,7 +283,7 @@ public class EditMachineInstructionController {
             }
         });
         instructionFormatPane.setOnDragExited(event -> {
-            if (currentInstr != null && !originPane.equals(assemblyFormatPane) &&
+            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
                     draggingField.getNumBits() != 0) {
                 updateInstructionDisplay();
                 updateAssemblyDisplay();
@@ -279,7 +297,7 @@ public class EditMachineInstructionController {
      */
     private void initializeAssemblyFormatPane() {
         assemblyFormatPane.setOnDragOver(event -> {
-            if (currentInstr != null) {
+            if (currentInstr.getValue() != null) {
                 if (originPane.equals(assemblyFormatPane) || draggingField
                         .getNumBits() == 0) {
                     event.acceptTransferModes(TransferMode.COPY);
@@ -296,92 +314,98 @@ public class EditMachineInstructionController {
         assemblyFormatPane.setOnDragDropped(event -> {
             /* data dropped */
             /* if there is a string data on dragboard, read it and use it */
-            if (currentInstr != null) {
-                if (originPane.equals(assemblyFormatPane) || draggingField
-                        .getNumBits() == 0) {
-                    double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
-                            (), event.getSceneY()).getX();
-                    int index = getAssemblyFieldIndex(localX);
+            MachineInstruction inst = currentInstr.getValue();
+            if (originPane.equals(assemblyFormatPane) || draggingField
+                    .getNumBits() == 0) {
+                double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
+                        (), event.getSceneY()).getX();
+                int index = getAssemblyFieldIndex(localX);
 
-                    currentInstr.getAssemblyFields().add(index, draggingField);
-                    currentInstr.getAssemblyColors().add(index, draggingColor);
+                inst.getAssemblyFields().add(index, draggingField);
+                inst.getAssemblyColors().add(index, draggingColor);
 
-                    /* let the source know whether the string was successfully
-                     * transferred and used */
-                    event.setDropCompleted(true);
-                    dropped = true;
-                    exited = true;
+                /* let the source know whether the string was successfully
+                 * transferred and used */
+                event.setDropCompleted(true);
+                dropped = true;
+                exited = true;
 
-                    event.consume();
-                }
+                event.consume();
             }
         });
         assemblyFormatPane.setOnDragExited(event -> {
-            if (currentInstr != null) {
-                if (originPane.equals(assemblyFormatPane) || draggingField
-                        .getNumBits() == 0) {
-                    if (!dropped && draggingField.getNumBits() != 0) {
-                        currentInstr.getAssemblyFields().add(draggingIndex,
-                                draggingField);
-                        currentInstr.getAssemblyColors().add(draggingIndex,
-                                draggingColor);
-                        exited = true;
-                    }
-                    updateAssemblyDisplay();
-                    event.consume();
+            MachineInstruction inst = currentInstr.getValue();
+            if (originPane.equals(assemblyFormatPane) || draggingField.getNumBits() == 0) {
+                if (!dropped && draggingField.getNumBits() != 0) {
+                    inst.getAssemblyFields().add(draggingIndex,
+                            draggingField);
+                    inst.getAssemblyColors().add(draggingIndex,
+                            draggingColor);
+                    exited = true;
                 }
+
+                updateAssemblyDisplay();
+                event.consume();
             }
         });
         assemblyFormatPane.setOnDragEntered(event -> {
-            if (currentInstr != null) {
-                if (originPane.equals(assemblyFormatPane) || draggingField
-                        .getNumBits() == 0) {
-                    //so there aren't duplicate fields added whenever the user drags
-                    //out of the field and back in again
-                    if (!dropped && draggingField.getNumBits() != 0 && exited &&
-                            !currentInstr.getAssemblyFields().isEmpty() &&
-                            !currentInstr.getInstructionFields().isEmpty()) {
-                        currentInstr.getAssemblyFields().remove(draggingIndex);
-                        currentInstr.getAssemblyColors().remove(draggingIndex);
-                        exited = false;
-                    }
-                    updateAssemblyDisplay();
-                    event.consume();
+            MachineInstruction inst = currentInstr.getValue();
+            if (originPane.equals(assemblyFormatPane) || draggingField
+                    .getNumBits() == 0) {
+                //so there aren't duplicate fields added whenever the user drags
+                //out of the field and back in again
+                if (!dropped && draggingField.getNumBits() != 0 && exited &&
+                        !inst.getAssemblyFields().isEmpty() &&
+                        !inst.getInstructionFields().isEmpty()) {
+                    inst.getAssemblyFields().remove(draggingIndex);
+                    inst.getAssemblyColors().remove(draggingIndex);
+                    exited = false;
                 }
+                updateAssemblyDisplay();
+                event.consume();
             }
         });
+
+        // set the preferred width of the instr and assm panes in case
+        // the width of the dialog changed
+        DoubleBinding formatPaneSizeBinding = mainPane.widthProperty()
+                .subtract(instructionList.widthProperty())
+                .subtract(fieldsList.widthProperty())
+                .subtract(Bindings.createDoubleBinding(() ->
+                                //sum of padding of instr list & format tab pane & field's VBox
+                                instructionList.getPadding().getLeft() +
+                                    formatTabPane.getPadding().getLeft() +
+                                    fieldsFormatVBox.getPadding().getLeft(),
+                        instructionList.paddingProperty(), formatTabPane.paddingProperty(), fieldsFormatVBox.paddingProperty()));
+        assemblyFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
+        instructionFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
     }
 
-    /**
-     * Initializes drag events for the implementationFormatPane.
-     */
-    private void initializeImplementationFormatPane() {
-        
-    }
-
-    public List<MachineInstruction> getInstructions() {
-        return instructionList.getItems();
-    }
-    
     /**
      * Takes the real fields and instructions and makes copies of them that will be
      * manipulated in this dialog.  These copies will be made real if the okay button
      * is hit, if cancel is hit, they will be garbage collected without being saved to
      * the machine.
      */
-    private void initializeInstructionsAndFields() {
+    private void updateViewsFromMachine() {
+        List<Field> realAllFields = machine.getValue().getFields();
+        ObservableList<Field> listFields = fieldsList.getItems();
 
-        List<Field> realAllFields = mediator.getMachine().getFields();
-        allFields = FXCollections.observableArrayList();
-
-        for (Field field : realAllFields) {
-            allFields.add(new Field(field));
-        }
+        listFields.clear();
+        List<Field> cloned = realAllFields.stream()
+                .map(Field::new)
+                .collect(Collectors.toList());
+        listFields.addAll(cloned); // do addAll to ease the change listener calls
 
         ObservableList<MachineInstruction> insViewItems = instructionList.getItems();
         insViewItems.clear();
-        getMachine().getInstructions().stream().map(Copyable::cloneOf).forEach(insViewItems::add);
-        
+        List<MachineInstruction> clonedInst = machine.getValue().getInstructions().stream()
+                .map(Copyable::cloneOf)
+                .collect(Collectors.toList());
+        insViewItems.addAll(clonedInst);
+
+
+
         // FIXME Isn't this just cloning the array?
 //        for (MachineInstruction instr : instructions) {
 //
@@ -429,48 +453,34 @@ public class EditMachineInstructionController {
 //        }
     }
 
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
+    }
+
+    public List<MachineInstruction> getInstructions() {
+        return instructionList.getItems();
+    }
+
     /**
      * Initializes the instruction list by making it editable, setting its items,
      * and giving it a change listener
      */
     private void initializeInstructionList() {
-        instructionList.setCellFactory(list ->
-                new ListCell<MachineInstruction>() {
-                    @Override
-                    protected void updateItem(final MachineInstruction item, final boolean empty) {
-                        super.updateItem(item, empty);
-                
-                        if (empty || item == null) {
-                            setText(null);
-                        } else {
-                            setText(item.getName());
-                        }
-                    }
-                });
+        instructionList.setCellFactory(list -> new NameListCell<>());
 
-        instructionList.getSelectionModel().selectedIndexProperty().addListener(
+        instructionList.getSelectionModel().selectedItemProperty().addListener(
                 (ov, value, new_value) -> {
 
-                    dupButton.setDisable(false);
-                    deleteButton.setDisable(false);
-                    opcodeTextField.setDisable(false);
-                    noFieldsLabel.setVisible(true);
-
-                    currInstrIndex = new_value.intValue();
-
-                    if (!instructionList.getItems().isEmpty() && new_value.intValue() != -1) {
-                        currentInstr = instructionList.getItems().get(new_value.intValue());
+                    if (new_value != null) {
 
                         int numOpcodeBits;
-                        if (currentInstr.getOpcode() != 0) {
-                            numOpcodeBits = 64 - Long.numberOfLeadingZeros
-                                    (currentInstr.getOpcode());
+                        if (new_value.getOpcode() != 0) {
+                            numOpcodeBits = 64 - Long.numberOfLeadingZeros(new_value.getOpcode());
                         } else {
                             numOpcodeBits = 1;
                         }
-                        opcodeTextField.setText(
-                                "0x" + ConvertLongs.fromLongToHexadecimalString(currentInstr.getOpcode(),
-                                        numOpcodeBits));
+                        opcodeTextField.setText("0x" + ConvertLongs.toHexString(new_value.getOpcode(), numOpcodeBits));
 
                     }
                     updateMicros();
@@ -544,32 +554,17 @@ public class EditMachineInstructionController {
     @FXML
     protected void handleDuplicateInstruction(ActionEvent ae) {
         int opcode = getUniqueOpcode();
-        String newName = NamedObject.createUniqueDuplicatedName(instructionList.getItems(), currentInstr);
-        
-        ArrayList<Field> instrFieldsCopy = new ArrayList<>();
-        for (Field micro : currentInstr.getInstructionFields()) {
-            instrFieldsCopy.add(micro);
-        }
-        ArrayList<Field> assembFieldsCopy = new ArrayList<>();
-        for (Field micro : currentInstr.getAssemblyFields()) {
-            assembFieldsCopy.add(micro);
-        }
-        ArrayList<String> instrColorCopy = new ArrayList<>();
-        for (String micro : currentInstr.getInstructionColors()) {
-            instrColorCopy.add(micro);
-        }
-        ArrayList<String> assembColorCopy = new ArrayList<>();
-        for (String micro : currentInstr.getAssemblyColors()) {
-            assembColorCopy.add(micro);
-        }
+        final MachineInstruction inst = currentInstr.getValue(); // no need to check for null because the button is bound
+                                                                 // to not being selected AND the currentInst property
+                                                                 // is bound to the selectedItem property.
+        String newName = NamedObject.createUniqueDuplicatedName(instructionList.getItems(), inst);
 
-        MachineInstruction newMI = new MachineInstruction(newName, IdentifiedObject.generateRandomID(),
-                currentInstr.getMachine(), assembFieldsCopy,
-                instrColorCopy, assembColorCopy,
-                opcode, instrFieldsCopy);
+        MachineInstruction newMI = new MachineInstruction(inst);
+        newMI.setName(newName);
+        newMI.setOpcode(opcode);
         
         ObservableList<Microinstruction<?>> microCopies = FXCollections.observableArrayList();
-        for (Microinstruction<?> micro : currentInstr.getMicros()) {
+        for (Microinstruction<?> micro : inst.getMicros()) {
             if( micro instanceof Comment) {
                 // create a clone of it since we want each Comment used only one place
                 micro = new Comment((Comment)micro);
@@ -598,72 +593,57 @@ public class EditMachineInstructionController {
         } else {
             instructionList.getSelectionModel().select(indx + 1);
             instructionList.getSelectionModel().select(indx);
-            if (!instructionList.getItems().isEmpty()) {
-                currentInstr = instructionList.getItems().get(indx);
-            } else {
-                currentInstr = null;
-                dupButton.setDisable(true);
-                deleteButton.setDisable(true);
-                opcodeTextField.setDisable(true);
-                opcodeTextField.setText("");
-                lengthLabel.setText("");
-                noFieldsLabel.setVisible(false);
-                instructionFormatPane.getChildren().clear();
-            }
+
+            // all buttons are bound by the selectionModel's select property.
         }
     }
 
-    /**
-     * closes the window without saving any of the changes made
-     *
-     * @param ae unused action event
-     */
-    @FXML
-    protected void handleCancel(ActionEvent ae) {
-        ((Stage) newButton.getScene().getWindow()).close();
+    @Override
+    public boolean onOkButtonClick() {
+        return true;
     }
 
-    /**
-     * saves the changes made and then closes the window.  If something is wrong
-     * there will be a error dialog box and the window will not close not will the changes
-     * be saved
-     *
-     * @param ae unused action event
-     */
-    @FXML
-    protected void handleOkay(ActionEvent ae) {
-        try {
-            Validate.machineInstructions(instructionList.getItems(), mediator.getMachine());
-            if (commentEditor != null) {
-                commitCommentEdit();
-            }
-            mediator.getMachine().setInstructions(instructionList.getItems());
-            mediator.getMachine().setFields(allFields);
-            mediator.setMachineDirty(true);
-            ((Stage) newButton.getScene().getWindow()).close();
-        } catch (ValidationException ex) {
-            Dialogs.createErrorDialog(newButton.getScene().getWindow(),
-                    "Machine Instruction Error", ex.getMessage()).showAndWait();
-        }
+    @Override
+    public void onMachineUpdated() {
+        // nothing really to do, #updateMachine() handles the actual writing.
     }
 
-    /**
-     * opens the help dialog to the machine instruction dialog help section
-     *
-     * @param ae unused ActionEvent
-     */
-    @FXML
-    protected void handleHelp(ActionEvent ae) {
-        String startString = "Machine Instruction Dialog";
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString);
-            mediator.getDesktopController().setHelpController(helpController);
-        } else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString);
-        }
+    @Override
+    public boolean onHelpButtonClick() {
+        return true;
+    }
+
+    @Override
+    public void displayHelpDialog(String helpPageId) {
+        mediator.getDesktopController().showHelpDialog(helpPageId);
+    }
+
+    @Override
+    public boolean onCancelButtonClick() {
+        return true;
+    }
+
+    @Override
+    public String getHelpPageID() {
+        return "Machine Instruction Dialog";
+    }
+
+    @Override
+    public void updateMachine() {
+        // FIXME KB
+//            if (commentEditor != null) {
+////                commitCommentEdit();
+//            }
+        mediator.getMachine().setInstructions(instructionList.getItems());
+        mediator.getMachine().setFields(fieldsList.getItems());
+        mediator.setMachineDirty(true);
+    }
+
+    @Override
+    public void checkValidity() {
+        Validatable.all(instructionList.getItems());
+
+        Validate.machineInstructions(instructionList.getItems(), machineProperty().getValue());
     }
 
     /**
@@ -677,7 +657,8 @@ public class EditMachineInstructionController {
     private int getInstrFieldIndex(double localX) {
 
 
-        ArrayList<Double> cutoffXLocs = new ArrayList<>();
+        // FIXME replace with Node#contains(pt)
+        List<Double> cutoffXLocs = new ArrayList<>();
         cutoffXLocs.add(0.0);
         for (int i = 0; i < instructionFormatPane.getChildren().size() - 1; i += 2) {
             cutoffXLocs.add(instructionFormatPane.getChildren().get(i).getLayoutX() +
@@ -704,6 +685,7 @@ public class EditMachineInstructionController {
      */
     private int getAssemblyFieldIndex(double localX) {
 
+        // FIXME replace with Node#contains(pt)
 
         ArrayList<Double> cutoffXLocs = new ArrayList<>();
         cutoffXLocs.add(0.0);
@@ -727,28 +709,19 @@ public class EditMachineInstructionController {
      * format pane
      */
     private void updateInstructionDisplay() {
-
-        // set the preferred width of the instr and assm panes in case
-        // the width of the dialog changed
-        assemblyFormatPane.setPrefWidth(mainPane.getWidth()
-                - instructionList.getWidth() - fieldsList.getWidth() - 24);
-        // 24 = sum of padding of instr list & format tab pane & field's VBox
-        instructionFormatPane.setPrefWidth(mainPane.getWidth()
-                - instructionList.getWidth() - fieldsList.getWidth() - 24);
-
-        if( currentInstr == null ) {
+        if( currentInstr.getValue() == null) {
             return;  // that's all we want to do
         }
 
+        final MachineInstruction inst = currentInstr.getValue();
+
         instructionFormatPane.getChildren().clear();
 
-        List<Field> fields = currentInstr.getInstructionFields();
+        List<Field> fields = inst.getInstructionFields();
         int totalBits = 0;
         for (Field field : fields) {
             totalBits += field.getNumBits();
         }
-
-        updateLengthLabel();
 
         int curX = 0;
         int i = 0;
@@ -770,10 +743,8 @@ public class EditMachineInstructionController {
             fieldName.setPrefHeight(25);
             fieldWidth.setPrefHeight(25);
 
-            fieldWidth.setStyle("-fx-background-color:" + currentInstr
-                    .getInstructionColors().get(i) + ";");
-            fieldName.setStyle("-fx-background-color:" + currentInstr
-                    .getInstructionColors().get(i) + ";");
+            fieldWidth.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
+            fieldName.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
 
             fieldWidth.setAlignment(Pos.CENTER);
             fieldName.setAlignment(Pos.CENTER);
@@ -786,26 +757,26 @@ public class EditMachineInstructionController {
             fieldName.setOnDragDetected(event -> {
                 /* drag was detected, start a drag-and-drop gesture*/
                 /* allow any transfer mode */
+                final MachineInstruction currentInstrValue = currentInstr.getValue();
 
                 Dragboard db = fieldName.startDragAndDrop(TransferMode.ANY);
 
                 int index = instructionFormatPane.getChildren().indexOf(fieldName) / 2;
 
-                final List<Field> fields1 = currentInstr.getInstructionFields();
+                final List<Field> fields1 = currentInstrValue.getInstructionFields();
 
                 draggingField = fields1.get(index);
-                draggingColor = currentInstr.getInstructionColors().get(index);
+                draggingColor = currentInstrValue.getInstructionColors().get(index);
 
-                draggingIndex = currentInstr.getAssemblyColors().indexOf
-                        (draggingColor);
+                draggingIndex = currentInstrValue.getAssemblyColors().indexOf(draggingColor);
                 originPane = instructionFormatPane;
 
-                currentInstr.getInstructionFields().remove(index);
-                currentInstr.getInstructionColors().remove(index);
+                currentInstrValue.getInstructionFields().remove(index);
+                currentInstrValue.getInstructionColors().remove(index);
 
                 if (draggingField.getType() != Type.ignored) {
-                    currentInstr.getAssemblyFields().remove(draggingIndex);
-                    currentInstr.getAssemblyColors().remove(draggingIndex);
+                    currentInstrValue.getAssemblyFields().remove(draggingIndex);
+                    currentInstrValue.getAssemblyColors().remove(draggingIndex);
                 }
 
                 updateInstructionDisplay();
@@ -829,12 +800,14 @@ public class EditMachineInstructionController {
      * format pane
      */
     private void updateAssemblyDisplay() {
-        if( currentInstr == null)
+        if( currentInstr.getValue() == null)
             return; // nothing to do in that case
 
+
+        final MachineInstruction inst = currentInstr.getValue();
         assemblyFormatPane.getChildren().clear();
 
-        List<Field> fields = currentInstr.getAssemblyFields();
+        List<Field> fields = inst.getAssemblyFields();
         int curX = 0;
         int i = 0;
         for (Field field : fields) {
@@ -847,8 +820,7 @@ public class EditMachineInstructionController {
 
             fieldName.setAlignment(Pos.CENTER);
 
-            fieldName.setStyle("-fx-background-color:" + currentInstr.getAssemblyColors
-                    ().get(i) + ";");
+            fieldName.setStyle("-fx-background-color:" + inst.getAssemblyColors().get(i) + ";");
 
             fieldName.setPrefHeight(25);
 
@@ -862,19 +834,21 @@ public class EditMachineInstructionController {
                 /* drag was detected, start a drag-and-drop gesture*/
                 /* allow any transfer mode */
 
+                final MachineInstruction currentInstruction = currentInstr.getValue();
+
                 Dragboard db = fieldName.startDragAndDrop(TransferMode.ANY);
 
                 int index = assemblyFormatPane.getChildren().indexOf(fieldName);
                 draggingIndex = index;
 
-                final List<Field> fields1 = currentInstr.getAssemblyFields();
+                final List<Field> fields1 = currentInstruction.getAssemblyFields();
 
                 draggingField = fields1.get(index);
-                draggingColor = currentInstr.getAssemblyColors().get(index);
+                draggingColor = currentInstruction.getAssemblyColors().get(index);
                 originPane = assemblyFormatPane;
 
-                currentInstr.getAssemblyFields().remove(index);
-                currentInstr.getAssemblyColors().remove(index);
+                currentInstruction.getAssemblyFields().remove(index);
+                currentInstruction.getAssemblyColors().remove(index);
 
                 //it hasn't exited the pane as soon as the drag starts
                 exited = false;
@@ -904,9 +878,9 @@ public class EditMachineInstructionController {
      *                      if dropped
      */
     private void insertInstrField(Field fieldToInsert, int index) {
-        List<Field> fields = currentInstr.getInstructionFields();
+        List<Field> fields = currentInstr.getValue().getInstructionFields();
 
-        ArrayList<Field> tempFields = new ArrayList<>();
+        List<Field> tempFields = new ArrayList<>();
         for (Field field : fields) {
             tempFields.add(field);
         }
@@ -954,7 +928,7 @@ public class EditMachineInstructionController {
      *                      if dropped
      */
     private void insertAssemblyField(Field draggingField, int index) {
-        List<Field> fields = currentInstr.getAssemblyFields();
+        List<Field> fields = currentInstr.getValue().getAssemblyFields();
 
         ArrayList<Field> tempFields = new ArrayList<>();
         for (Field field : fields) {
@@ -983,72 +957,60 @@ public class EditMachineInstructionController {
         }
     }
 
-    /**
-     * updates the length label for the selected instruction based on said
-     * instruction's field
-     */
-    private void updateLengthLabel() {
-        List<Field> fields = currentInstr.getInstructionFields();
-        int totalBits = 0;
-        for (Field field : fields) {
-            totalBits += field.getNumBits();
-        }
-
-        lengthLabel.setText(String.valueOf(totalBits));
-    }
-
-    /**
-     * updates the display of the fields on the left based on all the fields in the
-     * machine
-     */
-    private void updateFieldNames() {
-        fieldPane.getChildren().clear();
-        fieldNames.clear();
-        double labelWidth = 130;
-        double labelHeight = 30;
-        int i = 0;
-        for (Field field : allFields) {
-            fieldNames.add(field.getName());
-            final Label fieldLabel = new Label(field.getName());
-            fieldLabel.setPrefWidth(labelWidth);
-            fieldLabel.setPrefHeight(labelHeight);
-            fieldLabel.setLayoutY(i);
-            fieldLabel.setOnDragDetected(event -> {
-                /* drag was detected, start a drag-and-drop gesture*/
-                /* allow any transfer mode */
-                Dragboard db = fieldLabel.startDragAndDrop(TransferMode.ANY);
-
-                for (Field aField : allFields) {
-                    if (aField.getName().equals(fieldLabel.getText())) {
-                        draggingField = aField;
-                    }
-                }
-
-                draggingColor = Colors.generateRandomLightColor();
-                if (currentInstr != null) {
-                    draggingIndex = currentInstr.getAssemblyFields().size();
-                }
-                originPane = fieldPane;
-
-                /* Put a string on a dragboard */
-                ClipboardContent content = new ClipboardContent();
-                content.putString(fieldLabel.getText());
-                db.setContent(content);
-
-                event.consume();
-            });
 
 
-            i += labelHeight;
-            fieldPane.getChildren().add(fieldLabel);
-        }
-    }
+//    /**
+//     * updates the display of the fields on the left based on all the fields in the
+//     * machine
+//     */
+//    private void updateFieldNames() {
+//        fieldPane.getChildren().clear();
+//        fieldNames.clear();
+//        double labelWidth = 130;
+//        double labelHeight = 30;
+//        int i = 0;
+//        for (Field field : allFields) {
+//            fieldNames.add(field.getName());
+//            final Label fieldLabel = new Label(field.getName());
+//            fieldLabel.setPrefWidth(labelWidth);
+//            fieldLabel.setPrefHeight(labelHeight);
+//            fieldLabel.setLayoutY(i);
+//            fieldLabel.setOnDragDetected(event -> { // FIXME Extract this to handle when we drag a field
+//                /* drag was detected, start a drag-and-drop gesture*/
+//                /* allow any transfer mode */
+//                Dragboard db = fieldLabel.startDragAndDrop(TransferMode.ANY);
+//
+//                for (Field aField : allFields) {
+//                    if (aField.getName().equals(fieldLabel.getText())) {
+//                        draggingField = aField;
+//                    }
+//                }
+//
+//                draggingColor = Colors.generateRandomLightColor();
+//                if (currentInstr != null) {
+//                    draggingIndex = currentInstr.getAssemblyFields().size();
+//                }
+//                originPane = fieldPane;
+//
+//                /* Put a string on a dragboard */
+//                ClipboardContent content = new ClipboardContent();
+//                content.putString(fieldLabel.getText());
+//                db.setContent(content);
+//
+//                event.consume();
+//            });
+//
+//
+//            i += labelHeight;
+//            fieldPane.getChildren().add(fieldLabel);
+//        }
+//    }
 
     /**
      * displays the micros of the implementation of the currently selected instruction
      */
     public void updateMicros() {
-        if (currentInstr == null) {
+        if (currentInstr.getValue() == null) {
             return;
         }
 
@@ -1164,7 +1126,7 @@ public class EditMachineInstructionController {
      * @return the fields as they have been changed so far in the dialog
      */
     public ObservableList<Field> getFields() {
-        return allFields;
+        return fieldsList.getItems();
     }
 
     /**
@@ -1173,9 +1135,9 @@ public class EditMachineInstructionController {
      * @param fields the fields to set as the fields as they have been changed so far
      *               in the dialog
      */
-    public void setFields(ObservableList<Field> fields) {
-        allFields = fields;
-        updateFieldNames();
+    public void setFields(List<Field> fields) {
+        fieldsList.getItems().clear();
+        fieldsList.getItems().addAll(fields);
     }
 
 //    /**
@@ -1227,14 +1189,6 @@ public class EditMachineInstructionController {
 //
 //    }
 
-    /**
-     * returns the machine
-     *
-     * @return the machine
-     */
-    public Machine getMachine() {
-        return mediator.getMachine();
-    }
 
     /**
      * generates a unique opcode based on the opcodes taken by instruction that currently
@@ -1258,14 +1212,5 @@ public class EditMachineInstructionController {
             opcode++;
         }
         return opcode;
-    }
-
-    /**
-     * commits the edit made to a comment microinstructions
-     */
-    private void commitCommentEdit() {
-        currentCommentMicro.setName(commentEditor.getText());
-        updateMicros();
-        commentEditor = null;
     }
 }

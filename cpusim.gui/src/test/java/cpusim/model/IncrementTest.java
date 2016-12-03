@@ -12,8 +12,8 @@ public class IncrementTest {
     @Test
     public void test() {
         Machine machine = new Machine("test",true);
-        Register reg = new Register("reg",4);
-        Register statusReg = new Register("Status", 2);
+        Register reg = new Register("reg", machine, 4, 0, Register.Access.readWrite());
+        Register statusReg = new Register("Status", machine, 2, 0, Register.Access.readWrite());
         ConditionBit ofBit = new ConditionBit("ofBit", machine, statusReg, 0, false);
         ConditionBit cBit = new ConditionBit("cBit", machine, statusReg, 1, false);
         Increment incInstr = new Increment("Test", machine, reg, ofBit, cBit, 7L);

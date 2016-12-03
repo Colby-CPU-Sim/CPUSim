@@ -11,19 +11,21 @@
 package cpusim.gui.equs;
 
 import cpusim.Mediator;
-import cpusim.gui.help.HelpController;
 import cpusim.gui.util.Base;
-import cpusim.gui.util.EditingMultiBaseStyleLongCell;
-import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.table.EditingMultiBaseStyleLongCell;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.assembler.EQU;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -102,16 +104,7 @@ public class EQUsController implements Initializable {
      */
     public void onHelpButtonClicked() {
         String startString = "EQU Editor";
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString);
-            mediator.getDesktopController().setHelpController(helpController);
-        }
-        else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString);
-        }
+        mediator.getDesktopController().showHelpDialog(startString);
     }
 
     /**

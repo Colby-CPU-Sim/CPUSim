@@ -18,23 +18,25 @@
 
 package cpusim;
 
+import cpusim.model.Machine;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
 import cpusim.model.assembler.Token;
-import cpusim.model.Machine;
-import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.iochannel.BufferedChannel;
-import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.iochannel.FileChannel;
+import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.util.LoadException;
 import cpusim.xml.MachineReader;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import org.xml.sax.SAXParseException;
+
 import java.io.File;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public class Main {
     
@@ -83,7 +85,7 @@ public class Main {
      */
     private static void loadAndRunInCommandLineMode(String machineFileName, String
             textFileName) {
-    	
+        
     	// Give error when appropriate
         if(machineFileName.equals("") || textFileName.equals("")) {
             System.out.println("If you specify command line mode '-c', " +
@@ -112,7 +114,9 @@ public class Main {
             System.out.println(errorMessage);
             return;
         }
+        
         final Machine machine = reader.getMachine();
+        checkState(machine.getCodeStore().isPresent(), "No codeStore set for machine, " + machine);
 
         //assemble and load the program in the text file
         File programFile = new File(textFileName);
@@ -134,11 +138,10 @@ public class Main {
             System.out.println(errorMessage);
             return;
         }
-        List<AssembledInstructionCall> machineInstructions =
-                                        assembler.getAssembledInstructions();
+        List<AssembledInstructionCall> machineInstructions = assembler.getAssembledInstructions();
         try {
-            machine.getCodeStore().loadAssembledInstructions(machineInstructions,
-                                        machine.getStartingAddressForLoading());
+            machine.getCodeStore().get()
+                    .loadAssembledInstructions(machineInstructions, machine.getStartingAddressForLoading());
         } catch (LoadException ex) {
             System.out.println(ex.getMessage());
             return;

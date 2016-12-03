@@ -23,6 +23,9 @@ import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.PushBackReader;
 import cpusim.util.PushBackWriter;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +43,7 @@ public class FileChannel implements IOChannel, AutoCloseable, IdentifiedObject {
 	// Where to get or send the data
 	private File file;
 	
-	private final UUID id;
+	private final ReadOnlyObjectProperty<UUID> id;
 	
 	// Reader for the file for input
 	private PushBackReader reader;
@@ -61,7 +64,7 @@ public class FileChannel implements IOChannel, AutoCloseable, IdentifiedObject {
         this.reader = null;
         this.writer = null;
         
-        this.id = id;
+        this.id = new SimpleObjectProperty<>(this, "id", id);
     }
     
     /**
@@ -360,17 +363,13 @@ public class FileChannel implements IOChannel, AutoCloseable, IdentifiedObject {
     public String toString() {
         return file.toString();
     }
-    
-    /**
-     * getID is the same as toString(). It is included
-     * only for backwards compatibility.
-     * @return a String representation of the object.
-     */
-    public UUID getID() {
+
+    @Override
+    public ReadOnlyProperty<UUID> idProperty() {
         return id;
     }
 
-	@Override
+    @Override
 	public void writeString(String s) {
 		// TODO Auto-generated method stub
 		

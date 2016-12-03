@@ -12,7 +12,7 @@
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.RAM;
 
 import cpusim.model.util.IdentifiedObject;
@@ -79,7 +79,7 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      */
     @Override
     public RAM createInstance() {
-        return new RAM("???", IdentifiedObject.generateRandomID(), machine, 128, 8);
+        return new RAM("???", IdentifiedObject.generateRandomID(), machine.get(), 128, 8);
     }
 
     /**

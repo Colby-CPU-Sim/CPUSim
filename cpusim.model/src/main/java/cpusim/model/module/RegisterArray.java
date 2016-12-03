@@ -28,6 +28,8 @@ import cpusim.model.Module;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -63,6 +65,11 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         this.width = new SimpleIntegerProperty(width);  //used in setLength
         this.length = new SimpleIntegerProperty(length);  //initial length value to be used in setLength
         this.registers = checkNotNull(registers);
+
+        this.length.bind(Bindings.size(registers));
+
+        // bind all of the register's width to be the width of the array.
+        registers.forEach(r -> r.widthProperty().bind(this.width));
     }
 
     /**
@@ -88,12 +95,24 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
     }
 
     /**
+     * Read-only property for the width.
+     * @return Read-only, non-{@code null} width property.
+     */
+    public ReadOnlyIntegerProperty widthProperty() {
+        return width;
+    }
+
+    /**
      * getter of the length
      * @return the length as integer
      */
     public int getLength()
     {
         return length.get();
+    }
+
+    public ReadOnlyIntegerProperty lengthProperty() {
+        return length;
     }
 
     /**
@@ -171,11 +190,14 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
             registers.forEach(newRegisters::add);
             
             for (int i = length.get(); i < newLength; i++) {
-                newRegisters.add(new Register(getName() + toStringOfLength(i, numIndexDigits),
+                Register r = new Register(getName() + "[" + toStringOfLength(i, numIndexDigits) + "]",
                         machine,
                         width.get(),
                         0,
-                        Register.Access.readWrite()));
+                        Register.Access.readWrite());
+                r.widthProperty().bind(this.width);
+
+                newRegisters.add(r);
             }
             
             registers = newRegisters;
@@ -185,15 +207,13 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         this.length.set(newLength);
     }
 
-    public void setRegisters(ObservableList<Register> newRegisters){
-        for (int i = 0; i < newRegisters.size(); i++){
-            if (newRegisters.size() <= registers.size()){
-                newRegisters.get(i).copyTo(registers.get(i));
-            }
-            else {
-                registers.add(newRegisters.get(i));
-            }
-        }
+    public void setRegisters(ObservableList<Register> newRegisters) {
+
+        ObservableList<Register> newRegisterList = FXCollections.observableList(newRegisters);
+        newRegisterList.forEach(r -> r.widthProperty().bind(this.width));
+        this.length.bind(Bindings.size(newRegisterList));
+
+        this.registers = newRegisterList;
     }
 
     /**
@@ -279,11 +299,12 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
         oldRegisterArray.setName(getName());
         oldRegisterArray.setWidth(width.get());  //causes all register widths to change
         oldRegisterArray.setRegisters(registers);
-		
 	}
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         final int width = getWidth();
         if (width <= 0) {
             throw new ValidationException("You must specify a positive value for the " +

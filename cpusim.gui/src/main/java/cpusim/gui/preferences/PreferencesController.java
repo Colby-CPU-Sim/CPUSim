@@ -424,16 +424,7 @@ public class PreferencesController implements Initializable {
     @FXML
     protected void handleHelp(ActionEvent e) {
         String startString = "Preferences Dialog";
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString);
-            mediator.getDesktopController().setHelpController(helpController);
-        }
-        else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString);
-        }
+        mediator.getDesktopController().showHelpDialog(startString);
     }
 
     private void saveAssemblyLanguageStyles() {

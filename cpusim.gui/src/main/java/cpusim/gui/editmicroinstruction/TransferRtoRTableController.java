@@ -1,7 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
 import javafx.fxml.FXML;
@@ -11,8 +11,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-
-import java.util.List;
 
 /**
  * The controller for editing the {@link TransferRtoR} command in the {@link EditMicroinstructionsController}.
@@ -66,7 +64,7 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
         Callback<TableColumn<TransferRtoR,Register>,
                 TableCell<TransferRtoR,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -98,9 +96,9 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
 
     @Override
     public TransferRtoR createInstance() {
-        final Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new TransferRtoR("???", machine, r, 0, r, 0, 0);
+        final Register r = (machine.get().getAllRegisters().size() == 0 ? null :
+                machine.get().getAllRegisters().get(0));
+        return new TransferRtoR("???", machine.get(), r, 0, r, 0, 0);
     }
 
     @Override
@@ -109,11 +107,11 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    public void checkValidity(List<TransferRtoR> micros) {
-        super.checkValidity(micros);
+    public void checkValidity() {
+        super.checkValidity();
         // convert the array to an array of TransferRtoRs
 
-        for (TransferRtoR micro: micros) {
+        for (TransferRtoR micro: getItems()) {
             Register.validateIsNotReadOnly(micro.getDest(), micro.getName());
         }
     }

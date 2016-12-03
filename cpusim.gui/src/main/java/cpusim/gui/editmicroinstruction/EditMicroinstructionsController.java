@@ -1,8 +1,6 @@
 package cpusim.gui.editmicroinstruction;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
@@ -11,6 +9,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -50,7 +49,7 @@ public class EditMicroinstructionsController extends BorderPane
     @FXML @SuppressWarnings("unused")
     private DialogButtonController dialogButtonController;
 
-    private ObjectProperty<Machine> machine;
+    private final ObjectProperty<Machine> machine;
     private final Mediator mediator;
 
 
@@ -76,7 +75,8 @@ public class EditMicroinstructionsController extends BorderPane
     public EditMicroinstructionsController(Mediator mediator) {
         this.mediator = checkNotNull(mediator);
 
-        this.machine = mediator.machineProperty();
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(mediator.machineProperty());
 
         this.arithmeticTableController = new ArithmeticTableController(mediator);
         this.branchTableController = new BranchTableController(mediator);
@@ -204,7 +204,8 @@ public class EditMicroinstructionsController extends BorderPane
         // Select the first tab, seems like a good default.
         contentPane.getSelectionModel().select(0);
 
-        ImmutableSet<MicroinstructionTableController<?>> allControllers = ImmutableSet.of(arithmeticTableController,
+        dialogButtonController.setRequired(machine, this,
+                arithmeticTableController,
                 branchTableController,
                 decodeTableController,
                 incrementTableController,
@@ -218,10 +219,6 @@ public class EditMicroinstructionsController extends BorderPane
                 transferAtoRTableController,
                 transferRtoATableController,
                 transferRtoRTableController);
-
-        dialogButtonController.bindMachine(machine);
-        dialogButtonController.setInteractionHandler(this);
-        dialogButtonController.setControllers(allControllers);
     }
 
     /**
@@ -229,7 +226,7 @@ public class EditMicroinstructionsController extends BorderPane
      * {@link Microinstruction} will be selected in the table by default.
      * @param micro The instruction that is currently in focus.
      */
-    public void showTabForMicroinstruction(final Microinstruction micro) {
+    public void showTabForMicroinstruction(final Microinstruction<?> micro) {
         MicroinstructionTab<?> tab = classMicroinstructionTabMap.get(micro.getClass());
         if (tab == null) {
             throw new IllegalArgumentException("Unknown micro passed: " + micro);
@@ -247,7 +244,20 @@ public class EditMicroinstructionsController extends BorderPane
             ctrl.scrollTo(idx);
         }
     }
-
+    
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
+    }
+    
+    /*
+     * Delegates to DesktopController#showHelpDialog(String)
+     */
+    @Override
+    public void displayHelpDialog(final String helpPageId) {
+        mediator.getDesktopController().showHelpDialog(helpPageId);
+    }
+    
     @Override
     public boolean onOkButtonClick() {
         return true;

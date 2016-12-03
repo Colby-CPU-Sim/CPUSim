@@ -37,9 +37,7 @@ package cpusim.model.module;
     import cpusim.model.util.IdentifiedObject;
     import cpusim.model.util.ValidationException;
     import cpusim.model.util.units.ArchType;
-    import javafx.beans.property.SimpleIntegerProperty;
-    import javafx.beans.property.SimpleLongProperty;
-    import javafx.beans.property.SimpleObjectProperty;
+    import javafx.beans.property.*;
 
     import java.math.BigInteger;
     import java.util.EnumSet;
@@ -174,12 +172,27 @@ public class Register extends Module<Register> implements Sized<Register>
     }
 
     /**
+     * Gets a Read-only property for the width. To set the width, use {@link #setWidth(int)}.
+     *
+     * @return Read-only, non-{@code null} property.
+     */
+    public IntegerProperty widthProperty() { return width; }
+
+    /**
      * getter of the value
      * @return the value as long object
      */
     public long getValue()
     {
         return value.get();
+    }
+
+    /**
+     * return the property object of value
+     * @return property object
+     */
+    public ReadOnlyLongProperty valueProperty() {
+        return value;
     }
 
     /**
@@ -192,6 +205,14 @@ public class Register extends Module<Register> implements Sized<Register>
     }
 
     /**
+     * Property for initial value.
+     * @return Read-only, non-{@code null} property for initial value.
+     */
+    public ReadOnlyLongProperty initialValueProperty() {
+        return initialValue;
+    }
+
+    /**
      * getter of the read only value
      * @return the read only value as a boolean
      * 
@@ -199,7 +220,7 @@ public class Register extends Module<Register> implements Sized<Register>
      */
     public boolean getReadOnly()
     {
-        return access.get() == Access.readOnly();
+        return access.get().equals(Access.readOnly());
     }
     
     /**
@@ -211,6 +232,15 @@ public class Register extends Module<Register> implements Sized<Register>
     	return access.get();
     }
 
+
+    /**
+     * return the property object of readonly
+     * @return property object of readonly
+     */
+    public ReadOnlyObjectProperty<EnumSet<Access>> accessProperty(){
+        return access;
+    }
+
     /**
      * set the width value
      * @param w new width value
@@ -219,7 +249,7 @@ public class Register extends Module<Register> implements Sized<Register>
     {
         checkArgument(w > 0, "Register.setWidth() called with a parameter <= 0");
         
-        if (width != null && w < width.get()) {
+        if (w < width.get()) {
             setValue(0); //narrowing of width causes the value to be cleared
         }
         
@@ -271,21 +301,6 @@ public class Register extends Module<Register> implements Sized<Register>
     	this.access.set(checkNotNull(access));
     }
 
-    /**
-     * return the property object of value
-     * @return property object
-     */
-    public SimpleLongProperty valueProperty() {
-        return value;
-    }
-
-    /**
-     * return the property object of readonly
-     * @return property object of readonly
-     */
-    public SimpleObjectProperty<EnumSet<Access>> accessProperty(){
-        return access;
-    }
 
     /**
      * clear the value in the register to its initial value
@@ -321,7 +336,7 @@ public class Register extends Module<Register> implements Sized<Register>
 	}
     
     @Override
-    protected void validateState() {
+    public void validate() {
         // Validate the width
         final int width = getWidth();
         if (width <= 0) {

@@ -11,7 +11,7 @@ import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validatable;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
@@ -32,7 +32,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     // name of the microinstruction
     private SimpleStringProperty name;
     
-    private final UUID uuid;
+    private final ReadOnlyObjectProperty<UUID> uuid;
     
     protected Machine machine;
     
@@ -43,11 +43,10 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     Microinstruction(String name, UUID id, Machine machine) {
         checkNotNull(machine);
         checkArgument(!Strings.isNullOrEmpty(name));
-        checkNotNull(id);
         
-        this.name = new SimpleStringProperty(name);
+        this.name = new SimpleStringProperty(this, "name", name);
         this.machine = machine;
-        this.uuid = id;
+        this.uuid = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
     }
     
     /**
@@ -59,19 +58,14 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
 	public Microinstruction(final Microinstruction<T> other) {
 		this(checkNotNull(other).getName(), IdentifiedObject.generateRandomID(), other.machine);
 	}
-    
+
     @Override
-    public String getName() {
-        return name.get();
+    public StringProperty nameProperty() {
+        return name;
     }
-    
+
     @Override
-    public void setName(String newName){
-        name.set(newName);
-    }
-    
-    @Override
-    public UUID getID() {
+    public ReadOnlyProperty<UUID> idProperty() {
         return uuid;
     }
     
@@ -100,18 +94,10 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
      * @throws NullPointerException if <code>m</code> is <code>null</code>.
      */
     public abstract boolean uses(Module<?> m);
-    
-    /**
-     * Should perform the actions described by {@link Validatable#validate()}. This allows common
-     * {@link Microinstruction} validation to live inside {@link #validate()}.
-     */
-    protected abstract void validateState();
-    
+
     @Override
-    public final void validate() {
+    public void validate() {
         NamedObject.super.validate();
-        
-        this.validateState();
     }
     
 }  // end of class Microinstruction

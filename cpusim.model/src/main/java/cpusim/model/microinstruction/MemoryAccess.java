@@ -45,10 +45,10 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
                         Register data,
                         Register address){
         super(name, id, machine);
-        this.direction = new SimpleStringProperty(direction);
-        this.memory = new SimpleObjectProperty<>(memory);
-        this.data = new SimpleObjectProperty<>(data);
-        this.address = new SimpleObjectProperty<>(address);
+        this.direction = new SimpleStringProperty(this, "direction", direction);
+        this.memory = new SimpleObjectProperty<>(this, "memory", memory);
+        this.data = new SimpleObjectProperty<>(this, "data", data);
+        this.address = new SimpleObjectProperty<>(this, "address", address);
     }
     
     
@@ -187,11 +187,6 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
 //                        " write at address " + addressValue,
 //                        addressValue, memory.get());
         }
-    }
-
-    @Override
-    protected void validateState() {
-        // currently no-op
     }
 
     /**

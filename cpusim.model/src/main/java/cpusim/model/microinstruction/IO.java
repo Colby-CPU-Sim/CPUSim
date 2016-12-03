@@ -65,9 +65,9 @@ public class IO extends Microinstruction<IO> {
               String direction,
               IOChannel connection){
         super(name, id, machine);
-        this.type = new SimpleStringProperty(type);
-        this.buffer = new SimpleObjectProperty<>(buffer);
-        this.direction = new SimpleStringProperty(direction);
+        this.type = new SimpleStringProperty(this, "type", type);
+        this.buffer = new SimpleObjectProperty<>(this, "buffer", buffer);
+        this.direction = new SimpleStringProperty(this, "direction", direction);
         this.connection = connection;
     }
 
@@ -275,7 +275,9 @@ public class IO extends Microinstruction<IO> {
      * 16-bit-wide (or greater) buffers.
      */
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         if (getType().equals("ascii") && getBuffer().getWidth() < 1) {
             throw new ValidationException("IO \"" + this + "\" is of type " +
                     "ascii and so needs a\nbuffer register at least " +

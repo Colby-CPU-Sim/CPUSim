@@ -17,6 +17,8 @@ package cpusim.model.module;
 
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -98,15 +100,15 @@ public class RegisterRAMPair implements LegacyXMLSupported, Copyable<RegisterRAM
     }
 
     ////////////////Getters ////////////////
-    public SimpleObjectProperty<Register> registerProperty() {
+    public ObjectProperty<Register> registerProperty() {
     	return register;
     }
 
-    public SimpleObjectProperty<RAM> ramProperty() {
+    public ObjectProperty<RAM> ramProperty() {
     	return ram;
     }
 
-    public SimpleBooleanProperty dynamicProperty() {
+    public BooleanProperty dynamicProperty() {
     	return dynamic;
     }
     

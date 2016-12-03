@@ -10,35 +10,23 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.*;
-import cpusim.model.module.ConditionBit;
-import cpusim.model.module.ControlUnit;
-import cpusim.model.module.RAM;
-import cpusim.model.module.RAMLocation;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
+import cpusim.model.module.*;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This file contains the class for Machines created using CPU Sim
@@ -54,7 +42,7 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2013-10-01
  */
-public class Machine extends Module<Machine> implements Serializable {
+public class Machine extends Module<Machine> {
 
     private static final long serialVersionUID = 1L;
  
@@ -119,6 +107,8 @@ public class Machine extends Module<Machine> implements Serializable {
     private ObservableList<RegisterArray> registerArrays;
     private ObservableList<ConditionBit> conditionBits;
     private ObservableList<RAM> rams;
+    
+    private final ObservableList<Register> allRegisters;
 
     /**
      * the current state of the machine, defined by enum state
@@ -131,7 +121,7 @@ public class Machine extends Module<Machine> implements Serializable {
     // EQUs
     private ObservableList<EQU> EQUs;
     // key = micro name, value = list of microinstructions
-    private Map<Class<? extends Microinstruction>, ObservableList<? extends Microinstruction>> microMap;
+    private Map<Class<? extends Microinstruction>, ObservableList<? extends Microinstruction<?>>> microMap;
     // key = module type, value = list of modules
     private Map<Class<? extends Module<?>>, ObservableList<? extends Module<?>>> moduleMap;
     // Control unit for keeping track of index of micro within machine instruction
@@ -142,7 +132,7 @@ public class Machine extends Module<Machine> implements Serializable {
     // It is volatile to ensure that all threads can read it at any time
     private volatile RunModes runMode = RunModes.ABORT;
     // Fields of the machine instructions
-    private List<Field> fields;
+    private ObservableList<Field> fields;
     // Array of PunctChars.
     private List<PunctChar> punctChars;
     // Address to start when loading RAM with a program
@@ -152,7 +142,7 @@ public class Machine extends Module<Machine> implements Serializable {
     // True if bit indexing starts of the right side, false if on the left
     private SimpleBooleanProperty indexFromRight;
     // Register used for stopping at break points--initially null
-    private Register programCounter;
+    private ObjectProperty<Register> programCounter;
     // true if the machine just halted due to a breakpoint.  It is used to turn off the
     // break point temporarily to allow continuing past the breakpoint.
     private boolean justBroke;
@@ -167,6 +157,40 @@ public class Machine extends Module<Machine> implements Serializable {
         registers = FXCollections.observableArrayList();
         registerArrays = FXCollections.observableArrayList();
         conditionBits = FXCollections.observableArrayList();
+        allRegisters = FXCollections.observableArrayList();
+        
+        // We bind the "allRegisters" array to listen to the changes to the registers and registerArray lists,
+        // this way when they change, the allRegisters array is always up to date!
+        
+        registers.addListener((ListChangeListener<Register>) c -> {
+            while (c.next()) {
+                if (!c.wasPermutated() && !c.wasUpdated()) {
+                    // Add and remove registers are required.
+                    allRegisters.removeAll(c.getRemoved());
+                    allRegisters.addAll(c.getAddedSubList());
+                } // else {
+                    // Permutations just mean the order changed, this isn't relevant
+                    // and updates will already be transitive.
+                // }
+            }
+        });
+    
+        registerArrays.addListener((ListChangeListener<RegisterArray>) c -> {
+            while (c.next()) {
+                if (!c.wasPermutated() && !c.wasUpdated()) {
+                    for (RegisterArray arr : c.getRemoved()) {
+                        allRegisters.removeAll(arr.registers());
+                    }
+                    for (RegisterArray arr : c.getRemoved()) {
+                        allRegisters.addAll(arr.registers());
+                    }
+                } // else {
+                    // Permutations just mean the order changed, this isn't relevant
+                    // and updates will already be transitive.
+                // }
+            }
+        });
+        
         rams = FXCollections.observableArrayList();
         wrappedState = new SimpleObjectProperty<>(this, "machine state", new
                 StateWrapper(State.NEVER_RUN, ""));
@@ -175,15 +199,15 @@ public class Machine extends Module<Machine> implements Serializable {
         microMap = new HashMap<>();
 
         instructions = FXCollections.observableArrayList();
-        EQUs = FXCollections.observableArrayList(new ArrayList<EQU>());
-        fields = new ArrayList<>();
+        EQUs = FXCollections.observableArrayList();
+        fields = FXCollections.observableArrayList();
         punctChars = Lists.newArrayList(getDefaultPunctChars());
 
         fetchSequence = new MachineInstruction("Fetch sequence", IdentifiedObject.generateRandomID(), this, 0, "");
         controlUnit = new ControlUnit("ControlUnit", this);
 
         startingAddressForLoading = 0;
-        programCounter = null;
+        programCounter = new SimpleObjectProperty<>(null);
         codeStore = new SimpleObjectProperty<>(null);
         indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
         justBroke = false;
@@ -408,8 +432,8 @@ public class Machine extends Module<Machine> implements Serializable {
         return fields;
     }
 
-    public void setFields(List<Field> f) {
-        fields = f;
+    public void setFields(ObservableList<Field> f) {
+        fields = checkNotNull(f);
     }
     
     /**
@@ -481,6 +505,18 @@ public class Machine extends Module<Machine> implements Serializable {
         return microBuilder.build();
     }
 
+    /**
+     * Adds a {@link ListChangeListener} to all of the {@link Microinstruction} {@link ObservableList} stored internally.
+     * @param listener Non-{@code null} listener
+     */
+    public void addChangeListenerForMicros(ListChangeListener<Microinstruction<?>> listener) {
+        checkNotNull(listener);
+
+        for (ObservableList<? extends Microinstruction<?>> list: microMap.values()) {
+            list.addListener(listener);
+        }
+    }
+
     public ObservableList<MachineInstruction> getInstructions() {
         return instructions;
     }
@@ -498,9 +534,6 @@ public class Machine extends Module<Machine> implements Serializable {
         return startingAddressForLoading;
     }
 
-    public SimpleObjectProperty<RAM> getCodeStoreProperty() {
-        return codeStore;
-    }
 
     public boolean getIndexFromRight() {
         return indexFromRight.get();
@@ -509,9 +542,13 @@ public class Machine extends Module<Machine> implements Serializable {
     public void setIndexFromRight(boolean b) {
         indexFromRight.set(b);
     }
-
-    public RAM getCodeStore() {
-        return codeStore.get();
+    
+    public ObjectProperty<RAM> codeStoreProperty() {
+        return codeStore;
+    }
+    
+    public Optional<RAM> getCodeStore() {
+        return Optional.ofNullable(codeStore.get());
     }
 
     public void setCodeStore(RAM r) {
@@ -522,12 +559,16 @@ public class Machine extends Module<Machine> implements Serializable {
         startingAddressForLoading = add;
     }
 
-    public Register getProgramCounter() {
+    public ObjectProperty<Register> programCounterProperty() {
         return programCounter;
+    }
+    
+    public Optional<Register> getProgramCounter() {
+        return Optional.ofNullable(programCounter.get());
     }
 
     public void setProgramCounter(Register programCounter) {
-        this.programCounter = programCounter;
+        this.programCounter.setValue(programCounter);
     }
 
     private void initializeModuleMap() {
@@ -553,16 +594,6 @@ public class Machine extends Module<Machine> implements Serializable {
     
     // with the registers coming from register arrays at the end of the vector.
     public ObservableList<Register> getAllRegisters() {
-        ObservableList<Register> allRegisters = FXCollections.observableArrayList();
-        
-        for (Register register1 : registers) {
-            allRegisters.add(register1);
-        }
-
-        for (RegisterArray registerArray : registerArrays) {
-            allRegisters.addAll(registerArray.registers());
-        }
-        
         return allRegisters;
     }
     
@@ -959,6 +990,8 @@ public class Machine extends Module<Machine> implements Serializable {
             Task<Void> executionTask = new Task<Void>() {
                 @Override
                 protected Void call() throws Exception {
+                    final Register programCounter = Machine.this.programCounter.get();
+                    final RAM codeStore = Machine.this.codeStore.get();
                     while (runMode != RunModes.STOP &&
                             runMode != RunModes.ABORT &&
                             !isCancelled() &&
@@ -982,9 +1015,9 @@ public class Machine extends Module<Machine> implements Serializable {
                                 currentIndex == 0 &&
                                 currentInstruction == getFetchSequence()) {
                             // it's the start of a machine cycle
-                            if (getCodeStore().breakAtAddress((int)programCounter.getValue())
+                            if (codeStore.breakAtAddress((int)programCounter.getValue())
                                     && ! justBroke) {
-                                RAMLocation breakLocation = codeStore.get().data().get((int)
+                                RAMLocation breakLocation = codeStore.data().get((int)
                                         programCounter.getValue());
                                 setState(Machine.State.BREAK, breakLocation);
                                 runMode = RunModes.STOP;
@@ -997,8 +1030,7 @@ public class Machine extends Module<Machine> implements Serializable {
                                 //false is unused
                             }
                         }
-                        Microinstruction currentMicro = microInstructions.get
-                                (currentIndex);
+                        Microinstruction<?> currentMicro = microInstructions.get(currentIndex);
                         // Fire property change indicating the start of a
                         // microinstruction
                         if (currentIndex < microInstructions.size()) {
@@ -1019,8 +1051,7 @@ public class Machine extends Module<Machine> implements Serializable {
                         if (runMode == RunModes.STEP_BY_MICRO) {
                             runMode = RunModes.STOP;
                         }
-                        if (runMode == RunModes.STEP_BY_INSTR && currentMicro == getEnd
-                                ()) {
+                        if (runMode == RunModes.STEP_BY_INSTR && currentMicro == getEnd()) {
                             runMode = RunModes.STOP;
                         }
                     }
@@ -1158,7 +1189,9 @@ public class Machine extends Module<Machine> implements Serializable {
 	}
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         // Validate all of the internal state
         moduleMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);
         microMap.values().stream().flatMap(List::stream).forEach(Validatable::validate);

@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Logical;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
@@ -69,7 +70,7 @@ class LogicalTableController extends MicroinstructionTableController<Logical> {
                 );
         Callback<TableColumn<Logical,Register>,TableCell<Logical,Register>> cellComboFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         source1.setCellValueFactory(new PropertyValueFactory<>("source1"));
@@ -97,6 +98,7 @@ class LogicalTableController extends MicroinstructionTableController<Logical> {
 
     @Override
     public Logical createInstance() {
+        final Machine machine = this.machine.get();
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new Logical("???", machine, "AND", r, r, r);

@@ -372,12 +372,12 @@ public class MachineWriter
         //print the loading info
         out.println();
         out.println("\t<!--............. loading info ..................-->");
-        if (machine.getCodeStore() != null) {
+        machine.getCodeStore().ifPresent(codeStore -> {
             out.println("\t<LoadingInfo ram=\"" +
-                    machine.getCodeStore().getID() +
+                    codeStore.getID() +
                     "\" startingAddress=\"" +
                     machine.getStartingAddressForLoading() + "\" />");
-        }
+        });
 
         //print the indexing information
         out.println();
@@ -389,10 +389,10 @@ public class MachineWriter
         //print the program counter info
         out.println();
         out.println("\t<!--............. program counter info ..................-->");
-        if (machine.getProgramCounter() != null) {
+        machine.getProgramCounter().ifPresent(programCounter -> {
             out.println("\t<ProgramCounterInfo programCounter=\"" +
-                    machine.getProgramCounter().getID() + "\" />");
-        }
+                    programCounter.getID() + "\" />");
+        });
 
         out.println();
         out.println("</Machine>");

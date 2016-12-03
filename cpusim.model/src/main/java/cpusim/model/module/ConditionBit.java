@@ -18,9 +18,7 @@ import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -108,6 +106,10 @@ public class ConditionBit extends Module<ConditionBit> {
         register.set(r);
     }
 
+    public ObjectProperty<Register> registerProperty() {
+        return register;
+    }
+
     /**
      * getter for the bit
      * @return the bit value
@@ -125,6 +127,8 @@ public class ConditionBit extends Module<ConditionBit> {
     {
         bit.set(newBit);
     }
+
+    public IntegerProperty bitProperty() { return bit; }
 
     /**
      * getter for the Halt
@@ -148,7 +152,7 @@ public class ConditionBit extends Module<ConditionBit> {
      * get the simple property object
      * @return the simple property object of halt
      */
-    public SimpleBooleanProperty haltProperty(){
+    public BooleanProperty haltProperty(){
         return halt;
     }
     
@@ -186,7 +190,9 @@ public class ConditionBit extends Module<ConditionBit> {
     }
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         if (getRegister() == null) {
             throw new ValidationException("ConditionBit " + getName() + " does not have a register set.");
         }

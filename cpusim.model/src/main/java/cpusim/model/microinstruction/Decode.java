@@ -7,6 +7,7 @@ import cpusim.model.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.List;
@@ -56,6 +57,10 @@ public class Decode extends Microinstruction<Decode> {
         return ir.get();
     }
 
+    public ObjectProperty<Register> irProperty() {
+        return ir;
+    }
+
     /**
      * updates the fixed value stored in the set microinstruction.
      *
@@ -91,9 +96,11 @@ public class Decode extends Microinstruction<Decode> {
         throw new ExecutionException("No opcode matched the bits in " +
                 "the register: " + ir.get() + ".");
     }
-    
+
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         if (ir.getValue() == null) {
             throw new ValidationException("No IR register set for Decode instruction, " + getName());
         }

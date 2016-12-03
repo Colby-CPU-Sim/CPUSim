@@ -1,7 +1,5 @@
 package cpusim.model.util;
 
-import java.util.List;
-
 import static com.google.common.base.Preconditions.*;
 
 /**
@@ -27,7 +25,7 @@ public interface Validatable {
      *
      * @since 2016-11-21
      */
-    public static void all(List<? extends Validatable> list) {
+    public static void all(Iterable<? extends Validatable> list) {
         checkNotNull(list).forEach(Validatable::validate);
     }
 }

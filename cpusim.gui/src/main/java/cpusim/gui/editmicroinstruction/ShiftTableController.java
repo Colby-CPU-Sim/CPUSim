@@ -1,7 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
@@ -81,8 +81,7 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
         Callback<TableColumn<Shift,Integer>,TableCell<Shift,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Shift,Register>,TableCell<Shift,Register>> cellComboFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
@@ -114,9 +113,9 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
     
     @Override
     public Shift createInstance() {
-        final Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new Shift("???", machine, r, r,"logical", "left", 1);
+        final Register r = (machine.get().getAllRegisters().size() == 0 ? null :
+                machine.get().getAllRegisters().get(0));
+        return new Shift("???", machine.get(), r, r,"logical", "left", 1);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
@@ -60,7 +61,7 @@ class IOTableController extends MicroinstructionTableController<IO> {
                 );
         Callback<TableColumn<IO,Register>,TableCell<IO,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
         Callback<TableColumn<IO,String>,TableCell<IO,String>> cellDircFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
                         FXCollections.observableArrayList(
@@ -91,6 +92,7 @@ class IOTableController extends MicroinstructionTableController<IO> {
 
     @Override
     public IO createInstance() {
+        final Machine machine = this.machine.get();
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new IO("???", machine, "integer", r, "input");

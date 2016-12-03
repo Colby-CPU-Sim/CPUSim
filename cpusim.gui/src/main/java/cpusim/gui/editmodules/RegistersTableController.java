@@ -27,8 +27,9 @@ package cpusim.gui.editmodules;
 import com.google.common.base.Joiner;
 import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
-import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoR;
@@ -170,7 +171,12 @@ public class RegistersTableController extends ModuleTableController<Register> {
      */
     @Override
     public Register createInstance() {
-        return new Register("???", IdentifiedObject.generateRandomID(), machine,16, 0, Register.Access.readWrite());
+        return new Register("???",
+                IdentifiedObject.generateRandomID(),
+                machine.get(),
+                16,
+                0,
+                Register.Access.readWrite());
     }
 
     /**
@@ -195,6 +201,8 @@ public class RegistersTableController extends ModuleTableController<Register> {
         //build up a HashMap of old registers and new widths
         Map<Register, Integer> table = registers.stream()
                 .collect(Collectors.toMap(Function.identity(), Register::getWidth));
+        
+        final Machine machine = this.machine.get();
         
         Validate.registerWidthsAreOkayForMicros(machine, table);
         

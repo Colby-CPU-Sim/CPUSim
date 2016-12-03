@@ -91,9 +91,11 @@ public class Branch extends Microinstruction<Branch>
     {
         controlUnit.incrementMicroIndex(amount.get());
     }
-    
+
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         if (controlUnit == null) {
             throw new ValidationException("No control unit is set for Branch " + getName());
         }

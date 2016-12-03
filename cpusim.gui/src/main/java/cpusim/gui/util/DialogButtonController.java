@@ -42,7 +42,7 @@ public final class DialogButtonController extends VBox implements MachineBound {
     @FXML @SuppressWarnings("unused")
     private Button helpButton;
 
-    private ObjectProperty<Machine> machine;
+    private final ObjectProperty<Machine> machine;
 
     private InteractionHandler interactionHandler;
 
@@ -50,7 +50,7 @@ public final class DialogButtonController extends VBox implements MachineBound {
      * {@link List} of {@link MachineModificationController}s that can be used to update the machine when the
      * dialog tries to close.
      */
-    private Set<MachineModificationController<?>> controllers;
+    private Set<MachineModificationController> controllers;
 
     private final ObjectProperty<HelpPageEnabled> currentHelpable;
 
@@ -59,7 +59,7 @@ public final class DialogButtonController extends VBox implements MachineBound {
      * <ul>
      *     <li>{@link #setInteractionHandler(InteractionHandler)}</li>
      *     <li>{@link #setControllers(Iterable)}</li>
-     *     <li>{@link #bindMachine(ObjectProperty)}</li>
+     *     <li>Bind a {@link Machine} property to {@link #machineProperty()}</li>
      * </ul>
      *
      * This must be done <strong>before</strong> any interactions occur, otherwise behaviour is undefined (likely
@@ -67,7 +67,8 @@ public final class DialogButtonController extends VBox implements MachineBound {
      */
     public DialogButtonController() {
         this.interactionHandler = null;
-        this.currentHelpable = new SimpleObjectProperty<>(null);
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.currentHelpable = new SimpleObjectProperty<>(this, "currentHelpable", null);
         this.controllers = new HashSet<>();
 
         FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, FXML_FILE);
@@ -94,13 +95,30 @@ public final class DialogButtonController extends VBox implements MachineBound {
     }
 
     @Override
-    public void bindMachine(ObjectProperty<Machine> machineProperty) {
-        this.machine = checkNotNull(machineProperty);
-    }
-
-    @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
+    public ObjectProperty<Machine> machineProperty() {
         return machine;
+    }
+    
+    /**
+     * Convenience method to set the required parameters outlined by {@link #DialogButtonController()}. Delegates to
+     * other methods.
+     *
+     * @param machineProperty The {@link Machine} this instance "looks after"
+     * @param handler Handles all interactions, see {@link #setInteractionHandler(InteractionHandler)}.
+     * @param controllers Controllers that will cause the underlying {@link Machine} to update, see
+     *                      {@link #setControllers(Iterable)}.
+     *
+     * @see #DialogButtonController()
+     * @see #setInteractionHandler(InteractionHandler)
+     * @see #setControllers(Iterable)
+     */
+    public void setRequired(ObjectProperty<Machine> machineProperty,
+                            InteractionHandler handler,
+                            MachineModificationController... controllers) {
+        this.machine.bind(checkNotNull(machineProperty));
+
+        setInteractionHandler(handler);
+        setControllers(Arrays.asList(controllers));
     }
 
     /**
@@ -123,7 +141,7 @@ public final class DialogButtonController extends VBox implements MachineBound {
      * Copy the parameter to the {@link Set} of controllers that will be updated when closing the dialog.
      * @param controllers
      */
-    public void setControllers(Iterable<? extends MachineModificationController<?>> controllers) {
+    public void setControllers(Iterable<? extends MachineModificationController> controllers) {
         this.controllers.clear();
         controllers.forEach(this.controllers::add);
     }
@@ -133,7 +151,7 @@ public final class DialogButtonController extends VBox implements MachineBound {
      * "OK" button is pressed.
      * @return List of controller values
      */
-    public Set<MachineModificationController<?>> getControllers() {
+    public Set<MachineModificationController> getControllers() {
         return this.controllers;
     }
 
@@ -174,6 +192,8 @@ public final class DialogButtonController extends VBox implements MachineBound {
         }
 
         try {
+            controllers.forEach(MachineModificationController::checkValidity);
+
             controllers.forEach(MachineModificationController::updateMachine);
 
             // Now we tell the parent that we updated the Machine (they can do some extra actions as required).

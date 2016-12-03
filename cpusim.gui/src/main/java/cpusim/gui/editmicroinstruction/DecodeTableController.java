@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
 import cpusim.model.util.IdentifiedObject;
@@ -45,7 +46,7 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
 
         Callback<TableColumn<Decode,Register>,TableCell<Decode,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         ir.setCellValueFactory(new PropertyValueFactory<>("ir"));
 
@@ -63,6 +64,8 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
 
     @Override
     public Decode createInstance() {
+        final Machine machine = this.machine.get();
+        
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new Decode("???", IdentifiedObject.generateRandomID(), machine, r);

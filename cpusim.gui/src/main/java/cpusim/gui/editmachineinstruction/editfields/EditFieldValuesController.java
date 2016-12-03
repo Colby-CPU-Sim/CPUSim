@@ -18,7 +18,8 @@
  */
 package cpusim.gui.editmachineinstruction.editfields;
 
-import cpusim.gui.util.EditingLongCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
 import cpusim.model.FieldValue;
 import cpusim.model.util.NamedObject;
@@ -95,7 +96,7 @@ public class EditFieldValuesController implements Initializable {
         
         Callback<TableColumn<FieldValue, String>,
                 TableCell<FieldValue, String>> cellStrFactory =
-                setStringTableColumn -> new cpusim.gui.util.EditingStrCell<>();
+                setStringTableColumn -> new EditingStrCell<>();
         Callback<TableColumn<FieldValue,Long>,
                 TableCell<FieldValue,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();

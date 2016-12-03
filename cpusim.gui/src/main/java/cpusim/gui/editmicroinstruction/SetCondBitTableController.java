@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -12,8 +13,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-
-import java.util.List;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
@@ -58,7 +57,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
                                 "1"
                         ));
         Callback<TableColumn<SetCondBit,ConditionBit>,TableCell<SetCondBit,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.getModule(ConditionBit.class));
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getModule(ConditionBit.class));
 
         bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
         value.setCellValueFactory(new PropertyValueFactory<>("value"));
@@ -78,6 +77,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     
     @Override
     public SetCondBit createInstance() {
+        final Machine machine = this.machine.get();
         ConditionBit cBit = (machine.getModule(ConditionBit.class).isEmpty() ? null :
                 machine.getModule(ConditionBit.class).get(0));
         return new SetCondBit("???", machine, cBit, "0");
@@ -90,11 +90,10 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     }
 
     @Override
-    public void checkValidity(List<SetCondBit> micros)
-    {
-        super.checkValidity(micros);
+    public void checkValidity() {
+        super.checkValidity();
         
-        for (SetCondBit micro: micros) {
+        for (SetCondBit micro: getItems()) {
             Register.validateIsNotReadOnly(micro.getBit().getRegister(), micro.getName());
         }
     }
@@ -102,7 +101,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     @Override
     public boolean isNewButtonEnabled()
     {
-        return !machine.getModule(ConditionBit.class).isEmpty();
+        return !machine.get().getModule(ConditionBit.class).isEmpty();
     }
 
     @Override

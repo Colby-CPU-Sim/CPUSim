@@ -44,11 +44,6 @@ public class End extends Microinstruction<End>
     }
     
     @Override
-    protected void validateState() {
-        // nothing to validate
-    }
-    
-    @Override
     public boolean uses(Module<?> m)
     {
         return false;

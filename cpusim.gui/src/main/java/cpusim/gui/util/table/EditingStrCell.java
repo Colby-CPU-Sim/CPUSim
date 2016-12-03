@@ -3,7 +3,7 @@
  * last edit date: 6/3/2013
  */
 
-package cpusim.gui.util;
+package cpusim.gui.util.table;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

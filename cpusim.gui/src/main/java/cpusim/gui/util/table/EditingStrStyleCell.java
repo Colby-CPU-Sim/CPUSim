@@ -3,13 +3,12 @@
  * last edit date: 6/3/2013
  */
 
-package cpusim.gui.util;
+package cpusim.gui.util.table;
 
+import cpusim.gui.desktop.FontData;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -18,19 +17,15 @@ import javafx.scene.input.KeyEvent;
 /**
  * An editable cell class that allows the user to modify the string in the cell.
  */
-public class EditingStrListCell extends ListCell<String> {
+public class EditingStrStyleCell<T> extends TableCell<T, String> {
 
     protected TextField textField;
     protected int cellSize;
     protected boolean valid;
-    protected String errorMessage;
+    protected FontData styleInfo;
 
-    public EditingStrListCell(int cellSize) {
-        this.cellSize = cellSize;
-    }
-
-    public EditingStrListCell() {
-
+    public EditingStrStyleCell(FontData style) {
+        this.styleInfo = style;
     }
 
     /**
@@ -56,7 +51,7 @@ public class EditingStrListCell extends ListCell<String> {
     public void cancelEdit() {
         super.cancelEdit();
 
-        setText((String) getItem());
+        setText(getItem());
         setGraphic(null);
     }
 
@@ -69,6 +64,8 @@ public class EditingStrListCell extends ListCell<String> {
     public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
 
+        styleInfo.setFontAndBackground(this);
+        
         if (empty) {
             setText(null);
             setGraphic(null);
@@ -119,6 +116,6 @@ public class EditingStrListCell extends ListCell<String> {
      * @return a string value of the item in the table cell
      */
     protected String getString() {
-        return getItem() == null ? "" : getItem().toString();
+        return getItem() == null ? "" : getItem();
     }
 }

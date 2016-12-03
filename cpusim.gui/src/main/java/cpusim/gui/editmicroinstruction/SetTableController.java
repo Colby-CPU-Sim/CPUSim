@@ -1,8 +1,9 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.CpusimSet;
 import cpusim.model.module.Register;
 import javafx.fxml.FXML;
@@ -66,7 +67,7 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<CpusimSet,Register>,TableCell<CpusimSet,Register>> cellComboFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
@@ -94,6 +95,7 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
     
     @Override
     public CpusimSet createInstance() {
+        final Machine machine = this.machine.get();
         Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
         return new CpusimSet("???", machine, r, 0, 1, 0L);
     }

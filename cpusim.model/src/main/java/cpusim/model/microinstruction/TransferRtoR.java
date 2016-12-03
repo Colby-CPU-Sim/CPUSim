@@ -69,15 +69,14 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
     
     @Override
     public <U extends TransferRtoR> void copyTo(final U other) {
-        copyToHelper(other);
+        super.copyTo(other);
     }
 
     /**
      * execute the micro instruction from machine
      */
     @Override
-    public void execute()
-    {
+    public void execute() {
         //move the bit values of the registers to the far left end of the 64-bit long
         int srcFullShift = 64 - source.get().getWidth();
         int destFullShift = 64 - dest.get().getWidth();
@@ -158,7 +157,9 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
     }
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         int srcStartBit = getSrcStartBit();
         int destStartBit = getDestStartBit();
         int numBits = getNumBits();

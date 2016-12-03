@@ -3,7 +3,7 @@
  * last edit data: 6/3/2013
  */
 
-package cpusim.gui.util;
+package cpusim.gui.util.table;
 
 import cpusim.model.util.Convert;
 import cpusim.model.util.ValidationException;

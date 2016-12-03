@@ -10,7 +10,7 @@ import cpusim.model.MachineInstruction;
 import cpusim.Mediator;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.gui.util.StyledListCell;
+import cpusim.gui.util.list.StyledListCell;
 import cpusim.util.BackupManager;
 import cpusim.util.OutlineChangesManager;
 import javafx.application.Platform;
@@ -51,6 +51,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
     Button startOverButton;
     @FXML
     Label currentInstrLabel;
+
     @FXML
     private ListView<Microinstruction<?>> currentMicrosList;
 

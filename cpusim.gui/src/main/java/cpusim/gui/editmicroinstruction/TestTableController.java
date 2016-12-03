@@ -18,8 +18,9 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
 import cpusim.model.util.IdentifiedObject;
@@ -91,7 +92,7 @@ class TestTableController extends MicroinstructionTableController<Test> {
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Test,Register>,TableCell<Test,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         Callback<TableColumn<Test,String>,TableCell<Test,String>> cellCompFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
@@ -140,6 +141,7 @@ class TestTableController extends MicroinstructionTableController<Test> {
 
     @Override
     public Test createInstance() {
+        final Machine machine = this.machine.get();
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
                 machine.getAllRegisters().get(0));
         return new Test("???", IdentifiedObject.generateRandomID(), machine, r,
@@ -158,10 +160,7 @@ class TestTableController extends MicroinstructionTableController<Test> {
         return "Test";
     }
 
-    /**
-     * get the ID of the corresponding help page
-     * @return the ID of the page
-     */
+    @Override
     public String getHelpPageID()
     {
         return "Test";

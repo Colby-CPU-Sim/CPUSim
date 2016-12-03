@@ -20,12 +20,14 @@
 
 package cpusim.model.assembler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.util.conversion.ConvertStrings;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.google.common.base.Preconditions.*;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the CodeGenerator class
@@ -90,7 +92,8 @@ public class CodeGenerator
                             List<AssembledInstructionCall> instructionCallList) throws
             AssemblyException.InvalidOperandError, AssemblyException.MemoryError,
             AssemblyException.SyntaxError, AssemblyException.ValueError {
-        int cellSize = machine.getCodeStore().getCellSize(); //num bits per cell
+        checkState(machine.getCodeStore().isPresent());
+        int cellSize = machine.getCodeStore().get().getCellSize(); //num bits per cell
         List<Token> operands = instructionCall.operands;
         int numberOfCells = (int) getLong((Token) operands.get(0));
 

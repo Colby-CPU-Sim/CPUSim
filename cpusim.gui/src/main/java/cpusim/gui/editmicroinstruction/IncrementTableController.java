@@ -1,7 +1,8 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingLongCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Increment;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -63,10 +64,10 @@ class IncrementTableController
         Callback<TableColumn<Increment,Long>,TableCell<Increment,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Increment,Register>,TableCell<Increment,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
 
         final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.getModule(ConditionBit.class));
+        condBit.addAll(machine.get().getModule(ConditionBit.class));
         
         Callback<TableColumn<Increment,ConditionBit>,TableCell<Increment,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
@@ -97,6 +98,7 @@ class IncrementTableController
 
     @Override
     public Increment createInstance() {
+        final Machine machine = this.machine.get();
         Register r = (machine.getAllRegisters().size() == 0 ? null : machine.getAllRegisters().get(0));
         return new Increment("???", machine, r, ConditionBit.none(), ConditionBit.none(), 1L);
     }

@@ -227,7 +227,11 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import cpusim.Mediator;
 import cpusim.gui.about.AboutController;
-import cpusim.gui.desktop.editorpane.*;
+import cpusim.gui.desktop.editorpane.CodePaneController;
+import cpusim.gui.desktop.editorpane.CodePaneTab;
+import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
+import cpusim.gui.desktop.editorpane.LineNumPrintingFactory;
+import cpusim.gui.desktop.editorpane.StyleInfo;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.editmodules.EditModulesController;
@@ -239,14 +243,19 @@ import cpusim.gui.options.OptionsController;
 import cpusim.gui.preferences.PreferencesController;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.Machine;
-import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.assembler.Token;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.util.*;
+import cpusim.util.ConsoleManager;
+import cpusim.util.Dialogs;
+import cpusim.util.GUIChannels;
+import cpusim.util.HighlightManager;
+import cpusim.util.MIFReaderException;
+import cpusim.util.SourceLine;
+import cpusim.util.UpdateDisplayManager;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -266,7 +275,12 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -278,17 +292,27 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualFlow;
-import org.fxmisc.richtext.*;
+import org.fxmisc.richtext.CodeArea;
+import org.fxmisc.richtext.InlineStyleTextArea;
+import org.fxmisc.richtext.Paragraph;
+import org.fxmisc.richtext.StyleSpans;
+import org.fxmisc.richtext.StyledTextArea;
 import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.prefs.Preferences;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.awt.SystemColor.text;
 import static javafx.scene.input.KeyCode.TAB;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
@@ -1245,10 +1269,10 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleMachineInstructions(ActionEvent event) {
-        EditMachineInstructionController controller = new
-                EditMachineInstructionController(mediator);
+        EditMachineInstructionController controller = new EditMachineInstructionController(mediator);
         openModalDialog("Edit Machine Instructions",
         		 controller, "EditMachineInstruction.fxml");
+        controller.machineProperty().bind(mediator.machineProperty());
     }
 
     /**
@@ -1822,8 +1846,8 @@ public class DesktopController implements Initializable
      *
      * @return The current HelpController.
      */
-    public HelpController getHelpController() {
-        return helpController;
+    public Optional<HelpController> getHelpController() {
+        return Optional.ofNullable(helpController);
     }
 
     /**
@@ -1923,10 +1947,10 @@ public class DesktopController implements Initializable
             mediator.getMachine().setState(Machine.State.EXECUTION_HALTED,false);
             debugToolBarController.updateDisplay();
         }
-        RAM codeStore = mediator.getMachine().getCodeStore();
-        if (codeStore != null) {
+        
+        mediator.getMachine().getCodeStore().ifPresent(codeStore -> {
             codeStore.setHaltAtBreaks(inDebug);
-        }
+        });
         mediator.getBackupManager().setListening(inDebug);
         ((CheckMenuItem) (executeMenu.getItems().get(0))).setSelected(inDebug);
     }
@@ -3503,6 +3527,36 @@ public class DesktopController implements Initializable
                 StyledTextArea codeArea = (StyledTextArea) t.getContent();
                 codeArea.setWrapText(newVal);
             });
+        }
+    }
+    
+    /**
+     * Shows the {@link HelpController}
+     * @param helpId Help ID to show
+     */
+    public void showHelpDialog(final String helpId) {
+        Optional<HelpController> hc = getHelpController();
+        if (hc.isPresent()) {
+            hc.get().getStage().toFront();
+            hc.get().selectTreeItem(helpId);
+        } else {
+            HelpController helpController = HelpController.openHelpDialog(this, helpId);
+            setHelpController(helpController);
+        }
+    }
+    
+    /**
+     * Shows the {@link HelpController}
+     * @param helpId Help ID to show
+     */
+    public void showHelpDialog(final String helpId, final String appendString) {
+        Optional<HelpController> hc = getHelpController();
+        if (hc.isPresent()) {
+            hc.get().getStage().toFront();
+            hc.get().selectTreeItem(helpId, appendString);
+        } else {
+            HelpController helpController = HelpController.openHelpDialog(this, helpId, appendString);
+            setHelpController(helpController);
         }
     }
 }

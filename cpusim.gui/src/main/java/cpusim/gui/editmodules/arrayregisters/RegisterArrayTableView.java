@@ -8,17 +8,13 @@
 
 package cpusim.gui.editmodules.arrayregisters;
 
-import cpusim.gui.util.EditingLongCell;
-import cpusim.gui.util.EditingNonNegativeIntCell;
-import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.module.Modules;
 import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
-import cpusim.model.util.Validatable;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;

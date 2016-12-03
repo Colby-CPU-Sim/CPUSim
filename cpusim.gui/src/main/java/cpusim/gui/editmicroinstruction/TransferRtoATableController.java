@@ -12,7 +12,8 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -91,12 +92,12 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
         Callback<TableColumn<TransferRtoA,Register>,
                 TableCell<TransferRtoA,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters()
+                        machine.get().getAllRegisters()
                 );
         Callback<TableColumn<TransferRtoA,RegisterArray>,
                 TableCell<TransferRtoA,RegisterArray>> cellRegAFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getModule(RegisterArray.class));
+                        machine.get().getModule(RegisterArray.class));
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -143,6 +144,7 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
     
     @Override
     public TransferRtoA createInstance() {
+        Machine machine = this.machine.get();
         final RegisterArray a = (machine.getModule(RegisterArray.class).size() == 0 ? null :
                 machine.getModule(RegisterArray.class).get(0));
         final Register r = (machine.getAllRegisters().size() == 0 ? null :
@@ -153,7 +155,8 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
     @Override
     public boolean isNewButtonEnabled() {
         // Need at least one RegisterArray AND Register
-        return !machine.getModule(RegisterArray.class).isEmpty();
+        return !machine.get().getModule(RegisterArray.class).isEmpty()
+                && !machine.get().getModule(Register.class).isEmpty();
     }
 
     @Override

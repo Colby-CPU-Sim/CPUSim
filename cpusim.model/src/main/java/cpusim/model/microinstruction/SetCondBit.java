@@ -34,8 +34,8 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      */
     public SetCondBit(String name, UUID id, Machine machine, ConditionBit bit, String value){
         super(name, id, machine);
-        this.value = new SimpleStringProperty(value);
-        this.bit = new SimpleObjectProperty<>(bit);
+        this.value = new SimpleStringProperty(this, "value", value);
+        this.bit = new SimpleObjectProperty<>(this, "bit", bit);
     }
     
     /**
@@ -127,9 +127,10 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
                 "</TD><TD>" + getValue() +
                 "</TD></TR>";
     }
-    
+
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
         if (Strings.isNullOrEmpty(value.get())) {
             throw new ValidationException("No value set for " + SetCondBit.class.getSimpleName() + " microinstruction.");
         }

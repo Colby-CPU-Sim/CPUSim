@@ -3,6 +3,8 @@ package cpusim.model.util;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 import java.util.List;
@@ -23,12 +25,22 @@ public interface NamedObject extends Validatable {
      * Get the name of a component
      */
 	@JsonProperty
-    String getName();
+    default String getName() {
+	    return nameProperty().getValue();
+    }
+
+    /**
+     * Get the {@link ObjectProperty} binding to this name.
+     * @return Non-{@code null} property
+     */
+    StringProperty nameProperty();
     
     /**
      * Set the name of a component
      */
-    void setName(String name);
+    default void setName(String name) {
+        nameProperty().setValue(name);
+    }
     
     @Override
     default void validate() {

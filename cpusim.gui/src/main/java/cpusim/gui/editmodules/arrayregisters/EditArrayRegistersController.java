@@ -9,15 +9,11 @@ package cpusim.gui.editmodules.arrayregisters;
 import cpusim.Mediator;
 import cpusim.gui.editmodules.RegisterArrayTableController;
 import cpusim.gui.editmodules.RegistersTableController;
-import cpusim.gui.help.HelpController;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -200,15 +196,7 @@ public class EditArrayRegistersController implements Initializable {
     @FXML
     public void onHelpButtonClick(ActionEvent e) {
         String startString = "Hardware Modules";
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString);
-            mediator.getDesktopController().setHelpController(helpController);
-        } else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString);
-        }
+        mediator.getDesktopController().showHelpDialog(startString);
     }
 
     /**

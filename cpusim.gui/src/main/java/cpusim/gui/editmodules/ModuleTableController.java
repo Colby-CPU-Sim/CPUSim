@@ -1,22 +1,17 @@
-/**
- * Author: Jinghui Yu
- * Editing date: 7/29/2013
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- */
 package cpusim.gui.editmodules;
 
 import cpusim.Mediator;
-import cpusim.gui.util.*;
+import cpusim.gui.util.ControlButtonController;
+import cpusim.gui.util.table.EditingStrCell;
+import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.HelpPageEnabled;
+import cpusim.gui.util.MachineModificationController;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.util.Validatable;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,18 +22,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Deals with control over the data that the interface interacts with within the user interface.
- * @param <T>
+ * @param <T> Module subtype
  */
 abstract class ModuleTableController<T extends Module<T>>
         extends TableView<T>
         implements ControlButtonController.InteractionHandler<T>,
-                    MachineModificationController<T>,
+                    MachineModificationController,
                     HelpPageEnabled {
 
     /**
@@ -49,7 +43,7 @@ abstract class ModuleTableController<T extends Module<T>>
     /**
      * Underlying machine being modified.
      */
-    protected Machine machine;
+    protected final ObjectProperty<Machine> machine;
 
     private final Class<T> moduleClass;
 
@@ -70,16 +64,10 @@ abstract class ModuleTableController<T extends Module<T>>
                           final Class<T> moduleClass)
     {
         this.mediator = checkNotNull(mediator);
-        this.machine = mediator.getMachine();
+        this.machine = mediator.machineProperty();
 
         this.fxmlTablePath = checkNotNull(fxmlFile);
         this.moduleClass = checkNotNull(moduleClass);
-    
-        // Clone all of the modules already in use. This allows us to change the values of the machine without changing
-        // the underlying machine values until we are done.
-        ObservableList<T> items = getItems();
-        items.clear();
-        machine.getModule(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
     }
     
     /**
@@ -94,6 +82,17 @@ abstract class ModuleTableController<T extends Module<T>>
         name.setOnEditCommit(new NamedColumnHandler<>(this));
         
         initializeTable();
+    
+        ChangeListener<Machine> machineListener = (observable, oldValue, newValue) -> {
+            // Clone all of the modules already in use. This allows us to change the values of the machine without changing
+            // the underlying machine values until we are done.
+            ObservableList<T> items = getItems();
+            items.clear();
+            newValue.getModule(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
+        };
+    
+        machine.addListener(machineListener);
+        machineListener.changed(machine, machine.getValue(), machine.getValue());
     }
 
     /**
@@ -132,36 +131,23 @@ abstract class ModuleTableController<T extends Module<T>>
     void onTabSelected() {
         // no-op
     }
-
+    
     @Override
-    public final Machine getMachine() {
+    public ObjectProperty<Machine> machineProperty() {
         return machine;
     }
-
-
-    // Defaults to Validatable#all(List)
-    @Override
-    public void checkValidity(List<T> items) {
-        Validatable.all(items);
-    }
-
+    
     @Override
     public void updateMachine() {
         // By default, check the contents, then just replace the machine's values.
-        checkValidity(getItems());
-
-        final ObservableList<T> modules = machine.getModule(moduleClass);
+        final ObservableList<T> modules = machine.get().getModule(moduleClass);
         modules.clear();
         modules.addAll(getItems());
     }
 
-    /**
-     * Delegate to {@link #checkValidity(List)}
-     *
-     * @see #checkValidity(List)
-     */
+    @Override
     public void checkValidity() {
-        checkValidity(getItems());
+        Validatable.all(getItems());
     }
 
     @Override

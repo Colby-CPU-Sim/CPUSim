@@ -47,9 +47,9 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
                         int indexStart,
                         int indexNumBits){
         super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
-        this.index = new SimpleObjectProperty<>(index);
-        this.indexStart = new SimpleIntegerProperty(indexStart);
-        this.indexNumBits = new SimpleIntegerProperty(indexNumBits);
+        this.index = new SimpleObjectProperty<>(this, "index", index);
+        this.indexStart = new SimpleIntegerProperty(this, "indexStart", indexStart);
+        this.indexNumBits = new SimpleIntegerProperty(this, "indexNumBits", indexNumBits);
     }
     
     /**
@@ -154,7 +154,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
      */
     public <U extends TransferAtoR> void copyTo(U newTransferAtoR)
     {
-        copyToHelper(newTransferAtoR);
+        super.copyTo(newTransferAtoR);
         
         newTransferAtoR.setIndex(getIndex());
         newTransferAtoR.setIndexStart(getIndexStart());
@@ -289,8 +289,8 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
     }
     
     @Override
-    protected void validateState() {
-        super.validateState();
+    public void validate() {
+        super.validate();
     
         int indexNumBits = getIndexNumBits();
         int indexStart = getIndexStart();

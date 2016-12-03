@@ -20,25 +20,32 @@
  */
 package cpusim.gui.fetchsequence;
 
-import cpusim.model.Machine;
 import cpusim.Mediator;
-import cpusim.model.microinstruction.Microinstruction;
-import cpusim.gui.help.HelpController;
 import cpusim.gui.util.DragTreeCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Comment;
+import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -160,23 +167,14 @@ public class EditFetchSequenceController implements Initializable {
     @FXML
     protected void handleHelp(ActionEvent ae){
     	String startString = "Fetch Sequence Dialog";
-    	if (mediator.getDesktopController().getHelpController() == null) {
-			HelpController helpController = HelpController.openHelpDialog(
-					mediator.getDesktopController(), startString);
-			mediator.getDesktopController().setHelpController(helpController);
-		}
-		else {
-			HelpController hc = mediator.getDesktopController().getHelpController();
-			hc.getStage().toFront();
-			hc.selectTreeItem(startString);
-		}
+    	mediator.getDesktopController().showHelpDialog(startString);
     }
     
     public void updateMicros() {
         implementationFormatPane.getChildren().clear();
         int nextYPosition = 0;
         int labelHeight = 30;
-        for (final Microinstruction micro : micros){
+        for (final Microinstruction<?> micro : micros){
             final Label microLabel = new Label(micro.getName());
             boolean commentLabel = false;
             if (micro instanceof Comment){

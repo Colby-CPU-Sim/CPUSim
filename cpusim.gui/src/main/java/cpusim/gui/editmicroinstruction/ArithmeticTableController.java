@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -86,10 +87,10 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
 
         Callback<TableColumn<Arithmetic,Register>,TableCell<Arithmetic,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
 
         final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.getModule(ConditionBit.class));
+        condBit.addAll(machine.get().getModule(ConditionBit.class));
         Callback<TableColumn<Arithmetic,ConditionBit>,TableCell<Arithmetic,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
 
@@ -131,6 +132,7 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
      */
     @Override
     public Arithmetic createInstance() {
+        final Machine machine = this.machine.get();
         final Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
         return new Arithmetic("???", machine, "ADD", r, r, r, ConditionBit.none(), ConditionBit.none());
     }

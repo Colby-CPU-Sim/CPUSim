@@ -19,11 +19,13 @@ import cpusim.xml.HtmlEncoder;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class FieldValue implements NamedObject, LegacyXMLSupported
 {
 
-	private String name;
+	private StringProperty name;
 	private long value;
 	
 	/**
@@ -35,28 +37,23 @@ public class FieldValue implements NamedObject, LegacyXMLSupported
 	 */
 	public FieldValue(String name, long value) {
 		checkArgument(!Strings.isNullOrEmpty(name));
-		this.name = name;
+		this.name = new SimpleStringProperty(this, "name", name);
 		this.value = value;
     }
 	
 	/**
 	 * Creates a new Field Value by copying an existing value
 	 * 
-	 * @param other 
+	 * @param other instance to copy.
 	 * @throws NullPointerException if <code>null</code> argument
 	 */
 	public FieldValue(final FieldValue other) {
-		this(checkNotNull(other).name, other.value);
+		this(checkNotNull(other).name.getValue(), other.value);
     }
-	
-	@Override
-	public String getName() {
-		return name;
-	}
 
 	@Override
-	public void setName(String name) {
-		this.name = name;
+	public StringProperty nameProperty() {
+		return name;
 	}
 
 	/**
@@ -82,21 +79,13 @@ public class FieldValue implements NamedObject, LegacyXMLSupported
         return "<FieldValue name=\"" + HtmlEncoder.sEncode(getName()) +
                 "\" value=\"" + getValue() + "\" />";
     }
-
-	/**
-     * Gives a clone of this FieldValue.
-     */
-    @Override @Deprecated
-    public Object clone() {
-        return new FieldValue(getName(), getValue());
-    }
     
     /* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, Long.valueOf(value));
+		return Objects.hash(name, value);
 	}
 
 	/* (non-Javadoc)

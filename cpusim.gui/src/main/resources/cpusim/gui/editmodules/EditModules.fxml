@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import cpusim.gui.util.DialogButtonController?>
 <?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Tab?>
@@ -37,6 +38,10 @@
          </BorderPane.margin>
       </TabPane>
     </center>
+
+    <bottom>
+        <DialogButtonController fx:id="dialogButtonController" />
+    </bottom>
     <stylesheets>
         <URL value="@../css/Dialogs.css" />
     </stylesheets>

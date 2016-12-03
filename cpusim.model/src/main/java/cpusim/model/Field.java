@@ -11,10 +11,7 @@ import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -67,27 +64,27 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     	}
     }
 
-    private final UUID id;
+    private final ObjectProperty<UUID> id;
     
     /**
      * The name of the field
      */
-    private SimpleStringProperty name;    
+    private StringProperty name;
     
     /**
      * One of the three values of enum Type
      */
-    private SimpleObjectProperty<Type> type;  
+    private ObjectProperty<Type> type;
     
     /**
      * The number of bits of the field
      */
-    private SimpleIntegerProperty numBits;          	
+    private IntegerProperty numBits;
     
     /**
      *  Absolute or pc relative
      */
-    private SimpleObjectProperty<Relativity> relativity;
+    private ObjectProperty<Relativity> relativity;
     
     /**
      * The acceptable values for this field
@@ -97,12 +94,12 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     /**
      * The value to use if optional or ignored
      */
-    private SimpleLongProperty defaultValue;
+    private LongProperty defaultValue;
 
     /**
      * If Signed, allows only signed 2's complement values otherwise allows only unsigned binary values
      */
-    private SimpleObjectProperty<SignedType> signed; 
+    private ObjectProperty<SignedType> signed;
 
 
     /** 
@@ -120,7 +117,7 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
      * @param id
      */
     public Field(String name, final UUID id) {
-        this(name, IdentifiedObject.generateRandomID(), 0, Relativity.absolute, FXCollections.observableArrayList(), 0, SignedType.Signed, Type.required
+        this(name, id, 0, Relativity.absolute, FXCollections.observableArrayList(), 0, SignedType.Signed, Type.required
         );
     }
     
@@ -160,7 +157,7 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
                  @JsonProperty("defaultValue") long defaultValue,
                  @JsonProperty("signed") SignedType signed,
                  @JsonProperty("type") Type type) {
-        this.id = checkNotNull(id);
+        this.id = new SimpleObjectProperty<>(checkNotNull(id));
         
         this.name = new SimpleStringProperty(checkNotNull(name));
         this.type = new SimpleObjectProperty<>(checkNotNull(type));
@@ -168,25 +165,22 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
         this.relativity = new SimpleObjectProperty<>(checkNotNull(relativity));
         this.defaultValue = new SimpleLongProperty(defaultValue);
         this.signed = new SimpleObjectProperty<>(checkNotNull(signed));
+        this.values = checkNotNull(values);
     }
 
     ////////////////// Setters and getters //////////////////
-    
+
+
     @Override
-    public String getName() {
-        return name.get();
+    public StringProperty nameProperty() {
+        return name;
     }
 
-    @Override 
-    public void setName(String name) {
-        this.name.set(name);
-    }
-    
     @Override
-    public UUID getID() {
+    public ObjectProperty<UUID> idProperty() {
         return id;
     }
-    
+
     @JsonProperty
     public Type getType() {
         return type.get();
@@ -194,6 +188,10 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
 
     public void setType(Type type) {
         this.type.set(type);
+    }
+
+    public ObjectProperty<Type> typeProperty() {
+        return this.type;
     }
 
     @JsonProperty
@@ -205,9 +203,13 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
         this.numBits.set(checkNotNull(numBits));
     }
 
+    public IntegerProperty numBitsProperty() { return this.numBits; }
+
     public Relativity getRelativity() {
         return relativity.get();
     }
+
+    public ObjectProperty<Relativity> relativityProperty() { return relativity; }
 
     public void setRelativity(Relativity relativity) {
         this.relativity.set(relativity);
@@ -227,6 +229,8 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     	this.defaultValue.set(defaultValue); 
     }
 
+    public LongProperty defaultValueProperty() { return this.defaultValue; }
+
     @JsonIgnore
     public boolean isSigned() {
         return signed.get() == SignedType.Signed;
@@ -240,7 +244,7 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
         this.signed.set(checkNotNull(signed));
     }
 
-    public SimpleObjectProperty<SignedType> signedProperty() {
+    public ObjectProperty<SignedType> signedProperty() {
         return signed;
     }
     

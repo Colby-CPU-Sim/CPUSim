@@ -78,12 +78,12 @@ public class Test extends Microinstruction<Test> {
                long value,
                int omission) {
     	super(name, id, machine);
-        this.register = new SimpleObjectProperty<>(register);
-        this.start = new SimpleIntegerProperty(start);
-        this.numBits = new SimpleIntegerProperty(numBits);
-        this.comparison = new SimpleObjectProperty<>(comparison);
-        this.value = new SimpleLongProperty(value);
-        this.omission = new SimpleIntegerProperty(omission);
+        this.register = new SimpleObjectProperty<>(this, "register", register);
+        this.start = new SimpleIntegerProperty(this, "start", start);
+        this.numBits = new SimpleIntegerProperty(this, "numBits", numBits);
+        this.comparison = new SimpleObjectProperty<>(this, "comparison", comparison);
+        this.value = new SimpleLongProperty(this, "value", value);
+        this.omission = new SimpleIntegerProperty(this, "omission", omission);
     }
     
     /**
@@ -260,7 +260,9 @@ public class Test extends Microinstruction<Test> {
     }
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         final int start = getStart();
         final int numBits = getNumBits();
     

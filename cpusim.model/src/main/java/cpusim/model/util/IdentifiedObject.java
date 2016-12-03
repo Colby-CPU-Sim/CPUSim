@@ -1,11 +1,14 @@
 package cpusim.model.util;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyProperty;
 
 import java.util.UUID;
 
 /**
- * Created by kevin on 2016-12-01.
+ * Denotes an instance that has an {@link UUID} associated with it.
+ * @since 2016-12-01
  */
 public interface IdentifiedObject {
     /**
@@ -23,5 +26,13 @@ public interface IdentifiedObject {
      * @since 2016-09-20
      */
     @JsonProperty("id")
-    UUID getID();
+    default UUID getID() {
+        return idProperty().getValue();
+    }
+
+    /**
+     * Property for the UUID of an object.
+     * @return ObjectProperty allocated to the unique ID
+     */
+    ReadOnlyProperty<UUID> idProperty();
 }

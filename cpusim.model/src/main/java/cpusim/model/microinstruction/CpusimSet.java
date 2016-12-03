@@ -252,9 +252,11 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
 	public boolean uses(Module<?> m) {
 		return (m == register.get());
 	}
-    
+
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         // checks if Set objects with all ranges all in Bounds properly
         
         final int start = getStart();

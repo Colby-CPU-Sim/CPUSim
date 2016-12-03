@@ -3,8 +3,9 @@
  * last edit data: 6/3/2013
  */
 
-package cpusim.gui.util;
+package cpusim.gui.util.table;
 
+import cpusim.gui.desktop.FontData;
 import cpusim.model.util.Convert;
 import cpusim.util.Dialogs;
 import javafx.beans.value.ChangeListener;
@@ -18,14 +19,15 @@ import javafx.scene.input.KeyEvent;
 
 /**
  * An editable cell class that allows the user to modify the integer in the cell.
- * It only allows non-negative integers.
  */
 
-public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
+public class EditingIntStyleCell<T> extends TableCell<T, Integer> {
 
     private TextField textField;
+    protected FontData styleInfo;
 
-    public EditingNonNegativeIntCell() {
+    public EditingIntStyleCell(FontData style) {
+        this.styleInfo = style;
     }
 
     /**
@@ -65,6 +67,8 @@ public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
     public void updateItem(Integer item, boolean empty) {
         super.updateItem(item, empty);
 
+        styleInfo.setFontAndBackground(this);
+
         if (empty) {
             setText(null);
             setGraphic(null);
@@ -80,12 +84,6 @@ public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
             else {
                 setText(getString());
                 setGraphic(null);
-                setTooltip(new Tooltip("Binary: " +
-                        Integer.toBinaryString(item) +
-                        System.getProperty("line.separator") +
-                        "Decimal: " + item +
-                        System.getProperty("line.separator") +
-                        "Hex: " + Integer.toHexString(item)));
             }
         }
     }
@@ -108,23 +106,23 @@ public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
                         if (newInt >= 0) {
                             try {
                                 commitEdit(newInt);
+                                textField.setTooltip(new Tooltip("Binary: " +
+                                        Integer.toBinaryString(newInt) +
+                                        System.getProperty("line.separator") + "Hex: " +
+                                        Integer.toHexString(newInt)));
                             } catch (AssertionError e) {
                                 if (textField.getScene() != null) {
-                                    Dialogs.createErrorDialog(textField.getScene()
-                                                    .getWindow(),
-                                            "Integer Value Error", "Entered value out " +
-                                                    "of range").showAndWait();
+                                    Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                            "Integer Error", "Entered value out of range").showAndWait();
                                     cancelEdit();
                                 }
                             }
                         }
                         else {
                             if (textField.getScene() != null) {
-                                Dialogs.createErrorDialog(textField.getScene()
-                                                .getWindow(),
-                                        "Integer Value Error", "This column requires " +
-                                                "non-negative"
-                                                + " integer values").showAndWait();
+                                Dialogs.createErrorDialog(textField.getScene().getWindow(),
+                                        "Integer Error", "This column requires "
+                                                + "positive integer values").showAndWait();
                                 cancelEdit();
                             }
                         }
@@ -136,9 +134,8 @@ public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
                         // integer"));
                         if (textField.getScene() != null) {
                             Dialogs.createErrorDialog(textField.getScene().getWindow(),
-                                    "Integer Value Error", "This column requires "
-                                            + "non-negative integer values")
-                                    .showAndWait();
+                                    "Integer Error", "This column requires "
+                                            + "positive integer values").showAndWait();
                             cancelEdit();
                         }
                     }
@@ -175,7 +172,7 @@ public class EditingNonNegativeIntCell<T> extends TableCell<T, Integer> {
                     } catch (NumberFormatException e) {
                         textField.setStyle("-fx-background-color:red;");
                         textField.setTooltip(new Tooltip("You need to enter a "
-                                + "non-negative integer"));
+                                + "positive integer"));
                         //The following code crashes the program
                         //Dialogs.showErrorDialog(
                         //            (Stage)textField.getScene().getWindow(),

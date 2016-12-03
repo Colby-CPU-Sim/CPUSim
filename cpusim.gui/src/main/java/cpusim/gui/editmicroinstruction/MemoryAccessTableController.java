@@ -15,6 +15,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
@@ -75,7 +76,7 @@ class MemoryAccessTableController
 
         Callback<TableColumn<MemoryAccess,Register>,TableCell<MemoryAccess,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRegisters());
+                        machine.get().getAllRegisters());
         Callback<TableColumn<MemoryAccess,String>,TableCell<MemoryAccess,String>> cellDircFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
                         FXCollections.observableArrayList(
@@ -85,7 +86,7 @@ class MemoryAccessTableController
                 );
         Callback<TableColumn<MemoryAccess,RAM>,TableCell<MemoryAccess,RAM>> cellRAMFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.getAllRAMs()
+                        machine.get().getAllRAMs()
                 );
 
         direction.setCellValueFactory(new PropertyValueFactory<>("direction"));
@@ -114,6 +115,8 @@ class MemoryAccessTableController
 
     @Override
     public MemoryAccess createInstance() {
+        final Machine machine = this.machine.get();
+        
         Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
         RAM ram = (machine.getModule(RAM.class).isEmpty() ? null : machine.getModule(RAM.class).get(0));
         return new MemoryAccess("???", machine, "read", ram, r, r);
@@ -121,7 +124,7 @@ class MemoryAccessTableController
 
     @Override
     public boolean isNewButtonEnabled() {
-        return areRegistersAvailable() && !machine.getModule(RAM.class).isEmpty();
+        return areRegistersAvailable() && !machine.get().getModule(RAM.class).isEmpty();
     }
 
     @Override

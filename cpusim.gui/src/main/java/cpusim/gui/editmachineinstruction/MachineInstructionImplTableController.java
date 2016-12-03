@@ -1,20 +1,26 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.MachineBound;
+import cpusim.gui.util.MicroinstructionDragHelper;
 import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-
-import static com.google.common.base.Preconditions.*;
+import java.util.Optional;
 
 /**
  * Implements a {@link TableView} that supports drag and drop between it's own elements and a view of
@@ -22,119 +28,99 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2016-12-01
  */
-class MachineInstructionImplTableController extends TitledPane {
+public class MachineInstructionImplTableController extends TitledPane implements MachineBound {
     
     private static final String FXML_FILE = "MachineInstructionImplTable.fxml";
+
+    private final Logger logger = LoggerFactory.getLogger(MachineInstructionImplTableController.class);
     
-    @FXML
-    private TableView<Microinstruction<?>> instructionTable;
+    @FXML @SuppressWarnings("unused")
+    private TableView<Microinstruction<?>> executeSequenceTable;
+
+    private ObjectProperty<MachineInstruction> currentInstruction;
     
-    private final Machine machine;
-    
-    private Dragboard dragboard;
-    
-    MachineInstructionImplTableController(Machine machine) {
-        this.machine = machine;
-        
-        this.dragboard = null;
-        
+    private final ObjectProperty<Machine> machine;
+
+    public MachineInstructionImplTableController() {
+        this.currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", null);
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+
+        // If the machine changes, make sure we don't have anything showing because it doesn't make sense anymore :)
+
         try {
             FXMLLoaderFactory.fromRootController(this, FXML_FILE).load();
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
     }
-    
-    private interface HandleDragBehaviour {
-        
-        void onDragInteger(int value);
-        
-        void onDragClass(Class<?> clazz);
-    
-        default void onOther() {
-            
-        }
-        
+
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
-    
-    private <T> void parseDragboard(Dragboard db, Class<T> checkClass, HandleDragBehaviour handler) {
-        checkNotNull(db);
-        checkNotNull(handler);
-        
-        try {
-            // First try to see if it's just reordering
-            final int otherIdx = Integer.parseInt(db.getString());
-            
-            handler.onDragInteger(otherIdx);
-        } catch (NumberFormatException nfe) {
-            // it wasn't a string.. try to get a class then
-            try {
-                @SuppressWarnings("unchecked")
-                final Class<?> clazz = Class.forName(db.getString());
-                
-                checkArgument(checkClass.isAssignableFrom(clazz));
-                
-                handler.onDragClass(clazz);
-            } catch (ClassNotFoundException cnfe) {
-                // can't handle this..
-                // but it wasn't meant for us, so just don't consume it!
-            }
-        }
+
+    public Optional<MachineInstruction> getCurrentInstruction() {
+        return Optional.ofNullable(currentInstruction.getValue());
     }
-    
-    @FXML
+
+    public ObjectProperty<MachineInstruction> currentInstructionProperty() {
+        return currentInstruction;
+    }
+
+    @FXML @SuppressWarnings("unused")
     private void initialize() {
-        
-        instructionTable.setRowFactory(view -> {
+        executeSequenceTable.setRowFactory(view -> {
             TableRow<Microinstruction<?>> row = new TableRow<>();
             row.setOnDragDetected(event -> {
                 if (!row.isEmpty()) {
                     final int idx = row.getIndex();
                     Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
                     db.setDragView(row.snapshot(null, null));
-    
-                    ClipboardContent cc = new ClipboardContent();
-                    cc.putString(Integer.toString(idx));
-                    
-                    db.setContent(cc);
+
+                    MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
+                    helper.insertIntoDragboard(db, idx);
+
                     event.consume();
                 }
             });
-            
-            row.setOnDragOver(event -> {
-                Dragboard db = event.getDragboard();
-                if (db != null && db.hasString()) {
-                    parseDragboard(db, Microinstruction.class, new HandleDragBehaviour() {
-                        @Override
-                        public void onDragInteger(final int otherIdx) {
-                            // Check if the current index matches the index in question
-                            if (otherIdx != row.getIndex()) {
-                                event.acceptTransferModes(TransferMode.MOVE);
-                                event.consume();
-                            }
-                        }
-    
-                        @Override
-                        public void onDragClass(final Class<?> clazz) {
-                            
-                            // need to be smarter here..
-                            
-                            event.acceptTransferModes(TransferMode.COPY);
-                            event.consume();
-                        }
-                    });
-                }
-            });
+
+            // FIXME is this necessary?
+//            row.setOnDragOver(event -> {
+//                Dragboard db = event.getDragboard();
+//                if (db != null && db.hasString()) {
+//
+//                    parseDragboard(db, new MicroinstructionDragHelper.HandleDragBehaviour() {
+//                        @Override
+//                        public void onDragIndex(final int otherIdx) {
+//                            // Check if the current index matches the index in question
+//                            if (otherIdx != row.getIndex()) {
+//                                event.acceptTransferModes(TransferMode.MOVE);
+//                                event.consume();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onDragMicro(final Microinstruction<?> micro) {
+//
+//                            // need to be smarter here..
+//
+//                            event.acceptTransferModes(TransferMode.COPY);
+//                            event.consume();
+//                        }
+//                    });
+//                }
+//            });
             
             row.setOnDragDropped(event -> {
                 Dragboard db = event.getDragboard();
                 
                 if (db != null && db.hasString()) {
                     final ObservableList<Microinstruction<?>> items = view.getItems();
-                    
-                    parseDragboard(db, Microinstruction.class, new HandleDragBehaviour() {
+
+                    MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
+                    helper.parseDragboard(db, new MicroinstructionDragHelper.HandleDragBehaviour() {
                         @Override
-                        public void onDragInteger(final int otherIdx) {
+                        public void onDragIndex(final int otherIdx) {
                             // Check if the current index matches the index in question
                             if (otherIdx != row.getIndex()) {
                                 // Check if the current index matches the index in question
@@ -156,43 +142,24 @@ class MachineInstructionImplTableController extends TitledPane {
                         }
         
                         @Override
-                        public void onDragClass(final Class<?> clazz) {
-                            
-                            
-                            /* data dropped */
-                            /* if there is a string data on dragboard, read it and use it */
-//                            if (currentInstr != null) {
-//                                Dragboard db = event.getDragboard();
-//                                int lastComma = db.getString().lastIndexOf(",");
-//                                String microName = db.getString().substring(0, lastComma);
-//                                String className = db.getString().substring(lastComma + 1);
-//                                Microinstruction<?> micro = null;
-//
-//                                Outer: for (Class<? extends Microinstruction<?>> mc : Machine.getMicroClasses()) {
-//                                    if (mc.getSimpleName().toLowerCase().equals(className)) {
-//                                        for (Microinstruction<?> instr : mediator.getMachine().getMicrosUnsafe(mc)) {
-//                                            if (instr.getName().equals(microName)) {
-//                                                micro = instr;
-//                                                break Outer;
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//
-//                                if (className.equals("comment")) {
-//                                    // we want Comment micros used in only one place so create a new one
-//                                    micro = new Comment();
-//                                    micro.setName(microName);
-//                                }
-//                                double localY = implementationFormatPane.sceneToLocal(event.getSceneX(), event.getSceneY()).getY();
-//                                int index = getMicroinstrIndex(localY);
-//
-//                                currentInstr.getMicros().add(index, micro);
-//
-//                            }
+                        public void onDragMicro(final Microinstruction<?> micro) {
+
+                            Microinstruction<?> realMicro = micro;
+                            if (micro instanceof Comment) {
+                                // we want Comment micros used in only one place so create a new one
+                                realMicro = new Comment((Comment)micro);
+                            }
+
+                            items.add(row.getIndex(), realMicro);
+                            view.getSelectionModel().select(row.getIndex());
                             
                             event.setDropCompleted(true);
                             event.consume();
+                        }
+
+                        @Override
+                        public void onOther() {
+                            logger.debug("Received unknown value dropped.");
                         }
                     });
                 }
@@ -200,6 +167,16 @@ class MachineInstructionImplTableController extends TitledPane {
             
             return row;
         });
+
+        // bind the table of execution micros to be bound to the current instructions' sequence
+        currentInstruction.addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                executeSequenceTable.setItems(newValue.getMicros());
+            }
+        });
+
+        // If there is no value bound to the currentInstruction, disable the sequence table
+        executeSequenceTable.disableProperty().bind(currentInstruction.isNull());
     }
     
 }

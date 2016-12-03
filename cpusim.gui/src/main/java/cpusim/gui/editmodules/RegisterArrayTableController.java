@@ -16,7 +16,7 @@ import com.google.common.base.Joiner;
 import cpusim.Mediator;
 import cpusim.gui.editmodules.arrayregisters.EditArrayRegistersController;
 import cpusim.gui.util.ControlButtonController;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
@@ -197,7 +197,7 @@ public class RegisterArrayTableController extends ModuleTableController<Register
      */
     @Override
     public RegisterArray createInstance() {
-        return new RegisterArray("???", IdentifiedObject.generateRandomID(), machine,
+        return new RegisterArray("???", IdentifiedObject.generateRandomID(), machine.get(),
                 4, 32, FXCollections.observableArrayList());
     }
 
@@ -224,10 +224,10 @@ public class RegisterArrayTableController extends ModuleTableController<Register
                 .collect(Collectors.toMap(Function.identity(), Register::getWidth)); // map them to their widths
         
         //now do all the tests
-        Validate.registerWidthsAreOkayForMicros(machine, regWidths);
+        Validate.registerWidthsAreOkayForMicros(machine.get(), regWidths);
         
         ValidateControllers.registerArrayWidthsAreOkay(bitController, registerArrays);
-        ValidateControllers.registerArrayWidthsAreOkayForTransferMicros(machine, registerArrays, this);
+        ValidateControllers.registerArrayWidthsAreOkayForTransferMicros(machine.get(), registerArrays, this);
     }
     
     /**

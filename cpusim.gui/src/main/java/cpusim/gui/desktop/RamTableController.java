@@ -5,7 +5,7 @@
 package cpusim.gui.desktop;
 
 import cpusim.gui.util.Base;
-import cpusim.gui.util.EditingMultiBaseStyleLongCell;
+import cpusim.gui.util.table.EditingMultiBaseStyleLongCell;
 import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import javafx.collections.ObservableList;

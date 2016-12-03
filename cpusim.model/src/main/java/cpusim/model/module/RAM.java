@@ -27,8 +27,7 @@ import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.util.LoadException;
 import cpusim.util.SourceLine;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -41,8 +40,8 @@ import static com.google.common.base.Preconditions.*;
  * This class models RAM.  All addressable units ("cells") have the same
  * number of bits, but that number can be any value from 1 to 64.
  */
-public class RAM extends Module<RAM>
-{
+public class RAM extends Module<RAM> {
+
     /** the data stored in the ram cells */
     private ObservableList<RAMLocation> data;
     /** data value that is changed in debug mode and used for backupManager only */
@@ -217,7 +216,7 @@ public class RAM extends Module<RAM>
      * getter for the data simple list property object
      * @return the data simple list property object
      */
-    public SimpleListProperty<RAMLocation> dataProperty(){
+    public ListProperty<RAMLocation> dataProperty(){
         return changedData;
     }
 
@@ -321,6 +320,10 @@ public class RAM extends Module<RAM>
         }
     }
 
+    public ReadOnlyIntegerProperty cellSizeProperty() {
+        return cellSize;
+    }
+
     public int getLength() {
         return data.size();
     }
@@ -343,6 +346,10 @@ public class RAM extends Module<RAM>
         else { //new length is shorter so remove extra RAMLocations
             data.remove(newLength,oldLength);
         }
+    }
+
+    public ReadOnlyIntegerProperty lengthProperty() {
+        return cellSize;
     }
 
     /**
@@ -482,7 +489,9 @@ public class RAM extends Module<RAM>
     }
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         int size = getCellSize();
         if (size <= 0 || size > 64) {
             throw new ValidationException("The RAM module \"" + getName() +

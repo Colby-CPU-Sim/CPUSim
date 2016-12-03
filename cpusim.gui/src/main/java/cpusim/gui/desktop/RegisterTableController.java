@@ -6,9 +6,9 @@
 package cpusim.gui.desktop;
 
 import cpusim.gui.util.Base;
-import cpusim.gui.util.EditingIntStyleCell;
-import cpusim.gui.util.EditingMultiBaseStyleLongCell;
-import cpusim.gui.util.EditingStrStyleCell;
+import cpusim.gui.util.table.EditingIntStyleCell;
+import cpusim.gui.util.table.EditingMultiBaseStyleLongCell;
+import cpusim.gui.util.table.EditingStrStyleCell;
 import cpusim.model.module.Register;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;

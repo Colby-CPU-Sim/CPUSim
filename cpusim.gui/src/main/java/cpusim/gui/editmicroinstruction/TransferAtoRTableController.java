@@ -18,7 +18,8 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -29,8 +30,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-
-import java.util.List;
 
 /**
  * The controller for editing the {@link TransferAtoR} command in the {@link EditMicroinstructionsController}.
@@ -96,11 +95,11 @@ class TransferAtoRTableController
         
         Callback<TableColumn<TransferAtoR,Register>,
                 TableCell<TransferAtoR,Register>> cellRegFactory =
-                    _ignore -> new ComboBoxTableCell<>(machine.getAllRegisters());
+                    _ignore -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
         
         Callback<TableColumn<TransferAtoR,RegisterArray>,
                 TableCell<TransferAtoR,RegisterArray>> cellRegAFactory =
-                    _ignore -> new ComboBoxTableCell<>(machine.getModule(RegisterArray.class));
+                    _ignore -> new ComboBoxTableCell<>(machine.get().getModule(RegisterArray.class));
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -140,6 +139,8 @@ class TransferAtoRTableController
     
     @Override
     public TransferAtoR createInstance() {
+        final Machine machine = this.machine.get();
+        
         RegisterArray a = (machine.getModule(RegisterArray.class).isEmpty() ? null :
                 machine.getModule(RegisterArray.class).get(0));
         Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
@@ -149,15 +150,16 @@ class TransferAtoRTableController
     @Override
     public boolean isNewButtonEnabled() {
         // Need at least one RegisterArray AND Register
-        return !machine.getModule(RegisterArray.class).isEmpty();
+        return !machine.get().getModule(RegisterArray.class).isEmpty()
+                && !machine.get().getModule(Register.class).isEmpty();
     }
 
     @Override
-    public void checkValidity(List<TransferAtoR> micros) {
-        super.checkValidity(micros);
+    public void checkValidity() {
+        super.checkValidity();
         
         // convert the array to an array of TransferAtoRs
-        for (TransferAtoR check: micros) {
+        for (TransferAtoR check: getItems()) {
             Register.validateIsNotReadOnly(check.getDest(), check.getName());
         }
     }

@@ -27,8 +27,7 @@
 package cpusim.gui.options;
 
 import cpusim.Mediator;
-import cpusim.gui.help.HelpController;
-import cpusim.gui.util.EditingStrCell;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
@@ -196,16 +195,7 @@ public class OptionsController {
         else if (punctuationTab.isSelected())
             appendString = "#Punctuation";
 
-        if (mediator.getDesktopController().getHelpController() == null) {
-            HelpController helpController = HelpController.openHelpDialog(
-                    mediator.getDesktopController(), startString, appendString);
-            mediator.getDesktopController().setHelpController(helpController);
-            return;
-        } else {
-            HelpController hc = mediator.getDesktopController().getHelpController();
-            hc.getStage().toFront();
-            hc.selectTreeItem(startString, appendString);
-        }
+        mediator.getDesktopController().showHelpDialog(startString, appendString);
     }
 
     /**
@@ -595,7 +585,7 @@ public class OptionsController {
             loadingTab.setDisable(true);
         } else {
             codeStore.setItems(RAMs);
-            codeStore.setValue(mediator.getMachine().getCodeStore());
+            codeStore.setValue(mediator.getMachine().getCodeStore().get());
             startingAddress.textProperty().addListener((observable, oldValue, newValue) ->
                 setStartingAddressTooltip());
             startingAddress.setText(String.valueOf(
@@ -865,7 +855,7 @@ public class OptionsController {
             ObservableList<Register> registers =
                                   FXCollections.observableArrayList(this.registers);
             programCounterChoice.setItems(registers);
-            programCounterChoice.setValue(mediator.getMachine().getProgramCounter());
+            programCounterChoice.setValue(mediator.getMachine().getProgramCounter().get());
         }
     }
 

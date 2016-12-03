@@ -38,14 +38,8 @@ public class Comment extends Microinstruction<Comment>
     }
 
     @Override
-    public void execute()
-    {
+    public void execute() {
         //do nothing
-    }
-    
-    @Override
-    protected void validateState() {
-        // nothing to validate
     }
     
     @Override

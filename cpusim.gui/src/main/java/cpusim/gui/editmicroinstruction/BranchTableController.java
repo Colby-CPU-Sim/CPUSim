@@ -1,7 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.Branch;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
@@ -54,7 +54,7 @@ class BranchTableController extends MicroinstructionTableController<Branch> {
 
     @Override
     public Branch createInstance() {
-        return new Branch("???", machine, 0, machine.getControlUnit());
+        return new Branch("???", machine.get(), 0, machine.get().getControlUnit());
     }
 
     /**

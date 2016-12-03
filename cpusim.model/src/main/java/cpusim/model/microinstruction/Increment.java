@@ -156,11 +156,6 @@ public class Increment extends Microinstruction<Increment> {
         newIncr.setDelta(getDelta());
     }
     
-    @Override
-    protected void validateState() {
-        
-    }
-    
     /**
      * execute the micro instruction from machine
      */

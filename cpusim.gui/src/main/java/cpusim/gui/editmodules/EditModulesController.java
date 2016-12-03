@@ -7,15 +7,17 @@
  */
 package cpusim.gui.editmodules;
 
-import com.google.common.collect.ImmutableList;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
+import cpusim.gui.util.MachineBound;
 import cpusim.model.Machine;
 import cpusim.model.Module;
 import cpusim.model.module.RAM;
 import javafx.beans.binding.DoubleBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -28,16 +30,16 @@ import javafx.scene.layout.VBox;
 
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * This class is the controller for the dialog box that is used for
  * editing the properties of each register in a register array.
  */
-public class EditModulesController extends BorderPane implements DialogButtonController.InteractionHandler {
+public class EditModulesController extends BorderPane implements DialogButtonController.InteractionHandler, MachineBound {
     
     private final Mediator mediator;
-    private final Machine machine;
+    private final ObjectProperty<Machine> machine;
     private final DesktopController desktop;
 
     @FXML @SuppressWarnings("unused")
@@ -48,11 +50,14 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
     private final RegisterArrayTableController registerArrayTableController;
     private final RegistersTableController registersTableController;
 
-    private final DialogButtonController dialogButtonController;
+    @FXML @SuppressWarnings("unused")
+    private DialogButtonController dialogButtonController;
 
     public EditModulesController(Mediator mediator, DesktopController desktop) {
         this.mediator = mediator;
-        this.machine = mediator.getMachine();
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(mediator.machineProperty());
+        
         this.desktop = desktop;
 
         registersTableController = new RegistersTableController(mediator);
@@ -66,12 +71,6 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
         registerArrayTableController.setConditionBitController(conditionBitTableController);
         
         ramsTableController = new RAMsTableController(mediator);
-
-        dialogButtonController = new DialogButtonController(mediator, this,
-                ImmutableList.of(conditionBitTableController,
-                        registersTableController,
-                        registerArrayTableController,
-                        ramsTableController));
     }
 
     @FXML
@@ -128,13 +127,19 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
         modulePane.getSelectionModel().select(0);
 
         // Set the bottom to hold the dialog buttons
-        setBottom(dialogButtonController);
+        dialogButtonController.setRequired(machine, this,
+                conditionBitTableController,
+                registersTableController,
+                registerArrayTableController,
+                ramsTableController);
     }
 
     @Override
     public void onMachineUpdated() {
         mediator.addPropertyChangeListenerToAllModules(mediator.getBackupManager());
         desktop.getHighlightManager().updatePairsForNewRegistersAndRAMs();
+        
+        final Machine machine = this.machine.get();
 
         List<RAM> rams = machine.getModule(RAM.class);
         if (!rams.contains(machine.getCodeStore())) {
@@ -168,6 +173,16 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
     @Override
     public boolean onCancelButtonClick() {
         return true;
+    }
+    
+    @Override
+    public void displayHelpDialog(final String helpPageId) {
+        desktop.showHelpDialog(helpPageId);
+    }
+    
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     /**

@@ -10,9 +10,10 @@
  * 1.) added capability for the cell to handle the Unsigned Decimal and Ascii bases
  */
 
-package cpusim.gui.util;
+package cpusim.gui.util.table;
 
 import cpusim.gui.desktop.FontData;
+import cpusim.gui.util.Base;
 import cpusim.model.assembler.EQU;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;

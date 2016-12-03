@@ -27,7 +27,7 @@ import cpusim.model.util.NamedObject;
 import cpusim.model.util.Validatable;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
@@ -41,7 +41,7 @@ public abstract class Module<T extends Module<T>>
         implements IdentifiedObject, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>, Validatable
 {
     private SimpleStringProperty name;	//name of the module
-    private UUID id; //unique ID used when saving in XML
+    private ObjectProperty<UUID> id; //unique ID used when saving in XML
     protected Machine machine; //machine that holds the module
 
     //------------------------------
@@ -49,21 +49,28 @@ public abstract class Module<T extends Module<T>>
     
     protected Module(String name, UUID id, Machine machine) {
         this.name = new SimpleStringProperty(name);
-        this.id = checkNotNull(id);
+        this.id = new SimpleObjectProperty<>(checkNotNull(id));
+
         this.machine = machine;
     }
 
     //------------------------------
     //getters and setters to make it a Bean
 
+    @Override
     public void setName(String newName)
     {
     	name.set(newName);
     }
 
-    public String getName()
-    {
-        return name.get();
+    @Override
+    public StringProperty nameProperty() {
+        return name;
+    }
+
+    @Override
+    public ReadOnlyProperty<UUID> idProperty() {
+        return id;
     }
 
     public String getHTMLName()
@@ -76,27 +83,9 @@ public abstract class Module<T extends Module<T>>
         return name.get();
     }
     
-    public SimpleStringProperty getNameProperty()
-    {
-        return name;
-    }
-    
     @Override
-    public UUID getID()
-    {
-        return id;
-    }
-    
-    /**
-     * Validate the internal state of a subclass.
-     */
-    protected abstract void validateState();
-    
-    @Override
-    public final void validate() {
+    public void validate() {
         NamedObject.super.validate();
-        
-        validateState();
     }
 
 } //end of class Module

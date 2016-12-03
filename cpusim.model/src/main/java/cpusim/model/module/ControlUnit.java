@@ -18,6 +18,8 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.Module;
 import cpusim.model.util.IdentifiedObject;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -27,14 +29,13 @@ import static com.google.common.base.Preconditions.*;
 /**
  * The Control Unit class
  */
-public class ControlUnit extends Module<ControlUnit> implements Serializable
-{
+public class ControlUnit extends Module<ControlUnit> {
     
     //the instr currently or about to be executed
     private MachineInstruction currentInstruction;
     
     //the index of the micro sequence
-    private int microIndex;
+    private IntegerProperty microIndex;
     
     //the machine of which this is the control unit
     private Machine machine;
@@ -46,7 +47,7 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
      */
     public ControlUnit(String name, UUID id, Machine machine) {
         super(name, id, machine);
-        microIndex = 0;
+        microIndex = new SimpleIntegerProperty(0);
         currentInstruction = machine.getFetchSequence();
     }
     
@@ -65,25 +66,27 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
      */
     public int getMicroIndex()
     {
-        return this.microIndex;
+        return this.microIndex.get();
     }
 
     /**
      * setter for the micro index
      * @param index new index value
      */
-    public void setMicroIndex(int index)
-    {
-        this.microIndex = index;
+    public void setMicroIndex(int index) {
+        this.microIndex.set(index);
+    }
+
+    public IntegerProperty microIndexProperty() {
+        return microIndex;
     }
 
     /**
      * increment the index of micro instruction
      * @param amount specify how much to increment
      */
-    public void incrementMicroIndex(int amount)
-    {
-        this.microIndex += amount;
+    public void incrementMicroIndex(int amount) {
+        this.microIndex.add(amount);
     }
 
     /**
@@ -109,7 +112,7 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
      */
     public void reset()
     {
-        microIndex = 0;
+        microIndex.set(0);
         currentInstruction = machine.getFetchSequence();
     }
 
@@ -122,14 +125,9 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
     {
     	checkNotNull(newControl);
     	
-        newControl.setMicroIndex(microIndex);
+        newControl.setMicroIndex(microIndex.get());
         newControl.setCurrentInstruction(currentInstruction);
         newControl.machine = machine;
-    }
-    
-    @Override
-    protected void validateState() {
-        // no-op
     }
     
     /**
@@ -158,7 +156,7 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
      */
     public State getCurrentState()
     {
-        return new State(currentInstruction, microIndex);
+        return new State(currentInstruction, microIndex.get());
     }
 
     /**
@@ -189,7 +187,7 @@ public class ControlUnit extends Module<ControlUnit> implements Serializable
         public void restoreControlUnitToThisState()
         {
             ControlUnit.this.currentInstruction = instr;
-            ControlUnit.this.microIndex = microIndex;
+            ControlUnit.this.microIndex.set(microIndex);
         }
 
         public int getIndex() { return microIndex; }

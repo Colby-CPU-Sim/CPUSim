@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static com.google.common.base.Preconditions.checkState;
+
 ///////////////////////////////////////////////////////////////////////////////
 // the Normalizer class
 
@@ -164,8 +166,9 @@ public class Normalizer
     private void processLabels(List<InstructionCall> instructions,
                                int startingAddress) throws AssemblyException.NameSpaceError, AssemblyException.InvalidOperandError
     {
+        checkState(machine.getCodeStore().isPresent());
         labelHash.clear();
-        int cellSize = machine.getCodeStore().getCellSize();
+        int cellSize = machine.getCodeStore().get().getCellSize();
         int currAddressInBits = startingAddress*cellSize;
         //location in the program in bits from the start of the code store RAM
 
@@ -223,7 +226,8 @@ public class Normalizer
     private void replaceVars(
             List<InstructionCall> instructions, int startingAddress) throws NumberFormatException, AssemblyException.InvalidOperandError
     {
-        int cellSize = machine.getCodeStore().getCellSize();
+        checkState(machine.getCodeStore().isPresent());
+        int cellSize = machine.getCodeStore().get().getCellSize();
         int currAddressInBits = startingAddress * cellSize;
         for (InstructionCall instrCall : instructions) {
             if (instrCall.machineInstruction == null) {

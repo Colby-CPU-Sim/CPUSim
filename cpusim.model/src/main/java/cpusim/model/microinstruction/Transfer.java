@@ -50,11 +50,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
                     int destStartBit,
                     int numBits){
         super(name, id, machine);
-        this.source = new SimpleObjectProperty<>(source);
-        this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
-        this.dest = new SimpleObjectProperty<>(dest);
-        this.destStartBit = new SimpleIntegerProperty(destStartBit);
-        this.numBits = new SimpleIntegerProperty(numBits);
+        this.source = new SimpleObjectProperty<>(this, "source", source);
+        this.srcStartBit = new SimpleIntegerProperty(this, "srcStartBit", srcStartBit);
+        this.dest = new SimpleObjectProperty<>(this, "dest", dest);
+        this.destStartBit = new SimpleIntegerProperty(this, "destStartBit", destStartBit);
+        this.numBits = new SimpleIntegerProperty(this, "numBits", numBits);
     }
     
     /**
@@ -198,8 +198,9 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public boolean uses(Module<?> m){
         return (m == source.get() || m == dest.get());
     }
-    
-    protected final <U extends Sub> void copyToHelper(final U other) {
+
+    @Override
+    public <U extends Sub> void copyTo(final U other) {
         checkNotNull(other);
     
         other.setName(getName());
@@ -211,7 +212,9 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     }
     
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         String boundPhrase = "";
     
         int srcStartBit = getSrcStartBit();

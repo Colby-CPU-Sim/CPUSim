@@ -10,19 +10,18 @@
 package cpusim.model.module;
 
 import cpusim.util.SourceLine;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 /**
  * A kind of address and data in the RAM
  */
 public class RAMLocation {
-    private SimpleLongProperty address;
-    private SimpleLongProperty value;
+
+    private LongProperty address;
+    private LongProperty value;
     private RAM ram;
-    private SimpleBooleanProperty breakPoint;
-    private SimpleStringProperty comment;
+    private BooleanProperty breakPoint;
+    private StringProperty comment;
     private SourceLine sourceLine;
 
     /**
@@ -42,7 +41,6 @@ public class RAMLocation {
         this.breakPoint = new SimpleBooleanProperty(breakPoint);
         this.comment = new SimpleStringProperty(comment);
         this.sourceLine = sourceLine;
-        
     }
     
     /**
@@ -65,7 +63,7 @@ public class RAMLocation {
      * getter for the value property object
      * @return the value property
      */
-    public SimpleLongProperty valueProperty() {
+    public LongProperty valueProperty() {
         return value;
     }
     
@@ -81,7 +79,7 @@ public class RAMLocation {
      * getter the address property
      * @return the address property object
      */
-    public SimpleLongProperty addressProperty() {
+    public LongProperty addressProperty() {
     	return address;
     }
 
@@ -105,7 +103,7 @@ public class RAMLocation {
      * get the breakPoint property
      * @return the breakPoint property object
      */
-    public SimpleBooleanProperty breakProperty() {
+    public BooleanProperty breakProperty() {
         return breakPoint;
     }
 

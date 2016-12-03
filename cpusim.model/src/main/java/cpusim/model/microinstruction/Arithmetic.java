@@ -262,12 +262,12 @@ public class Arithmetic extends Microinstruction<Arithmetic> {
     }
     
     @Override
-    public void validateState() {
+    public void validate() {
+        super.validate();
+
         if (Strings.isNullOrEmpty(type.getValue())) {
             throw new ValidationException("The arithmetic operation is not specified.");
         }
-        
-        
     }
     
     /**

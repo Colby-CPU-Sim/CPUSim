@@ -101,6 +101,7 @@ import cpusim.util.MIFReaderException;
 import cpusim.util.SourceLine;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -119,6 +120,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * This class is the repository of global data, such as the current machine.
@@ -211,15 +214,15 @@ public class Mediator {
         }
         if (desktopController != null) {
             stage.titleProperty().bind(machineDirtyString.
-                    concat(machine.get().getNameProperty()));
+                    concat(machine.get().nameProperty()));
         } else {
-            stage.titleProperty().bind(machine.get().getNameProperty());
+            stage.titleProperty().bind(machine.get().nameProperty());
         }
 
         // In case name ends with .cpu
         String newName = machine.get().getName();
         if (newName.toLowerCase().endsWith(".cpu")) {
-            machine.get().getNameProperty().set(newName.substring(0, newName.length() - 4));
+            machine.get().nameProperty().set(newName.substring(0, newName.length() - 4));
         }
 
         machine.get().stateProperty().removeListener(backupManager);
@@ -251,7 +254,7 @@ public class Mediator {
      *
      * @return the Mediator's current Machine Property.
      */
-    public SimpleObjectProperty<Machine> machineProperty() {
+    public ObjectProperty<Machine> machineProperty() {
         return machine;
     }
 
@@ -668,7 +671,7 @@ public class Mediator {
      */
     private boolean load(boolean clearing) {
 
-        if (machine.get().getCodeStore() == null) {
+        if (!machine.get().getCodeStore().isPresent()) {
             Dialogs.createErrorDialog(stage, "Error finding RAM",
                     "The machine has no RAM's and so there is " +
                     "nowhere to load the assembled code.").showAndWait();
@@ -683,9 +686,9 @@ public class Mediator {
                 clearRegisterArrays();
                 clearRAMs();
             }
-            RAM codeStore = machine.get().getCodeStore();
-            codeStore.loadAssembledInstructions(instrs,
-                    machine.get().getStartingAddressForLoading());
+            RAM codeStore = machine.get().getCodeStore().get();
+            
+            codeStore.loadAssembledInstructions(instrs, machine.get().getStartingAddressForLoading());
 
             // remove the old breakpoints and add the new ones
             codeStore.clearAllBreakpoints();
@@ -1153,7 +1156,8 @@ public class Mediator {
      * @param set true if setting the breakpoint, false if clearing the breakpoint
      */
     public void setBreakPointInRAM(SourceLine sourceLine, boolean set) {
-        RAM ram = machine.get().getCodeStore();
+        checkState(machine.get().getCodeStore().isPresent());
+        RAM ram = machine.get().getCodeStore().get();
         for (RAMLocation rLoc : ram.data()) {
             if (sourceLine.equals(rLoc.getSourceLine())) {
                 rLoc.setBreak(set);
@@ -1166,7 +1170,8 @@ public class Mediator {
      * point status of the corresponding lines of the currently loaded assembly program.
      */
     private void setBreakPointsInRam() {
-        RAM ram = machine.get().getCodeStore();
+        checkState(machine.get().getCodeStore().isPresent());
+        RAM ram = machine.get().getCodeStore().get();
         for (RAMLocation rLoc : ram.data()) {
             if (rLoc.getSourceLine() != null) {
                 SourceLine sourceLine = rLoc.getSourceLine();

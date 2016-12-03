@@ -34,7 +34,7 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
     @FXML @SuppressWarnings("unused")
     private Button propertiesButton;
 
-    private final InteractionHandler<T> interactionHandler;
+    private InteractionHandler<T> interactionHandler;
 
     private final ButtonChangeListener buttonListener;
 
@@ -45,7 +45,14 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
         this.interactionHandler = interactionHandler;
         this.buttonListener = new ButtonChangeListener();
     }
-    
+
+    /**
+     * Default constructor so it can be used within the Scene Builder
+     */
+    ControlButtonController() {
+        this(true, null);
+    }
+
     /**
      * Loads the buttons FXML file, see {@link #FXML_PATH} for the location.
      */
@@ -58,16 +65,11 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
     }
 
     @FXML @SuppressWarnings("unused")
-    private void initialize() {
+    protected void initialize() {
         if (!hasExtendedProperties) {
             getChildren().remove(propertiesButton);
         }
-
-        initializeSubclass();
     }
-
-    protected abstract void initializeSubclass();
-
 
     /**
      * Gets a {@link ChangeListener} that updates the "enabled" state of the buttons in the control if there is a

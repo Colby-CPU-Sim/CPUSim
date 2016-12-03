@@ -3,6 +3,8 @@ package cpusim.gui.util;
 import com.google.common.base.Strings;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TitledPane;
@@ -13,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.*;
@@ -23,17 +26,18 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2016-12-01
  */
-public final class MicroinstructionTreeView extends TitledPane {
+public final class MicroinstructionTreeView extends TitledPane implements MachineBound {
 
     private static final String FXML_FILE = "MicroinstructionTreeView.fxml";
 
-    private final Machine machine;
+    private final ObjectProperty<Machine> machine;
 
     @FXML @SuppressWarnings("unused")
     private TreeView<Microinstruction<?>> treeView;
 
-    public MicroinstructionTreeView(Machine machine) {
-        this.machine = machine;
+    public MicroinstructionTreeView() {
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.addListener((observable, oldValue, newValue) -> reloadFromMachine());
 
         FXMLLoader loader = FXMLLoaderFactory.fromRootController(this, FXML_FILE);
         try {
@@ -77,8 +81,6 @@ public final class MicroinstructionTreeView extends TitledPane {
                 };
             }
         });
-        
-        reloadFromMachine();
     }
     
     /**
@@ -86,13 +88,14 @@ public final class MicroinstructionTreeView extends TitledPane {
      */
     public void reloadFromMachine() {
         checkState(treeView != null, "Must be called AFTER #initialize()");
+        checkState(machine.getValue() != null, "No machine value is bound.");
     
         treeView.setRoot(null);
         
         final MicroinstructionTreeItem root = MicroinstructionTreeItem.forCategory("Microinstructions");
         root.setExpanded(true);
         
-        machine.visitMicros(new Machine.MicroinstructionVisitor() {
+        machine.getValue().visitMicros(new Machine.MicroinstructionVisitor() {
             private MicroinstructionTreeItem currentCategory;
         
             @Override
@@ -119,6 +122,11 @@ public final class MicroinstructionTreeView extends TitledPane {
         });
         
         treeView.setRoot(root);
+    }
+
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return this.machine;
     }
 
     private static class MicroinstructionTreeItem extends TreeItem<Microinstruction<?>> {

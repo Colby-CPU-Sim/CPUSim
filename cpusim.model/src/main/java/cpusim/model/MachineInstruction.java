@@ -15,6 +15,7 @@ import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -22,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This file contains the class for Machine Instructions created using CPU Sim
@@ -32,16 +35,18 @@ public class MachineInstruction
         implements IdentifiedObject, NamedObject,
                     LegacyXMLSupported, HTMLEncodable, Copyable<MachineInstruction> {
     
-    private String name;				//the name of the machine instruction
-    private final UUID id;
+    private StringProperty name;				//the name of the machine instruction
+    private final ReadOnlyObjectProperty<UUID> id;
     private ObservableList<Microinstruction<?>> micros;	//all the microinstructions
     private long opcode;					//the opcode of the instruction
     private Machine machine;
     private String format; //the format String matching the list of fields
-    private List<String> instructionColors;
-    private List<Field> assemblyFields;
-    private List<Field> instructionFields;
-    private List<String> assemblyColors;
+
+    private ObservableList<Field> instructionFields;
+    private ObservableList<String> instructionColors;
+
+    private ObservableList<Field> assemblyFields;
+    private ObservableList<String> assemblyColors;
 
     /*
      * CLASS INVARIANT:  Except when the InstructionDialog is open,
@@ -77,15 +82,15 @@ public class MachineInstruction
                               long opcode,
                               List<Field> newInstrFields)
     {
-        this.name = name;
-        this.id = id;
+        this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
+        this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
         this.opcode = opcode;
         this.micros = FXCollections.observableArrayList();
         this.machine = machine;
-        this.assemblyFields = newAssemblyFields;
-        this.instructionFields = newInstrFields;
-        this.assemblyColors = newAssemblyColors;
-        this.instructionColors = newInstrColors;
+        this.assemblyFields = FXCollections.observableArrayList(newAssemblyFields);
+        this.instructionFields = FXCollections.observableArrayList(newInstrFields);
+        this.assemblyColors = FXCollections.observableArrayList(newAssemblyColors);
+        this.instructionColors = FXCollections.observableArrayList(newInstrColors);
         
         //for backwards compatibility
         List<Field> fieldsToRemove = new ArrayList<>();
@@ -100,21 +105,33 @@ public class MachineInstruction
             this.assemblyFields.remove(field);
         }
     }
-    
+
+    /**
+     * Copy constructor
+     * @param other instance to copy
+     */
     public MachineInstruction(final MachineInstruction other){
-        this(other.name, IdentifiedObject.generateRandomID(), other.machine, other.assemblyFields, other.instructionColors, other.assemblyColors, other.opcode, other.instructionFields
+        this(other.name.getValue(), IdentifiedObject.generateRandomID(),
+                other.machine, other.assemblyFields,
+                other.instructionColors, other.assemblyColors,
+                other.opcode, other.instructionFields
         );
     }
 
     //===================================
     // getters and setters
-    
-    
+
+
     @Override
-    public UUID getID() {
-        return this.id;
+    public StringProperty nameProperty() {
+        return name;
     }
-    
+
+    @Override
+    public ReadOnlyProperty<UUID> idProperty() {
+        return id;
+    }
+
     public Machine getMachine() {
         return machine;
     }
@@ -124,8 +141,13 @@ public class MachineInstruction
         return format;
     }
 
-    public List<Field> getAssemblyFields(){
+    public ObservableList<Field> getAssemblyFields(){
         return assemblyFields;
+    }
+
+    public void setAssemblyFields(List<Field> assemblyFields){
+        this.assemblyFields.clear();
+        this.assemblyFields.addAll(assemblyFields);
     }
 
     /**
@@ -137,27 +159,33 @@ public class MachineInstruction
      */
     public void setInstructionFields(List<Field> instructionFields)
     {
-        this.instructionFields = instructionFields;
+        checkNotNull(instructionFields);
+
+        this.instructionFields.clear();
+        this.instructionFields.addAll(instructionFields);
 
     }
     
-    public List<Field> getInstructionFields(){
+    public ObservableList<Field> getInstructionFields(){
         return instructionFields;
     }
     
     public void setInstructionColors(List<String> instructionColors){
-        this.instructionColors = instructionColors;
+        this.instructionColors.clear();
+        this.instructionColors.addAll(instructionColors);
     }
     
-    public List<String> getInstructionColors(){
+    public ObservableList<String> getInstructionColors(){
         return this.instructionColors;
     }
     
     public void setAssemblyColors(List<String> assemblyColors){
-        this.assemblyColors = assemblyColors;
+        checkNotNull(assemblyColors);
+        this.instructionColors.clear();
+        this.instructionColors.addAll(assemblyColors);
     }
     
-    public List<String> getAssemblyColors(){
+    public ObservableList<String> getAssemblyColors(){
         return this.assemblyColors;
     }
     
@@ -257,22 +285,6 @@ public class MachineInstruction
         
         return relativePositions;
     }
-    
-    public void setAssemblyFields(List<Field> assemblyFields){
-        this.assemblyFields = assemblyFields;
-    }
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    @Override
-    public void setName(String newName)
-    {
-        name = newName;
-    }
 
     public ObservableList<Microinstruction<?>> getMicros()
     {
@@ -302,9 +314,9 @@ public class MachineInstruction
     //===================================
     // other utility methods
 
-    public String toString()
-    {
-        return name;
+    @Override
+    public String toString() {
+        return name.getValue();
     }
     
 

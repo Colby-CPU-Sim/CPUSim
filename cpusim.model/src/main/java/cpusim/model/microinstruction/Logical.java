@@ -64,10 +64,10 @@ public class Logical extends Microinstruction<Logical> {
                    Register source2,
                    Register destination){
         super(name, id, machine);
-        this.type = new SimpleStringProperty(type);
-        this.source1 = new SimpleObjectProperty<>(source1);
-        this.source2 = new SimpleObjectProperty<>(source2);
-        this.destination = new SimpleObjectProperty<>(destination);
+        this.type = new SimpleStringProperty(this, "type", type);
+        this.source1 = new SimpleObjectProperty<>(this, "source1", source1);
+        this.source2 = new SimpleObjectProperty<>(this, "source2", source2);
+        this.destination = new SimpleObjectProperty<>(this, "destination", destination);
     }
 
     /**
@@ -209,7 +209,9 @@ public class Logical extends Microinstruction<Logical> {
     }
 
     @Override
-    protected void validateState() {
+    public void validate() {
+        super.validate();
+
         // get width of the source1, source2, and destination
         // registers, if they are different, then the validity
         // test fails
