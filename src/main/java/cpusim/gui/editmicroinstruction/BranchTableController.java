@@ -58,13 +58,13 @@ public class BranchTableController
         this.prototype = new Branch("???", machine, 0, machine.getControlUnit());
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "branchTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "BranchTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: branchTable.fxml";
+            assert false : "Unable to load file: BranchTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

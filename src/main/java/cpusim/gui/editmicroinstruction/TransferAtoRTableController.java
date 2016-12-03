@@ -79,13 +79,13 @@ public class TransferAtoRTableController
         this.prototype = new TransferAtoR("???", machine, a, 0, r, 0, 0, r,0, 0);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "transferAtoRTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "TransferAtoRTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: transferAtoRTable.fxml";
+            assert false : "Unable to load file: TransferAtoRTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

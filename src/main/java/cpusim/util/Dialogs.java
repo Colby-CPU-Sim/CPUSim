@@ -7,7 +7,9 @@ package cpusim.util;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.layout.Region;
 import javafx.stage.Window;
 
 import java.util.List;
@@ -20,18 +22,14 @@ public class Dialogs {
     /**
      * Creates error dialog for saving, closing, new actions.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
     public static Alert createErrorDialog(Window window, String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.ERROR);
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
+        initializeDialog(dialog, window, header, content);
 
         return dialog;
     }
@@ -39,18 +37,14 @@ public class Dialogs {
     /**
      * Creates information dialog for saving, closing, new actions.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
     public static Alert createInformationDialog(Window window, String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.INFORMATION);
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
+        initializeDialog(dialog, window, header, content);
 
         return dialog;
     }
@@ -58,37 +52,14 @@ public class Dialogs {
     /**
      * Creates confirmation dialog.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
     public static Alert createConfirmationDialog(Window window, String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
-
-        return dialog;
-    }
-
-    /**
-     * Creates customized confirmation dialog for saving, closing, new actions.
-     *
-     * @param window
-     * @param header  head text of the confirmation dialog
-     * @param content content of the confirmation dialog
-     * @return an dialog object
-     */
-    public static Alert createCustomizedConfirmationDialog(Window window, String header, String content) {
-        Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
+        initializeDialog(dialog, window, header, content);
 
         return dialog;
     }
@@ -96,7 +67,7 @@ public class Dialogs {
     /**
      * Creates choice dialog for saving, closing, new actions.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
@@ -104,11 +75,7 @@ public class Dialogs {
     public static ChoiceDialog<String> createChoiceDialog(Window window, String header, String content,
                                                           String initC, List<String> choices) {
         ChoiceDialog<String> dialog = new ChoiceDialog<>(initC, choices);
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
+        initializeDialog(dialog, window, header, content);
 
         return dialog;
     }
@@ -116,18 +83,14 @@ public class Dialogs {
     /**
      * Creates text input dialog.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
     public static TextInputDialog createTextInputDialog(Window window, String header, String content) {
         TextInputDialog dialog = new TextInputDialog();
-        if (window != null)
-            dialog.initOwner(window);
-        dialog.setTitle("CPU Sim");
-        dialog.setHeaderText(header);
-        dialog.setContentText(content);
+        initializeDialog(dialog, window, header, content);
 
         return dialog;
     }
@@ -135,19 +98,35 @@ public class Dialogs {
     /**
      * Creates warning dialog.
      *
-     * @param window
+     * @param window owning window or null if there is none
      * @param header  head text of the confirmation dialog
      * @param content content of the confirmation dialog
      * @return an dialog object
      */
     public static Alert createWariningDialog(Window window, String header, String content) {
         Alert dialog = new Alert(Alert.AlertType.WARNING);
+        initializeDialog(dialog, window, header, content);
+
+        return dialog;
+    }
+
+    /**
+     * Initialized a dialog with the given owner window, and String header and content
+     * @param dialog dialog box to initialize
+     * @param window owning window or null if there is none
+     * @param header dialog header
+     * @param content dialog content
+     */
+    public static void initializeDialog(Dialog dialog, Window window, String header, String content){
         if (window != null)
             dialog.initOwner(window);
         dialog.setTitle("CPU Sim");
         dialog.setHeaderText(header);
         dialog.setContentText(content);
 
-        return dialog;
+        // Allow dialogs to resize for Linux
+        // https://bugs.openjdk.java.net/browse/JDK-8087981
+        dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
     }
 }

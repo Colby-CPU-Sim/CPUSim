@@ -289,6 +289,7 @@ import java.util.prefs.Preferences;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.awt.SystemColor.text;
 import static javafx.scene.input.KeyCode.TAB;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
@@ -298,28 +299,44 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 public class DesktopController implements Initializable
 {
 
-    public static final String SHORTCUT = System.getProperty("os.name").startsWith
-            ("Windows") ? "Ctrl" : "Cmd";
+    public static final String SHORTCUT =
+            System.getProperty("os.name").toLowerCase().contains("mac") ? "Cmd" : "Ctrl";
+
     public static final String[][] DEFAULT_KEY_BINDINGS = {
             /* quit, undo, redo, cut, copy, paste, delete, select all are not editable */
-            {"New text", SHORTCUT + "-N"}, {"Open text...", SHORTCUT + "-O"}, {"Close "
-            + "text", SHORTCUT + "-W"}, {"Save text", SHORTCUT + "-S"}, {"Save text " +
-            "as...", SHORTCUT + "-Shift-S"}, {"New machine", SHORTCUT + "-Shift-N"},
-            {"Open machine...", SHORTCUT + "-Shift-O"}, {"Save machine", SHORTCUT +
-            "-B"}, {"Save machine as...", SHORTCUT + "-Shift-B"}, {"Save machine in " +
-            "HTML...", SHORTCUT + "-Alt-B"}, {"Print setup...", SHORTCUT + "-Shift-P"},
-            {"Print...", SHORTCUT + "-P"}, {"Toggle Comment", SHORTCUT + "-Slash"},
-            {"Find...", SHORTCUT + "-F"}, {"Preferences...", SHORTCUT + "-Comma"},
-            {"Machine instructions...", SHORTCUT + "-M"}, {"Microinstructions...",
-            SHORTCUT + "-Shift-M"}, {"Hardware Modules...", SHORTCUT + "-K"},
-            {"EQUs...", SHORTCUT + "-E"}, {"Fetch Sequence...", SHORTCUT + "-T"},
-            {"Debug Mode", SHORTCUT + "-D"}, {"Assemble", SHORTCUT + "-1"}, {"Assemble " +
-            "" + "& load", SHORTCUT + "-2"}, {"Assemble, load & run", SHORTCUT + "-3"},
-            {"Clear, assemble, load & run", SHORTCUT + "-G"}, {"Run", SHORTCUT + "-R"},
-            {"Stop", SHORTCUT + "-Period"}, {"Reset everything", SHORTCUT +
-            "-Shift-R"}, {"Clear console", SHORTCUT + "-L"}, {"Options...", SHORTCUT +
-            "-I"}, {"General CPUSim Help", SHORTCUT + "-Shift-H"}, {"About CPUSim",
-            SHORTCUT + "-Shift-A"}};
+            {"New text", SHORTCUT + "-N"},
+            {"Open text...", SHORTCUT + "-O"},
+            {"Close text", SHORTCUT + "-W"},
+            {"Save text", SHORTCUT + "-S"},
+            {"Save text as...", SHORTCUT + "-Shift-S"},
+            {"New machine", SHORTCUT + "-Shift-N"},
+            {"Open machine...", SHORTCUT + "-Shift-O"},
+            {"Save machine", SHORTCUT + "-B"},
+            {"Save machine as...", SHORTCUT + "-Shift-B"},
+            {"Save machine in HTML...", SHORTCUT + "-Alt-B"},
+            {"Print setup...", SHORTCUT + "-Shift-P"},
+            {"Print...", SHORTCUT + "-P"},
+            {"Toggle Comment", SHORTCUT + "-Slash"},
+            {"Find...", SHORTCUT + "-F"},
+            {"Preferences...", SHORTCUT + "-Comma"},
+            {"Machine instructions...", SHORTCUT + "-M"},
+            {"Microinstructions...", SHORTCUT + "-Shift-M"},
+            {"Hardware Modules...", SHORTCUT + "-K"},
+            {"EQUs...", SHORTCUT + "-E"},
+            {"Fetch Sequence...", SHORTCUT + "-T"},
+            {"Debug Mode", SHORTCUT + "-D"},
+            {"Assemble", SHORTCUT + "-1"},
+            {"Assemble & load", SHORTCUT + "-2"},
+            {"Assemble, load & run", SHORTCUT + "-3"},
+            {"Clear, assemble, load & run", SHORTCUT + "-G"},
+            {"Run", SHORTCUT + "-R"},
+            {"Stop", SHORTCUT + "-Period"},
+            {"Reset everything", SHORTCUT + "-Shift-R"},
+            {"Clear console", SHORTCUT + "-L"},
+            {"Options...", SHORTCUT + "-I"},
+            {"General CPUSim Help", SHORTCUT + "-Shift-H"},
+            {"About CPUSim", SHORTCUT + "-Shift-A"}};
+
     // System.getProperty("line.separator") doesn't work
     // on PCs. TextArea class may just use "\n".
     static final String NEWLINE = "\n";
@@ -659,9 +676,9 @@ public class DesktopController implements Initializable
     @FXML
     protected void handleNewMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
-                    "Machine", "The machine you are currently working on is unsaved.  "
-                    + "Would you like to save it before you open a new machine?");
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save Machine",
+                    "The machine you are currently working on is unsaved.  "
+                        + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == buttonTypeYes) {
@@ -686,7 +703,7 @@ public class DesktopController implements Initializable
     protected void handleOpenMachine(ActionEvent event) {
         if (mediator.isMachineDirty()) {
 
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "Machine", "The machine you are currently working on is unsaved.  "
                     + "Would you like to save it before you open a new machine?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -1462,7 +1479,7 @@ public class DesktopController implements Initializable
      */
     private void closeTab(Tab tab, boolean close) {
         if (((CodePaneTab) tab).getDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "File", "Would you like to save your work before you close this " +
                     "tab?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -2619,10 +2636,9 @@ public class DesktopController implements Initializable
             menuItem.setMnemonicParsing(false);
             menuItem.setOnAction(e -> {
                 if (mediator.isMachineDirty()) {
-                    Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage,
-                            "Save Machine", "The machine you are currently working on " +
-                            "is unsaved.  " + "Would you like to save it before" +
-                            " you open a new machine?");
+                    Alert dialog = Dialogs.createConfirmationDialog(stage, "Save Machine",
+                            "The machine you are currently working on is unsaved.  "
+                                    + "Would you like to save it before you open a new machine?");
                     dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
                             buttonTypeCancel);
                     Optional<ButtonType> result = dialog.showAndWait();
@@ -3058,7 +3074,7 @@ public class DesktopController implements Initializable
      */
     private boolean confirmClosing() {
         if (inRunningMode.get()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Running "
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Running "
                     + "Program", "There is a program running. " +
                     "Closing the application will also quit the program. " +
                     "Do you want to quit the running program?");
@@ -3069,7 +3085,7 @@ public class DesktopController implements Initializable
             }
         }
         if (mediator.isMachineDirty()) {
-            Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
+            Alert dialog = Dialogs.createConfirmationDialog(stage, "Save " +
                     "Machine", "The machine you are currently working on is unsaved.  "
                     + "Would you like to save it before you close?");
             dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo, buttonTypeCancel);
@@ -3083,10 +3099,10 @@ public class DesktopController implements Initializable
         }
         for (Tab tab : textTabPane.getTabs()) {
             if (((CodePaneTab) tab).getDirty()) {
-                Alert dialog = Dialogs.createCustomizedConfirmationDialog(stage, "Save " +
-                        "" + "Text", "Would you like to save your work before you " +
-                        "close" +
-                        " " + tab.getText().substring(1) + "?");
+                Alert dialog = Dialogs.createConfirmationDialog(stage,
+                        "Save Text",
+                        "Would you like to save your work before you close" +
+                            " " + tab.getText().substring(1) + "?");
                 dialog.getButtonTypes().setAll(buttonTypeYes, buttonTypeNo,
                         buttonTypeCancel);
                 Optional<ButtonType> result = dialog.showAndWait();

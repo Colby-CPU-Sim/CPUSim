@@ -63,13 +63,13 @@ public class DecodeTableController
         this.prototype = new Decode("???", machine, r);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "decodeTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "DecodeTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: decodeTable.fxml";
+            assert false : "Unable to load file: DecodeTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

@@ -340,7 +340,7 @@ public class EditFieldsController implements Initializable {
     @FXML
     protected void handleValues(ActionEvent ae){
         FXMLLoader fxmlLoader = new FXMLLoader(this.getClass().getResource(
-                "editFieldValues.fxml"));
+                "EditFieldValues.fxml"));
 
         Stage fieldStage = new Stage();
         Pane dialogRoot = null;
@@ -353,7 +353,7 @@ public class EditFieldsController implements Initializable {
             dialogRoot = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-            assert false : "Unable to load file: editFieldValues.fxml";
+            assert false : "Unable to load file: EditFieldValues.fxml";
         }
         Scene dialogScene = new Scene(dialogRoot);
         fieldStage.setScene(dialogScene);
