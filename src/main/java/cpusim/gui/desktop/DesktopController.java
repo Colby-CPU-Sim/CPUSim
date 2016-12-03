@@ -289,6 +289,7 @@ import java.util.prefs.Preferences;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.awt.SystemColor.text;
 import static javafx.scene.input.KeyCode.TAB;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
@@ -298,28 +299,44 @@ import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 public class DesktopController implements Initializable
 {
 
-    public static final String SHORTCUT = System.getProperty("os.name").startsWith
-            ("Windows") ? "Ctrl" : "Cmd";
+    public static final String SHORTCUT =
+            System.getProperty("os.name").toLowerCase().contains("mac") ? "Cmd" : "Ctrl";
+
     public static final String[][] DEFAULT_KEY_BINDINGS = {
             /* quit, undo, redo, cut, copy, paste, delete, select all are not editable */
-            {"New text", SHORTCUT + "-N"}, {"Open text...", SHORTCUT + "-O"}, {"Close "
-            + "text", SHORTCUT + "-W"}, {"Save text", SHORTCUT + "-S"}, {"Save text " +
-            "as...", SHORTCUT + "-Shift-S"}, {"New machine", SHORTCUT + "-Shift-N"},
-            {"Open machine...", SHORTCUT + "-Shift-O"}, {"Save machine", SHORTCUT +
-            "-B"}, {"Save machine as...", SHORTCUT + "-Shift-B"}, {"Save machine in " +
-            "HTML...", SHORTCUT + "-Alt-B"}, {"Print setup...", SHORTCUT + "-Shift-P"},
-            {"Print...", SHORTCUT + "-P"}, {"Toggle Comment", SHORTCUT + "-Slash"},
-            {"Find...", SHORTCUT + "-F"}, {"Preferences...", SHORTCUT + "-Comma"},
-            {"Machine instructions...", SHORTCUT + "-M"}, {"Microinstructions...",
-            SHORTCUT + "-Shift-M"}, {"Hardware Modules...", SHORTCUT + "-K"},
-            {"EQUs...", SHORTCUT + "-E"}, {"Fetch Sequence...", SHORTCUT + "-T"},
-            {"Debug Mode", SHORTCUT + "-D"}, {"Assemble", SHORTCUT + "-1"}, {"Assemble " +
-            "" + "& load", SHORTCUT + "-2"}, {"Assemble, load & run", SHORTCUT + "-3"},
-            {"Clear, assemble, load & run", SHORTCUT + "-G"}, {"Run", SHORTCUT + "-R"},
-            {"Stop", SHORTCUT + "-Period"}, {"Reset everything", SHORTCUT +
-            "-Shift-R"}, {"Clear console", SHORTCUT + "-L"}, {"Options...", SHORTCUT +
-            "-I"}, {"General CPUSim Help", SHORTCUT + "-Shift-H"}, {"About CPUSim",
-            SHORTCUT + "-Shift-A"}};
+            {"New text", SHORTCUT + "-N"},
+            {"Open text...", SHORTCUT + "-O"},
+            {"Close text", SHORTCUT + "-W"},
+            {"Save text", SHORTCUT + "-S"},
+            {"Save text as...", SHORTCUT + "-Shift-S"},
+            {"New machine", SHORTCUT + "-Shift-N"},
+            {"Open machine...", SHORTCUT + "-Shift-O"},
+            {"Save machine", SHORTCUT + "-B"},
+            {"Save machine as...", SHORTCUT + "-Shift-B"},
+            {"Save machine in HTML...", SHORTCUT + "-Alt-B"},
+            {"Print setup...", SHORTCUT + "-Shift-P"},
+            {"Print...", SHORTCUT + "-P"},
+            {"Toggle Comment", SHORTCUT + "-Slash"},
+            {"Find...", SHORTCUT + "-F"},
+            {"Preferences...", SHORTCUT + "-Comma"},
+            {"Machine instructions...", SHORTCUT + "-M"},
+            {"Microinstructions...", SHORTCUT + "-Shift-M"},
+            {"Hardware Modules...", SHORTCUT + "-K"},
+            {"EQUs...", SHORTCUT + "-E"},
+            {"Fetch Sequence...", SHORTCUT + "-T"},
+            {"Debug Mode", SHORTCUT + "-D"},
+            {"Assemble", SHORTCUT + "-1"},
+            {"Assemble & load", SHORTCUT + "-2"},
+            {"Assemble, load & run", SHORTCUT + "-3"},
+            {"Clear, assemble, load & run", SHORTCUT + "-G"},
+            {"Run", SHORTCUT + "-R"},
+            {"Stop", SHORTCUT + "-Period"},
+            {"Reset everything", SHORTCUT + "-Shift-R"},
+            {"Clear console", SHORTCUT + "-L"},
+            {"Options...", SHORTCUT + "-I"},
+            {"General CPUSim Help", SHORTCUT + "-Shift-H"},
+            {"About CPUSim", SHORTCUT + "-Shift-A"}};
+
     // System.getProperty("line.separator") doesn't work
     // on PCs. TextArea class may just use "\n".
     static final String NEWLINE = "\n";

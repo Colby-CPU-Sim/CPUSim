@@ -47,11 +47,10 @@ public class KeyCodeInfo {
                             shift = KeyCodeCombination.ModifierValue.DOWN;
                             break;
                         case "Ctrl":
-                            if (!System.getProperty("os.name").startsWith
-                                    ("Windows")) {
-                                ctrl = KeyCodeCombination.ModifierValue.DOWN;
-                            } else {
+                            if (!System.getProperty("os.name").toLowerCase().contains("mac")) {
                                 shortcut = KeyCodeCombination.ModifierValue.DOWN;
+                            } else {
+                                ctrl = KeyCodeCombination.ModifierValue.DOWN;
                             }
                             break;
                         case "Alt":
