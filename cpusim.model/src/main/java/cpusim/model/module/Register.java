@@ -113,11 +113,6 @@ public class Register extends Module<Register> implements Sized<Register>
     private SimpleLongProperty initialValue; // the initial value stored in the register
     private SimpleObjectProperty<EnumSet<Access>> access;
     
-    // FIXME Why was this here?
-//    private boolean programCounter; // if true, program breaks when this register's value
-//                                    // matches the address of an instruction where a break
-//                                    // point has been set
-    
     /**
      * Constructor
      * @param name name of the register
