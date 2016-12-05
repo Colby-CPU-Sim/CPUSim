@@ -69,7 +69,7 @@ public class MachineInstruction
     
     public MachineInstruction(String name, final UUID id, Machine machine, List<Field> assemblyFields, List<Field> instructionFields, long opcode,
                               List<List<String>> colors){
-        this(name, IdentifiedObject.generateRandomID(), machine, assemblyFields,
+        this(name, id, machine, assemblyFields,
                 colors.get(0), colors.get(1), opcode, instructionFields);
     }
     

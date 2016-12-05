@@ -3,7 +3,7 @@ package cpusim.gui.editmachineinstruction;
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.util.*;
-import cpusim.gui.util.list.NameListCell;
+import cpusim.gui.util.list.StringPropertyListCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
@@ -12,7 +12,6 @@ import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
-import cpusim.util.Dialogs;
 import javafx.beans.binding.*;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -467,7 +466,7 @@ public class EditMachineInstructionController
      * and giving it a change listener
      */
     private void initializeInstructionList() {
-        instructionList.setCellFactory(list -> new NameListCell<>());
+        instructionList.setCellFactory(list -> new StringPropertyListCell<>(MachineInstruction::nameProperty));
 
         instructionList.getSelectionModel().selectedItemProperty().addListener(
                 (ov, value, new_value) -> {
