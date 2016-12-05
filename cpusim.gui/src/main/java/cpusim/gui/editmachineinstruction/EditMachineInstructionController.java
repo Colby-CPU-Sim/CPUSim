@@ -12,7 +12,10 @@ import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
-import javafx.beans.binding.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -24,7 +27,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -32,8 +38,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * FXML Controller class for modifying {@link MachineInstruction} values.
@@ -466,7 +470,17 @@ public class EditMachineInstructionController
      * and giving it a change listener
      */
     private void initializeInstructionList() {
-        instructionList.setCellFactory(list -> new StringPropertyListCell<>(MachineInstruction::nameProperty));
+        instructionList.setCellFactory(list -> {
+                    StringPropertyListCell<MachineInstruction> cell
+                            = new StringPropertyListCell<>(MachineInstruction::nameProperty);
+                    cell.getTextField().focusedProperty().addListener((observable, oldValue, newValue) -> {
+                        if (oldValue && !newValue) {
+                            instructionList.getSelectionModel().select(cell.getIndex());
+                        }
+                    });
+
+                    return cell;
+                });
 
         instructionList.getSelectionModel().selectedItemProperty().addListener(
                 (ov, value, new_value) -> {

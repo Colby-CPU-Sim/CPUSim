@@ -12,6 +12,8 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 
 import java.io.IOException;
@@ -51,10 +53,8 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
     private void initialize() {
         
         // Setup the cell factory to display information properly.
-        treeView.setCellFactory(new Callback<TreeView<Microinstruction<?>>, TreeCell<Microinstruction<?>>>() {
-            @Override
-            public TreeCell<Microinstruction<?>> call(final TreeView<Microinstruction<?>> param) {
-                return new TreeCell<Microinstruction<?>>() {
+        treeView.setCellFactory(param -> {
+                TreeCell<Microinstruction<?>> cell = new TreeCell<Microinstruction<?>>() {
                     @Override
                     protected void updateItem(final Microinstruction<?> value, final boolean empty) {
                         super.updateItem(value, empty); // MUST BE CALLED, see super docs
@@ -64,7 +64,7 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
                         if (empty || item == null) {
                             // if it's empty, we need to rewrite the cell to be empty
                             // see: http://stackoverflow.com/a/23205728/1748595
-                            setText("");
+                            setText(null);
                             setGraphic(null);
                         } else {
                             
@@ -79,8 +79,22 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
                         }
                     }
                 };
-            }
-        });
+
+                cell.setOnDragDetected(ev -> {
+                    MicroinstructionTreeItem item = (MicroinstructionTreeItem)cell.getTreeItem();
+                    if (item.isLeaf()) {
+                        // then it's actually an instruction..
+                        MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
+                        Dragboard db = cell.startDragAndDrop(TransferMode.COPY);
+
+                        helper.insertIntoDragboard(db, item.getValue());
+
+                        ev.consume();
+                    }
+                });
+
+                return cell;
+            });
     }
     
     /**

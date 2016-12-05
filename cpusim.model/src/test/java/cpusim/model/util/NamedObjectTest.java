@@ -10,33 +10,30 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
 
 /**
- * 
- * @author Kevin Brightwell
+ *
  * @since 2016-10-11
  */
 public class NamedObjectTest {
 
 	private static class Foo implements NamedObject {
 
-		private String name;
+		private StringProperty name;
 		
 		Foo(final String name) {
-			this.name = name;
-		}
-		
-		@Override
-		public String getName() {
-			return name;
+			this.name = new SimpleStringProperty(name);
 		}
 
 		@Override
-		public void setName(String name) {
-			this.name = name;
+		public StringProperty nameProperty() {
+			return name;
 		}
 	}
 	

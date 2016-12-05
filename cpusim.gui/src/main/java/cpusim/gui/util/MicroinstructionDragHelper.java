@@ -4,8 +4,10 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.util.ClassCleaner;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
 import org.slf4j.Logger;
@@ -24,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class MicroinstructionDragHelper implements MachineBound {
 
-    private static final String ENCODING_CHAR = new String(Character.toChars('$'));
+    private static final String ENCODING_CHAR = new String(Character.toChars('#'));
     private static final String ENCODING_INDEX = "index";
     private static final String ENCODING_MICROID = "micro_id";
 
@@ -33,7 +35,8 @@ public final class MicroinstructionDragHelper implements MachineBound {
     private final ObjectProperty<Machine> machine;
 
     public MicroinstructionDragHelper(ObjectProperty<Machine> machineProperty) {
-        this.machine = checkNotNull(machineProperty);
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(checkNotNull(machineProperty));
     }
 
     @Override
@@ -42,11 +45,21 @@ public final class MicroinstructionDragHelper implements MachineBound {
     }
 
     /**
+     * Get the character used to separate encoded values.
+     * @return Non-{@code null} encoded character.
+     */
+    static String getEncodingChar() {
+        return ENCODING_CHAR;
+    }
+
+    /**
      * Inserts an index into the {@link Dragboard}
      * @param db Current {@code Dragboard}
      * @param index Index into a {@link List}
+     *
+     * @return Encoded {@link String}
      */
-    public void insertIntoDragboard(Dragboard db, int index) {
+    public String insertIntoDragboard(Dragboard db, int index) {
         checkNotNull(db);
 
         final String encoded = Joiner.on(ENCODING_CHAR)
@@ -56,14 +69,18 @@ public final class MicroinstructionDragHelper implements MachineBound {
         cc.putString(encoded);
 
         db.setContent(cc);
+
+        return encoded;
     }
 
     /**
      * Inserts an {@link Microinstruction} reference from the {@link #machineProperty()} into the {@link Dragboard}
      * @param db Current {@code Dragboard}
      * @param micro a {@code Microinstruction} to be inserted.
+     *
+     * @return Encoded {@link String}
      */
-    public void insertIntoDragboard(Dragboard db, final Microinstruction<?> micro) {
+    public String insertIntoDragboard(Dragboard db, final Microinstruction<?> micro) {
         checkNotNull(db);
         checkNotNull(micro);
 
@@ -76,6 +93,8 @@ public final class MicroinstructionDragHelper implements MachineBound {
         cc.putString(encoded);
 
         db.setContent(cc);
+
+        return encoded;
     }
 
     /**
@@ -89,50 +108,58 @@ public final class MicroinstructionDragHelper implements MachineBound {
         checkNotNull(db);
         checkNotNull(handler);
 
-        List<String> tokens = Splitter.on(ENCODING_CHAR).omitEmptyStrings().splitToList(db.getString());
-        String type = tokens.get(0);
+        if (!db.hasString()) {
+            handler.onOther();
+        } else {
+            // We have string content, might be ours
+            List<String> tokens = Splitter.on(ENCODING_CHAR).omitEmptyStrings().splitToList(db.getString());
+            String type = tokens.get(0);
 
-        switch (type) {
-            case ENCODING_INDEX: {
-                // FIXME finish
-                checkArgument(tokens.size() == 2);
-                int index = Integer.parseInt(tokens.get(1));
-                handler.onDragIndex(index);
+            switch (type) {
+                case ENCODING_INDEX: {
+                    // FIXME finish
+                    checkArgument(tokens.size() == 2);
+                    int index = Integer.parseInt(tokens.get(1));
+                    handler.onDragIndex(index);
 
-            } break;
+                } break;
 
-            case ENCODING_MICROID: {
-                checkArgument(tokens.size() == 3);
-                try {
-                    @SuppressWarnings("unchecked") // if it's bad, it'll throw and be caught
-                            Class<? extends Microinstruction<?>> microClass = (Class<? extends Microinstruction<?>>) Class.forName(tokens.get(1));
-                    UUID id = UUID.fromString(tokens.get(2));
+                case ENCODING_MICROID: {
+                    checkArgument(tokens.size() == 3);
+                    try {
+                        @SuppressWarnings("unchecked") // if it's bad, it'll throw and be caught
+                                Class<? extends Microinstruction<?>> microClass
+                                = (Class<? extends Microinstruction<?>>) ClassCleaner.forName(tokens.get(1));
+                        UUID id = UUID.fromString(tokens.get(2));
 
-                    final Machine machine = this.machine.getValue();
+                        final Machine machine = this.machine.getValue();
 
-                    List<Microinstruction<?>> micros = machine.getMicrosUnsafe(microClass);
-                    Optional<Microinstruction<?>> microOpt = micros.stream()
-                            .filter(m -> m.getID().equals(id))
-                            .findFirst();
+                        List<Microinstruction<?>> micros = machine.getMicrosUnsafe(microClass);
+                        Optional<Microinstruction<?>> microOpt = micros.stream()
+                                .filter(m -> m.getID().equals(id))
+                                .findFirst();
 
-                    if (microOpt.isPresent()) {
-                        handler.onDragMicro(microOpt.get());
-                    } else {
-                        logger.debug("Was passed a microinstruction that the Machine does not know about: {}@{}",
-                                microClass, id);
+                        if (microOpt.isPresent()) {
+                            handler.onDragMicro(microOpt.get());
+                        } else {
+                            logger.debug("Was passed a microinstruction that the Machine does not know about: {}@{}",
+                                    microClass, id);
+                            handler.onOther();
+                        }
+                    } catch (ClassNotFoundException | ClassCastException ce) {
+                        logger.debug("Could not get microClass from token: " + tokens.get(1), ce);
                         handler.onOther();
                     }
-                } catch (ClassNotFoundException | ClassCastException ce) {
-                    logger.debug("Could not get microClass from token: " + tokens.get(1), ce);
+                } break;
+
+                default: {
+                    logger.debug("Unknown dragboard sequence: {}", db.getString());
                     handler.onOther();
                 }
-            } break;
-
-            default: {
-                logger.debug("Unknown dragboard sequence: {}", db.getString());
-                handler.onOther();
             }
         }
+
+
     }
 
 

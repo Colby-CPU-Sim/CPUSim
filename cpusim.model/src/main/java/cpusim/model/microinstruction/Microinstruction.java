@@ -41,7 +41,6 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     // constructor
     
     Microinstruction(String name, UUID id, Machine machine) {
-        checkNotNull(machine);
         checkArgument(!Strings.isNullOrEmpty(name));
         
         this.name = new SimpleStringProperty(this, "name", name);

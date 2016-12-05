@@ -27,23 +27,15 @@ public class TransferRtoRTest {
 		final long SOURCE_VALUE = 0xFA; // 0b11111010
 		final long DEST_VALUE = 0; // 0x00
 
-		Register src = mock(Register.class);
-        src.setValue(SOURCE_VALUE);
+		final Machine testMachine = new Machine("test");
+
+		Register src = new Register("src", testMachine, 8, SOURCE_VALUE, Register.Access.readOnly());
         assertEquals(SOURCE_VALUE, src.getValue());
         
-        Register dst = mock(Register.class);
-        dst.setValue(DEST_VALUE);
-        
+        Register dst = new Register("dest", testMachine, 8, DEST_VALUE, Register.Access.readWrite());
         assertEquals(DEST_VALUE, dst.getValue());
 
-        TransferRtoR micro = mock(TransferRtoR.class);
-        micro.setSource(src);
-        micro.setSrcStartBit(4);
-
-        micro.setDest(dst);
-        micro.setDestStartBit(1);
-
-        micro.setNumBits(5);
+        TransferRtoR micro = new TransferRtoR("xfer", testMachine, src, 4, dst, 1, 4);
 
         // dest = (SOURCE_VALUE >> 4) << 1
         micro.execute();

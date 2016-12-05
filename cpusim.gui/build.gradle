@@ -18,7 +18,10 @@ dependencies {
     
     compile project(':cpusim.model')
     
-    testCompile 'junit:junit:4.12' 
+    testCompile 'junit:junit:4.12'
+
+    testCompile "org.testfx:testfx-core:4.0.+"
+    testCompile "org.testfx:testfx-junit:4.0.+"
 }
 
 jar {
