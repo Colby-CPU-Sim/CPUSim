@@ -121,10 +121,9 @@ public class EditFieldsController implements Initializable {
             MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
                     IdentifiedObject.generateRandomID(),
                     editMachineInstructionController.getMachine().get(),
-                    newAssemblyFields, instr.getInstructionColors(),
-                    instr.getAssemblyColors(),
-                    instr.getOpcode(),
-                    newInstrFields);
+                    newInstrFields, newAssemblyFields,
+                    instr.getOpcode()
+            );
             
             instrToAdd.setMicros(instr.getMicros());
             

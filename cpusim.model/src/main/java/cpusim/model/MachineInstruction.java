@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -40,82 +41,44 @@ public class MachineInstruction
     private ObservableList<Microinstruction<?>> micros;	//all the microinstructions
     private long opcode;					//the opcode of the instruction
     private Machine machine;
-    private String format; //the format String matching the list of fields
-
+    
     private ObservableList<Field> instructionFields;
-    private ObservableList<String> instructionColors;
-
     private ObservableList<Field> assemblyFields;
-    private ObservableList<String> assemblyColors;
-
-    /*
-     * CLASS INVARIANT:  Except when the InstructionDialog is open,
-     * the format string must correspond to a legal list of fields.
-     * More precisely, Machine.getFieldsFromFormat(format) must produce the list
-     * of fields.
+    
+    /**
+     * Create a new {@link MachineInstruction}.
+     *
+     * @param name Name (see {@link NamedObject#nameProperty()}
+     * @param id Identifier (see {@link IdentifiedObject#idProperty()}
+     * @param machine machine this belongs to
+     * @param opcode Start value for the opcode
+     * @param instructionFields Instruction layout
+     * @param assemblyFields Assembly layout
      */
-
-    public MachineInstruction(String name, final UUID id, Machine machine, long opcode, String format)
-    {
-        this(name, id, machine,
-                Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
-                Lists.newArrayList(ConvertStrings.formatStringToFields(format, machine)),
-                opcode,
-                Colors.generateTwoListsOfRandomLightColors(
-                    Splitter.on(' ')
-                            .omitEmptyStrings()
-                            .splitToList(format).size()));
-    }
-    
-    public MachineInstruction(String name, final UUID id, Machine machine, List<Field> assemblyFields, List<Field> instructionFields, long opcode,
-                              List<List<String>> colors){
-        this(name, id, machine, assemblyFields,
-                colors.get(0), colors.get(1), opcode, instructionFields);
-    }
-    
     public MachineInstruction(String name,
-                              final UUID id,
+                              UUID id,
                               Machine machine,
-                              List<Field> newAssemblyFields,
-                              List<String> newInstrColors,
-                              List<String> newAssemblyColors,
                               long opcode,
-                              List<Field> newInstrFields)
-    {
+                              List<Field> instructionFields,
+                              List<Field> assemblyFields) {
         this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
         this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
-        this.opcode = opcode;
-        this.micros = FXCollections.observableArrayList();
         this.machine = machine;
-        this.assemblyFields = FXCollections.observableArrayList(newAssemblyFields);
-        this.instructionFields = FXCollections.observableArrayList(newInstrFields);
-        this.assemblyColors = FXCollections.observableArrayList(newAssemblyColors);
-        this.instructionColors = FXCollections.observableArrayList(newInstrColors);
         
-        //for backwards compatibility
-        List<Field> fieldsToRemove = new ArrayList<>();
-        for (Field field : this.assemblyFields){
-            if (field.getType() == Field.Type.ignored){
-                fieldsToRemove.add(field);
-            }
-        }
+        this.opcode = opcode;
         
-        for (Field field : fieldsToRemove){
-            this.assemblyColors.remove(this.assemblyFields.indexOf(field));
-            this.assemblyFields.remove(field);
-        }
+        this.micros = FXCollections.observableArrayList();
+        this.instructionFields = FXCollections.observableArrayList(instructionFields);
+        this.assemblyFields = FXCollections.observableArrayList(assemblyFields);
     }
 
     /**
      * Copy constructor
      * @param other instance to copy
      */
-    public MachineInstruction(final MachineInstruction other){
+    public MachineInstruction(final MachineInstruction other) {
         this(other.name.getValue(), IdentifiedObject.generateRandomID(),
-                other.machine, other.assemblyFields,
-                other.instructionColors, other.assemblyColors,
-                other.opcode, other.instructionFields
-        );
+                other.machine, other.opcode, other.instructionFields, other.assemblyFields);
     }
 
     //===================================

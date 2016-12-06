@@ -57,7 +57,6 @@ import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.module.RegisterRAMPair;
-import cpusim.model.util.Colors;
 import cpusim.model.util.Convert;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.MachineReaderException;
@@ -1403,16 +1402,16 @@ public class MachineReader {
 			// The format will be set in startFieldLength and then resolved in
 			// endMachineInstruction
 			currentFormat = "";
-			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), opcode, new ArrayList<>()
-			);
+			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, new ArrayList<>(), new ArrayList<>(), opcode
+            );
 		} else if (currentInstructionFormat == null) {
 			// version 2: A single format for machine & assembly instructions
 			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, opcode, currentFormat);
 		} else {
 			// version 3: separate formats for machine & assembly instructions
 			
-			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, Convert.formatStringToFields(currentAssemblyFormat, machine), Colors.xmlToColorsList(instrColors), Colors.xmlToColorsList(assemblyColors), opcode, Convert.formatStringToFields(currentInstructionFormat, machine)
-			);
+			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, Convert.formatStringToFields(currentInstructionFormat, machine), Convert.formatStringToFields(currentAssemblyFormat, machine), opcode
+            );
 		}
 
 		machine.getInstructions().add(currentInstruction);

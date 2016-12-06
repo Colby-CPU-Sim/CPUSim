@@ -2,8 +2,11 @@ package cpusim.gui.editmachineinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
-import cpusim.gui.util.*;
-import cpusim.gui.util.list.PropertyListCell;
+import cpusim.gui.util.DialogButtonController;
+import cpusim.gui.util.HelpPageEnabled;
+import cpusim.gui.util.MachineBound;
+import cpusim.gui.util.MachineModificationController;
+import cpusim.gui.util.MicroinstructionTreeView;
 import cpusim.gui.util.list.StringPropertyListCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
@@ -11,7 +14,13 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.*;
+import cpusim.model.util.Convert;
+import cpusim.model.util.Copyable;
+import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.NamedObject;
+import cpusim.model.util.Validatable;
+import cpusim.model.util.Validate;
+import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertLongs;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -26,15 +35,23 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.DefaultStringConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,6 +105,9 @@ public class EditMachineInstructionController
 
     @FXML
     private VBox noFieldsLabel;
+    
+    @FXML @SuppressWarnings("unused")
+    private Label currentInstructionTitle;
 
     @FXML @SuppressWarnings("unused")
     private TabPane implTabPane;
@@ -150,23 +170,34 @@ public class EditMachineInstructionController
         implTabPane.disableProperty().bind(isInstructionSelected);
 
         currentInstr.bind(instructionList.getSelectionModel().selectedItemProperty());
+        
+        currentInstr.addListener((ob, oldValue, newValue) -> {
+            currentInstructionTitle.textProperty().unbind();
+            
+            if (newValue != null) {
+                currentInstructionTitle.textProperty().bind(newValue.nameProperty());
+            } else {
+                currentInstructionTitle.setText("Unspecified");
+            }
+        });
+        
         instImplTableController.currentInstructionProperty().bind(currentInstr);
 
 //         updates the length label for the selected instruction based on said
 //         instruction's field
         StringBinding lengthTextBinding = Bindings.createStringBinding(() -> {
-                if (currentInstr.getValue() != null) {
-                    int sum = currentInstr.getValue().getInstructionFields().stream()
-                            .mapToInt(Field::getNumBits)
-                            .sum();
+            if (currentInstr.getValue() != null) {
+                int sum = currentInstr.getValue().getInstructionFields().stream()
+                        .mapToInt(Field::getNumBits)
+                        .sum();
 
-                    if (sum > 0) {
-                        return Integer.toString(sum);
-                    }
+                if (sum > 0) {
+                    return Integer.toString(sum);
                 }
+            }
 
-                return "";
-            }, currentInstr);
+            return "";
+        }, currentInstr);
 
         lengthLabel.textProperty().bind(lengthTextBinding);
 
@@ -555,8 +586,8 @@ public class EditMachineInstructionController
         String uniqueName = NamedObject.createUniqueName(instructionList.getItems(), "?");
         instructionList.getItems().add(0, new MachineInstruction(uniqueName, IdentifiedObject.generateRandomID(),
                 mediator.getMachine(),
-                new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
-                opcode, new ArrayList<>()));
+                new ArrayList<>(), new ArrayList<>(),
+                opcode));
         instructionList.scrollTo(0);
         instructionList.getSelectionModel().selectFirst();
     }
