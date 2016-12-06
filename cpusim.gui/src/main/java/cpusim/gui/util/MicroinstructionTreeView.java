@@ -14,10 +14,8 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.*;
@@ -84,17 +82,50 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
                     MicroinstructionTreeItem item = (MicroinstructionTreeItem)cell.getTreeItem();
                     if (item.isLeaf()) {
                         // then it's actually an instruction..
-                        MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
                         Dragboard db = cell.startDragAndDrop(TransferMode.COPY);
+                        DragHelper helper = new DragHelper(machineProperty(), db);
+                        db.setDragView(cell.snapshot(null, null));
 
-                        helper.insertIntoDragboard(db, item.getValue());
+                        helper.setMicroContent(item.getValue());
 
                         ev.consume();
                     }
                 });
 
+                cell.setOnDragDone(ev -> {
+                    if (ev.getTransferMode() == TransferMode.COPY) {
+                        // success, don't think there's anything to do!
+                    }
+                    ev.consume();
+                });
+
+                cell.setOnMouseClicked(ev -> {
+                    MicroinstructionTreeItem item = (MicroinstructionTreeItem)cell.getTreeItem();
+                    if (!item.isLeaf()) {
+                        item.setExpanded(!item.isExpanded());
+                    }
+                });
+
                 return cell;
             });
+        
+        treeView.setOnDragOver(ev -> {
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragIndex(final int value) {
+                    // someone is trying to remove the value
+                    ev.acceptTransferModes(TransferMode.MOVE);
+                }
+    
+                @Override
+                public void onDragMicro(final Microinstruction<?> micro) {
+        
+                }
+            });
+            
+            ev.consume();
+        });
     }
     
     /**

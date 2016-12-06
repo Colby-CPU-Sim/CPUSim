@@ -1,23 +1,26 @@
 package cpusim.gui.editmachineinstruction;
 
+import cpusim.gui.util.DragHelper;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.MachineBound;
-import cpusim.gui.util.MicroinstructionDragHelper;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -32,10 +35,16 @@ public class MachineInstructionImplTableController extends TitledPane implements
     
     private static final String FXML_FILE = "MachineInstructionImplTable.fxml";
 
-    private final Logger logger = LoggerFactory.getLogger(MachineInstructionImplTableController.class);
+    private final Logger logger = LogManager.getLogger(MachineInstructionImplTableController.class);
     
     @FXML @SuppressWarnings("unused")
     private TableView<Microinstruction<?>> executeSequenceTable;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Microinstruction<?>, String> nameColumn;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Microinstruction<?>, Integer> cycleColumn;
 
     private ObjectProperty<MachineInstruction> currentInstruction;
     
@@ -69,100 +78,207 @@ public class MachineInstructionImplTableController extends TitledPane implements
 
     @FXML @SuppressWarnings("unused")
     private void initialize() {
+
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        cycleColumn.setCellValueFactory(new PropertyValueFactory<>("cycleCount"));
+    
+        class WrappedInteger {
+            int index = -1;
+        }
+    
+        WrappedInteger currentIndex = new WrappedInteger();
+
+        executeSequenceTable.setOnDragEntered(ev -> {
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragIndex(int value) {
+                    // do nothing
+                }
+
+                @Override
+                public void onDragMicro(Microinstruction<?> micro) {
+                    if (executeSequenceTable.getItems().isEmpty()) {
+                        // set the index to zero, this is because it will not get set by the row onDragOver
+                        // due to the way that the rows work.
+                        currentIndex.index = 0;
+                    }
+                }
+            });
+
+            ev.consume();
+        });
+    
+        final EventHandler<DragEvent> checkDragOver = ev -> {
+            // we can just draw it
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragIndex(int value) {
+                    ev.acceptTransferModes(TransferMode.MOVE);
+                }
+            
+                @Override
+                public void onDragMicro(Microinstruction<?> micro) {
+                    ev.acceptTransferModes(TransferMode.COPY);
+//                  logger.debug("executeSequenceTable#setOnDragOver(): micro -> {}", micro);
+                }
+            });
+        
+            ev.consume();
+        };
+        executeSequenceTable.setOnDragOver(checkDragOver);
+
+        executeSequenceTable.setOnDragExited(ev -> {
+            // we can just draw it
+            ObservableList<Microinstruction<?>> items = executeSequenceTable.getItems();
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragIndex(int value) {
+                    
+                }
+
+                @Override
+                public void onDragMicro(Microinstruction<?> micro) {
+                    int index = items.indexOf(micro);
+                    if (index != -1) {
+                        items.remove(index);
+
+                        logger.trace("Removed marker {}", micro);
+                    }
+                }
+            });
+
+            ev.consume();
+        });
+
+        executeSequenceTable.setOnDragDropped(ev -> {
+            ObservableList<Microinstruction<?>> items = executeSequenceTable.getItems();
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragIndex(int value) {
+                    // Happens when removing an instruction
+                    if (currentIndex.index != value) {
+                        Microinstruction<?> item = items.remove(value);
+                        items.add(Math.min(items.size(), Math.max(0, currentIndex.index - 1)), item);
+                        
+                        ev.setDropCompleted(true);
+                    } else {
+                        
+                        ev.setDropCompleted(false);
+                    }
+                }
+
+                @Override
+                public void onDragMicro(Microinstruction<?> micro) {
+                    logger.trace("Dropped {}", micro);
+                    int index = items.indexOf(micro);
+                    
+                    if (index != -1) {
+                        items.remove(index);
+                    }
+                    
+                    items.add(Math.min(currentIndex.index, items.size()), micro.cloneOf());
+
+                    ev.setDropCompleted(true);
+                    logger.debug("executeSequenceTable#setOnDragDropped({}): micro -> {}", micro, index);
+                }
+            });
+
+            currentIndex.index = -1;
+            ev.consume();
+        });
+
         executeSequenceTable.setRowFactory(view -> {
-            TableRow<Microinstruction<?>> row = new TableRow<>();
+            TableRow<Microinstruction<?>> row = new TableRow<Microinstruction<?>>() {
+                @Override
+                protected void updateItem(Microinstruction<?> item, boolean empty) {
+                    super.updateItem(item, empty);
+
+                    if (empty || item == null) {
+                        setText(null);
+                        setGraphic(null);
+                    }
+                }
+            };
+            
+            // @Nava2 - After *hours* of work, I figured out that TableRow values do NOT receive the
+            // onDragDropped() event. This is silly, but it means that the executeSequenceTable must do this itself.
+            // We do this by using the "currentIndex" variable to maintain the current row being dragged across.
+            
+            // TODO Add some highlighting to show that there is more feedback than just the "hovering row"
+
+            // Starting a drag
             row.setOnDragDetected(event -> {
                 if (!row.isEmpty()) {
                     final int idx = row.getIndex();
                     Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
                     db.setDragView(row.snapshot(null, null));
 
-                    MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
-                    helper.insertIntoDragboard(db, idx);
+                    DragHelper helper = new DragHelper(machineProperty(), db);
+                    helper.setIndexContent(idx);
 
                     event.consume();
+                    logger.trace("row.setOnDragDetected() started MOVE, idx = {}", idx);
                 }
             });
 
-            // FIXME is this necessary?
-//            row.setOnDragOver(event -> {
-//                Dragboard db = event.getDragboard();
-//                if (db != null && db.hasString()) {
+            // A drag entered the row
+            row.setOnDragEntered(ev -> {
+                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+                helper.visit(new DragHelper.HandleDragBehaviour() {
+                    @Override
+                    public void onDragIndex(int value) {
+                        logger.trace("Over micro ({}) drag, row.getIndex() = {}, mode = {}",
+                                value, row.getIndex(), ev.getTransferMode());
+                    }
+
+                    @Override
+                    public void onDragMicro(Microinstruction<?> micro) {
+                        logger.trace("Over micro ({}) drag, row.getIndex() = {}, mode = {}",
+                                micro, row.getIndex(), ev.getTransferMode());
+                    }
+                });
+    
+                currentIndex.index = row.getIndex();
+
+                ev.consume();
+            });
+
+            row.setOnDragOver(checkDragOver);
+
+            // Drag left the row
+//            row.setOnDragExited(ev -> {
+//                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+//                helper.visit(new DragHelper.HandleDragBehaviour() {
+//                    @Override
+//                    public void onDragIndex(int value) {
+//                        logger.trace("Exited index ({}) drag, row.getIndex() = {}", value, row.getIndex());
+//                    }
 //
-//                    parseDragboard(db, new MicroinstructionDragHelper.HandleDragBehaviour() {
-//                        @Override
-//                        public void onDragIndex(final int otherIdx) {
-//                            // Check if the current index matches the index in question
-//                            if (otherIdx != row.getIndex()) {
-//                                event.acceptTransferModes(TransferMode.MOVE);
-//                                event.consume();
-//                            }
-//                        }
+//                    @Override
+//                    public void onDragMicro(Microinstruction<?> micro) {
+//                        logger.trace("Exited micro ({}) drag, row.getIndex() = {}", micro, row.getIndex());
+//                    }
+//                });
 //
-//                        @Override
-//                        public void onDragMicro(final Microinstruction<?> micro) {
-//
-//                            // need to be smarter here..
-//
-//                            event.acceptTransferModes(TransferMode.COPY);
-//                            event.consume();
-//                        }
-//                    });
-//                }
+//                ev.consume();
 //            });
             
-            row.setOnDragDropped(event -> {
-                Dragboard db = event.getDragboard();
-                
-                if (db != null && db.hasString()) {
-                    final ObservableList<Microinstruction<?>> items = view.getItems();
 
-                    MicroinstructionDragHelper helper = new MicroinstructionDragHelper(machineProperty());
-                    helper.parseDragboard(db, new MicroinstructionDragHelper.HandleDragBehaviour() {
-                        @Override
-                        public void onDragIndex(final int otherIdx) {
-                            // Check if the current index matches the index in question
-                            if (otherIdx != row.getIndex()) {
-                                // Check if the current index matches the index in question
-                                Microinstruction<?> instruction = items.get(otherIdx);
-    
-                                int insertIdx = row.getIndex();
-                                if (row.isEmpty()) {
-                                    // just insert it at the end then
-                                    insertIdx = items.size();
-                                }
-                                
-                                items.remove(otherIdx);
-                                items.add((otherIdx < insertIdx ? insertIdx : insertIdx - 1), instruction);
-                                view.getSelectionModel().select(insertIdx);
-    
-                                event.setDropCompleted(true);
-                                event.consume();
-                            }
-                        }
-        
-                        @Override
-                        public void onDragMicro(final Microinstruction<?> micro) {
-
-                            Microinstruction<?> realMicro = micro;
-                            if (micro instanceof Comment) {
-                                // we want Comment micros used in only one place so create a new one
-                                realMicro = new Comment((Comment)micro);
-                            }
-
-                            items.add(row.getIndex(), realMicro);
-                            view.getSelectionModel().select(row.getIndex());
-                            
-                            event.setDropCompleted(true);
-                            event.consume();
-                        }
-
-                        @Override
-                        public void onOther() {
-                            logger.debug("Received unknown value dropped.");
-                        }
-                    });
+            // This row started a drag, and is now done
+            row.setOnDragDone(ev -> {
+                if (ev.getTransferMode() == TransferMode.MOVE) {
+                    logger.trace("Row Drag successfully completed: row.getIndex() = {}", row.getIndex());
+                } else {
+                    int index = row.getIndex();
+                    Microinstruction<?> item = executeSequenceTable.getItems().remove(row.getIndex());
+                    logger.trace("Removed microinstruction: {}@{}", item, row.getIndex());
                 }
+
+                ev.consume();
             });
             
             return row;

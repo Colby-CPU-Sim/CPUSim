@@ -13,8 +13,6 @@ dependencies {
 
     // http://search.maven.org/#artifactdetails%7Corg.controlsfx%7Ccontrolsfx%7C8.40.12%7C
     compile 'org.controlsfx:controlsfx:8.40.12'
-
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.7'
     
     compile project(':cpusim.model')
     

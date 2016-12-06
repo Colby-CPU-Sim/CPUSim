@@ -1154,6 +1154,7 @@ public class Machine extends Module<Machine> {
 
 
     public List<Comment> getCommentMicros() {
+        // FIXME This doesn't actually get the #getMicros(Comment.class) results.. Is it supposed to?
         //go through all the instrs and get their Comment micros in a list.
         List<Comment> result = new ArrayList<Comment>();
         for (MachineInstruction instr : instructions) {

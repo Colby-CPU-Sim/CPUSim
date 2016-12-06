@@ -30,8 +30,13 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
 {
 	
     // name of the microinstruction
-    private SimpleStringProperty name;
-    
+    private final StringProperty name;
+
+    /**
+     * Cycle count for an operation.
+     */
+    private final IntegerProperty cycles;
+
     private final ReadOnlyObjectProperty<UUID> uuid;
     
     protected Machine machine;
@@ -44,6 +49,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
         checkArgument(!Strings.isNullOrEmpty(name));
         
         this.name = new SimpleStringProperty(this, "name", name);
+        this.cycles = new SimpleIntegerProperty(this, "cycleCount", 1);
         this.machine = machine;
         this.uuid = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
     }
@@ -67,7 +73,15 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     public ReadOnlyProperty<UUID> idProperty() {
         return uuid;
     }
-    
+
+    public int getCycleCount() {
+        return cycles.get();
+    }
+
+    public IntegerProperty cycleCountProperty() {
+        return cycles;
+    }
+
     public String getHTMLName()
     {
         return HtmlEncoder.sEncode(getName());

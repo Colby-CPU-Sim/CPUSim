@@ -28,11 +28,11 @@ import static org.mockito.Mockito.*;
 /**
  * @since 2016-12-05
  */
-public class MicroinstructionDragHelperTest extends ApplicationTest {
+public class DragHelperTest extends ApplicationTest {
 
     private Branch branchMicro;
-    private MicroinstructionDragHelper helper;
-    private MicroinstructionDragHelper.HandleDragBehaviour handler;
+    private DragHelper helper;
+    private DragHelper.HandleDragBehaviour handler;
 
     private final UUID branchUUID = UUID.randomUUID();
     private final int dragIndex = 2;
@@ -51,7 +51,7 @@ public class MicroinstructionDragHelperTest extends ApplicationTest {
         microLabel.setOnDragDetected(ev -> {
             Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
 
-            helper.insertIntoDragboard(db, branchMicro);
+            helper.setMicroContent(db, branchMicro);
 
             ev.setDragDetect(true);
             ev.consume();
@@ -64,7 +64,7 @@ public class MicroinstructionDragHelperTest extends ApplicationTest {
         indexLabel.setOnDragDetected(ev -> {
             Dragboard db = indexLabel.startDragAndDrop(TransferMode.ANY);
 
-            helper.insertIntoDragboard(db, dragIndex);
+            helper.setMicroContent(db, dragIndex);
 
             ev.setDragDetect(true);
             ev.consume();
@@ -94,7 +94,7 @@ public class MicroinstructionDragHelperTest extends ApplicationTest {
         dropLabel.setOnDragDropped(ev -> {
             Dragboard db = ev.getDragboard();
 
-            helper.parseDragboard(db, handler);
+            helper.visit(handler);
 
             ev.setDropCompleted(true);
             ev.consume();
@@ -116,9 +116,9 @@ public class MicroinstructionDragHelperTest extends ApplicationTest {
         when(branchMicro.getID()).thenReturn(branchUUID);
         machineProperty.getValue().getMicros(Branch.class).add(branchMicro);
 
-        helper = new MicroinstructionDragHelper(machineProperty);
+        helper = new DragHelper(machineProperty);
 
-        handler = mock(MicroinstructionDragHelper.HandleDragBehaviour.class);
+        handler = mock(DragHelper.HandleDragBehaviour.class);
     }
 
     @Test

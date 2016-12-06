@@ -3,6 +3,7 @@ package cpusim.gui.editmachineinstruction;
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.util.*;
+import cpusim.gui.util.list.PropertyListCell;
 import cpusim.gui.util.list.StringPropertyListCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
@@ -33,6 +34,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.io.IOException;
 import java.util.ArrayList;

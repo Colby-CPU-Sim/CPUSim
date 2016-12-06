@@ -43,6 +43,10 @@ subprojects {
         
         // https://mvnrepository.com/artifact/com.google.code.findbugs/findbugs
         compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.7'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.7'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.7'
         
         testCompile 'junit:junit:4.12'
         testCompile "org.mockito:mockito-core:1.+"
