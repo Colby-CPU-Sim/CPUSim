@@ -287,7 +287,10 @@ public class MachineInstructionImplTableController extends TitledPane implements
         // bind the table of execution micros to be bound to the current instructions' sequence
         currentInstruction.addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                executeSequenceTable.setItems(newValue.getMicros());
+                ObservableList<Microinstruction<?>> items = executeSequenceTable.getItems();
+                items.clear();
+                
+                items.addAll(newValue.getMicros());
             }
         });
 
