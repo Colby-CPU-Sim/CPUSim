@@ -2,6 +2,7 @@ package cpusim.gui.util;
 
 import cpusim.gui.help.HelpController;
 import cpusim.model.Machine;
+import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
 import javafx.beans.property.ObjectProperty;
@@ -26,7 +27,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 30/11/2016.
  */
-public final class DialogButtonController extends VBox implements MachineBound {
+public final class DialogButtonController extends VBox implements ReadOnlyMachineBound {
 
     /**
      * FXML file loaded for the controls.
@@ -90,12 +91,12 @@ public final class DialogButtonController extends VBox implements MachineBound {
     }
 
     @Override
-    public Optional<Machine> getMachine() {
+    public Machine getMachine() {
         return Optional.ofNullable(machine.get());
     }
 
     @Override
-    public ObjectProperty<Machine> machineProperty() {
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
         return machine;
     }
     

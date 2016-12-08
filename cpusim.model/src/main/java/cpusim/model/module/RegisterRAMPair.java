@@ -35,8 +35,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RegisterRAMPair implements LegacyXMLSupported, Copyable<RegisterRAMPair> {
 	
-	private SimpleObjectProperty<Register> register;
-	private SimpleObjectProperty<RAM> ram;
+	private ObjectProperty<Register> register;
+	private ObjectProperty<RAM> ram;
 	
 	/**
      * if true, always highlight with the current value, not just at the start of a cycle

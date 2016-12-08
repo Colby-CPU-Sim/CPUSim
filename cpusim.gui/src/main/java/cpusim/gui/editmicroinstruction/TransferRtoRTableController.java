@@ -12,6 +12,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the {@link TransferRtoR} command in the {@link EditMicroinstructionsController}.
  */
@@ -64,7 +66,7 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
         Callback<TableColumn<TransferRtoR,Register>,
                 TableCell<TransferRtoR,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
+                        machine.get().getRegisters());
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -96,9 +98,10 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
 
     @Override
     public TransferRtoR createInstance() {
-        final Register r = (machine.get().getAllRegisters().size() == 0 ? null :
-                machine.get().getAllRegisters().get(0));
-        return new TransferRtoR("???", machine.get(), r, 0, r, 0, 0);
+        final Register r = (machine.get().getRegisters().size() == 0 ? null :
+                machine.get().getRegisters().get(0));
+        return new TransferRtoR("???", UUID.randomUUID(), machine.get(),
+                r, 0, r, 0, 0);
     }
 
     @Override

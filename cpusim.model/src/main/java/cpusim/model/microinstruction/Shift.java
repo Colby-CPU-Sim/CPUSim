@@ -2,10 +2,9 @@ package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
@@ -17,13 +16,23 @@ import static com.google.common.base.Preconditions.*;
  * in the destination register.
  */
 public class Shift extends Transfer<Register, Register, Shift> {
-    
-    // TODO Enumeration
-    private SimpleStringProperty type;
-    
-    // TODO Enumeration
-    private SimpleStringProperty direction;
-    private SimpleIntegerProperty distance;
+
+    /**
+     * Type of shift
+     */
+    public enum ShiftType {
+        Arithmetic,
+        Logical,
+        Cyclic
+    }
+
+    public enum ShiftDirection {
+        Left, Right
+    }
+
+    private final ObjectProperty<ShiftType> type;
+    private final ObjectProperty<ShiftDirection> direction;
+    private final IntegerProperty distance;
 
     /**
      * Constructor
@@ -42,35 +51,16 @@ public class Shift extends Transfer<Register, Register, Shift> {
                  Machine machine,
                  Register source,
                  Register destination,
-                 String type,
-                 String direction,
+                 ShiftType type,
+                 ShiftDirection direction,
                  int distance){
         super(name, id, machine, source, 0, destination, 0, source.getWidth());
         
-        this.type = new SimpleStringProperty(this, "type", type);
-        this.direction = new SimpleStringProperty(this, "direction", direction);
+        this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
+        this.direction = new SimpleObjectProperty<>(this, "direction", checkNotNull(direction));
         this.distance = new SimpleIntegerProperty(this, "distance", distance);
-    }
-    
-    /**
-     * Constructor
-     * creates a new Increment object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param source the source register.
-     * @param destination the destination register.
-     * @param type type of shift.
-     * @param direction left or right shift.
-     * @param distance number of bits to be shifted.
-     */
-    public Shift(String name, Machine machine,
-                 Register source,
-                 Register destination,
-                 String type,
-                 String direction,
-                 int distance){
-        this(name, IdentifiedObject.generateRandomID(), machine, source, destination, type, direction, distance);
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
     
     /**
@@ -80,14 +70,16 @@ public class Shift extends Transfer<Register, Register, Shift> {
      * @param other instance to copy
      */
     public Shift(Shift other){
-        this(other.getName(), other.machine, other.getSource(), other.getDest(), other.getType(), other.getDirection(), other.getDistance());
+        this(other.getName(), UUID.randomUUID(), other.getMachine(),
+                other.getSource(), other.getDest(), other.getType(),
+                other.getDirection(), other.getDistance());
     }
 
     /**
      * returns the type of shift.
      * @return type of shift as a string.
      */
-    public String getType(){
+    public ShiftType getType(){
         return type.get();
     }
 
@@ -95,15 +87,19 @@ public class Shift extends Transfer<Register, Register, Shift> {
      * updates the type used by the microinstruction.
      * @param newType the new string of type.
      */
-    public void setType(String newType){
-        type.set(newType);
+    public void setType(ShiftType newType){
+        type.set(checkNotNull(newType));
+    }
+
+    public ObjectProperty<ShiftType> typeProperty() {
+        return type;
     }
 
     /**
      * returns the type of shift.
      * @return type of shift as a string.
      */
-    public String getDirection(){
+    public ShiftDirection getDirection(){
         return direction.get();
     }
 
@@ -111,8 +107,12 @@ public class Shift extends Transfer<Register, Register, Shift> {
      * updates the type used by the microinstruction.
      * @param newDirection the new string of type.
      */
-    public void setDirection(String newDirection){
-        direction.set(newDirection);
+    public void setDirection(ShiftDirection newDirection){
+        direction.set(checkNotNull(newDirection));
+    }
+
+    public ObjectProperty<ShiftDirection> directionProperty() {
+        return direction;
     }
 
     /**
@@ -130,14 +130,9 @@ public class Shift extends Transfer<Register, Register, Shift> {
     public void setDistance(int newDistance){
         distance.set(newDistance);
     }
-    
-    @Override
-    public <U extends Shift> void copyTo(final U other) {
-        super.copyTo(other);
-    
-        other.setType(getType());
-        other.setDirection(getDirection());
-        other.setDistance(getDistance());
+
+    public IntegerProperty distanceProperty() {
+        return distance;
     }
     
     @Override
@@ -145,8 +140,7 @@ public class Shift extends Transfer<Register, Register, Shift> {
         super.validate();
     
         // checks if the two registers specified in the shift microinstructions have the same width
-        if (getSource().getWidth() !=
-                getDest().getWidth()) {
+        if (getSource().getWidth() != getDest().getWidth()) {
             throw new ValidationException("The microinstruction " + getName() +
                     " has different-sized registers designated " +
                     "for source and destination.\nBoth registers " +
@@ -166,46 +160,85 @@ public class Shift extends Transfer<Register, Register, Shift> {
      * execute the micro instruction from machine
      */
     @Override
-    public void execute()
-    {
+    public void execute() {
         long width = source.get().getWidth();
         long value = source.get().getValue() << (64 - width);
 
-        if (type.get().equals("logical") && direction.get().equals("left")) {
-            value = value << distance.get();
-            value = value >> (64 - width);
+        long distance = this.distance.get();
+
+        switch (direction.get()) {
+            case Left: {
+                switch (type.get()) {
+
+                    case Logical:
+                    case Arithmetic:  {
+                        value <<= distance;
+                        value >>= 64 - width;
+                    } break;
+
+                    case Cyclic: {
+                        long temp = value;
+                        value <<= distance;
+                        temp >>>= width - distance;
+                        value |= temp;
+                        value >>= (64 - width);
+                    } break;
+
+                    default: {
+                        throw new IllegalStateException("Unknown shift type: " + type.get());
+                    }
+                }
+            } break;
+
+            case Right: {
+                switch (type.get()) {
+
+                    case Logical: {
+                        value >>>= 64 - width;
+                        value >>>= distance;
+                    } break;
+
+                    case Arithmetic:  {
+                        value >>= 64 - width;
+                        value >>= distance;
+                    } break;
+
+                    case Cyclic: {
+                        long temp = value;
+                        value >>>= distance;
+                        temp <<= width - distance;
+                        value |= temp;
+                        value >>= 64 - width;
+                    } break;
+
+                    default: {
+                        throw new IllegalStateException("Unknown shift type: " + type.get());
+                    }
+                }
+            } break;
+
+            default:
+                throw new IllegalStateException("Unknown shift direction: " + direction.get());
         }
-        else if (type.get().equals("logical") && direction.get().equals("right")) {
-            value = value >>> (64 - width);
-            value = value >>> distance.get();
-        }
-        else if (type.get().equals("arithmetic") && direction.get().equals("left")) {
-            value = value << distance.get();
-            value = value >> (64 - width);
-        }
-        else if (type.get().equals("arithmetic") && direction.get().equals("right")) {
-            value = value >> (64 - width);
-            value = value >> distance.get();
-        }
-        else if (type.get().equals("cyclic") && direction.get().equals("left")) {
-            long temp = value;
-            value = value << distance.get();
-            temp = temp >>> (width - distance.get());
-            value = value | temp;
-            value = value >> (64 - width);
-        }
-        else {
-            assert type.get().equals("cyclic") &&
-                    direction.get().equals("right") : "Illegal type " +
-                    "or direction in Shift micro " +
-                    getName();
-            long temp = value;
-            value = value >>> distance.get();
-            temp = temp << (width - distance.get());
-            value = value | temp;
-            value = value >> (64 - width);
-        }
+
         dest.get().setValue(value);
+    }
+
+
+    @Override
+    public Shift cloneFor(IdentifierMap oldToNew) {
+        return new Shift(getName(), UUID.randomUUID(), getMachine(),
+                oldToNew.get(getSource()), oldToNew.get(getDest()),
+                getType(), getDirection(), getDistance());
+    }
+
+    @Override
+    public <U extends Shift> void copyTo(U other) {
+        super.copyTo(other);
+
+        other.setType(getType());
+        other.setDirection(getDirection());
+        other.setDistance(getDistance());
     }
 
     /**

@@ -15,13 +15,13 @@
 package cpusim.model.module;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 
-import java.util.Optional;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -31,61 +31,36 @@ import java.util.UUID;
  * Arithmetic or Increment microinstruction.
  */
 public class ConditionBit extends Module<ConditionBit> {
-	
-    private SimpleObjectProperty<Register> register;  //the register containing the bit
-    private SimpleIntegerProperty bit;    //the index of the bit in the register, bit = 0
+
+    @DependantComponent
+    private final ObjectProperty<Register> register;  //the register containing the bit
+    private final IntegerProperty bit;    //the index of the bit in the register, bit = 0
     //means the left-most or rightmost bit depending on the indexFromRight field in the machine.
-    private SimpleBooleanProperty halt;  //should machine halt when this bit is set to 1?
-    
-    /**
-     * Get the {@link ConditionBit} referring to having no condition bit set. This replaces the old <code>CpuSimConstants.NO_CONDITIONBIT</code>
-     * field.
-     * 
-     * @return {@code null}
-     * 
-     * @since 2016-10-12
-     * @deprecated Use an {@link Optional} instead to store if there maybe none set. 
-     */
-    @Deprecated
-    public static ConditionBit none() {
-    	
-        return null;
-    }
-    
+    private final BooleanProperty halt;  //should machine halt when this bit is set to 1?
+
+    private final ReadOnlySetProperty<MachineComponent> dependants;
+
     /**
      * Constructor
      * @param name name of the condition bit
-     * @param machine the machine that contains this condition bit
-     * @param register the register that contains the condition bit
      * @param bit the bit of the register that is the condition bit.
      * @param halt  a boolean value.
-     *              If this value is true, then the machine will halt
-     *              and display a message after the execution of any
-     *              microinstruction that causes the bit's value to
-     *              be set to 1.
+*              If this value is true, then the machine will halt
+*              and display a message after the execution of any
+*              microinstruction that causes the bit's value to
      */
     public ConditionBit(String name, UUID id, Machine machine, Register register, int bit, boolean halt) {
         super(name, id, machine);
-        this.register = new SimpleObjectProperty<>(register);
+        this.register = new SimpleObjectProperty<>(this, "register", register);
         this.bit = new SimpleIntegerProperty(bit);
         this.halt = new SimpleBooleanProperty(halt);
+
+        this.dependants = MachineComponent.collectDependancies(this);
     }
-    
-    /**
-     * Constructor
-     * @param name name of the condition bit
-     * @param machine the machine that contains this condition bit
-     * @param register the register that contains the condition bit
-     * @param bit the bit of the register that is the condition bit.
-     * @param halt  a boolean value.
-     *              If this value is true, then the machine will halt
-     *              and display a message after the execution of any
-     *              microinstruction that causes the bit's value to
-     *              be set to 1.
-     */
-    public ConditionBit(String name, Machine machine, Register register, int bit, boolean halt)
-    {
-        this(name, IdentifiedObject.generateRandomID(), machine, register, bit, halt);
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return this.dependants;
     }
 
     /**
@@ -95,15 +70,6 @@ public class ConditionBit extends Module<ConditionBit> {
     public Register getRegister()
     {
         return register.get();
-    }
-
-    /**
-     * setter for the register
-     * @param r new one that will replace the old register
-     */
-    public void setRegister(Register r)
-    {
-        register.set(r);
     }
 
     public ObjectProperty<Register> registerProperty() {
@@ -161,7 +127,7 @@ public class ConditionBit extends Module<ConditionBit> {
      *
      * @throws ValidationException if the internal state is invalid.
      */
-    public void validateNotReadOnlyRegister() {
+    private void validateNotReadOnlyRegister() {
         
         if(getRegister().getAccess().equals(Register.Access.readOnly())) {
             throw new ValidationException("The register \""+ getRegister().getName() +
@@ -176,7 +142,7 @@ public class ConditionBit extends Module<ConditionBit> {
      *
      * @throws ValidationException if the bit is outside the width of the {@link Register}
      */
-    public void validateBitWithinRegisterWidth() {
+    private void validateBitWithinRegisterWidth() {
         final int width = getRegister().getWidth();
         final int bit = getBit();
         if (bit < 0) {
@@ -200,18 +166,22 @@ public class ConditionBit extends Module<ConditionBit> {
         validateBitWithinRegisterWidth();
         validateNotReadOnlyRegister();
     }
-    
-    /**
-     * copies the data from the current module to a specific module
-     * @param newBit the micro instruction that will be updated
-     */
+
     @Override
-    public void copyTo(ConditionBit newBit)
-    {
-        newBit.setName(getName());
-        newBit.setRegister(getRegister());
-        newBit.setBit(getBit());
-        newBit.setHalt(getHalt());
+    public ConditionBit cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        return new ConditionBit(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getRegister()), getBit(), getHalt());
+    }
+
+    @Override
+    public <U extends ConditionBit> void copyTo(U other) {
+        other.setName(getName());
+        other.setBit(getBit());
+        other.setHalt(getHalt());
+
+        other.registerProperty().setValue(getRegister());
     }
 
     /**
@@ -220,10 +190,12 @@ public class ConditionBit extends Module<ConditionBit> {
      */
     public void set(int bitValue)
     {
-        assert bitValue == 0 || bitValue == 1 : "Illegal argument: " + bitValue +
-                " to ConditionBit.set().";
+        if (bitValue != 1 && bitValue != 0) {
+            throw new IllegalArgumentException("Illegal value: " + bitValue);
+        }
+
         int leftShift;
-        if (machine.getIndexFromRight()) {
+        if (machineProperty().getValue().getIndexFromRight()) {
             leftShift = bit.get();
         }
         else {
@@ -241,6 +213,14 @@ public class ConditionBit extends Module<ConditionBit> {
     }
 
     /**
+     * Set the value
+     * @param bitValue {@code 1} if {@code true}, {@code 0} otherwise.
+     */
+    public void set(boolean bitValue) {
+        this.set(bitValue ? 1 : 0);
+    }
+
+    /**
      * returns true if the bit has value 1
      * @return true if the bit has value 1
      */
@@ -249,7 +229,7 @@ public class ConditionBit extends Module<ConditionBit> {
         long registerValue = register.get().getValue();
         
         int leftShift;
-        if (machine.getIndexFromRight()) {
+        if (machineProperty().getValue().getIndexFromRight()) {
             leftShift = 64 - bit.get() - 1;
         }
         else {

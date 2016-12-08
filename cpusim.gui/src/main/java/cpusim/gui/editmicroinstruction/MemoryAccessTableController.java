@@ -1,25 +1,12 @@
-/**
- * Authoer: Jinghui Yu
- * Last editing date: 6/7/2013
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
- * which throws a ValidationException in lieu of returning a boolean value
- */
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
+import cpusim.model.microinstruction.IODirection;
 import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -28,8 +15,12 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the {@link MemoryAccess} command in the {@link EditMicroinstructionsController}.
+ *
+ * @since 2013-06-07
  */
 class MemoryAccessTableController
         extends MicroinstructionTableController<MemoryAccess> {
@@ -42,7 +33,7 @@ class MemoryAccessTableController
     final static String FX_ID = "memoryAccessTab";
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<MemoryAccess,String> direction;
+    private TableColumn<MemoryAccess, IODirection> direction;
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<MemoryAccess,RAM> memory;
@@ -76,18 +67,10 @@ class MemoryAccessTableController
 
         Callback<TableColumn<MemoryAccess,Register>,TableCell<MemoryAccess,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
-        Callback<TableColumn<MemoryAccess,String>,TableCell<MemoryAccess,String>> cellDircFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "read",
-                                "write"
-                        )
-                );
+                        machine.get().getRegisters());
         Callback<TableColumn<MemoryAccess,RAM>,TableCell<MemoryAccess,RAM>> cellRAMFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRAMs()
-                );
+                        machine.get().getModules(RAM.class));
 
         direction.setCellValueFactory(new PropertyValueFactory<>("direction"));
         memory.setCellValueFactory(new PropertyValueFactory<>("memory"));
@@ -95,7 +78,7 @@ class MemoryAccessTableController
         address.setCellValueFactory(new PropertyValueFactory<>("address"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        direction.setCellFactory(cellDircFactory);
+        direction.setCellFactory(new EnumCellFactory<>(IODirection.class));
         direction.setOnEditCommit(text -> text.getRowValue().setDirection(text.getNewValue()));
 
         memory.setCellFactory(cellRAMFactory);
@@ -117,14 +100,14 @@ class MemoryAccessTableController
     public MemoryAccess createInstance() {
         final Machine machine = this.machine.get();
         
-        Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
-        RAM ram = (machine.getModule(RAM.class).isEmpty() ? null : machine.getModule(RAM.class).get(0));
-        return new MemoryAccess("???", machine, "read", ram, r, r);
+        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+        RAM ram = (machine.getModules(RAM.class).isEmpty() ? null : machine.getModules(RAM.class).get(0));
+        return new MemoryAccess("???", UUID.randomUUID(), machine, IODirection.Read, ram, r, r);
     }
 
     @Override
     public boolean isNewButtonEnabled() {
-        return areRegistersAvailable() && !machine.get().getModule(RAM.class).isEmpty();
+        return areRegistersAvailable() && !machine.get().getModules(RAM.class).isEmpty();
     }
 
     @Override

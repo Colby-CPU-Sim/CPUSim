@@ -2688,7 +2688,7 @@ public class DesktopController implements Initializable
      */
     private void updateRamMenus() {
         ObservableList<RAM> rams = mediator.getMachine()
-                .getModule(RAM.class);
+                .getModules(RAM.class);
         saveRamMenu.getItems().clear();
         openRamMenu.getItems().clear();
 
@@ -2853,7 +2853,7 @@ public class DesktopController implements Initializable
         updateStyleOfTables();
 
         ObservableList<Register> registers = mediator
-                .getMachine().getModule(Register.class);
+                .getMachine().getModules(Register.class);
 
         RegisterTableController registerTableController =
                 new RegisterTableController(this, registers, "Registers");
@@ -2875,7 +2875,7 @@ public class DesktopController implements Initializable
         regSplitPane.getItems().add(registerTableRoot);
 
 
-        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModule(RegisterArray.class);
+        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModules(RegisterArray.class);
 
         Pane registerArrayTableRoot = null;
 
@@ -2884,7 +2884,7 @@ public class DesktopController implements Initializable
                 RegisterTableController registerArrayTableController = new
                         RegisterTableController(
                         this,
-                        registerArrays.get(i).registers(),
+                        registerArrays.get(i).getRegisters(),
                         registerArrays.get(i).getName());
                 FXMLLoader registerArrayFxmlLoader = FXMLLoaderFactory.fromController(registerArrayTableController, "RegisterTable" +
                         ".fxml");
@@ -2913,7 +2913,7 @@ public class DesktopController implements Initializable
         }
 
         ObservableList<RAM> rams = mediator.getMachine()
-                .getModule(RAM.class);
+                .getModules(RAM.class);
 
         if (!rams.isEmpty()) {
             ramVbox.getChildren().remove(noRAMLabel);
@@ -2986,7 +2986,7 @@ public class DesktopController implements Initializable
         }
         registerControllers.remove(1, registerControllers.size());
 
-        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModule(RegisterArray.class);
+        ObservableList<RegisterArray> registerArrays = mediator.getMachine().getModules(RegisterArray.class);
 
         Pane registerArrayTableRoot = null;
 
@@ -2995,7 +2995,7 @@ public class DesktopController implements Initializable
                 RegisterTableController registerArrayTableController = new
                         RegisterTableController(
                         this,
-                        registerArrays.get(i).registers(),
+                        registerArrays.get(i).getRegisters(),
                         registerArrays.get(i).getName());
                 FXMLLoader registerArrayFxmlLoader = FXMLLoaderFactory.fromController(registerArrayTableController,
                         "RegisterTable.fxml");
@@ -3022,7 +3022,7 @@ public class DesktopController implements Initializable
         }
 
         ramSplitPane.getItems().clear();
-        ObservableList<RAM> rams = mediator.getMachine().getModule(RAM.class);
+        ObservableList<RAM> rams = mediator.getMachine().getModules(RAM.class);
         ramControllers.clear();
 
         if (!rams.isEmpty()) {

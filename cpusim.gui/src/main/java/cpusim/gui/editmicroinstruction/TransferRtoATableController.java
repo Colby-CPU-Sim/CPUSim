@@ -25,6 +25,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the {@link TransferRtoA} command in the {@link EditMicroinstructionsController}.
  */
@@ -92,12 +94,11 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
         Callback<TableColumn<TransferRtoA,Register>,
                 TableCell<TransferRtoA,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters()
-                );
+                        machine.get().getRegisters());
         Callback<TableColumn<TransferRtoA,RegisterArray>,
                 TableCell<TransferRtoA,RegisterArray>> cellRegAFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getModule(RegisterArray.class));
+                        machine.get().getModules(RegisterArray.class));
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -145,18 +146,19 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
     @Override
     public TransferRtoA createInstance() {
         Machine machine = this.machine.get();
-        final RegisterArray a = (machine.getModule(RegisterArray.class).size() == 0 ? null :
-                machine.getModule(RegisterArray.class).get(0));
-        final Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new TransferRtoA("???", machine, r, 0, a, 0, 0, r,0, 0);
+        final RegisterArray a = (machine.getModules(RegisterArray.class).size() == 0 ? null :
+                machine.getModules(RegisterArray.class).get(0));
+        final Register r = (machine.getRegisters().size() == 0 ? null :
+                machine.getRegisters().get(0));
+        return new TransferRtoA("???", UUID.randomUUID(), machine, r, 0, a,
+                0, 0, r,0, 0);
     }
 
     @Override
     public boolean isNewButtonEnabled() {
         // Need at least one RegisterArray AND Register
-        return !machine.get().getModule(RegisterArray.class).isEmpty()
-                && !machine.get().getModule(Register.class).isEmpty();
+        return !machine.get().getModules(RegisterArray.class).isEmpty()
+                && !machine.get().getModules(Register.class).isEmpty();
     }
 
     @Override

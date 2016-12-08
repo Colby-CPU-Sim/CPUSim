@@ -123,7 +123,7 @@ public class EditFetchSequenceController implements Initializable {
             Outer: for (Class<? extends Microinstruction<?>> mc : Machine.getMicroClasses()) {
                 if (mc.getSimpleName().toLowerCase().equals(className)) {
                     // intelliJ says the following is an error, I have no idea why.
-                    for (Microinstruction<?> instr : mediator.getMachine().getMicrosUnsafe(mc)) {
+                    for (Microinstruction<?> instr : mediator.getMachine().getMicrosUnchecked(mc)) {
                         if (instr.getName().equals(microName)) {
                             micro = instr;
                             break Outer;
@@ -284,7 +284,7 @@ public class EditFetchSequenceController implements Initializable {
 
         for(Class<? extends Microinstruction<?>> microClass : Machine.getMicroClasses()){
             TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
-            for (Microinstruction<?> micro : mediator.getMachine().getMicrosUnsafe(microClass)){
+            for (Microinstruction<?> micro : mediator.getMachine().getMicrosUnchecked(microClass)){
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());
                 classNode.getChildren().add(microNode);
             }

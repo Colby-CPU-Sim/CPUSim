@@ -2,7 +2,7 @@ package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
 
 import java.util.UUID;
@@ -36,29 +36,10 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
                         int destStartBit,
                         int numBits){
         super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
-    
-    /**
-     * Constructor
-     * creates a new Transfer object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param source the register whose value is to be tested.
-     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be transfered.
-     * @param dest the destination register.
-     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
-     * @param numBits a non-negative integer indicating the number of bits to be tested.
-     */
-    public TransferRtoR(String name, Machine machine,
-                        Register source,
-                        int srcStartBit,
-                        Register dest,
-                        int destStartBit,
-                        int numBits){
-        this(name, IdentifiedObject.generateRandomID(), machine, source, srcStartBit, dest, destStartBit, numBits);
-    }
-    
+
     /**
      * Copy constructor
      * @param other copied instance
@@ -66,10 +47,12 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
     public TransferRtoR(TransferRtoR other) {
         super(other);
     }
-    
+
     @Override
-    public <U extends TransferRtoR> void copyTo(final U other) {
-        super.copyTo(other);
+    public TransferRtoR cloneFor(IdentifierMap oldToNew) {
+        return new TransferRtoR(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getSource()), getSrcStartBit(),
+                oldToNew.get(getDest()), getDestStartBit(), getNumBits());
     }
 
     /**
@@ -88,7 +71,7 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
         int destLeftShift;
         int srcRightShift;
         int srcLeftShift;
-        if (machine.getIndexFromRight()) {
+        if (getMachine().getIndexFromRight()) {
             destRightShift = destFullShift + destStartBit.get() + numBits.get();
             destLeftShift = dest.get().getWidth() - destStartBit.get();
             srcLeftShift = source.get().getWidth() - srcStartBit.get() - numBits.get();

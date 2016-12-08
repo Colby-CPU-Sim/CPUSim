@@ -31,6 +31,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the {@link TransferAtoR} command in the {@link EditMicroinstructionsController}.
  */
@@ -95,11 +97,11 @@ class TransferAtoRTableController
         
         Callback<TableColumn<TransferAtoR,Register>,
                 TableCell<TransferAtoR,Register>> cellRegFactory =
-                    _ignore -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
+                    _ignore -> new ComboBoxTableCell<>(machine.get().getRegisters());
         
         Callback<TableColumn<TransferAtoR,RegisterArray>,
                 TableCell<TransferAtoR,RegisterArray>> cellRegAFactory =
-                    _ignore -> new ComboBoxTableCell<>(machine.get().getModule(RegisterArray.class));
+                    _ignore -> new ComboBoxTableCell<>(machine.get().getModules(RegisterArray.class));
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));
@@ -141,17 +143,18 @@ class TransferAtoRTableController
     public TransferAtoR createInstance() {
         final Machine machine = this.machine.get();
         
-        RegisterArray a = (machine.getModule(RegisterArray.class).isEmpty() ? null :
-                machine.getModule(RegisterArray.class).get(0));
-        Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
-        return new TransferAtoR("???", machine, a, 0, r, 0, 0, r,0, 0);
+        RegisterArray a = (machine.getModules(RegisterArray.class).isEmpty() ? null :
+                machine.getModules(RegisterArray.class).get(0));
+        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+        return new TransferAtoR("???", UUID.randomUUID(), machine, a, 0,
+                r, 0, 0, r,0, 0);
     }
 
     @Override
     public boolean isNewButtonEnabled() {
         // Need at least one RegisterArray AND Register
-        return !machine.get().getModule(RegisterArray.class).isEmpty()
-                && !machine.get().getModule(Register.class).isEmpty();
+        return !machine.get().getModules(RegisterArray.class).isEmpty()
+                && !machine.get().getModules(Register.class).isEmpty();
     }
 
     @Override

@@ -82,7 +82,7 @@ package cpusim;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
@@ -165,21 +165,21 @@ public class Mediator {
      */
     public void addPropertyChangeListenerToAllModules(ChangeListener listener) {
         // FIXME Fix type safe data
-        ObservableList<Register> registerList = machine.get().getModule(Register.class);
+        ObservableList<Register> registerList = machine.get().getModules(Register.class);
         for (Register register : registerList) {
             register.valueProperty().removeListener(listener);
             //the preceding statement does nothing if the listener
             //is not currently a listener of the register
             register.valueProperty().addListener(listener);
         }
-        ObservableList<RegisterArray> arrays = machine.get().getModule(RegisterArray.class);
+        ObservableList<RegisterArray> arrays = machine.get().getModules(RegisterArray.class);
         for (RegisterArray array : arrays) {
             for (Register register : array) {
                 register.valueProperty().removeListener(listener);
                 register.valueProperty().addListener(listener);
             }
         }
-        ObservableList<RAM> rams = machine.get().getModule(RAM.class);
+        ObservableList<RAM> rams = machine.get().getModules(RAM.class);
         for (RAM ram : rams) {
             ram.dataProperty().removeListener(listener);
             ram.dataProperty().addListener(listener);
@@ -196,7 +196,7 @@ public class Mediator {
 
     public <U extends Module<U>> ObservableList<U> getModule(Class<U> moduleType) {
         final Machine machineObj = machine.get();
-        return machineObj.getModule(moduleType);
+        return machineObj.getModules(moduleType);
     }
 
     /**

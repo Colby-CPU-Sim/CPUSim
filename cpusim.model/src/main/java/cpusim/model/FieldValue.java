@@ -5,28 +5,29 @@
  */
 package cpusim.model;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.LegacyXMLSupported;
+import cpusim.model.util.MoreFXCollections;
+import cpusim.model.util.NamedObject;
+import cpusim.xml.HtmlEncoder;
+import javafx.beans.property.*;
+
+import javax.annotation.Generated;
+import java.util.Objects;
+import java.util.UUID;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Objects;
+public class FieldValue implements NamedObject, LegacyXMLSupported, MachineComponent {
 
-import javax.annotation.Generated;
-
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
-import cpusim.xml.HtmlEncoder;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-
-public class FieldValue implements NamedObject, LegacyXMLSupported
-{
-
+	private ReadOnlyObjectProperty<UUID> id;
 	private StringProperty name;
-	private long value;
+	private LongProperty value;
+
+	private final Machine machine;
 	
 	/**
 	 * Creates a new Field Value with specified name
@@ -35,10 +36,13 @@ public class FieldValue implements NamedObject, LegacyXMLSupported
 	 * @param name - Name of new FieldValue.
 	 * @param value - long value of new FieldValue.
 	 */
-	public FieldValue(String name, long value) {
+	public FieldValue(String name, UUID id, Machine machine, long value) {
 		checkArgument(!Strings.isNullOrEmpty(name));
+
 		this.name = new SimpleStringProperty(this, "name", name);
-		this.value = value;
+		this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
+		this.machine = machine;
+		this.value = new SimpleLongProperty(this, "value", value);
     }
 	
 	/**
@@ -48,12 +52,32 @@ public class FieldValue implements NamedObject, LegacyXMLSupported
 	 * @throws NullPointerException if <code>null</code> argument
 	 */
 	public FieldValue(final FieldValue other) {
-		this(checkNotNull(other).name.getValue(), other.value);
+		this(checkNotNull(other).getName(), UUID.randomUUID(), other.machine, other.value.get());
     }
 
-	@Override
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getChildrenComponents() {
+        return new ReadOnlySetWrapper<>(this, "childrenComponents", MoreFXCollections.emptyObservableSet());
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return new ReadOnlySetWrapper<>(this, "dependantComponents", MoreFXCollections.emptyObservableSet());
+    }
+
+    @Override
 	public StringProperty nameProperty() {
 		return name;
+	}
+
+	@Override
+	public ReadOnlyProperty<UUID> idProperty() {
+		return id;
+	}
+
+	@Override
+	public ReadOnlyObjectProperty<Machine> machineProperty() {
+		return new ReadOnlyObjectWrapper<>(this, "machine", machine);
 	}
 
 	/**
@@ -61,15 +85,26 @@ public class FieldValue implements NamedObject, LegacyXMLSupported
 	 * @return the value
 	 */
 	public long getValue() {
-		return value;
+		return value.get();
 	}
 
 	/**
 	 * @param value the value to set
 	 */
 	public void setValue(long value) {
-		this.value = value;
+		this.value.setValue(value);
 	}
+
+	public LongProperty valueProperty() {
+		return value;
+	}
+
+	@Override
+	public FieldValue cloneFor(MachineComponent.IdentifierMap oldToNew) {
+		return new FieldValue(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), getValue());
+	}
+
+
 
 	/**
      * Gives the XML description of this FieldValue.

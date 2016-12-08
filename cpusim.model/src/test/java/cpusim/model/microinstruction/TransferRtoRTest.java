@@ -11,6 +11,8 @@ import cpusim.model.module.Register;
 
 import org.junit.Test;
 
+import java.util.UUID;
+
 /**
  * 
  * @author Kevin Brightwell
@@ -29,13 +31,13 @@ public class TransferRtoRTest {
 
 		final Machine testMachine = new Machine("test");
 
-		Register src = new Register("src", testMachine, 8, SOURCE_VALUE, Register.Access.readOnly());
+		Register src = new Register("src", UUID.randomUUID(), testMachine, 8, SOURCE_VALUE, Register.Access.readOnly());
         assertEquals(SOURCE_VALUE, src.getValue());
         
-        Register dst = new Register("dest", testMachine, 8, DEST_VALUE, Register.Access.readWrite());
+        Register dst = new Register("dest", UUID.randomUUID(), testMachine, 8, DEST_VALUE, Register.Access.readWrite());
         assertEquals(DEST_VALUE, dst.getValue());
 
-        TransferRtoR micro = new TransferRtoR("xfer", testMachine, src, 4, dst, 1, 4);
+        TransferRtoR micro = new TransferRtoR("xfer", UUID.randomUUID(), testMachine, src, 4, dst, 1, 4);
 
         // dest = (SOURCE_VALUE >> 4) << 1
         micro.execute();

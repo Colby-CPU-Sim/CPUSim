@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
@@ -15,6 +16,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the arithmetic command in the EditMicroDialog.
  *
@@ -28,22 +31,22 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
     static final String FX_ID = "arithmeticTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,Register> source1;
+    private TableColumn<Arithmetic, Register> source1;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,Register> source2;
+    private TableColumn<Arithmetic, Register> source2;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,Register> destination;
+    private TableColumn<Arithmetic, Register> destination;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,String> type;
+    private TableColumn<Arithmetic, Arithmetic.Type> type;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,ConditionBit> overflowBit;
+    private TableColumn<Arithmetic, ConditionBit> overflowBit;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic,ConditionBit> carryBit;
+    private TableColumn<Arithmetic, ConditionBit> carryBit;
 
     /**
      * Constructor
@@ -74,23 +77,12 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
         overflowBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         carryBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<Arithmetic,String>,TableCell<Arithmetic,String>> cellTypeFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "ADD",
-                                "SUBTRACT",
-                                "MULTIPLY",
-                                "DIVIDE"
-                        )
-                );
-
 
         Callback<TableColumn<Arithmetic,Register>,TableCell<Arithmetic,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
 
-        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.get().getModule(ConditionBit.class));
+        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList((ConditionBit) null);
+        condBit.addAll(machine.get().getModules(ConditionBit.class));
         Callback<TableColumn<Arithmetic,ConditionBit>,TableCell<Arithmetic,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
 
@@ -102,14 +94,14 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
         carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
 
         //Add for EdiCell of each field, in String or in Integer
-        type.setCellFactory(cellTypeFactory);
-        type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
+        type.setCellFactory(new EnumCellFactory<>(Arithmetic.Type.class));
+        type.setOnEditCommit(text -> text.getRowValue().setOperation(text.getNewValue()));
 
         source1.setCellFactory(cellRegFactory);
-        source1.setOnEditCommit(text -> text.getRowValue().setSource1(text.getNewValue()));
+        source1.setOnEditCommit(text -> text.getRowValue().setLhs(text.getNewValue()));
 
         source2.setCellFactory(cellRegFactory);
-        source2.setOnEditCommit(text -> text.getRowValue().setSource2(text.getNewValue()));
+        source2.setOnEditCommit(text -> text.getRowValue().setRhs(text.getNewValue()));
 
         destination.setCellFactory(cellRegFactory);
         destination.setOnEditCommit(text -> text.getRowValue().setDestination(text.getNewValue()));
@@ -133,8 +125,9 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
     @Override
     public Arithmetic createInstance() {
         final Machine machine = this.machine.get();
-        final Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
-        return new Arithmetic("???", machine, "ADD", r, r, r, ConditionBit.none(), ConditionBit.none());
+        final Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+        return new Arithmetic("???", UUID.randomUUID(), machine, Arithmetic.Type.ADD, r, r, r,
+                null, null, null);
     }
 
     /**

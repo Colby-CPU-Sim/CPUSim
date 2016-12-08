@@ -17,14 +17,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // the package in which our file resides
 
-package cpusim.model;
+package cpusim.model.module;
 
 
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validatable;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.Machine;
+import cpusim.model.util.*;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
@@ -38,29 +36,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 // the Module class
 
 public abstract class Module<T extends Module<T>>
-        implements IdentifiedObject, NamedObject, LegacyXMLSupported, HTMLEncodable, Copyable<T>, Validatable
+        implements IdentifiedObject,
+                NamedObject,
+                LegacyXMLSupported,
+                HTMLEncodable,
+                Validatable,
+                MachineComponent,
+                Copyable<T>
 {
-    private SimpleStringProperty name;	//name of the module
-    private ObjectProperty<UUID> id; //unique ID used when saving in XML
-    protected Machine machine; //machine that holds the module
+    private StringProperty name;	//name of the module
+    private ReadOnlyObjectProperty<UUID> id; //unique ID used when saving in XML
+    private final Machine machine; //machine that holds the module
 
     //------------------------------
     // constructor
     
     protected Module(String name, UUID id, Machine machine) {
-        this.name = new SimpleStringProperty(name);
-        this.id = new SimpleObjectProperty<>(checkNotNull(id));
+        this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
+        this.id = new ReadOnlyObjectWrapper<>(this, "id", checkNotNull(id));
 
         this.machine = machine;
-    }
-
-    //------------------------------
-    //getters and setters to make it a Bean
-
-    @Override
-    public void setName(String newName)
-    {
-    	name.set(newName);
     }
 
     @Override
@@ -73,16 +68,16 @@ public abstract class Module<T extends Module<T>>
         return id;
     }
 
+    @Override
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
+        return new ReadOnlyObjectWrapper<>(this, "machine", checkNotNull(machine));
+    }
+
     public String getHTMLName()
     {
         return HtmlEncoder.sEncode(getName());
     }
 
-    public String toString()
-    {
-        return name.get();
-    }
-    
     @Override
     public void validate() {
         NamedObject.super.validate();

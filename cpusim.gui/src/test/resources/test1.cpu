@@ -21,7 +21,7 @@
 <!ELEMENT Increment EMPTY>
 <!ATTLIST Increment name CDATA #REQUIRED register IDREF #REQUIRED overflowBit IDREF #IMPLIED delta CDATA #REQUIRED id ID #REQUIRED>
 <!ELEMENT Arithmetic EMPTY>
-<!ATTLIST Arithmetic name CDATA #REQUIRED type (ADD|SUBTRACT|MULTIPLY|DIVIDE) #REQUIRED source1 IDREF #REQUIRED source2 IDREF #REQUIRED destination IDREF #REQUIRED overflowBit IDREF #IMPLIED  carryBit IDREF #IMPLIED  id ID #REQUIRED>
+<!ATTLIST Arithmetic name CDATA #REQUIRED type (ADD|SUBTRACT|MULTIPLY|DIVIDE) #REQUIRED lhs IDREF #REQUIRED rhs IDREF #REQUIRED destination IDREF #REQUIRED overflowBit IDREF #IMPLIED  carryBit IDREF #IMPLIED  id ID #REQUIRED>
 <!ELEMENT TransferRtoR EMPTY>
 <!ATTLIST TransferRtoR name CDATA #REQUIRED source IDREF #REQUIRED srcStartBit CDATA #REQUIRED dest IDREF #REQUIRED destStartBit CDATA #REQUIRED numBits CDATA #REQUIRED id ID #REQUIRED>
 <!ELEMENT TransferRtoA EMPTY>
@@ -33,7 +33,7 @@
 <!ELEMENT Branch EMPTY>
 <!ATTLIST Branch name CDATA #REQUIRED amount CDATA #REQUIRED id ID #REQUIRED>
 <!ELEMENT Logical EMPTY>
-<!ATTLIST Logical name CDATA #REQUIRED source1 IDREF #REQUIRED source2 IDREF #REQUIRED destination IDREF #REQUIRED type (AND | OR | NAND | NOR | XOR | NOT) #REQUIRED id ID #REQUIRED>
+<!ATTLIST Logical name CDATA #REQUIRED lhs IDREF #REQUIRED rhs IDREF #REQUIRED destination IDREF #REQUIRED type (AND | OR | NAND | NOR | XOR | NOT) #REQUIRED id ID #REQUIRED>
 <!ELEMENT Set EMPTY>
 <!ATTLIST Set name CDATA #REQUIRED register IDREF #REQUIRED start CDATA #REQUIRED numBits CDATA #REQUIRED value CDATA #REQUIRED id ID #REQUIRED>
 <!ELEMENT Test EMPTY >
@@ -173,10 +173,10 @@
 	<!-- none -->
 
 	<!--............. arithmetic ....................-->
-	<Arithmetic name="buf1*buf2-&gt;buf1" type="MULTIPLY" source1="module.Register43b71a61" source2="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic3948166e" />
-	<Arithmetic name="buf1+buf2-&gt;buf1" type="ADD" source1="module.Register43b71a61" source2="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic2bb8ad23" />
-	<Arithmetic name="buf1-buf2-&gt;buf1" type="SUBTRACT" source1="module.Register43b71a61" source2="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic696eeb41" />
-	<Arithmetic name="buf1/buf2-&gt;buf1" type="DIVIDE" source1="module.Register43b71a61" source2="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic71172e7a" />
+	<Arithmetic name="buf1*buf2-&gt;buf1" type="MULTIPLY" lhs="module.Register43b71a61" rhs="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic3948166e" />
+	<Arithmetic name="buf1+buf2-&gt;buf1" type="ADD" lhs="module.Register43b71a61" rhs="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic2bb8ad23" />
+	<Arithmetic name="buf1-buf2-&gt;buf1" type="SUBTRACT" lhs="module.Register43b71a61" rhs="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic696eeb41" />
+	<Arithmetic name="buf1/buf2-&gt;buf1" type="DIVIDE" lhs="module.Register43b71a61" rhs="module.Register2a24f902" destination="module.Register43b71a61" overflowBit="module.ConditionBit44fe9034" id="microinstruction.Arithmetic71172e7a" />
 
 	<!--............. branch ........................-->
 	<!-- none -->

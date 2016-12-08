@@ -37,6 +37,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-multibindings
     compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.1.0'
 
+    // https://github.com/TomasMikula/EasyBind
+    compile group: 'org.fxmisc.easybind', name: 'easybind', version: '1.0.4-SNAPSHOT'
+
 //	compile group: 'org.eclipse.xtend', name: 'org.eclipse.xtend.lib', version: '${xtextVersion}'
 //
 //	// https://mvnrepository.com/artifact/com.github.oehme.xtend/xtend-contrib
@@ -68,12 +71,5 @@ sourceSets {
 
 
 buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    
-//    dependencies {
-//        classpath 'org.xtext:xtext-gradle-plugin:1.0.2'
-//    }
+
 }

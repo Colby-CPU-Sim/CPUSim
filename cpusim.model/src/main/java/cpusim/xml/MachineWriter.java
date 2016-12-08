@@ -33,7 +33,7 @@ import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.FileChannel;

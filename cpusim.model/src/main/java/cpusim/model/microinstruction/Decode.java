@@ -3,17 +3,21 @@ package cpusim.model.microinstruction;
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Module;
+import cpusim.model.module.ControlUnit;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.MoreBindings;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlySetProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Decodes an instruction and stores it in a {@link Register}.
@@ -21,9 +25,15 @@ import static com.google.common.base.Preconditions.*;
  * @since 2013-06-06
  */
 public class Decode extends Microinstruction<Decode> {
-    
-    private SimpleObjectProperty<Register> ir;
-    
+
+    @DependantComponent
+    private final ReadOnlyObjectProperty<ControlUnit> controlUnit;
+
+    @DependantComponent
+    private final ObjectProperty<Register> ir;
+
+    private final ReadOnlySetProperty<MachineComponent> dependants;
+
     /**
      * Constructor
      * creates a new Branch object with input values.
@@ -37,7 +47,11 @@ public class Decode extends Microinstruction<Decode> {
                   Machine machine,
                   Register ir){
         super(name, id, machine);
-        this.ir = new SimpleObjectProperty<>(ir);
+        this.ir = new SimpleObjectProperty<>(this, "ir", ir);
+
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+
+        this.dependants = MachineComponent.collectDependancies(this);
     }
     
     /**
@@ -45,7 +59,12 @@ public class Decode extends Microinstruction<Decode> {
      * @param other Instance to copy from
      */
     public Decode(Decode other) {
-        this(other.getName(), IdentifiedObject.generateRandomID(), other.machine, other.getIr());
+        this(other.getName(), UUID.randomUUID(), other.getMachine(), other.getIr());
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependants;
     }
 
     /**
@@ -75,7 +94,7 @@ public class Decode extends Microinstruction<Decode> {
      */
     @Override
     public void execute() {
-        List<MachineInstruction> instructions = machine.getInstructions();
+        List<MachineInstruction> instructions = getMachine().getInstructions();
         int width = ir.get().getWidth();
         long value = ir.get().getValue();
         for (int i = 1; i <= width; i++) {
@@ -86,8 +105,7 @@ public class Decode extends Microinstruction<Decode> {
             for (MachineInstruction instr : instructions) {
                 if (opcode == instr.getOpcode() &&
                         i == instr.getInstructionFields().get(0).getNumBits()) {
-                    machine.getControlUnit().setMicroIndex(0);
-                    machine.getControlUnit().setCurrentInstruction(instr);
+                    controlUnit.getValue().setCurrentInstruction(instr);
                     return;
                 }
             }
@@ -105,15 +123,20 @@ public class Decode extends Microinstruction<Decode> {
             throw new ValidationException("No IR register set for Decode instruction, " + getName());
         }
     }
-    
+
     @Override
-    public <U extends Decode> void copyTo(final U other) {
+    public Decode cloneFor(IdentifierMap oldToNew) {
+        return new Decode(getName(), UUID.randomUUID(), getMachine(), oldToNew.get(getIr()));
+    }
+
+    @Override
+    public <U extends Decode> void copyTo(U other) {
         checkNotNull(other);
-        
+
         other.setName(getName());
         other.setIr(getIr());
     }
-    
+
     @Override
     public String getXMLDescription(String indent) {
         return indent + "<Decode name=\"" + getHTMLName() +

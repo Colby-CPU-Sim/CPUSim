@@ -75,11 +75,9 @@ public class RegistersTableController extends ModuleTableController<Register> {
 
     /**
      * Constructor
-     * @param mediator holds the machine and information needed
      */
-
-    RegistersTableController(Mediator mediator){
-        super(mediator, "RegistersTable.fxml", Register.class);
+    RegistersTableController() {
+        super("RegistersTable.fxml", Register.class);
     
         loadFXML();
     }
@@ -153,7 +151,11 @@ public class RegistersTableController extends ModuleTableController<Register> {
     void setConditionBitController(ConditionBitTableController ctrl) {
         bitController = checkNotNull(ctrl);
     }
-    
+
+    protected ConditionBitTableController getBitController() {
+        return bitController;
+    }
+
     /**
      * Searches through the current {@link #getItems()} to see if the {@code original} {@link Register} was cloned.
      * @param original The {@link Register} from the underlying {@link cpusim.model.Machine}.
@@ -198,7 +200,7 @@ public class RegistersTableController extends ModuleTableController<Register> {
         // convert the array to an array of Registers
 
         List<Register> registers = getItems();
-        //build up a HashMap of old registers and new widths
+        //buildSet up a HashMap of old registers and new widths
         Map<Register, Integer> table = registers.stream()
                 .collect(Collectors.toMap(Function.identity(), Register::getWidth));
         

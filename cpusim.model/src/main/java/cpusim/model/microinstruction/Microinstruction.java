@@ -1,17 +1,15 @@
 package cpusim.model.microinstruction;
 
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
+import cpusim.model.util.*;
 import cpusim.model.Machine;
-import cpusim.model.Module;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validatable;
+import cpusim.model.module.Module;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 
 import java.util.UUID;
 
@@ -26,7 +24,14 @@ import static com.google.common.base.Preconditions.*;
  * @since 1999-06-01
  */
 public abstract class Microinstruction<T extends Microinstruction<T>>
-        implements IdentifiedObject, NamedObject, LegacyXMLSupported, HTMLEncodable, Validatable, Copyable<T>
+        implements IdentifiedObject,
+                NamedObject,
+                LegacyXMLSupported,
+                HTMLEncodable,
+                Validatable,
+                ReadOnlyMachineBound,
+                MachineComponent,
+                Copyable<T>
 {
 	
     // name of the microinstruction
@@ -39,7 +44,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
 
     private final ReadOnlyObjectProperty<UUID> uuid;
     
-    protected Machine machine;
+    private final Machine machine;
     
 
     //------------------------------
@@ -50,8 +55,8 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
         
         this.name = new SimpleStringProperty(this, "name", name);
         this.cycles = new SimpleIntegerProperty(this, "cycleCount", 1);
-        this.machine = machine;
-        this.uuid = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
+        this.machine = checkNotNull(machine);
+        this.uuid = new ReadOnlyObjectWrapper<>(this, "id", checkNotNull(id));
     }
     
     /**
@@ -74,6 +79,16 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
         return uuid;
     }
 
+    @Override
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
+        return new ReadOnlyObjectWrapper<>(this, "machine", machine);
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getChildrenComponents() {
+        return new ReadOnlySetWrapper<>(this, "childrenComponents", MoreFXCollections.emptyObservableSet());
+    }
+
     public int getCycleCount() {
         return cycles.get();
     }
@@ -87,9 +102,15 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
         return HtmlEncoder.sEncode(getName());
     }
 
-    public String toString()
-    {
-        return name.get();
+    protected final MoreObjects.ToStringHelper toStringHelper() {
+	    return MoreObjects.toStringHelper(getClass())
+                .addValue(getID())
+                .add("name", getName());
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
     }
 
     //------------------------------
@@ -112,5 +133,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     public void validate() {
         NamedObject.super.validate();
     }
-    
+
+    @Override
+    public abstract T cloneFor(MachineComponent.IdentifierMap oldToNew);
 }  // end of class Microinstruction

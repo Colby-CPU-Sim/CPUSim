@@ -7,8 +7,8 @@
     <columns>
         <TableColumn text="name" fx:id="name"/>
         <TableColumn text="type" fx:id="type"/>
-        <TableColumn text="source1" fx:id="source1"/>
-        <TableColumn text="source2" fx:id="source2"/>
+        <TableColumn text="lhs" fx:id="lhs"/>
+        <TableColumn text="rhs" fx:id="rhs"/>
         <TableColumn text="destination" fx:id="destination"/>
         <TableColumn text="overflowBit" fx:id="overflowBit"/>
         <TableColumn text="carryBit" fx:id="carryBit"/>

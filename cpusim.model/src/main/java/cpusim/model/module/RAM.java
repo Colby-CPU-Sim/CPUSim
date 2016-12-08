@@ -21,12 +21,11 @@ package cpusim.model.module;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
-import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.util.LoadException;
 import cpusim.util.SourceLine;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,7 +33,7 @@ import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class models RAM.  All addressable units ("cells") have the same
@@ -45,12 +44,13 @@ public class RAM extends Module<RAM> {
     /** the data stored in the ram cells */
     private ObservableList<RAMLocation> data;
     /** data value that is changed in debug mode and used for backupManager only */
-    private SimpleListProperty<RAMLocation> changedData;
+    private ListProperty<RAMLocation> changedData;
     /** number of bits per cell.  The first 64-cellSize bits of each data value
      * will be all 0's. That is, the value is not stored in 64-bit 2's complement. */
-    private SimpleIntegerProperty cellSize;
+    private IntegerProperty cellSize;
     /** the number of cells in ram */
-    private SimpleIntegerProperty length;
+    private ReadOnlyIntegerProperty length;
+
     /** set to true when CPU Sim is running in debug mode */
     private boolean haltAtBreaks;
     /** all 0s except the rightmost cellSize bits, which are 1s. */
@@ -67,7 +67,7 @@ public class RAM extends Module<RAM> {
     public RAM(String name, UUID id, Machine machine, int length, int cellSize) {
         super(name, id, machine);
         this.cellSize = new SimpleIntegerProperty(cellSize);
-        this.length = new SimpleIntegerProperty(length);
+
         this.data = FXCollections.observableArrayList();
         this.changedData = new SimpleListProperty<>(this,"RAM data",null);
         for (int i=0; i<length; i++){
@@ -78,20 +78,11 @@ public class RAM extends Module<RAM> {
         for (int i = 0; i < cellSize; i++) {
             cellMask = (cellMask << 1) + 1;
         }
+
+        IntegerProperty lengthProperty = new SimpleIntegerProperty(this, "length", length);
+        lengthProperty.bind(Bindings.size(this.data));
+        this.length = lengthProperty;
     }
-    
-    /**
-     * Constructor
-     * @param name name of the ram
-     * @param length a positive integer that specifies the number
-     *               of cells in the RAM.
-     * @param cellSize the number of bits per cell. This must be a positive
-     *                 integer up to 64.
-     */
-    public RAM(String name, Machine machine, int length, int cellSize) {
-        this(name, IdentifiedObject.generateRandomID(), machine, length, cellSize);
-    }
-    
 
     //------------------------
     // utility methods
@@ -325,7 +316,7 @@ public class RAM extends Module<RAM> {
     }
 
     public int getLength() {
-        return data.size();
+        return length.get();
     }
 
     /**
@@ -333,7 +324,6 @@ public class RAM extends Module<RAM> {
      * @param newLength new length of the data
      */
     public void setLength(int newLength) {
-        length.set(newLength);
         int oldLength = data.size();
         if (newLength == oldLength)
             return;  //no changes need to be made
@@ -344,12 +334,12 @@ public class RAM extends Module<RAM> {
                 data.add(new RAMLocation(i,0,this,false,"",null));
             }
         else { //new length is shorter so remove extra RAMLocations
-            data.remove(newLength,oldLength);
+            data.remove(newLength, oldLength);
         }
     }
 
     public ReadOnlyIntegerProperty lengthProperty() {
-        return cellSize;
+        return length;
     }
 
     /**
@@ -418,17 +408,20 @@ public class RAM extends Module<RAM> {
         }
     }
 
-    /**
-     * copies the data from the current module to a specific module
-     * @param newRAM the micro instruction that will be updated
-     */
+    @Override
+    public RAM cloneFor(IdentifierMap oldToNew) {
+        return new RAM(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), getLength(), getCellSize());
+    }
+
     @Override
     public void copyTo(RAM newRAM) {
         checkNotNull(newRAM);
-        
+
         newRAM.setName(getName());
         newRAM.setLength(getLength());
         newRAM.setCellSize(getCellSize());
+
+        // FIXME Data copy?
     }
 
     /**

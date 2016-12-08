@@ -11,12 +11,13 @@ import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
-import cpusim.gui.util.MachineBound;
+import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.RAM;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -36,7 +37,7 @@ import static com.google.common.base.Preconditions.*;
  * This class is the controller for the dialog box that is used for
  * editing the properties of each register in a register array.
  */
-public class EditModulesController extends BorderPane implements DialogButtonController.InteractionHandler, MachineBound {
+public final class EditModulesController extends BorderPane implements DialogButtonController.InteractionHandler, ReadOnlyMachineBound {
     
     private final Mediator mediator;
     private final ObjectProperty<Machine> machine;
@@ -60,8 +61,8 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
         
         this.desktop = desktop;
 
-        registersTableController = new RegistersTableController(mediator);
-        registerArrayTableController = new RegisterArrayTableController(mediator, registersTableController);
+        registersTableController = new RegistersTableController();
+        registerArrayTableController = new RegisterArrayTableController(registersTableController);
         conditionBitTableController = new ConditionBitTableController(
                 mediator,
                 registersTableController,
@@ -70,7 +71,7 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
         registersTableController.setConditionBitController(conditionBitTableController);
         registerArrayTableController.setConditionBitController(conditionBitTableController);
         
-        ramsTableController = new RAMsTableController(mediator);
+        ramsTableController = new RAMsTableController();
     }
 
     @FXML
@@ -141,7 +142,7 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
         
         final Machine machine = this.machine.get();
 
-        List<RAM> rams = machine.getModule(RAM.class);
+        List<RAM> rams = machine.getModules(RAM.class);
         if (!rams.contains(machine.getCodeStore())) {
             //the code store was deleted so set a different
             //RAM to be the code store
@@ -181,7 +182,7 @@ public class EditModulesController extends BorderPane implements DialogButtonCon
     }
     
     @Override
-    public ObjectProperty<Machine> machineProperty() {
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
         return machine;
     }
 

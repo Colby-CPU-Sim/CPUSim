@@ -2,8 +2,11 @@ package cpusim.gui.util;
 
 import com.google.common.base.Strings;
 import cpusim.model.Machine;
+import cpusim.model.util.MachineBound;
+import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.microinstruction.Microinstruction;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

@@ -1,7 +1,8 @@
 package cpusim.gui.util;
 
 import cpusim.model.Machine;
-import cpusim.model.util.Validatable;
+import cpusim.model.util.MachineBound;
+import cpusim.model.util.ReadOnlyMachineBound;
 
 /**
  * Designates that a controller modifies an underlying {@link cpusim.model.Machine}.

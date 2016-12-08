@@ -17,6 +17,10 @@ subprojects {
     repositories {
         mavenCentral()
         jcenter()
+
+        maven { // SonaType
+            url "https://oss.sonatype.org/content/repositories/snapshots"
+        }
     }
 
     apply plugin: 'java'

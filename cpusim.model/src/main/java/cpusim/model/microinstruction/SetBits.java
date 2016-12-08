@@ -1,18 +1,16 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The Set microinstruction allows the computer to set the contents
@@ -20,12 +18,16 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2013-06-07
  */
-public class CpusimSet extends Microinstruction<CpusimSet> {
+public class SetBits extends Microinstruction<SetBits> {
 
-    private SimpleObjectProperty<Register> register;
-    private SimpleIntegerProperty start;
-    private SimpleIntegerProperty numBits;
-    private SimpleLongProperty value;
+    @DependantComponent
+    private final ObjectProperty<Register> register;
+
+    private final IntegerProperty start;
+    private final IntegerProperty numBits;
+    private final LongProperty value;
+
+    private final ReadOnlySetProperty<MachineComponent> dependencies;
 
     /**
      * Constructor
@@ -38,44 +40,21 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
      * @param numBits the number of consecutive bits in the register to be set.
      * @param value the base-10 value to which the bits are to be set.
      */
-    public CpusimSet(String name, Machine machine,
-                     Register register,
-                     int start,
-                     int numBits,
-                     long value){
-		this(name,
-                IdentifiedObject.generateRandomID(),
-                machine,
-                register,
-                start,
-                numBits,
-                value);
-    }
-    
-    /**
-     * Constructor
-     * creates a new Set object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param register the register whose bits are to be set.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param start the leftmost or rightmost bit of the register that is to be set.
-     * @param numBits the number of consecutive bits in the register to be set.
-     * @param value the base-10 value to which the bits are to be set.
-     */
-    public CpusimSet(String name,
-                     UUID id,
-                     Machine machine,
-                     Register register,
-                     int start,
-                     int numBits,
-                     long value){
+    public SetBits(String name,
+                   UUID id,
+                   Machine machine,
+                   Register register,
+                   int start,
+                   int numBits,
+                   long value){
         super(name, id, machine);
         
         this.register = new SimpleObjectProperty<>(register);
         this.start = new SimpleIntegerProperty(start);
         this.numBits = new SimpleIntegerProperty(numBits);
         this.value = new SimpleLongProperty(value);
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
 
     
@@ -85,8 +64,8 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
      * 
      * @throws NullPointerException if <code>other</code> is <code>null</code>
      */
-    public CpusimSet(final CpusimSet other) {
-    	this(checkNotNull(other).getName(), other.machine, other.getRegister(), 
+    public SetBits(final SetBits other) {
+    	this(checkNotNull(other).getName(), UUID.randomUUID(), other.getMachine(), other.getRegister(),
     			other.getStart(), other.getNumBits(), other.getValue());
     }
 
@@ -106,6 +85,10 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
         register.set(newRegister);
     }
 
+    public ObjectProperty<Register> registerProperty() {
+        return register;
+    }
+
     /**
      * returns the index of the start bit of the microinstruction.
      * @return the integer value of the index.
@@ -122,7 +105,11 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
     public void setStart(int newStart){
         start.set(newStart);
     }
-    
+
+    public IntegerProperty startProperty() {
+        return start;
+    }
+
     /**
      * returns the number of bits of the value.
      * @return the integer value of the number of bits.
@@ -139,6 +126,10 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
         numBits.set(newNumbits);
     }
 
+    public IntegerProperty numBitsProperty() {
+        return numBits;
+    }
+
     /**
      * returns the fixed value stored in the set microinstruction.
      * @return the integer value of the field.
@@ -153,6 +144,10 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
      */
     public void setValue(final long newValue){
         value.set(newValue);
+    }
+
+    public LongProperty valueProperty() {
+        return value;
     }
     
     /**
@@ -174,7 +169,7 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
         int numBits = this.numBits.get();
         int startBits = this.start.get();
         
-        if (!machine.getIndexFromRight()){
+        if (!getMachine().getIndexFromRight()){
             rightOffsetShift = 64 - startBits; 
             leftOffsetShift = startBits + numBits;
             valueRightShift = startBits;
@@ -207,14 +202,22 @@ public class CpusimSet extends Microinstruction<CpusimSet> {
     }
 
     @Override
-    public void copyTo(CpusimSet oldMicro){
-    	checkNotNull(oldMicro);
-    	
-    	oldMicro.setName(getName());
-    	oldMicro.setRegister(getRegister());
-    	oldMicro.setStart(getStart());
-    	oldMicro.setNumBits(getNumBits());
-    	oldMicro.setValue(getValue());
+    public SetBits cloneFor(IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        return new SetBits(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getRegister()), getStart(), getNumBits(), getValue());
+    }
+
+    @Override
+    public <U extends SetBits> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setRegister(getRegister());
+        other.setStart(getStart());
+        other.setNumBits(getNumBits());
+        other.setValue(getValue());
     }
 
     /**

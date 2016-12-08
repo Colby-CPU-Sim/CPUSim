@@ -1,18 +1,15 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.ControlUnit;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.MoreBindings;
 import cpusim.model.util.ValidationException;
-import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
-import java.util.function.BiPredicate;
 
 import static com.google.common.base.Preconditions.*;
 
@@ -26,34 +23,41 @@ public class Test extends Microinstruction<Test> {
 	
 	public enum Operation {
 		
-		EQ(ArchValue::equals),
+		EQ((u, s, check) -> u == check || s == check),
+		NE((u, s, check) -> u != check || s != check),
+		LT((_u, s, check) -> s < check),
+		LE((_u, s, check) -> s <= check),
+		GT((_u, s, check) -> s > check),
+		GE((_u, s, check) -> s <= check);
 		
-		NE(((BiPredicate<ArchValue, ArchValue>)ArchValue::equals).negate()),
-		LT(ArchValue::lt),
-		LE(ArchValue::lte),
-		GT(ArchValue::gt),
-		GE(ArchValue::gte);
+		private final BiLongPredicate checkFunc;
 		
-		private final BiPredicate<ArchValue, ArchValue> checkFunc;
-		
-		private Operation(BiPredicate<ArchValue, ArchValue> checkFunc) {
+		Operation(BiLongPredicate checkFunc) {
 			this.checkFunc = checkNotNull(checkFunc);
 		}
 		
-		boolean check(long unsigned, long signed, ArchValue toCheck) {
-			checkNotNull(toCheck);
-			
-			return checkFunc.test(ArchType.Bit.of(unsigned), toCheck);
+		boolean check(long unsigned, long signed, long toCheck) {
+			return checkFunc.test(unsigned, signed, toCheck);
 		}
+
+		private interface BiLongPredicate {
+		    boolean test(long unsigned, long signed, long toCheck);
+        }
 	}
-	
-    private final SimpleObjectProperty<Register> register;
-    private final SimpleIntegerProperty start;
-    private final SimpleIntegerProperty numBits;
+
+	@DependantComponent
+    private final ObjectProperty<Register> register;
+    private final IntegerProperty start;
+    private final IntegerProperty numBits;
     
-    private final SimpleObjectProperty<Operation> comparison;
-    private final SimpleLongProperty value;
-    private final SimpleIntegerProperty omission;
+    private final ObjectProperty<Operation> comparison;
+    private final LongProperty value;
+    private final IntegerProperty omission;
+
+    @DependantComponent
+    private final ReadOnlyObjectProperty<ControlUnit> controlUnit;
+
+    private final ReadOnlySetProperty<MachineComponent> dependencies;
     
     /**
      * Constructor
@@ -84,6 +88,10 @@ public class Test extends Microinstruction<Test> {
         this.comparison = new SimpleObjectProperty<>(this, "comparison", comparison);
         this.value = new SimpleLongProperty(this, "value", value);
         this.omission = new SimpleIntegerProperty(this, "omission", omission);
+
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
     
     /**
@@ -93,7 +101,7 @@ public class Test extends Microinstruction<Test> {
      * @param other Instance to copy
      */
     public Test(Test other) {
-        this(other.getName(), IdentifiedObject.generateRandomID(), other.machine,
+        this(other.getName(), UUID.randomUUID(), other.getMachine(),
                 other.getRegister(), other.getStart(),
                 other.getNumBits(), other.getComparison(),
                 other.getValue(), other.getOmission());
@@ -201,61 +209,36 @@ public class Test extends Microinstruction<Test> {
     @Override
     public void execute()
     {
-        Operation comparison = this.comparison.get();
         long registerValue = register.get().getValue();
-        final ArchValue width = ArchValue.bits(register.get().getWidth());
-        final ArchValue numBits = ArchValue.bits(this.numBits.get());
-        final ArchValue start = ArchValue.bits(this.start.get());
+        final int width = register.get().getWidth();
+        final int numBits = this.numBits.get();
+        final int start = this.start.get();
         
-        final ArchValue bits64 = ArchType.Bit.of(64);
-        ArchValue leftShift;
-        final ArchValue rightShift = bits64.sub(numBits);
+        final long bits64 = 64;
+        long leftShift;
+        final long rightShift = bits64 - numBits;
         
         //set leftShift differently depending on whether we are indexing from the
         //right or the left
-        if (!machine.getIndexFromRight()){
-            leftShift = bits64.sub(width).add(start);
+        if (!getMachine().getIndexFromRight()){
+            leftShift = bits64 - width + start;
         }
         else{
-            leftShift = bits64.sub(start).sub(numBits);
+            leftShift = bits64 - start - numBits;
         }
+
         
         //compare both the signed and unsigned values of the segment
         //of the register?  Does that make sense for GT, LT, GE, LE?
         //Just use both values for EQ and NE?
-        long signedSegment = (registerValue << leftShift.as()) >> (rightShift.as());
+        long signedSegment = (registerValue << leftShift) >> rightShift;
         long unsignedSegment = signedSegment;
-        if (numBits.lt(bits64) && signedSegment < 0) {
-            unsignedSegment = signedSegment + (1L << numBits.as());
+        if (numBits < bits64 && signedSegment < 0) {
+            unsignedSegment = signedSegment + (1L << numBits);
         }
-        
-        // TODO Replace with Functional approach using Enum
-        if (comparison == Operation.EQ) {
-            if (signedSegment == value.get() || unsignedSegment == value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        }
-        else if (comparison == Operation.NE) {
-            if (signedSegment != value.get() && unsignedSegment != value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        }
-        else if (comparison == Operation.LT) {
-            if (signedSegment < value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        }
-        else if (comparison == Operation.GT) {
-            if (signedSegment > value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        }
-        else if (comparison == Operation.LE) {
-            if (signedSegment <= value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        }
-        else if(comparison == Operation.GE) {
-            
-            if (signedSegment >= value.get())
-                machine.getControlUnit().incrementMicroIndex(omission.get());
-        } else {
-        	throw new IllegalStateException("Illegal comparison in Test microinstruction " + getName());
+
+        if (comparison.get().check(unsignedSegment, signedSegment, value.get())) {
+            controlUnit.get().incrementMicroIndex(omission.get());
         }
     }
     
@@ -283,12 +266,18 @@ public class Test extends Microinstruction<Test> {
                     " are too large to fit in the register.");
         }
     }
-    
+
     @Override
-    public <U extends Test> void copyTo(U newTest)
-    {
+    public Test cloneFor(IdentifierMap oldToNew) {
+        return new Test(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getRegister()), getStart(), getNumBits(),
+                getComparison(), getValue(), getOmission());
+    }
+
+    @Override
+    public <U extends Test> void copyTo(U newTest) {
         checkNotNull(newTest);
-        
+
         newTest.setName(getName());
         newTest.setRegister(getRegister());
         newTest.setStart(getStart());
@@ -298,12 +287,6 @@ public class Test extends Microinstruction<Test> {
         newTest.setOmission(getOmission());
     }
 
-    /**
-     * returns true if this microinstruction uses m
-     * (so if m is modified, this micro may need to be modified.
-     * @param m the module that holds the microinstruction
-     * @return boolean value true if this micro used the module
-     */
     @Override
     public boolean uses(Module<?> m){
         return (m == register.get());

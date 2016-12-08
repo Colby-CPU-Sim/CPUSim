@@ -52,30 +52,15 @@ import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.*;
-import cpusim.model.module.ConditionBit;
-import cpusim.model.module.RAM;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
-import cpusim.model.module.RegisterRAMPair;
-import cpusim.model.util.Convert;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.MachineReaderException;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
+import cpusim.model.module.*;
+import cpusim.model.util.*;
 import javafx.collections.FXCollections;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
@@ -227,8 +212,8 @@ public class MachineReader {
 		machine.setPunctChars(punctChars);
 
 		// set the code store if not already set
-		if (!machine.getModule(RAM.class).isEmpty() && machine.getCodeStore() == null) {
-			machine.setCodeStore(machine.getModule(RAM.class).get(0));
+		if (!machine.getModules(RAM.class).isEmpty() && machine.getCodeStore() == null) {
+			machine.setCodeStore(machine.getModules(RAM.class).get(0));
 		}
 	}
 	
@@ -306,8 +291,8 @@ public class MachineReader {
 					+ "\" must be in the range -(2^" + (numBits - 1) + ") and" + "(2^" + (numBits - 1) + "-1).");
 		}
 
-		final Field f = new Field(name, IdentifiedObject.generateRandomID(), numBits, rel, FXCollections.observableArrayList(), defaultValue, Field.SignedType.fromBool(signed), type
-		);
+		final Field f = new Field(name, UUID.randomUUID(), machine, numBits,
+				rel, FXCollections.observableArrayList(), defaultValue, Field.SignedType.fromBool(signed), type);
 		machine.getFields().add(f);
 		fields.put(name, f);
 	}
@@ -323,8 +308,9 @@ public class MachineReader {
 			throw new MachineReaderException(getCurrentLine() + "The value of FieldValue \"" + name
 					+ "\" must be an integer, not \"" + valueString + "\".");
 		}
+		UUID id = idToUUID(attrs.getValue("id"));
 		Field lastField = machine.getFields().get(machine.getFields().size() - 1);
-		lastField.getValues().add(new FieldValue(name, value));
+		lastField.getValues().add(new FieldValue(name, id, machine, value));
 	}
 	
 	/**
@@ -391,10 +377,10 @@ public class MachineReader {
 				throw new MachineReaderException(getCurrentLine() + "The length " + "of register array "
 						+ currentRegisterArray.getName() + " does not match the list of registers for it");
 			}
-			currentRegisterArray.registers().add(r);
+			currentRegisterArray.getRegisters().add(r);
 			currentRegisterArrayIndex++;
 		} else {
-			machine.getModule(Register.class).add(r);
+			machine.getModules(Register.class).add(r);
 		}
 		
 		components.put(id, r);
@@ -429,9 +415,9 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		RegisterArray r = new RegisterArray(name, id, machine, length, width, FXCollections.observableArrayList());
+		RegisterArray r = new RegisterArray(name, id, machine, length, width, 0);
 		components.put(id, r);
-		machine.getModule(RegisterArray.class).add(r);
+		machine.getModules(RegisterArray.class).add(r);
 
 		// now prepare for reading in the registers
 		currentRegisterArray = r;
@@ -475,7 +461,7 @@ public class MachineReader {
 		ConditionBit c = new ConditionBit(name, id, machine, register, bit, halt);
 		
 		components.put(id, c);
-		machine.getModule(ConditionBit.class).add(c);
+		machine.getModules(ConditionBit.class).add(c);
 	}
 
 	@SuppressWarnings("unused")
@@ -514,7 +500,7 @@ public class MachineReader {
 		UUID id = idToUUID(attrs.getValue("id"));
 		RAM ram = new RAM(name, id, machine, length, cellSize);
 		components.put(id, ram);
-		machine.getModule(RAM.class).add(ram);
+		machine.getModules(RAM.class).add(ram);
 	}
 
 	@SuppressWarnings("unused")
@@ -545,7 +531,7 @@ public class MachineReader {
         ConditionBit overflowBit;
 		UUID overflowBitID = idToUUID(attrs.getValue("overflowBit"));
         if (overflowBitID == null) {
-            overflowBit = ConditionBit.none();
+            overflowBit = null;
         }
         else {
             mod = components.get(overflowBitID);
@@ -560,7 +546,7 @@ public class MachineReader {
         ConditionBit carryBit;
 		UUID carryBitID = idToUUID(attrs.getValue("carryBit"));
         if (carryBitID == null) {
-            carryBit = ConditionBit.none();
+            carryBit = null;
         }
         else {
             mod = components.get(carryBitID);
@@ -573,7 +559,7 @@ public class MachineReader {
         }
 	
 		UUID id = idToUUID(attrs.getValue("id"));
-        Increment c = new Increment(name, id, machine, register, overflowBit, carryBit, delta);
+        Increment c = new Increment(name, id, machine, register, delta, carryBit, overflowBit, null);
         components.put(id, c);
         machine.getMicros(Increment.class).add(c);
     }
@@ -581,7 +567,7 @@ public class MachineReader {
 	@SuppressWarnings("unused")
 	public void startArithmetic(Attributes attrs) {
 		String name = attrs.getValue("name");
-		String type = attrs.getValue("type");
+		Arithmetic.Type type = Arithmetic.Type.valueOf(attrs.getValue("type").trim());
 
 		UUID registerID = idToUUID(attrs.getValue("source1"));
 		Object object = components.get(registerID);
@@ -610,7 +596,7 @@ public class MachineReader {
 		ConditionBit overflowBit;
 		UUID overflowBitID = idToUUID(attrs.getValue("overflowBit"));
 		if (overflowBitID == null) {
-			overflowBit = ConditionBit.none();
+            overflowBit = null;
 		} else {
 			object = components.get(overflowBitID);
 			if (object == null || !(object instanceof ConditionBit)) {
@@ -623,7 +609,7 @@ public class MachineReader {
 		ConditionBit carryBit;
 		UUID carryBitID = idToUUID(attrs.getValue("carryBit"));
 		if (carryBitID == null) {
-			carryBit = ConditionBit.none();
+            carryBit = null;
 		} else {
 			object = components.get(carryBitID);
 			if (object == null || !(object instanceof ConditionBit)) {
@@ -634,7 +620,8 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		Arithmetic c = new Arithmetic(name, id, machine, type, source1, source2, destination, overflowBit, carryBit);
+		Arithmetic c = new Arithmetic(name, id, machine, type, destination, source1, source2,
+				carryBit, overflowBit, null);
 		components.put(id, c);
 		machine.getMicros(Arithmetic.class).add(c);
 	}
@@ -996,8 +983,8 @@ public class MachineReader {
 					+ "Shift microinstruction \"" + name + "\" must be nonnegative, not " + distance + ".");
 		}
 
-		String type = attrs.getValue("type");
-		String direction = attrs.getValue("direction");
+		Shift.ShiftType type = Shift.ShiftType.valueOf(attrs.getValue("type").trim());
+		Shift.ShiftDirection direction = Shift.ShiftDirection.valueOf(attrs.getValue("direction").trim());
 		
 		UUID id = idToUUID(attrs.getValue("id"));
 		Shift c = new Shift(name, id, machine, source, dest, type, direction, distance);
@@ -1019,7 +1006,7 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		Branch c = new Branch(name, id, machine, amount, machine.getControlUnit());
+		Branch c = new Branch(name, id, machine, amount);
 		components.put(id, c);
 		machine.getMicros(Branch.class).add(c);
 	}
@@ -1027,7 +1014,7 @@ public class MachineReader {
 	@SuppressWarnings("unused")
 	public void startLogical(Attributes attrs) {
 		String name = attrs.getValue("name");
-		String type = attrs.getValue("type");
+		Logical.Type type = Logical.Type.valueOf(attrs.getValue("type").trim());
 
 		UUID registerID = idToUUID(attrs.getValue("source1"));
 		Object object = components.get(registerID);
@@ -1059,7 +1046,7 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		Logical c = new Logical(name, id, machine, type, source1, source2, destination);
+		Logical c = new Logical(name, id, machine, type, destination, source1, source2, null);
 		components.put(id, c);
 		machine.getMicros(Logical.class).add(c);
 	}
@@ -1125,9 +1112,9 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		CpusimSet c = new CpusimSet(name, id, machine, register, start, numBits, value);
+		SetBits c = new SetBits(name, id, machine, register, start, numBits, value);
 		components.put(id, c);
-		machine.getMicros(CpusimSet.class).add(c);
+		machine.getMicros(SetBits.class).add(c);
 	}
 
 	@SuppressWarnings("unused")
@@ -1230,12 +1217,8 @@ public class MachineReader {
 	@SuppressWarnings("unused")
 	public void startIO(Attributes attrs) {
 		String name = attrs.getValue("name");
-		String direction = attrs.getValue("direction");
-		String type = attrs.getValue("type");
-		if ("character".equals(type)) {
-			throw new MachineReaderException(getCurrentLine() + "IO microinstructions of type "
-					+ "character are not yet " + "implemented.  The microinstruction \"" + name + "\" is not valid.");
-		}
+		IODirection direction = IODirection.valueOf(attrs.getValue("direction").trim());
+		IO.Type type = IO.Type.valueOf(attrs.getValue("type").trim());
 
 		UUID registerID = idToUUID(attrs.getValue("buffer"));
 		Object object = components.get(registerID);
@@ -1266,8 +1249,8 @@ public class MachineReader {
 			connection = (IOChannel) object;
 		}
 
-		IO c = new IO(name, machine, type, buffer, direction, connection);
 		UUID id = idToUUID(attrs.getValue("id"));
+		IO c = new IO(name, id, machine, type, buffer, direction, connection);
 		components.put(id, c);
 		machine.getMicros(IO.class).add(c);
 	}
@@ -1275,7 +1258,7 @@ public class MachineReader {
 	@SuppressWarnings("unused")
 	public void startMemoryAccess(Attributes attrs) {
 		String name = attrs.getValue("name");
-		String direction = attrs.getValue("direction");
+		IODirection direction = IODirection.valueOf(attrs.getValue("direction").trim());
 
 		UUID ramID = idToUUID(attrs.getValue("memory"));
 		Object object = components.get(ramID);
@@ -1310,8 +1293,8 @@ public class MachineReader {
 		}
 		Register address = (Register) object;
 
-		MemoryAccess c = new MemoryAccess(name, machine, direction, memory, data, address);
 		UUID id = idToUUID(attrs.getValue("id"));
+		MemoryAccess c = new MemoryAccess(name, id, machine, direction, memory, data, address);
 		components.put(id, c);
 		machine.getMicros(MemoryAccess.class).add(c);
 	}
@@ -1329,8 +1312,8 @@ public class MachineReader {
 		}
 		ConditionBit bit = (ConditionBit) object;
 
-		SetCondBit c = new SetCondBit(name, machine, bit, value);
 		UUID id = idToUUID(attrs.getValue("id"));
+		SetCondBit c = new SetCondBit(name, id, machine, bit, Integer.valueOf(value) == 1);
 		components.put(id, c);
 		machine.getMicros(SetCondBit.class).add(c);
 	}
@@ -1402,16 +1385,19 @@ public class MachineReader {
 			// The format will be set in startFieldLength and then resolved in
 			// endMachineInstruction
 			currentFormat = "";
-			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, new ArrayList<>(), new ArrayList<>(), opcode
-            );
+			currentInstruction = new MachineInstruction(name, UUID.randomUUID(), machine, opcode,
+					null, null);
 		} else if (currentInstructionFormat == null) {
 			// version 2: A single format for machine & assembly instructions
-			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, opcode, currentFormat);
+			// FIXME this had a format string previously..
+			currentInstruction = new MachineInstruction(name, UUID.randomUUID(), machine, opcode, null, null);
 		} else {
 			// version 3: separate formats for machine & assembly instructions
 			
-			currentInstruction = new MachineInstruction(name, IdentifiedObject.generateRandomID(), machine, Convert.formatStringToFields(currentInstructionFormat, machine), Convert.formatStringToFields(currentAssemblyFormat, machine), opcode
-            );
+			currentInstruction = new MachineInstruction(name, UUID.randomUUID(), machine,
+					opcode,
+					Convert.formatStringToFields(currentInstructionFormat, machine),
+					Convert.formatStringToFields(currentAssemblyFormat, machine));
 		}
 
 		machine.getInstructions().add(currentInstruction);
@@ -1430,21 +1416,24 @@ public class MachineReader {
 				for (String fieldName : fieldNames) {
 					if (!fields.containsKey(fieldName)) {
 						int fieldLength = Math.abs(Integer.parseInt(fieldName));
-						Field field = new Field(fieldName, IdentifiedObject.generateRandomID(), fieldLength, Field.Relativity.absolute, FXCollections.observableArrayList(), 0, Field.SignedType.Signed, Field.Type.required
-						);
+						Field field = new Field(fieldName, UUID.randomUUID(), machine,
+								fieldLength, Field.Relativity.absolute,
+								FXCollections.observableArrayList(), 0,
+								Field.SignedType.Signed, Field.Type.required);
 
 						machine.getFields().add(field);
 						fields.put(fieldName, field);
 					}
 				}
 				// generate the correct instruction
-				MachineInstruction newInstr = new MachineInstruction(currentInstruction.getName(),
-						IdentifiedObject.generateRandomID(), machine, currentInstruction.getOpcode(), currentFormat);
+				MachineInstruction newInstr = new MachineInstruction(currentInstruction.getName(), UUID.randomUUID(),
+						machine, currentInstruction.getOpcode(), null, null);
 				// copy it into currentInstruction
 				currentInstruction.setInstructionFields(newInstr.getInstructionFields());
 				currentInstruction.setAssemblyFields(newInstr.getAssemblyFields());
-				currentInstruction.setInstructionColors(newInstr.getInstructionColors());
-				currentInstruction.setAssemblyColors(newInstr.getAssemblyColors());
+				// FIXME colours https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109#109
+//				currentInstruction.setInstructionColors(newInstr.getInstructionColors());
+//				currentInstruction.setAssemblyColors(newInstr.getAssemblyColors());
 			}
 
 			Validate.fieldsListIsNotEmpty(currentInstruction);

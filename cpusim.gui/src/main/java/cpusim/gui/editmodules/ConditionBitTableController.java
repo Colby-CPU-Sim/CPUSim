@@ -70,7 +70,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     ConditionBitTableController(Mediator mediator,
                                 RegistersTableController registerTableController,
                                 RegisterArrayTableController registerArrayTableController){
-        super(mediator, "ConditionBitTable.fxml", ConditionBit.class);
+        super("ConditionBitTable.fxml", ConditionBit.class);
         this.ctrlRegisterListProperty = checkNotNull(registerTableController).itemsProperty();
         this.ctrlRegisterArrayListProperty = checkNotNull(registerArrayTableController).itemsProperty();
     
@@ -180,7 +180,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
             defaultRegister = registerList.get(0);
         }
         
-        return new ConditionBit("???", machine.get(), defaultRegister, 0, false);
+        return new ConditionBit("???", 0, false);
     }
 
     /**

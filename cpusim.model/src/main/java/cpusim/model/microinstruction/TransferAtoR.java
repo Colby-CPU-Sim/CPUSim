@@ -2,11 +2,13 @@ package cpusim.model.microinstruction;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -17,10 +19,11 @@ import java.util.UUID;
  * @since 2013-06-07
  */
 public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR> {
-    
-    private SimpleObjectProperty<Register> index;
-    private SimpleIntegerProperty indexStart;
-    private SimpleIntegerProperty indexNumBits;
+
+    @DependantComponent
+    private ObjectProperty<Register> index;
+    private IntegerProperty indexStart;
+    private IntegerProperty indexNumBits;
 
     /**
      * Constructor
@@ -50,44 +53,16 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
         this.index = new SimpleObjectProperty<>(this, "index", index);
         this.indexStart = new SimpleIntegerProperty(this, "indexStart", indexStart);
         this.indexNumBits = new SimpleIntegerProperty(this, "indexNumBits", indexNumBits);
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
-    
-    /**
-     * Constructor
-     * creates a new TransferRtoA object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param source the register whose value is to be tested.
-     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be tested.
-     * @param dest the destination register.
-     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
-     * @param numBits a non-negative integer indicating the number of bits to be tested.
-     */
-    public TransferAtoR(String name,
-                        Machine machine,
-                        RegisterArray source,
-                        int srcStartBit,
-                        Register dest,
-                        int destStartBit,
-                        int numBits,
-                        Register index,
-                        int indexStart,
-                        int indexNumBits){
-        this(name, IdentifiedObject.generateRandomID(),
-                machine, source,
-                srcStartBit, dest,
-                destStartBit, numBits,
-                index, indexStart,
-                indexNumBits);
-    }
-    
+
     /**
      * Copy constructor
      * @param other copied instance
      */
     public TransferAtoR(TransferAtoR other) {
-        this(other.getName(), other.machine,
+        this(other.getName(), UUID.randomUUID(), other.getMachine(),
                 other.getSource(), other.getSrcStartBit(),
                 other.getDest(), other.getDestStartBit(),
                 other.getNumBits(), other.getIndex(),
@@ -147,30 +122,32 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
 	public void setIndexNumBits(int newIndexNumBits){
         indexNumBits.set(newIndexNumBits);
     }
-    
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param newTransferAtoR the micro instruction that will be updated
-     */
-    public <U extends TransferAtoR> void copyTo(U newTransferAtoR)
-    {
+
+
+    @Override
+    public TransferAtoR cloneFor(IdentifierMap oldToNew) {
+        return new TransferAtoR(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getSource()), getSrcStartBit(),
+                oldToNew.get(getDest()), getDestStartBit(),
+                getNumBits(),
+                oldToNew.get(getIndex()), getIndexStart(), getIndexNumBits());
+    }
+
+    @Override
+    public <U extends TransferAtoR> void copyTo(U newTransferAtoR) {
         super.copyTo(newTransferAtoR);
-        
         newTransferAtoR.setIndex(getIndex());
         newTransferAtoR.setIndexStart(getIndexStart());
         newTransferAtoR.setIndexNumBits(getIndexNumBits());
     }
 
-    /**
-     * execute the micro instruction from machine
-     */
     @Override
     public void execute()
     {
         //manipulate variables depending on the indexing scheme
         int indexLeftShift;
         int indexRightShift = 64 - indexNumBits.get();
-        if (!machine.getIndexFromRight()){
+        if (!getMachine().getIndexFromRight()){
             indexLeftShift = 64 - index.get().getWidth() + indexStart.get();            
         }
         else{
@@ -188,7 +165,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
                     dest.get() + " in the transferAtoR microinstruction: " +
                     getName());
         
-        Register sourceRegister = source.get().registers().get((int) indexValue);
+        Register sourceRegister = source.get().getRegisters().get((int) indexValue);
         
         int srcFullShift = 64 - sourceRegister.getWidth();
         int destFullShift = 64 - dest.get().getWidth();
@@ -203,7 +180,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
         int srcRightShift;
         int srcLeftShift;
         int srcOffsetShift = 64 - numBits.get();
-        if(!machine.getIndexFromRight()){
+        if(!getMachine().getIndexFromRight()){
             destRightShift = 64 - destStartBit.get();
             destLeftShift = destStartBit.get() + numBits.get();
             srcLeftShift = srcStartBit.get();

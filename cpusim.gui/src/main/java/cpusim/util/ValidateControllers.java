@@ -1,7 +1,6 @@
 package cpusim.util;
 
 import cpusim.gui.editmodules.ConditionBitTableController;
-import cpusim.gui.editmodules.RegisterArrayTableController;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoA;
@@ -86,17 +85,14 @@ public class ValidateControllers {
      */
     public static void registerArrayWidthsAreOkayForTransferMicros(
             Machine machine,
-            List<? extends RegisterArray> arrays,
-            RegisterArrayTableController controller)
+            List<? extends RegisterArray> arrays)
     {
-        // FIXME controller?
-        
         //make a HashMap of old arrays as keys and new widths as
         //Integer values
         final Map<RegisterArray, Integer> newWidths = new HashMap<>();
 
         newWidths.putAll(
-                machine.getModule(RegisterArray.class).stream()
+                machine.getModules(RegisterArray.class).stream()
                     .collect(Collectors.toMap(Function.identity(), RegisterArray::getWidth)));
 
 

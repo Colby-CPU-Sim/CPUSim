@@ -8,6 +8,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
  *
@@ -21,7 +23,7 @@ class BranchTableController extends MicroinstructionTableController<Branch> {
     static final String FX_ID = "branchTab";
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Branch,Integer> amount;
+    private TableColumn<Branch, Integer> amount;
 
     /**
      * Constructor
@@ -54,7 +56,7 @@ class BranchTableController extends MicroinstructionTableController<Branch> {
 
     @Override
     public Branch createInstance() {
-        return new Branch("???", machine.get(), 0, machine.get().getControlUnit());
+        return new Branch("???", UUID.randomUUID(), machine.get(), 0);
     }
 
     /**

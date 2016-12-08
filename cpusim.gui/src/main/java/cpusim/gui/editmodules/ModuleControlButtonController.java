@@ -3,7 +3,7 @@ package cpusim.gui.editmodules;
 import com.google.common.base.Joiner;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.util.Dialogs;
 import javafx.collections.ObservableList;

@@ -222,7 +222,7 @@ public class ConsoleChannel extends AbstractStringChannel {
 					ioConsole.setEditable(false);
 				}
 			});
-			throw new ExecutionException("Input cancelled.");
+			throw new ExecutionException("Read cancelled.");
 			
 		}
 		

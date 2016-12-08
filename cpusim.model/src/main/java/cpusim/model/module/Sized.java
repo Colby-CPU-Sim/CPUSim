@@ -1,7 +1,5 @@
 package cpusim.model.module;
 
-import cpusim.model.Module;
-
 /**
  * Denotes that a {@link Module} has a bit width.
  *

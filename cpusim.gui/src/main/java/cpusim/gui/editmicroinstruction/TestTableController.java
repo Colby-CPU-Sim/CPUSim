@@ -1,30 +1,12 @@
-/**
- * auther: Jinghui Yu
- * last edit date: 6/4/2013
- */
-
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
- * which throws a ValidationException in lieu of returning a boolean value
- * 3.) Moved rangeInBound method to the Validate class and changed the return value to void
- * from boolean
- */
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -33,8 +15,12 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the {@link Test} command in the {@link EditMicroinstructionsController}.
+ *
+ * @since 2013-06-04
  */
 class TestTableController extends MicroinstructionTableController<Test> {
 
@@ -46,22 +32,22 @@ class TestTableController extends MicroinstructionTableController<Test> {
     final static String FX_ID = "testTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,Register> register;
+    private TableColumn<Test, Register> register;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,Integer> start;
+    private TableColumn<Test, Integer> start;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,Integer> numBits;
+    private TableColumn<Test, Integer> numBits;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,String> comparison;
+    private TableColumn<Test, Test.Operation> comparison;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,Long> value;
+    private TableColumn<Test, Long> value;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Test,Integer> omission;
+    private TableColumn<Test, Integer> omission;
     
 
     /**
@@ -92,19 +78,7 @@ class TestTableController extends MicroinstructionTableController<Test> {
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Test,Register>,TableCell<Test,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
-
-        Callback<TableColumn<Test,String>,TableCell<Test,String>> cellCompFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "EQ",
-                                "NE",
-                                "LT",
-                                "GT",
-                                "LE",
-                                "GE"
-                        )
-                );
+                        machine.get().getRegisters());
 
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
@@ -123,9 +97,9 @@ class TestTableController extends MicroinstructionTableController<Test> {
         numBits.setCellFactory(cellIntFactory);
         numBits.setOnEditCommit(text -> text.getRowValue().setNumBits(text.getNewValue()));
 
-        comparison.setCellFactory(cellCompFactory);
+        comparison.setCellFactory(new EnumCellFactory<>(Test.Operation.class));
         comparison.setOnEditCommit((text) ->
-                text.getRowValue().setComparison(Test.Operation.valueOf(text.getNewValue())));
+                text.getRowValue().setComparison(text.getNewValue()));
 
         value.setCellFactory(cellLongFactory);
         value.setOnEditCommit(text -> text.getRowValue().setValue(text.getNewValue()));
@@ -142,9 +116,9 @@ class TestTableController extends MicroinstructionTableController<Test> {
     @Override
     public Test createInstance() {
         final Machine machine = this.machine.get();
-        final Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new Test("???", IdentifiedObject.generateRandomID(), machine, r,
+        final Register r = (machine.getRegisters().size() == 0 ? null :
+                machine.getRegisters().get(0));
+        return new Test("???", UUID.randomUUID(), machine, r,
                 0, 1, Test.Operation.EQ,
                 0, 0);
     }

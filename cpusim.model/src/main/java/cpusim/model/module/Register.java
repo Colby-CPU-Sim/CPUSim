@@ -32,12 +32,12 @@
 package cpusim.model.module;
 
     import cpusim.model.Machine;
-    import cpusim.model.Module;
     import cpusim.model.microinstruction.Microinstruction;
-    import cpusim.model.util.IdentifiedObject;
+    import cpusim.model.util.MachineComponent;
     import cpusim.model.util.ValidationException;
     import cpusim.model.util.units.ArchType;
     import javafx.beans.property.*;
+    import javafx.collections.FXCollections;
 
     import java.math.BigInteger;
     import java.util.EnumSet;
@@ -108,44 +108,30 @@ public class Register extends Module<Register> implements Sized<Register>
 	
     //------------------------
     //instance variables
-    private SimpleLongProperty value;  //the current value stored in the register
-    private SimpleIntegerProperty width;	 //the number of bits in the register
-    private SimpleLongProperty initialValue; // the initial value stored in the register
-    private SimpleObjectProperty<EnumSet<Access>> access;
+    private LongProperty value;  //the current value stored in the register
+    private IntegerProperty width;	 //the number of bits in the register
+    private LongProperty initialValue; // the initial value stored in the register
+    private ObjectProperty<EnumSet<Access>> access;
     
     /**
      * Constructor
      * @param name name of the register
      * @param width a positive integer that specifies the number of bits in the register.
      * @param initialValue the initial value stored in the register
-     * @param readOnly the read only status of the register (if true, the value in
+     * @param access the read only status of the register (if true, the value in
      *                 the register cannot be changed)
      * 
      * @since 2016-10-12
      */
-    public Register(String name, UUID id, Machine machine, int width, long initialValue, EnumSet<Access> readOnly) {
+    public Register(String name, UUID id, Machine machine, int width, long initialValue, EnumSet<Access> access) {
         super(name, id, machine);
-        checkNotNull(readOnly);
+        checkNotNull(access);
         
-        this.value = new SimpleLongProperty(this, "register value", 0);
-        this.width = new SimpleIntegerProperty(width);
-        this.initialValue = new SimpleLongProperty(initialValue);
-        this.access = new SimpleObjectProperty<>(readOnly);
+        this.value = new SimpleLongProperty(this, "value", 0);
+        this.width = new SimpleIntegerProperty(this, "width", width);
+        this.initialValue = new SimpleLongProperty(this, "initialValue", initialValue);
+        this.access = new SimpleObjectProperty<>(this, "access", access);
         setValue(initialValue);
-    }
-    
-    /**
-     * Constructor
-     * @param name name of the register
-     * @param width a positive integer that specifies the number of bits in the register.
-     * @param initialValue the initial value stored in the register
-     * @param readOnly the read only status of the register (if true, the value in
-     *                 the register cannot be changed)
-     *
-     * @since 2016-10-12
-     */
-    public Register(String name, Machine machine, int width, long initialValue, EnumSet<Access> readOnly) {
-        this(name, IdentifiedObject.generateRandomID(), machine, width, initialValue, readOnly);
     }
     
     /**
@@ -153,7 +139,9 @@ public class Register extends Module<Register> implements Sized<Register>
      * @param other
      */
     public Register(Register other) {
-        this(other.getName(), other.machine, other.getWidth(), other.getInitialValue(), other.getAccess());
+        this(other.getName(), UUID.randomUUID(),
+                other.getMachine(), other.getWidth(),
+                other.getInitialValue(), other.getAccess());
     }
 
     /**
@@ -186,7 +174,7 @@ public class Register extends Module<Register> implements Sized<Register>
      * return the property object of value
      * @return property object
      */
-    public ReadOnlyLongProperty valueProperty() {
+    public LongProperty valueProperty() {
         return value;
     }
 
@@ -203,7 +191,7 @@ public class Register extends Module<Register> implements Sized<Register>
      * Property for initial value.
      * @return Read-only, non-{@code null} property for initial value.
      */
-    public ReadOnlyLongProperty initialValueProperty() {
+    public LongProperty initialValueProperty() {
         return initialValue;
     }
 
@@ -232,7 +220,7 @@ public class Register extends Module<Register> implements Sized<Register>
      * return the property object of readonly
      * @return property object of readonly
      */
-    public ReadOnlyObjectProperty<EnumSet<Access>> accessProperty(){
+    public ObjectProperty<EnumSet<Access>> accessProperty(){
         return access;
     }
 
@@ -320,16 +308,25 @@ public class Register extends Module<Register> implements Sized<Register>
                 + getInitialValue() + "</TD><TD>" + getReadOnly() + "</TD></TR>";
 	}
 
-	@Override
-	public <U extends Register> void copyTo(U newRegister) {
-		checkNotNull(newRegister);
-		
-		newRegister.setName(getName());
-        newRegister.setWidth(width.get());  //if a narrower width, the value is cleared
-        newRegister.setInitialValue(initialValue.get());
-        newRegister.setAccess(access.get());
-	}
-    
+    @Override
+    public Register cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        return new Register(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                getWidth(), getInitialValue(), getAccess());
+    }
+
+    @Override
+    public void copyTo(Register other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setWidth(getWidth());
+        other.setInitialValue(getInitialValue());
+        other.setAccess(getAccess());
+        other.setValue(getValue());
+    }
+
     @Override
     public void validate() {
         // Validate the width

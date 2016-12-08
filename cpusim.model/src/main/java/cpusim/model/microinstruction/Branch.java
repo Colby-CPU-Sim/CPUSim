@@ -1,15 +1,17 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.ControlUnit;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.MoreBindings;
+import cpusim.model.util.PropertyCollectionBuilder;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The branch microinstruction is identical to the {@link Test} microinstruction except
@@ -19,23 +21,12 @@ import static com.google.common.base.Preconditions.*;
  */
 public class Branch extends Microinstruction<Branch>
 {
-    private final SimpleIntegerProperty amount;
-    private ControlUnit controlUnit;
-    
-    /**
-     * Constructor
-     * creates a new Branch object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the microinstruction belongs to.
-     * @param amount size of the relative jump.
-     */
-    public Branch(String name,
-                  Machine machine,
-                  int amount,
-                  ControlUnit controlUnit) {
-        this(name, IdentifiedObject.generateRandomID(), machine, amount, controlUnit);
-    }
+    private final IntegerProperty amount;
+
+    @DependantComponent
+    private final ReadOnlyObjectProperty<ControlUnit> controlUnit;
+
+    private final ReadOnlySetProperty<MachineComponent> dependants;
     
     /**
      * Constructor
@@ -48,11 +39,23 @@ public class Branch extends Microinstruction<Branch>
     public Branch(String name,
                   UUID id,
                   Machine machine,
-                  int amount,
-                  ControlUnit controlUnit) {
+                  int amount) {
         super(name, id, machine);
-        this.amount = new SimpleIntegerProperty(amount);
-        this.controlUnit = controlUnit;
+        this.amount = new SimpleIntegerProperty(this, "amount", amount);
+
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+
+        dependants = MachineComponent.collectDependancies(this);
+    }
+
+    /**
+     * Creates a new instance
+     * @param name Name of instruction
+     * @param id Unique ID
+     * @param machine Binding machine
+     */
+    private Branch(String name, UUID id, Machine machine) {
+        this(name, id, machine, -1);
     }
     
     /**
@@ -60,7 +63,12 @@ public class Branch extends Microinstruction<Branch>
      * @param other instance copied from.
      */
     public Branch(Branch other) {
-        this(other.getName(), other.machine, other.getAmount(), other.controlUnit);
+        this(other.getName(), UUID.randomUUID(), other.getMachine(), other.getAmount());
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependants;
     }
 
     /**
@@ -82,14 +90,24 @@ public class Branch extends Microinstruction<Branch>
     {
         amount.set(newAmount);
     }
-    
+
+    /**
+     * Gets a property for the amount.
+     * @return property bound to the amount to branch
+     *
+     * @see #getAmount()
+     * @see #setAmount(int)
+     */
+    public IntegerProperty amountProperty() {
+        return amount;
+    }
+
     /**
      * increment the micro index by the amount specified by the instruction
      */
     @Override
-    public void execute()
-    {
-        controlUnit.incrementMicroIndex(amount.get());
+    public void execute() {
+        controlUnit.get().incrementMicroIndex(amount.get());
     }
 
     @Override
@@ -100,18 +118,18 @@ public class Branch extends Microinstruction<Branch>
             throw new ValidationException("No control unit is set for Branch " + getName());
         }
     }
-    
-    /**
-     * copies the data from the current micro to a specific micro
-     * @param oldMicro the micro instruction that will be updated
-     */
+
     @Override
-    public void copyTo(Branch oldMicro)
-    {
-        checkNotNull(oldMicro);
-        oldMicro.setName(getName());
-        oldMicro.setAmount(getAmount());
-        oldMicro.controlUnit = controlUnit;
+    public Branch cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        // don't copy the controlUnit, its bound from the machine on construction
+        return new Branch(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), getAmount());
+    }
+
+    @Override
+    public <U extends Branch> void copyTo(U other) {
+        checkNotNull(other);
+        other.setName(getName());
+        other.setAmount(getAmount());
     }
 
     /**

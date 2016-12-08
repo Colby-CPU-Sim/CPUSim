@@ -16,6 +16,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the Increment command in the EditMicroDialog.
  *
@@ -30,16 +32,16 @@ class IncrementTableController
     static final String FX_ID = "incrementTab";
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Increment,Register> register;
+    private TableColumn<Increment, Register> register;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Increment,ConditionBit> overflowBit;
+    private TableColumn<Increment, ConditionBit> overflowBit;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Increment,ConditionBit> carryBit;
+    private TableColumn<Increment, ConditionBit> carryBit;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Increment,Long> delta;
+    private TableColumn<Increment, Long> delta;
 
     /**
      * Constructor
@@ -64,10 +66,10 @@ class IncrementTableController
         Callback<TableColumn<Increment,Long>,TableCell<Increment,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Increment,Register>,TableCell<Increment,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
 
-        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList(ConditionBit.none());
-        condBit.addAll(machine.get().getModule(ConditionBit.class));
+        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList((ConditionBit) null);
+        condBit.addAll(machine.get().getModules(ConditionBit.class));
         
         Callback<TableColumn<Increment,ConditionBit>,TableCell<Increment,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
@@ -99,8 +101,9 @@ class IncrementTableController
     @Override
     public Increment createInstance() {
         final Machine machine = this.machine.get();
-        Register r = (machine.getAllRegisters().size() == 0 ? null : machine.getAllRegisters().get(0));
-        return new Increment("???", machine, r, ConditionBit.none(), ConditionBit.none(), 1L);
+        Register r = (machine.getRegisters().size() == 0 ? null : machine.getRegisters().get(0));
+        return new Increment("???", UUID.randomUUID(), machine, r, 1L,
+                null, null, null);
     }
 
     @Override

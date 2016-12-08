@@ -1,13 +1,13 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.xml.HtmlEncoder;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Comment microinstructions do nothing.  They are included just so that their
@@ -28,7 +28,7 @@ public class Comment extends Microinstruction<Comment>
     } // end constructor
     
     public Comment(Comment other) {
-        super(other.getName(), IdentifiedObject.generateRandomID(), other.machine);
+        super(other.getName(), UUID.randomUUID(), other.getMachine());
     }
 
     @Override
@@ -41,12 +41,17 @@ public class Comment extends Microinstruction<Comment>
     public void execute() {
         //do nothing
     }
-    
+
     @Override
-    public <U extends Comment> void copyTo(final U other) {
+    public Comment cloneFor(IdentifierMap oldToNew) {
+        return new Comment(getName(), UUID.randomUUID(), oldToNew.getNewMachine());
+    }
+
+    @Override
+    public <U extends Comment> void copyTo(U other) {
         checkNotNull(other);
     }
-    
+
     @Override
     public String getHTMLDescription(String indent)
     {

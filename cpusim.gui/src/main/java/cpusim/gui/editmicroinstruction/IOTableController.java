@@ -1,10 +1,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.IO;
+import cpusim.model.microinstruction.IODirection;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -12,6 +13,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+
+import java.util.UUID;
 
 /**
  * The controller for editing the {@link IO} command in the {@link EditMicroinstructionsController}.
@@ -24,13 +27,13 @@ class IOTableController extends MicroinstructionTableController<IO> {
     final static String FX_ID = "ioTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<IO,String> type;
+    private TableColumn<IO, IO.Type> type;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<IO,Register> buffer;
+    private TableColumn<IO, Register> buffer;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<IO,String> direction;
+    private TableColumn<IO, IODirection> direction;
 
     /**
      * Constructor
@@ -51,37 +54,22 @@ class IOTableController extends MicroinstructionTableController<IO> {
         direction.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         type.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<IO,String>,TableCell<IO,String>> cellTypeFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "integer",
-                                "ascii",
-                                "unicode"
-                        )
-                );
         Callback<TableColumn<IO,Register>,TableCell<IO,Register>> cellRegFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
-        Callback<TableColumn<IO,String>,TableCell<IO,String>> cellDircFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "input",
-                                "output"
-                        )
-                );
+                        machine.get().getRegisters());
 
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
         buffer.setCellValueFactory(new PropertyValueFactory<>("buffer"));
         direction.setCellValueFactory(new PropertyValueFactory<>("direction"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        type.setCellFactory(cellTypeFactory);
+        type.setCellFactory(new EnumCellFactory<>(IO.Type.class));
         type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
         buffer.setCellFactory(cellRegFactory);
         buffer.setOnEditCommit(text -> text.getRowValue().setBuffer(text.getNewValue()));
 
-        direction.setCellFactory(cellDircFactory);
+        direction.setCellFactory(new EnumCellFactory<>(IODirection.class));
         direction.setOnEditCommit(text -> text.getRowValue().setDirection(text.getNewValue()));
     }
 
@@ -93,9 +81,9 @@ class IOTableController extends MicroinstructionTableController<IO> {
     @Override
     public IO createInstance() {
         final Machine machine = this.machine.get();
-        Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new IO("???", machine, "integer", r, "input");
+        Register r = (machine.getRegisters().size() == 0 ? null :
+                machine.getRegisters().get(0));
+        return new IO("???", UUID.randomUUID(), machine, IO.Type.Integer, r, IODirection.Read, null);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class DialogChannel extends AbstractStringChannel {
     @Override
     public void writeString(final String s) {
         try {
-            FXUtilities.runAndWait(() -> Dialogs.createConfirmationDialog(stage, "Output", s).showAndWait());
+            FXUtilities.runAndWait(() -> Dialogs.createConfirmationDialog(stage, "Write", s).showAndWait());
         } catch (Exception e) {
             throw new ExecutionException("An Exception was thrown" +
                     " when we attempted to read from the dialog.");
@@ -85,7 +85,7 @@ public class DialogChannel extends AbstractStringChannel {
     @Override
     public String readString(final String prompt) {
         try {
-            FXUtilities.runAndWait(() -> input = Dialogs.createTextInputDialog(stage,"Input Dialog",prompt).showAndWait());
+            FXUtilities.runAndWait(() -> input = Dialogs.createTextInputDialog(stage,"Read Dialog",prompt).showAndWait());
         } catch (Exception e) {
             throw new ExecutionException("An Exception was thrown" +
                     " when we attempted to read from the dialog.");
@@ -95,7 +95,7 @@ public class DialogChannel extends AbstractStringChannel {
             // The user chose "Cancel" from the input dialog.
             // I don't think the input will ever be null, but I'm leaving the test
             // here anyway.
-            throw new ExecutionException("Input cancelled.");
+            throw new ExecutionException("Read cancelled.");
         }
         return input.get();
     }

@@ -57,7 +57,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
                                 "1"
                         ));
         Callback<TableColumn<SetCondBit,ConditionBit>,TableCell<SetCondBit,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getModule(ConditionBit.class));
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getModules(ConditionBit.class));
 
         bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
         value.setCellValueFactory(new PropertyValueFactory<>("value"));
@@ -78,8 +78,8 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     @Override
     public SetCondBit createInstance() {
         final Machine machine = this.machine.get();
-        ConditionBit cBit = (machine.getModule(ConditionBit.class).isEmpty() ? null :
-                machine.getModule(ConditionBit.class).get(0));
+        ConditionBit cBit = (machine.getModules(ConditionBit.class).isEmpty() ? null :
+                machine.getModules(ConditionBit.class).get(0));
         return new SetCondBit("???", machine, cBit, "0");
     }
 
@@ -101,7 +101,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     @Override
     public boolean isNewButtonEnabled()
     {
-        return !machine.get().getModule(ConditionBit.class).isEmpty();
+        return !machine.get().getModules(ConditionBit.class).isEmpty();
     }
 
     @Override

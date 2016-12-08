@@ -2,9 +2,11 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -12,6 +14,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The controller for editing the shift command in the EditMicroDialog
@@ -34,10 +41,10 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
     private TableColumn<Shift,Register> destination;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Shift,String> type;
+    private TableColumn<Shift, Shift.ShiftType> type;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Shift,String> direction;
+    private TableColumn<Shift, Shift.ShiftDirection> direction;
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<Shift,Integer> distance;
@@ -63,25 +70,10 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
         direction.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         distance.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<Shift,String>,TableCell<Shift,String>> cellTypeFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "logical",
-                                "arithmetic",
-                                "cyclic"
-                        )
-                );
-        Callback<TableColumn<Shift,String>,TableCell<Shift,String>> cellDircFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "left",
-                                "right"
-                        )
-                );
         Callback<TableColumn<Shift,Integer>,TableCell<Shift,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Shift,Register>,TableCell<Shift,Register>> cellComboFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
@@ -96,10 +88,10 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
         destination.setCellFactory(cellComboFactory);
         destination.setOnEditCommit(text -> text.getRowValue().setDest(text.getNewValue()));
 
-        type.setCellFactory(cellTypeFactory);
+        type.setCellFactory(new EnumCellFactory<>(Shift.ShiftType.class));
         type.setOnEditCommit(text -> text.getRowValue().setType(text.getNewValue()));
 
-        direction.setCellFactory(cellDircFactory);
+        direction.setCellFactory(new EnumCellFactory<>(Shift.ShiftDirection.class));
         direction.setOnEditCommit(text -> text.getRowValue().setDirection(text.getNewValue()));
 
         distance.setCellFactory(cellIntFactory);
@@ -113,9 +105,10 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
     
     @Override
     public Shift createInstance() {
-        final Register r = (machine.get().getAllRegisters().size() == 0 ? null :
-                machine.get().getAllRegisters().get(0));
-        return new Shift("???", machine.get(), r, r,"logical", "left", 1);
+        final Register r = (machine.get().getRegisters().size() == 0 ? null :
+                machine.get().getRegisters().get(0));
+        return new Shift("???", UUID.randomUUID(), machine.get(), r, r,
+                Shift.ShiftType.Logical, Shift.ShiftDirection.Left, 1);
     }
 
     @Override

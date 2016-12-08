@@ -1,16 +1,13 @@
 package cpusim.gui.editmodules;
 
-import cpusim.Mediator;
-import cpusim.gui.util.ControlButtonController;
+import cpusim.gui.util.*;
 import cpusim.gui.util.table.EditingStrCell;
-import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.gui.util.HelpPageEnabled;
-import cpusim.gui.util.MachineModificationController;
-import cpusim.gui.util.NamedColumnHandler;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.util.Validatable;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -23,27 +20,22 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Deals with control over the data that the interface interacts with within the user interface.
  * @param <T> Module subtype
  */
-abstract class ModuleTableController<T extends Module<T>>
+public abstract class ModuleTableController<T extends Module<T>>
         extends TableView<T>
         implements ControlButtonController.InteractionHandler<T>,
                     MachineModificationController,
                     HelpPageEnabled {
 
     /**
-     * Mediator used between the controller and the machine.
-     */
-    protected Mediator mediator;
-    
-    /**
      * Underlying machine being modified.
      */
-    protected final ObjectProperty<Machine> machine;
+    private final ObjectProperty<Machine> machine;
 
     private final Class<T> moduleClass;
 
@@ -55,16 +47,13 @@ abstract class ModuleTableController<T extends Module<T>>
     //-------------------------------
     /**
      * Constructor
-     * @param mediator holds the information to be shown in tables
      * @param fxmlFile Name of FXML file to load from
      * @param moduleClass Marker to set the class of the {@link ModuleTableController}
      */
-    ModuleTableController(Mediator mediator,
-                          final String fxmlFile,
+    ModuleTableController(final String fxmlFile,
                           final Class<T> moduleClass)
     {
-        this.mediator = checkNotNull(mediator);
-        this.machine = mediator.machineProperty();
+        this.machine = new SimpleObjectProperty<>(null);
 
         this.fxmlTablePath = checkNotNull(fxmlFile);
         this.moduleClass = checkNotNull(moduleClass);
@@ -88,7 +77,7 @@ abstract class ModuleTableController<T extends Module<T>>
             // the underlying machine values until we are done.
             ObservableList<T> items = getItems();
             items.clear();
-            newValue.getModule(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
+            newValue.getModules(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
         };
     
         machine.addListener(machineListener);
@@ -140,7 +129,7 @@ abstract class ModuleTableController<T extends Module<T>>
     @Override
     public void updateMachine() {
         // By default, check the contents, then just replace the machine's values.
-        final ObservableList<T> modules = machine.get().getModule(moduleClass);
+        final ObservableList<T> modules = machine.get().getModules(moduleClass);
         modules.clear();
         modules.addAll(getItems());
     }

@@ -1,56 +1,52 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
-import cpusim.model.iochannel.StreamChannel;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HtmlEncoder;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlySetProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads/writes to an {@link IOChannel}.
  */
 public class IO extends Microinstruction<IO> {
-    
-    private SimpleStringProperty type; // FIXME Enum
-    private SimpleObjectProperty<Register> buffer;
-    private SimpleStringProperty direction; // FIXME Enum
+
+    public enum Type {
+        Integer,
+        ASCII,
+        Unicode
+    }
+
+    private final ObjectProperty<Type> type;
+    private final ObjectProperty<IODirection> direction;
+
+    @DependantComponent
+    private final ObjectProperty<Register> buffer;
+
     private IOChannel connection;
+
+    private final ReadOnlySetProperty<MachineComponent> dependencies;
+
+    private final Logger logger = LogManager.getLogger(IO.class);
 
     /**
      * Constructor
-     * creates a new {@link IOChannel} object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param type type of logical microinstruction.
-     * @param buffer the source1 register.
-     * @param direction the destination register.
-     * @param connection the IOChannel used
-     */
-    public IO(String name, Machine machine,
-              String type,
-              Register buffer,
-              String direction,
-              IOChannel connection){
-        this(name, IdentifiedObject.generateRandomID(), machine, type, buffer, direction, connection);
-    }
-    
-    /**
-     * Constructor
      * creates a new Increment object with input values.
-     *
-     * @param name name of the microinstruction.
+     *  @param name name of the microinstruction.
      * @param machine the machine that the microinstruction belongs to.
      * @param type type of logical microinstruction.
      * @param buffer the source1 register.
@@ -60,28 +56,17 @@ public class IO extends Microinstruction<IO> {
     public IO(String name,
               UUID id,
               Machine machine,
-              String type,
+              Type type,
               Register buffer,
-              String direction,
+              IODirection direction,
               IOChannel connection){
         super(name, id, machine);
-        this.type = new SimpleStringProperty(this, "type", type);
+        this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
         this.buffer = new SimpleObjectProperty<>(this, "buffer", buffer);
-        this.direction = new SimpleStringProperty(this, "direction", direction);
+        this.direction = new SimpleObjectProperty<>(this, "direction", checkNotNull(direction));
         this.connection = connection;
-    }
 
-    /**
-     * Constructor
-     * creates a new Increment object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param type type of logical microinstruction.
-     * @param buffer the source1 register.
-     * @param direction the destination register.
-     */
-    public IO(String name, Machine machine, String type, Register buffer, String direction) {
-        this(name, IdentifiedObject.generateRandomID(), machine, type, buffer, direction, new StreamChannel());
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
     
     /**
@@ -90,11 +75,17 @@ public class IO extends Microinstruction<IO> {
      */
     public IO(IO other) {
         this(other.getName(),
-                other.machine,
+                UUID.randomUUID(),
+                other.getMachine(),
                 other.getType(),
                 other.getBuffer(),
                 other.getDirection(),
                 other.getConnection());
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependencies;
     }
 
     /**
@@ -113,11 +104,15 @@ public class IO extends Microinstruction<IO> {
         buffer.set(newBuffer);
     }
 
+    public ObjectProperty<Register> bufferProperty() {
+        return buffer;
+    }
+
     /**
      * returns the register to put result.
      * @return the name of the register.
      */
-    public String getDirection(){
+    public IODirection getDirection(){
         return direction.get();
     }
 
@@ -125,15 +120,19 @@ public class IO extends Microinstruction<IO> {
      * updates the register used by the microinstruction.
      * @param newDirection the new destination for the logical microinstruction.
      */
-    public void setDirection(String newDirection){
+    public void setDirection(IODirection newDirection){
         direction.set(newDirection);
+    }
+
+    public ObjectProperty<IODirection> directionProperty() {
+        return direction;
     }
 
     /**
      * returns the type of shift.
      * @return type of shift as a string.
      */
-    public String getType(){
+    public Type getType(){
         return type.get();
     }
 
@@ -141,8 +140,12 @@ public class IO extends Microinstruction<IO> {
      * updates the type used by the microinstruction.
      * @param newType the new string of type.
      */
-    public void setType(String newType){
+    public void setType(Type newType){
         type.set(newType);
+    }
+
+    public ObjectProperty<Type> typeProperty() {
+        return type;
     }
 
     /**
@@ -160,11 +163,20 @@ public class IO extends Microinstruction<IO> {
     public void setConnection(IOChannel newConnection){
         this.connection = newConnection;
     }
-    
+
     @Override
-    public <U extends IO> void copyTo(U newIO)
-    {
+    public IO cloneFor(IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        return new IO(getName(), UUID.randomUUID(), getMachine(),
+                getType(), oldToNew.get(getBuffer()),
+                getDirection(), getConnection());
+    }
+
+    @Override
+    public <U extends IO> void copyTo(U newIO) {
         checkNotNull(newIO);
+
         newIO.setName(getName());
         newIO.setDirection(getDirection());
         newIO.setType(getType());
@@ -175,39 +187,62 @@ public class IO extends Microinstruction<IO> {
     /**
      * execute the micro instruction from machine
      */
-    public void execute()
-    {
+    @Override
+    public void execute() {
         int numBits = buffer.get().getWidth();
 
-        if (type.get().equals("integer") && direction.get().equals("input")) {
-            long inputLong = connection.readLong(numBits);
-            buffer.get().setValue(inputLong);
+        IODirection dir = getDirection();
+        Type type = getType();
+
+        switch (dir) {
+            case Read: {
+                long value;
+                switch (type) {
+                    case Integer:
+                        value = connection.readLong(numBits);
+                        break;
+                    case ASCII:
+                        value = connection.readAscii();
+                        break;
+                    case Unicode:
+                        value = connection.readUnicode();
+                        break;
+
+                    default:
+                        throw new IllegalStateException("Unsupported Type received: " + type);
+                }
+
+                buffer.get().setValue(value);
+            } break;
+
+            case Write: {
+                final long value = buffer.get().getValue();
+                switch (type) {
+                    case Integer:
+                        connection.writeLong(value);
+                        break;
+
+                    case ASCII:
+                        connection.writeAscii((char)(value & ArchType.Byte.getMask(1)));
+                        break;
+
+                    case Unicode:
+                        connection.writeUnicode((int)value);
+                        break;
+
+                    default:
+                        throw new IllegalStateException("Unsupported Type received: " + type);
+                }
+            } break;
+
+            default:
+                throw new IllegalStateException("Unsupported direction: " + dir);
         }
-        else if (type.get().equals("ascii") && direction.get().equals("input")) {
-            char c = connection.readAscii();
-            buffer.get().setValue((int) c);
-        }
-        else if (type.get().equals("unicode") && direction.get().equals("input")) {
-            int c = connection.readUnicode();
-            buffer.get().setValue(c);
-        }
-        else if (type.get().equals("integer") && direction.get().equals("output")) {
-            connection.writeLong(buffer.get().getValue());
-        }
-        else if (type.get().equals("ascii") && direction.get().equals("output")) {
-            connection.writeAscii((char) (buffer.get().getValue() & ArchType.Byte.getMask(1)));
-        }
-        else if (type.get().equals("unicode") && direction.get().equals("output")) {
-            connection.writeUnicode((int) buffer.get().getValue());
-        }
-        else
-            assert false : "IO '" + getName() + "' has an illegal " +
-                    "type or direction";
-        
-        //addded on 3/20 by Ben Borchard because outputs wouldn't print to the console.
+
+        // FIXME Is it necessary?
+        //added on 3/20 by Ben Borchard because outputs wouldn't print to the console.
         //I am not sure that this is the correct thing to do...
         connection.flush(true);
-
     }
 
     /**
@@ -216,22 +251,46 @@ public class IO extends Microinstruction<IO> {
     public void undoExecute(){
         if (connection instanceof FileChannel){
             FileChannel connect = (FileChannel) connection;
-            if (type.get().equals("integer") && direction.get().equals("input")) {
-                connect.unReadLong();
-            }
-            else if ((type.get().equals("ascii")||type.get().equals("unicode"))
-                    && direction.get().equals("input")) {
-                connect.unReadOneChar();
-            }
-            else if (type.get().equals("integer") && direction.get().equals("output")) {
-                connect.unWriteLong();
-            }
-            else if ((type.get().equals("ascii") ||type.get().equals("unicode"))
-                    && direction.get().equals("output")) {
-                connect.unWriteOneChar();
+
+            Type type = this.type.get();
+
+            switch (direction.get()) {
+                case Read: {
+                    switch (type) {
+                        case Integer:
+                        case Unicode:
+                            connect.unReadLong();
+                            break;
+
+                        case ASCII:
+                            connect.unReadOneChar();
+                            break;
+
+                        default:
+                            throw new IllegalStateException("Unknown type: " + type);
+                    }
+                } break;
+
+                case Write: {
+                    switch (type) {
+                        case Integer:
+                        case Unicode:
+                            connect.unWriteLong();
+                            break;
+
+                        case ASCII:
+                            connect.unWriteOneChar();
+                            break;
+
+                        default:
+                            throw new IllegalStateException("Unknown type: " + type);
+                    }
+                } break;
+
+                default:
+                    throw new IllegalStateException("Unknown direction: " + direction);
             }
         }
-
     }
 
     /**
@@ -278,15 +337,28 @@ public class IO extends Microinstruction<IO> {
     public void validate() {
         super.validate();
 
-        if (getType().equals("ascii") && getBuffer().getWidth() < 1) {
-            throw new ValidationException("IO \"" + this + "\" is of type " +
-                    "ascii and so needs a\nbuffer register at least " +
-                    "8 bits wide.");
+        ArchValue width;
+        switch (getType()) {
+            case ASCII:
+                width = ArchType.Byte.of(Character.BYTES);
+                break;
+
+            case Unicode:
+                width = ArchType.Byte.of(Short.BYTES);
+                break;
+
+            case Integer:
+                width = ArchType.Byte.of(Long.BYTES);
+                break;
+
+            default:
+                throw new IllegalStateException("Unknown type: " + getType());
+
         }
-        else if (getType().equals("unicode") && getBuffer().getWidth() < 2) {
-            throw new ValidationException("IO \"" + this + "\" is of type " +
-                    "unicode and so needs a\nbuffer register at least " +
-                    "16 bits wide.");
+
+        if (getBuffer().getWidth() < width.as(ArchType.Byte)) {
+            throw new ValidationException("IO \"" + this + "\" is of type " + getType()+ " and so needs a\n" +
+                    "buffer register at least " + width.as(ArchType.Bit) + " bits wide.");
         }
     }
 }

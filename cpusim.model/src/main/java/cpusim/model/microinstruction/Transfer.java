@@ -1,12 +1,11 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.Sized;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
@@ -20,15 +19,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 abstract class Transfer<From extends Module<From> & Sized<From>, To extends Module<To> & Sized<To>,
         Sub extends Transfer<From, To, Sub>>
         extends Microinstruction<Sub> {
-    
-    protected SimpleObjectProperty<From> source;
-    protected SimpleIntegerProperty srcStartBit;
-    
-    protected SimpleObjectProperty<To> dest;
-    protected SimpleIntegerProperty destStartBit;
-    protected SimpleIntegerProperty numBits;
-    
-    
+
+    @DependantComponent
+    protected final ObjectProperty<From> source;
+    protected final IntegerProperty srcStartBit;
+
+    @DependantComponent
+    protected final ObjectProperty<To> dest;
+    protected final IntegerProperty destStartBit;
+    protected final IntegerProperty numBits;
+
+    protected ReadOnlySetProperty<MachineComponent> dependencies;
+
     /**
      * Constructor
      * creates a new Transfer object with input values.
@@ -58,46 +60,25 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     }
     
     /**
-     * Constructor
-     * creates a new Transfer object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param source the register whose value is to be tested.
-     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be transfered.
-     * @param dest the destination register.
-     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
-     * @param numBits a non-negative integer indicating the number of bits to be tested.
-     */
-    public Transfer(String name,
-                    Machine machine,
-                    From source,
-                    int srcStartBit,
-                    To dest,
-                    int destStartBit,
-                    int numBits){
-        super(name, IdentifiedObject.generateRandomID(), machine);
-        this.source = new SimpleObjectProperty<>(source);
-        this.srcStartBit = new SimpleIntegerProperty(srcStartBit);
-        this.dest = new SimpleObjectProperty<>(dest);
-        this.destStartBit = new SimpleIntegerProperty(destStartBit);
-        this.numBits = new SimpleIntegerProperty(numBits);
-    }
-    
-    /**
      * Copy constructor
      * @param other Copied instance
      */
     public Transfer(final Transfer<From, To, Sub> other) {
         this(checkNotNull(other).getName(),
-                other.machine,
+                UUID.randomUUID(),
+                other.getMachine(),
                 other.getSource(),
                 other.getSrcStartBit(),
                 other.getDest(),
                 other.getDestStartBit(),
                 other.getNumBits());
     }
-    
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return this.dependencies;
+    }
+
     /**
      * returns the name of the set microinstruction as a string.
      *
@@ -115,7 +96,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public final void setSource(From newSource){
         source.set(newSource);
     }
-    
+
+    public ObjectProperty<From> sourceProperty() {
+        return source;
+    }
+
     /**
      * returns the index of the start bit of the microinstruction.
      *
@@ -133,7 +118,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public final void setSrcStartBit(int newSrcStartBit){
         srcStartBit.set(newSrcStartBit);
     }
-    
+
+    public IntegerProperty srcStartBitProperty() {
+        return srcStartBit;
+    }
+
     /**
      * returns the name of the set microinstruction as a string.
      *
@@ -151,7 +140,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public final void setDest(To newDest){
         dest.set(newDest);
     }
-    
+
+    public ObjectProperty<To> destProperty() {
+        return dest;
+    }
+
     /**
      * returns the index of the start bit of the microinstruction.
      *
@@ -169,7 +162,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public final void setDestStartBit(int newDestStartBit){
         destStartBit.set(newDestStartBit);
     }
-    
+
+    public IntegerProperty destStartBitProperty() {
+        return destStartBit;
+    }
+
     /**
      * returns the number of bits of the value.
      *
@@ -187,7 +184,11 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     public final void setNumBits(int newNumbits){
         numBits.set(newNumbits);
     }
-    
+
+    public IntegerProperty numBitsProperty() {
+        return numBits;
+    }
+
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.
@@ -202,7 +203,7 @@ abstract class Transfer<From extends Module<From> & Sized<From>, To extends Modu
     @Override
     public <U extends Sub> void copyTo(final U other) {
         checkNotNull(other);
-    
+
         other.setName(getName());
         other.setSource(getSource());
         other.setSrcStartBit(getSrcStartBit());

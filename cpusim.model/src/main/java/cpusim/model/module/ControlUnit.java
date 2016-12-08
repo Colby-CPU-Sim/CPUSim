@@ -16,12 +16,10 @@ package cpusim.model.module;
 
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Module;
-import cpusim.model.util.IdentifiedObject;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import cpusim.model.util.MachineComponent;
+import javafx.beans.property.*;
+import org.fxmisc.easybind.EasyBind;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
@@ -32,32 +30,34 @@ import static com.google.common.base.Preconditions.*;
 public class ControlUnit extends Module<ControlUnit> {
     
     //the instr currently or about to be executed
-    private MachineInstruction currentInstruction;
+    @DependantComponent
+    private final ObjectProperty<MachineInstruction> currentInstruction;
     
     //the index of the micro sequence
-    private IntegerProperty microIndex;
-    
-    //the machine of which this is the control unit
-    private Machine machine;
+    private final IntegerProperty microIndex;
+
+    private final ReadOnlySetProperty<MachineComponent> dependencies;
+
 
     /**
      * Constructor
      * @param name name of the control unit
-     * @param machine machine that implement it
+     *
      */
     public ControlUnit(String name, UUID id, Machine machine) {
         super(name, id, machine);
         microIndex = new SimpleIntegerProperty(0);
-        currentInstruction = machine.getFetchSequence();
+        currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", machine.getFetchSequence());
+
+        // When the current instruction changes, we reset the value to 0
+        EasyBind.subscribe(currentInstruction, newValue -> setMicroIndex(0));
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
-    
-    /**
-     * Constructor
-     * @param name name of the control unit
-     * @param machine machine that implement it
-     */
-    public ControlUnit(String name, Machine machine) {
-        this(name, IdentifiedObject.generateRandomID(), machine);
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependencies;
     }
 
     /**
@@ -89,13 +89,17 @@ public class ControlUnit extends Module<ControlUnit> {
         this.microIndex.add(amount);
     }
 
+    public ObjectProperty<MachineInstruction> currentInstructionProperty() {
+        return currentInstruction;
+    }
+
     /**
      * getter for the current instruction
      * @return the current instruction
      */
     public MachineInstruction getCurrentInstruction()
     {
-        return this.currentInstruction;
+        return this.currentInstruction.get();
     }
 
     /**
@@ -104,7 +108,7 @@ public class ControlUnit extends Module<ControlUnit> {
      */
     public void setCurrentInstruction(MachineInstruction instr)
     {
-        this.currentInstruction = instr;
+        this.currentInstruction.set(instr);
     }
 
     /**
@@ -113,23 +117,27 @@ public class ControlUnit extends Module<ControlUnit> {
     public void reset()
     {
         microIndex.set(0);
-        currentInstruction = machine.getFetchSequence();
+        currentInstruction.set(getMachine().getFetchSequence());
     }
 
-    /**
-     * copies the data from the current module to a specific module
-     * @param newControl the micro instruction that will be updated
-     */
     @Override
-    public void copyTo(ControlUnit newControl)
-    {
-    	checkNotNull(newControl);
-    	
-        newControl.setMicroIndex(microIndex.get());
-        newControl.setCurrentInstruction(currentInstruction);
-        newControl.machine = machine;
+    public ControlUnit cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        ControlUnit newInst = new ControlUnit(getName(), UUID.randomUUID(), oldToNew.getNewMachine());
+        oldToNew.copyProperty(this, newInst, ControlUnit::currentInstructionProperty);
+
+        return newInst;
     }
-    
+
+    @Override
+    public <U extends ControlUnit> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setMicroIndex(getMicroIndex());
+        other.setCurrentInstruction(getCurrentInstruction());
+    }
+
     /**
      * returns the XML description
      * @return the XML description
@@ -156,7 +164,7 @@ public class ControlUnit extends Module<ControlUnit> {
      */
     public State getCurrentState()
     {
-        return new State(currentInstruction, microIndex.get());
+        return new State(currentInstruction.get(), microIndex.get());
     }
 
     /**
@@ -175,7 +183,7 @@ public class ControlUnit extends Module<ControlUnit> {
      */
     public class State
     {
-        private MachineInstruction  instr;
+        private MachineInstruction instr;
         private int microIndex;
 
         public State(MachineInstruction instr, int microIndex)
@@ -186,7 +194,7 @@ public class ControlUnit extends Module<ControlUnit> {
 
         public void restoreControlUnitToThisState()
         {
-            ControlUnit.this.currentInstruction = instr;
+            ControlUnit.this.currentInstruction.setValue(instr);
             ControlUnit.this.microIndex.set(microIndex);
         }
 

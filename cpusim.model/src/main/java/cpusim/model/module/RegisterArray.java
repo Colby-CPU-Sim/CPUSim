@@ -24,65 +24,90 @@
 package cpusim.model.module;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.fxmisc.easybind.EasyBind;
 
 import java.util.Iterator;
-import java.util.Spliterator;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A register array is an indexed list of any number of registers.
  */
-public class RegisterArray extends Module<RegisterArray> implements Iterable<Register>, Sized<RegisterArray>
-{
+public class RegisterArray extends Module<RegisterArray>
+        implements Sized<RegisterArray>, Iterable<Register> {
+
 
     //------------------------
     //instance variables
-    private SimpleIntegerProperty length;
-    private SimpleIntegerProperty width;
-    private ObservableList<Register> registers;
-    private int numIndexDigits;  //== floor(log10(length-1))+1
+    @ChildComponent
+    private final ListProperty<Register> registers;
+
+    private final IntegerProperty width;
+    private final ReadOnlyIntegerProperty numIndexDigits;  //== floor(log10(length-1))+1
+
+    private final ReadOnlySetProperty<MachineComponent> children;
     
     /**
      * Constructor
      * @param name name of the register array
-     * @param length a positive base-10 integer specifying the number of registers in the register array.
      * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
      */
-    public RegisterArray(String name, UUID id, Machine machine, int length, int width, ObservableList<Register> registers) {
+    public RegisterArray(String name, UUID id, Machine machine, int width, int length, int initialValue) {
         super(name, id, machine);
-        this.width = new SimpleIntegerProperty(width);  //used in setLength
-        this.length = new SimpleIntegerProperty(length);  //initial length value to be used in setLength
-        this.registers = checkNotNull(registers);
+        this.width = new SimpleIntegerProperty(this, "width", width);  //used in setLength
 
-        this.length.bind(Bindings.size(registers));
+        this.registers = new SimpleListProperty<>(this, "registers", FXCollections.observableArrayList());
 
-        // bind all of the register's width to be the width of the array.
-        registers.forEach(r -> r.widthProperty().bind(this.width));
+        for (int i = 0; i < length; ++i) {
+            Register register = new Register("", UUID.randomUUID(),
+                    machine, width,
+                    initialValue, Register.Access.readOnly());
+
+            bindRegister(register);
+            this.registers.add(register);
+        }
+
+        // Auto compute the number of digits when the size changes
+
+        IntegerProperty numIndexDigits = new SimpleIntegerProperty(this, "numIndexDigits", 0);
+        numIndexDigits.bind(EasyBind.map(this.registers.sizeProperty(), size ->
+            (int)Math.floor(Math.log10(size.intValue() - 1)) + 1));
+        this.numIndexDigits = numIndexDigits;
+
+        children = MachineComponent.collectChildren(this);
     }
 
     /**
-     * Constructor
-     * @param name name of the register array
-     * @param length a positive base-10 integer specifying the number of registers in the register array.
-     * @param width a positive base-10 integer that specifies the number of bits in each register in the array.
+     * Binds the name "arrayName[i]" ({@link Register#nameProperty()} &lt;- {@link #nameProperty()}) and the
+     * {@link Register#widthProperty()} &lt;-&gt; {@link #widthProperty()}.
+     *
+     * @param toBind The register that will be bound to the properties of the RegisterArray
      */
-    public RegisterArray(String name, Machine machine, int length, int width, ObservableList<Register> registers) {
-        this(name, IdentifiedObject.generateRandomID(), machine, length, width, registers);
+    private void bindRegister(Register toBind) {
+        checkNotNull(toBind);
+
+        toBind.nameProperty().bind(Bindings.createStringBinding(() ->
+                        nameProperty().getValue()
+                                + "["
+                                + getIndexString(registers.indexOf(toBind))
+                                + "]",
+                nameProperty(), registers));
+
+        toBind.widthProperty().bindBidirectional(width);
     }
 
-    //------------------------
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getChildrenComponents() {
+        return children;
+    }
 
     /**
      * getter of the width
@@ -98,7 +123,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
      * Read-only property for the width.
      * @return Read-only, non-{@code null} width property.
      */
-    public ReadOnlyIntegerProperty widthProperty() {
+    public IntegerProperty widthProperty() {
         return width;
     }
 
@@ -106,60 +131,39 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
      * getter of the length
      * @return the length as integer
      */
-    public int getLength()
-    {
-        return length.get();
-    }
-
-    public ReadOnlyIntegerProperty lengthProperty() {
-        return length;
+    public int getLength() {
+        return registers.size();
     }
 
     /**
-     * getter of the list of registers
-     * @return a list of registers
+     * Gets the length of the register array, it is bound to {@link ObservableList#size()} of the
+     * {@link #registersProperty()}.
+     *
+     * @return Length of register array.
      */
-    public ObservableList<Register> registers()
-    {
+    public ReadOnlyIntegerProperty lengthProperty() {
+        return registers.sizeProperty();
+    }
+
+    public ListProperty<Register> registersProperty() {
         return registers;
     }
-    
+
+    public ObservableList<Register> getRegisters() {
+        return registers.getValue();
+    }
+
     @Override
     public Iterator<Register> iterator() {
         return registers.iterator();
-    }
-    
-    @Override
-    public void forEach(final Consumer<? super Register> action) {
-        registers.forEach(action);
-    }
-    
-    @Override
-    public Spliterator<Register> spliterator() {
-        return registers.spliterator();
-    }
-    
-    /**
-     * overrides the Module.setName() method it inherits
-     */
-    public void setName(String name)
-    {
-        super.setName(name);
-        
-        for (int i = 0; i < registers.size(); i++){
-            final Register r = registers.get(i);
-            r.setName(name + "[" + toStringOfLength(i, numIndexDigits) + "]");
-        }
     }
 
     /**
      * set the width value
      * @param width new width value
      */
-    public void setWidth(int width)
-    {
+    public void setWidth(int width) {
         this.width.set(width);
-        registers.forEach(r -> r.setWidth(width));
     }
 
     /**
@@ -172,62 +176,39 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
             throw new IllegalArgumentException("RegisterArray.setLength() called with length <= 0");
         }
 
-        //compute numIndexDigits instance variable for the new length
-        updateNumIndexDigits(newLength);
-
         //now delete or add registers to the array, saving the deleted ones
         //in deletedRegisters
-        if (newLength < length.get()) {
-            //copy the old registers in a new shorter array
-            ObservableList<Register> newRegisters = FXCollections.observableArrayList();
-            registers.stream().limit(newLength).forEach(newRegisters::add);
 
-            registers = newRegisters;
+        // remove registers if needed
+        registers.remove(newLength, registers.size());
+
+       for (int i = registers.size(); i < newLength; i++) {
+            Register r = new Register("",
+                    UUID.randomUUID(),
+                    getMachine(),
+                    width.get(),
+                    0,
+                    Register.Access.readWrite());
+
+            bindRegister(r);
+            registers.add(r);
         }
-        else if (newLength >= length.get()) {
-            //save the old registers and add new ones on the end
-            ObservableList<Register> newRegisters = FXCollections.observableArrayList();
-            registers.forEach(newRegisters::add);
-            
-            for (int i = length.get(); i < newLength; i++) {
-                Register r = new Register(getName() + "[" + toStringOfLength(i, numIndexDigits) + "]",
-                        machine,
-                        width.get(),
-                        0,
-                        Register.Access.readWrite());
-                r.widthProperty().bind(this.width);
-
-                newRegisters.add(r);
-            }
-            
-            registers = newRegisters;
-        }
-
-        //adjust the length instance variable
-        this.length.set(newLength);
     }
 
     public void setRegisters(ObservableList<Register> newRegisters) {
+        for (int i = 0; i < newRegisters.size(); ++i) {
+            final Register r = newRegisters.get(i);
 
-        ObservableList<Register> newRegisterList = FXCollections.observableList(newRegisters);
-        newRegisterList.forEach(r -> r.widthProperty().bind(this.width));
-        this.length.bind(Bindings.size(newRegisterList));
+            bindRegister(r);
 
-        this.registers = newRegisterList;
-    }
-
-    /**
-     * updates the number digits
-     * @param newLength  new length of the digits
-     */
-    private void updateNumIndexDigits(int newLength) {
-        numIndexDigits = 1;
-        int temp = newLength;
-        while (temp > 10) {
-            numIndexDigits++;
-            temp /= 10;
+            if (i < registers.size()) {
+                registers.set(i, r);
+            } else {
+                registers.add(r);
+            }
         }
     }
+
 
 
     //------------------------
@@ -245,7 +226,7 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
                 "<TR><TD><B>Name</B></TD><TD><B>" +
                 "Width</B></TD><TD><B>Initial Value</B></TD>"+
                 "<TD><B>Read Only</B></TD><B>");
-        for (Register register : registers){
+        for (Register register : registers) {
             registerTableString.append(register.getHTMLDescription(indent + "\t"));
         }
         registerTableString.append("</TABLE><P></P>");
@@ -258,24 +239,26 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
     /**
      * clear the value in the register in this array to 0
      */
-    public void clear()
-    {
-        registers().forEach(Register::clear);
-    } // end clear()
+    public void clear() {
+        getRegisters().forEach(Register::clear);
+    }
 
     /**
      * returns a string rep of i preceded by enough spaces to make the total
      * length of the string equal to the given length.
      * @param i a integer value
-     * @param length length of the data
      * @return a string representation of value i
      */
-    private String toStringOfLength(int i, int length)
+    private String getIndexString(int i)
     {
-        String result = "" + i;
-        while (result.length() < length)
-            result = " " + result;
-        return result;
+        StringBuilder bld = new StringBuilder();
+        String intStr = Integer.toString(i);
+
+        while (bld.length() < (this.numIndexDigits.get() - intStr.length())) {
+            bld.append(' ');
+        }
+
+        return bld.append(intStr).toString();
     }
 
 	@Override
@@ -285,22 +268,33 @@ public class RegisterArray extends Module<RegisterArray> implements Iterable<Reg
                 + getLength() + "\" width=\"" + getWidth() + "\" id=\""
                 + getID() + "\" >" + nl;
         //write the descriptions of all the registers in the array
-        for(int i = 0; i < length.get(); i++)
-            result += "\t\t" + registers.get(i).getXMLDescription(indent + "\t") + nl;
+        for(Register r: registers)
+            result += "\t\t" + r.getXMLDescription(indent + "\t") + nl;
         result += "\t</RegisterArray>";
         return indent + result;
 	}
 
-	@Override
-	public <U extends RegisterArray> void copyTo(U oldRegisterArray) {
-		checkNotNull(oldRegisterArray);
-		
-		oldRegisterArray.setLength(length.get()); //causes the array length to change
-        oldRegisterArray.setName(getName());
-        oldRegisterArray.setWidth(width.get());  //causes all register widths to change
-        oldRegisterArray.setRegisters(registers);
-	}
-    
+    @Override
+    public RegisterArray cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        RegisterArray newArray = new RegisterArray(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                getWidth(), getWidth(), getLength());
+
+        registers.stream().map(oldToNew::get).forEach(newArray.registers::add);
+
+        return newArray;
+    }
+
+    @Override
+    public <U extends RegisterArray> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setWidth(getWidth());  //causes all register widths to change
+        other.setRegisters(registers);
+    }
+
     @Override
     public void validate() {
         super.validate();

@@ -3,12 +3,7 @@ package cpusim.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
+import cpusim.model.util.*;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
@@ -32,7 +27,14 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2013-08-01
  */
-public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable<Field>, LegacyXMLSupported, HTMLEncodable {
+public class Field
+        implements
+                NamedObject
+                , IdentifiedObject
+                , LegacyXMLSupported
+                , HTMLEncodable
+                , MachineComponent
+                , Copyable<Field> {
 
 	public enum Relativity {
 		absolute, 
@@ -64,7 +66,9 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     	}
     }
 
-    private final ObjectProperty<UUID> id;
+    private final Machine machine;
+
+    private final ReadOnlyObjectProperty<UUID> id;
     
     /**
      * The name of the field
@@ -89,7 +93,7 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     /**
      * The acceptable values for this field
      */
-    private ObservableList<FieldValue> values;
+    private ListProperty<FieldValue> values;
     
     /**
      * The value to use if optional or ignored
@@ -105,8 +109,8 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     /** 
      * Constructor for Field with name "?".
      */
-    public Field() {
-        this("?", IdentifiedObject.generateRandomID());
+    public Field(Machine machine) {
+        this("?", UUID.randomUUID(), machine);
     }
     
     /**
@@ -116,9 +120,9 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
      * @param name - The name of the field.
      * @param id
      */
-    public Field(String name, final UUID id) {
-        this(name, id, 0, Relativity.absolute, FXCollections.observableArrayList(), 0, SignedType.Signed, Type.required
-        );
+    public Field(String name, final UUID id, Machine machine) {
+        this(name, id, machine, 0, Relativity.absolute, FXCollections.observableArrayList(),
+                0, SignedType.Signed, Type.required);
     }
     
     /**
@@ -128,7 +132,8 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
      * @throws NullPointerException if <code>other</code> is <code>null</code>.
      */
     public Field(final Field other) {
-        this(other.getName(), IdentifiedObject.generateRandomID(),
+        this(other.getName(), UUID.randomUUID(),
+                other.machine,
                 other.getNumBits(), other.getRelativity(),
                 other.getValues(), other.getDefaultValue(),
                 other.getSigned(), other.getType());
@@ -151,25 +156,25 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     @JsonCreator
     public Field(@JsonProperty("name") String name,
                  @JsonProperty("id") final UUID id,
+                 final Machine machine,
                  @JsonProperty("numBits") int length,
                  @JsonProperty("relativity") Relativity relativity,
                  @JsonProperty("values") ObservableList<FieldValue> values,
                  @JsonProperty("defaultValue") long defaultValue,
                  @JsonProperty("signed") SignedType signed,
                  @JsonProperty("type") Type type) {
-        this.id = new SimpleObjectProperty<>(checkNotNull(id));
-        
-        this.name = new SimpleStringProperty(checkNotNull(name));
-        this.type = new SimpleObjectProperty<>(checkNotNull(type));
-        this.numBits = new SimpleIntegerProperty(length);
-        this.relativity = new SimpleObjectProperty<>(checkNotNull(relativity));
-        this.defaultValue = new SimpleLongProperty(defaultValue);
-        this.signed = new SimpleObjectProperty<>(checkNotNull(signed));
-        this.values = checkNotNull(values);
+        this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
+        this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
+        this.machine = checkNotNull(machine);
+        this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
+        this.numBits = new SimpleIntegerProperty(this, "numBits", length);
+        this.relativity = new SimpleObjectProperty<>(this, "relativity", checkNotNull(relativity));
+        this.defaultValue = new SimpleLongProperty(this, "defaultValue", defaultValue);
+        this.signed = new SimpleObjectProperty<>(this, "signed", checkNotNull(signed));
+        this.values = new SimpleListProperty<>(this, "values", values);
     }
 
     ////////////////// Setters and getters //////////////////
-
 
     @Override
     public StringProperty nameProperty() {
@@ -177,8 +182,13 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
     }
 
     @Override
-    public ObjectProperty<UUID> idProperty() {
+    public ReadOnlyObjectProperty<UUID> idProperty() {
         return id;
+    }
+
+    @Override
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
+        return new ReadOnlyObjectWrapper<>(this, "machine", machine);
     }
 
     @JsonProperty
@@ -217,8 +227,15 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
 
     public ObservableList<FieldValue> getValues() { return values; }
 
+    private ListProperty<FieldValue> valuesProperty() {
+        return values;
+    }
+
     public void setValues(ObservableList<FieldValue> values) {
-        this.values = values;
+        checkNotNull(values);
+
+        this.values.clear();
+        this.values.addAll(values);
     }
 
     public long getDefaultValue() {
@@ -295,18 +312,29 @@ public class Field implements NamedObject, IdentifiedObject, Cloneable, Copyable
             }
         }
     }
-    
+
     @Override
-    public void copyTo(final Field newField) {
-    	checkNotNull(newField);
-    	
-        newField.setName(getName());
-        newField.setType(getType());
-        newField.setRelativity(getRelativity());
-        newField.setNumBits(getNumBits());
-        newField.setDefaultValue(getDefaultValue());
-        newField.setSigned(getSigned());
-        newField.setValues(getValues());
+    public Field cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        Field newInst = new Field(getName(), UUID.randomUUID(), machine,
+                getNumBits(),getRelativity(), FXCollections.observableArrayList(),
+                getDefaultValue(), getSigned(), getType());
+
+        oldToNew.copyListProperty(this, newInst, Field::valuesProperty);
+
+        return newInst;
+    }
+
+    @Override
+    public <U extends Field> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setType(getType());
+        other.setRelativity(getRelativity());
+        other.setNumBits(getNumBits());
+        other.setDefaultValue(getDefaultValue());
+        other.setSigned(getSigned());
+        other.setValues(getValues());
     }
 
     /**

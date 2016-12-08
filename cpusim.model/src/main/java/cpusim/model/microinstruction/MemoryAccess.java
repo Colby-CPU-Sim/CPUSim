@@ -1,16 +1,16 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.PropertyCollectionBuilder;
+import javafx.beans.property.*;
 
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads data from a {@link RAM} location and places it into a {@link Register}.
@@ -19,10 +19,12 @@ import static com.google.common.base.Preconditions.*;
  */
 public class MemoryAccess extends Microinstruction<MemoryAccess> {
 	
-    private SimpleStringProperty direction;
-    private SimpleObjectProperty<RAM> memory;
-    private SimpleObjectProperty<Register> data;
-    private SimpleObjectProperty<Register> address;
+    private ObjectProperty<IODirection> direction;
+    private ObjectProperty<RAM> memory;
+    private ObjectProperty<Register> data;
+    private ObjectProperty<Register> address;
+
+    private ReadOnlySetProperty<MachineComponent> dependants;
 
 
     /**
@@ -40,35 +42,21 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
     public MemoryAccess(String name,
                         UUID id,
                         Machine machine,
-                        String direction,
+                        IODirection direction,
                         RAM memory,
                         Register data,
                         Register address){
         super(name, id, machine);
-        this.direction = new SimpleStringProperty(this, "direction", direction);
+        this.direction = new SimpleObjectProperty<>(this, "direction", direction);
         this.memory = new SimpleObjectProperty<>(this, "memory", memory);
         this.data = new SimpleObjectProperty<>(this, "data", data);
         this.address = new SimpleObjectProperty<>(this, "address", address);
-    }
-    
-    
-    /**
-     * Constructor
-     * creates a new Increment object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param machine the machine that the microinstruction belongs to.
-     * @param direction type of logical microinstruction.
-     * @param memory the RAM memory.
-     * @param data the register storing the data.
-     * @param address the register storing the address.
-     */
-    public MemoryAccess(String name, Machine machine,
-                        String direction,
-                        RAM memory,
-                        Register data,
-                        Register address){
-        this(name, IdentifiedObject.generateRandomID(), machine, direction, memory, data, address);
+
+        this.dependants = (new PropertyCollectionBuilder<MachineComponent>())
+                .add(this.memory)
+                .add(this.data)
+                .add(this.address)
+                .buildSet(this, "dependants");
     }
     
     /**
@@ -76,11 +64,16 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      * @param other instance to copy
      */
     public MemoryAccess(MemoryAccess other) {
-        this(other.getName(), other.machine,
+        this(other.getName(), UUID.randomUUID(), other.getMachine(),
                 other.getDirection(), other.getMemory(),
                 other.getData(), other.getAddress());
     }
-    
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependants;
+    }
+
     /**
      * returns the register to be calculated.
      * @return the name of the register.
@@ -95,6 +88,10 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      */
     public void setMemory(RAM newMemory){
         memory.set(newMemory);
+    }
+
+    public ObjectProperty<RAM> memoryProperty() {
+        return memory;
     }
 
     /**
@@ -113,6 +110,10 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
         data.set(newData);
     }
 
+    public ObjectProperty<Register> dataProperty() {
+        return data;
+    }
+
     /**
      * returns the register to be calculated.
      * @return the name of the register.
@@ -129,11 +130,15 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
         address.set(newAddress);
     }
 
+    public ObjectProperty<Register> addressProperty() {
+        return address;
+    }
+
     /**
      * returns the register to put result.
      * @return the name of the register.
      */
-    public String getDirection(){
+    public IODirection getDirection(){
         return direction.get();
     }
 
@@ -141,10 +146,14 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      * updates the register used by the microinstruction.
      * @param newDirection the new destination for the logical microinstruction.
      */
-    public void setDirection(String newDirection){
+    public void setDirection(IODirection newDirection){
         direction.set(newDirection);
     }
-    
+
+    public ObjectProperty<IODirection> directionProperty() {
+        return direction;
+    }
+
     /**
      * execute the micro instruction from machine
      */
@@ -164,28 +173,38 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
             }
         }
         int numBits = data.get().getWidth();
-        if (direction.get().equals("read")) {
-            long value = memory.get().getData(addressValue, numBits);
-            data.get().setValue(value);
+        switch (direction.get()) {
+            case Read: {
+                long value = memory.get().getData(addressValue, numBits);
+                data.get().setValue(value);
+
 //            if( memory.get().breakAtAddress(addressValue))
 //                throw new BreakException("Break in " + memory.get().getName() +
 //                        " read at address " + addressValue,
 //                        addressValue, memory.get());
-        }
-        else {
-            assert direction.get().equals("write") : "Illegal direction " +
-                    direction.get() + " in MemoryAccess micro " + getName();
-            long value = data.get().getValue();
-            memory.get().setData(addressValue, value, numBits);
-            //it would seem like the next statement should be added to the
-            //end of RAM.setData, but that method is called when the user
-            //manually edits the data in the RAM and we don't want a break
-            //to be called in that case(?).  But there should be a better way
-            //to do this.
+            } break;
+
+            case Write: {
+                long value = data.get().getValue();
+                memory.get().setData(addressValue, value, numBits);
+
+                // FIXME this could be done via listeners
+                //it would seem like the next statement should be added to the
+                //end of RAM.setData, but that method is called when the user
+                //manually edits the data in the RAM and we don't want a break
+                //to be called in that case(?).  But there should be a better way
+                //to do this.
 //            if (memory.get().breakAtAddress(addressValue))
 //                throw new BreakException("Break in " + memory.get().getName() +
 //                        " write at address " + addressValue,
 //                        addressValue, memory.get());
+
+            } break;
+
+            default: {
+                throw new IllegalArgumentException("Illegal direction " + direction.get()
+                        + " in MemoryAccess micro " + getName());
+            }
         }
     }
 
@@ -216,18 +235,25 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
                 "</TD><TD>" + getAddress().getHTMLName() +
                 "</TD></TR>";
     }
-    
+
     @Override
-    public <U extends MemoryAccess> void copyTo(final U newMemoryAccess) {
-        checkNotNull(newMemoryAccess);
-        
-        newMemoryAccess.setName(getName());
-        newMemoryAccess.setDirection(getDirection());
-        newMemoryAccess.setMemory(getMemory());
-        newMemoryAccess.setData(getData());
-        newMemoryAccess.setAddress(getAddress());
+    public MemoryAccess cloneFor(IdentifierMap oldToNew) {
+        return new MemoryAccess(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                getDirection(), oldToNew.get(getMemory()),
+                oldToNew.get(getData()), oldToNew.get(getAddress()));
     }
-    
+
+    @Override
+    public <U extends MemoryAccess> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setDirection(getDirection());
+        other.setMemory(getMemory());
+        other.setData(getData());
+        other.setAddress(getAddress());
+    }
+
     /**
      * returns true if this microinstruction uses m
      * (so if m is modified, this micro may need to be modified.

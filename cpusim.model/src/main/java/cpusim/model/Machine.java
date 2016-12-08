@@ -1,8 +1,7 @@
 package cpusim.model;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSet;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.assembler.PunctChar.Use;
@@ -11,17 +10,17 @@ import cpusim.model.iochannel.IOChannel;
 import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.Validatable;
-import cpusim.model.util.ValidationException;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import cpusim.model.util.*;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,23 +28,12 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This file contains the class for Machines created using CPU Sim
- * <p>
- * Class Modifications:
- * Generics added to setRegisterArrays, getMicrosThatUse, setEnd, setRAMs,
- * haltBitsThatAreSet and getInstructionsThatUse methods.
- * <p>
- * In the execute method we added "fire property change" to indicate the start
- * of a microinstruction. This property change is used to indicate when to put
- * a new microInstructionStack of HashMaps as an element in the
- * machineInstructionStack.
+ * This file contains the class for Machines created using CPUSim
  *
  * @since 2013-10-01
  */
 public class Machine extends Module<Machine> {
 
-    private static final long serialVersionUID = 1L;
- 
     /**
      * constants for different running modes
      */
@@ -72,163 +60,6 @@ public class Machine extends Module<Machine> {
         START_OF_MICROINSTRUCTION,
         BREAK,
         HALTED_STEP_BY_MICRO
-    }
-    
-    /**
-     * Get all of the supported implementing {@link Class} values for the {@link Microinstruction}.
-     * @return
-     */
-    public static ImmutableList<Class<? extends Microinstruction<?>>> getMicroClasses() {
-        ImmutableList.Builder<Class<? extends Microinstruction<?>>> bld = ImmutableList.builder();
-        Arrays.stream(MicroClassMapping.values()).map(v -> v.instructionType)
-                .forEach(c -> bld.add((Class<? extends Microinstruction<?>>)c));
-        return bld.build();
-    }
-
-    public static Optional<Class<? extends Microinstruction<?>>> getMicroClassByName(String name) {
-        return getMicroClasses().stream().filter(c -> c.getSimpleName().equals(name)).findFirst();
-    }
-    
-    /**
-     * Get all of the supported implementing {@link Class} values for {@link Module} instances.
-     * @return
-     */
-    public static ImmutableList<Class<? extends Module<?>>> getModuleClasses() {
-        ImmutableList.Builder<Class<? extends Module<?>>> bld = ImmutableList.builder();
-        Arrays.stream(ModuleClassMapping.values()).map(v -> v.moduleType).forEach(bld::add);
-        return bld.build();
-    }
-
-
-    /**
-     * the hardware modules making up the machine
-     */
-    private ObservableList<Register> registers;
-    private ObservableList<RegisterArray> registerArrays;
-    private ObservableList<ConditionBit> conditionBits;
-    private ObservableList<RAM> rams;
-    
-    private final ObservableList<Register> allRegisters;
-
-    /**
-     * the current state of the machine, defined by enum state
-     * and associated Object value
-     */
-    private SimpleObjectProperty<StateWrapper> wrappedState;
-
-    // Machine instructions
-    private ObservableList<MachineInstruction> instructions;
-    // EQUs
-    private ObservableList<EQU> EQUs;
-    // key = micro name, value = list of microinstructions
-    private Map<Class<? extends Microinstruction>, ObservableList<? extends Microinstruction<?>>> microMap;
-    // key = module type, value = list of modules
-    private Map<Class<? extends Module<?>>, ObservableList<? extends Module<?>>> moduleMap;
-    // Control unit for keeping track of index of micro within machine instruction
-    private ControlUnit controlUnit;
-    // The machine's fetch sequence
-    private MachineInstruction fetchSequence;
-    // Can be: RUN, STEP_BY_MICRO, STEP_BY_INSTR, STOP, ABORT, COMMAND_LINE
-    // It is volatile to ensure that all threads can read it at any time
-    private volatile RunModes runMode = RunModes.ABORT;
-    // Fields of the machine instructions
-    private ObservableList<Field> fields;
-    // Array of PunctChars.
-    private List<PunctChar> punctChars;
-    // Address to start when loading RAM with a program
-    private int startingAddressForLoading;
-    // RAM where the code store resides
-    private SimpleObjectProperty<RAM> codeStore;
-    // True if bit indexing starts of the right side, false if on the left
-    private SimpleBooleanProperty indexFromRight;
-    // Register used for stopping at break points--initially null
-    private ObjectProperty<Register> programCounter;
-    // true if the machine just halted due to a breakpoint.  It is used to turn off the
-    // break point temporarily to allow continuing past the breakpoint.
-    private boolean justBroke;
-
-    /**
-     * Creates a new machine.
-     *
-     * @param name - The name of the machine.
-     */
-    public Machine(String name) {
-        super(name, IdentifiedObject.generateRandomID(), null);
-        registers = FXCollections.observableArrayList();
-        registerArrays = FXCollections.observableArrayList();
-        conditionBits = FXCollections.observableArrayList();
-        allRegisters = FXCollections.observableArrayList();
-        
-        // We bind the "allRegisters" array to listen to the changes to the registers and registerArray lists,
-        // this way when they change, the allRegisters array is always up to date!
-        
-        registers.addListener((ListChangeListener<Register>) c -> {
-            while (c.next()) {
-                if (!c.wasPermutated() && !c.wasUpdated()) {
-                    // Add and remove registers are required.
-                    allRegisters.removeAll(c.getRemoved());
-                    allRegisters.addAll(c.getAddedSubList());
-                } // else {
-                    // Permutations just mean the order changed, this isn't relevant
-                    // and updates will already be transitive.
-                // }
-            }
-        });
-    
-        registerArrays.addListener((ListChangeListener<RegisterArray>) c -> {
-            while (c.next()) {
-                if (!c.wasPermutated() && !c.wasUpdated()) {
-                    for (RegisterArray arr : c.getRemoved()) {
-                        allRegisters.removeAll(arr.registers());
-                    }
-                    for (RegisterArray arr : c.getRemoved()) {
-                        allRegisters.addAll(arr.registers());
-                    }
-                } // else {
-                    // Permutations just mean the order changed, this isn't relevant
-                    // and updates will already be transitive.
-                // }
-            }
-        });
-        
-        rams = FXCollections.observableArrayList();
-        wrappedState = new SimpleObjectProperty<>(this, "machine state", new
-                StateWrapper(State.NEVER_RUN, ""));
-
-        moduleMap = new HashMap<>();
-        microMap = new HashMap<>();
-
-        instructions = FXCollections.observableArrayList();
-        EQUs = FXCollections.observableArrayList();
-        fields = FXCollections.observableArrayList();
-        punctChars = Lists.newArrayList(getDefaultPunctChars());
-
-        fetchSequence = new MachineInstruction("Fetch sequence", IdentifiedObject.generateRandomID(), this, 0, "");
-        controlUnit = new ControlUnit("ControlUnit", this);
-
-        startingAddressForLoading = 0;
-        programCounter = new SimpleObjectProperty<>(null);
-        codeStore = new SimpleObjectProperty<>(null);
-        indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
-        justBroke = false;
-        initializeModuleMap();
-        initializeMicroMap();
-
-    }
-
-    /**
-     * This constructor exists for backwards compatibility. The default
-     * on old existing machines was to index from the left, where the default on new
-     * machines
-     * is to index from the right
-     *
-     * @param name          machines name
-     * @param indexFromLeft if true then index from
-     *                      the left rather than the right side of the registers
-     */
-    public Machine(String name, boolean indexFromLeft) {
-        this(name);
-        indexFromRight.set(!indexFromLeft);
     }
 
     /**
@@ -315,6 +146,202 @@ public class Machine extends Module<Machine> {
         }
     }
 
+
+    /**
+     * Get all of the supported implementing {@link Class} values for the {@link Microinstruction}.
+     * @return
+     */
+    public static ImmutableSet<Class<? extends Microinstruction<?>>> getMicroClasses() {
+        ImmutableSet.Builder<Class<? extends Microinstruction<?>>> bld = ImmutableSet.builder();
+        bld.add(Arithmetic.class);
+        bld.add(Branch.class);
+        bld.add(Decode.class);
+        bld.add(End.class);
+        bld.add(Comment.class);
+        bld.add(Increment.class);
+        bld.add(IO.class);
+        bld.add(Logical.class);
+        bld.add(MemoryAccess.class);
+        bld.add(SetBits.class);
+        bld.add(SetCondBit.class);
+        bld.add(Shift.class);
+        bld.add(Test.class);
+        bld.add(TransferRtoR.class);
+        bld.add(TransferRtoA.class);
+        bld.add(TransferAtoR.class);
+        return bld.build();
+    }
+    
+    /**
+     * Get all of the supported implementing {@link Class} values for {@link Module} instances.
+     * @return
+     */
+    public static ImmutableSet<Class<? extends Module<?>>> getModuleClasses() {
+        ImmutableSet.Builder<Class<? extends Module<?>>> bld = ImmutableSet.builder();
+        bld.add(Register.class);
+        bld.add(RegisterArray.class);
+        bld.add(RAM.class);
+        bld.add(ConditionBit.class);
+        return bld.build();
+    }
+
+    private Logger logger = LogManager.getLogger(Machine.class);
+
+    private ObservableMap<UUID, MachineComponent> components;
+
+    /**
+     * the hardware modules making up the machine
+     */
+    private final ListProperty<RAM> rams;
+    private final ListProperty<Register> registers;
+    private final ListProperty<RegisterArray> registerArrays;
+    private final ListProperty<ConditionBit> conditionBits;
+
+    // Machine instructions
+    private ListProperty<MachineInstruction> instructions;
+    // EQUs
+    private ListProperty<EQU> EQUs;
+
+    // key = micro name, value = list of microinstructions
+    private Map<Class<? extends Microinstruction<?>>, ListProperty<? extends Microinstruction<?>>> microMap;
+    // key = module type, value = list of modules
+    private Map<Class<? extends Module<?>>, ListProperty<? extends Module<?>>> moduleMap;
+    // Control unit for keeping track of index of micro within machine instruction
+    private ObjectProperty<ControlUnit> controlUnit;
+    // The machine's fetch sequence
+    private ObjectProperty<MachineInstruction> fetchSequence;
+
+    // Fields of the machine instructions
+    private ListProperty<Field> fields;
+
+    // RAM where the code store resides
+    private ObjectProperty<RAM> codeStore;
+    // True if bit indexing starts of the right side, false if on the left
+    private BooleanProperty indexFromRight;
+    // Register used for stopping at break points--initially null
+    private ObjectProperty<Register> programCounter;
+
+    // Address to start when loading RAM with a program
+    private IntegerProperty startingAddressForLoading;
+
+
+    // Array of PunctChars.
+    private final ListProperty<PunctChar> punctChars;
+
+    // Can be: RUN, STEP_BY_MICRO, STEP_BY_INSTR, STOP, ABORT, COMMAND_LINE
+    // It is volatile to ensure that all threads can read it at any time
+    private volatile RunModes runMode = RunModes.ABORT;
+
+    /**
+     * the current state of the machine, defined by enum state
+     * and associated Object value
+     */
+    private SimpleObjectProperty<StateWrapper> wrappedState;
+
+    // true if the machine just halted due to a breakpoint.  It is used to turn off the
+    // break point temporarily to allow continuing past the breakpoint.
+    private boolean justBroke;
+
+    /**
+     * Creates a new machine.
+     *
+     * @param name - The name of the machine.
+     */
+    public Machine(String name) {
+        super(name, IdentifiedObject.generateRandomID(), null);
+
+        rams = new SimpleListProperty<>(this, "rams",
+                FXCollections.observableArrayList());
+        registers = new SimpleListProperty<>(this, "registers",
+                FXCollections.observableArrayList());
+        registerArrays = new SimpleListProperty<>(this, "registerArray",
+                FXCollections.observableArrayList());
+        conditionBits = new SimpleListProperty<>(this, "conditionBits",
+                FXCollections.observableArrayList());
+
+        components = FXCollections.observableHashMap();
+
+        ListChangeListener<? extends MachineComponent> componentsListener = c -> {
+            while (c.next()) {
+                if (c.wasRemoved()) {
+                    c.getRemoved().stream()
+                            .map(IdentifiedObject::getID)
+                            .forEach(components::remove);
+                } else if (c.wasAdded()) {
+                    c.getAddedSubList().forEach(i -> components.put(i.getID(), i));
+                } else if (c.wasPermutated()) {
+                    // don't care about permutations
+                }
+            }
+        };
+
+        getModuleClasses().forEach(mc -> getModuleUnchecked(mc).addListener(
+                (ListChangeListener<Module<?>>)componentsListener
+        ));
+
+        getMicroClasses().forEach(mc -> getMicrosUnchecked(mc).addListener(
+                (ListChangeListener<Microinstruction<?>>)componentsListener
+        ));
+        
+        // We bind the "allRegisters" array to listen to the changes to the registers and registerArray lists,
+        // this way when they change, the allRegisters array is always up to date!
+
+
+        wrappedState = new SimpleObjectProperty<>(this, "machine state", new
+                StateWrapper(State.NEVER_RUN, ""));
+
+        moduleMap = new HashMap<>();
+        microMap = new HashMap<>();
+
+        instructions = new SimpleListProperty<>(this, "instructions", FXCollections.observableArrayList());
+        EQUs = new SimpleListProperty<>(this, "equs", FXCollections.observableArrayList());
+        fields = new SimpleListProperty<>(this, "fields", FXCollections.observableArrayList());
+        punctChars = new SimpleListProperty<>(this, "punctChars", FXCollections.observableArrayList());
+        punctChars.addAll(getDefaultPunctChars());
+
+        fetchSequence = new SimpleObjectProperty<>(this, "fetchSequence",
+                new MachineInstruction("Fetch sequence", UUID.randomUUID(), this,
+                        0, null, null));
+        controlUnit = new SimpleObjectProperty<>(this, "controlUnit",
+                new ControlUnit("ControlUnit", UUID.randomUUID(), this));
+
+        startingAddressForLoading = new SimpleIntegerProperty(0);
+        programCounter = new SimpleObjectProperty<>(null);
+        codeStore = new SimpleObjectProperty<>(null);
+        indexFromRight = new SimpleBooleanProperty(true); //conventional indexing order
+
+        justBroke = false;
+        initializeModuleMap();
+        initializeMicroMap();
+    }
+
+    /**
+     * This constructor exists for backwards compatibility. The default
+     * on old existing machines was to index from the left, where the default on new
+     * machines
+     * is to index from the right
+     *
+     * @param name          machines name
+     * @param indexFromLeft if true then index from
+     *                      the left rather than the right side of the registers
+     */
+    public Machine(String name, boolean indexFromLeft) {
+        this(name);
+        indexFromRight.set(!indexFromLeft);
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getChildrenComponents() {
+        // FIXME
+        throw new UnsupportedOperationException("unimplemented");
+    }
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        // FIXME
+        throw new UnsupportedOperationException("unimplemented");
+    }
+
     /**
      * Returns the wrapped state of the machine.
      *
@@ -341,7 +368,7 @@ public class Machine extends Module<Machine> {
      *
      * @return - the state Simple Object Property.
      */
-    public SimpleObjectProperty<StateWrapper> stateProperty() {
+    public ObjectProperty<StateWrapper> stateProperty() {
         return this.wrappedState;
     }
 
@@ -398,12 +425,23 @@ public class Machine extends Module<Machine> {
 
     ////////////////// Setters and setters //////////////////
 
+    ReadOnlyMapProperty<UUID, MachineComponent> componentsProperty() {
+        return new ReadOnlyMapWrapper<>(components);
+    }
+
+    Map<UUID, MachineComponent> getComponents() {
+        return Collections.unmodifiableMap(components);
+    }
+
     public List<PunctChar> getPunctChars() {
         return punctChars;
     }
 
     public void setPunctChars(List<PunctChar> punctChars) {
-        this.punctChars = checkNotNull(punctChars);
+        checkNotNull(punctChars);
+
+        this.punctChars.clear();
+        this.punctChars.addAll(punctChars);
     }
 
     public char getLabelChar() {
@@ -424,16 +462,15 @@ public class Machine extends Module<Machine> {
             }
         }
         //should never get this far
-        assert false : "No comment char found in the machine's punctChars";
-        return ';';  //to satisfy the compiler
+        throw new IllegalStateException("No comment char found in the machine's punctChars");
     }
 
     public List<Field> getFields() {
         return fields;
     }
 
-    public void setFields(ObservableList<Field> f) {
-        fields = checkNotNull(f);
+    private ListProperty<Field> fieldsProperty() {
+        return fields;
     }
     
     /**
@@ -443,8 +480,8 @@ public class Machine extends Module<Machine> {
      * @return a Vector object
      */
     @SuppressWarnings("unchecked")
-    public <T extends Module<T>> ObservableList<T> getModule(final Class<T> moduleClazz) {
-        return (ObservableList<T>)moduleMap.get(moduleClazz);
+    public <T extends Module<T>> ListProperty<T> getModules(final Class<T> moduleClazz) {
+        return (ListProperty<T>)moduleMap.get(moduleClazz);
     }
     
     /**
@@ -454,8 +491,8 @@ public class Machine extends Module<Machine> {
      * @return a Vector object
      */
     @SuppressWarnings("unchecked")
-    public ObservableList<? extends Module<?>> getModuleUnchecked(final Class<? extends Module<?>> moduleClazz) {
-        return moduleMap.get(moduleClazz);
+    public ListProperty<Module<?>> getModuleUnchecked(final Class<? extends Module<?>> moduleClazz) {
+        return (ListProperty<Module<?>>)moduleMap.get(moduleClazz);
     }
     
     /**
@@ -464,7 +501,7 @@ public class Machine extends Module<Machine> {
      */
     public ImmutableList<List<? extends Module<?>>> getAllModules() {
         ImmutableList.Builder<List<? extends Module<?>>> moduleBuilder = ImmutableList.builder();
-        Machine.getModuleClasses().stream().map(c -> machine.getModuleUnchecked(c)).forEach(moduleBuilder::add);
+        Machine.getModuleClasses().stream().map(this::getModuleUnchecked).forEach(moduleBuilder::add);
         return moduleBuilder.build();
     }
     
@@ -477,8 +514,8 @@ public class Machine extends Module<Machine> {
      * @since 2016-11-20
      */
     @SuppressWarnings("unchecked")
-    public <U extends Microinstruction<U>> ObservableList<U> getMicros(Class<U> clazz) {
-        return (ObservableList<U>)microMap.get(clazz);
+    public <U extends Microinstruction<U>> ListProperty<U> getMicros(Class<U> clazz) {
+        return (ListProperty<U>)microMap.get(clazz);
     }
     
     /**
@@ -490,8 +527,8 @@ public class Machine extends Module<Machine> {
      * @since 2016-12-01
      */
     @SuppressWarnings("unchecked")
-    public ObservableList<Microinstruction<?>> getMicrosUnsafe(Class<? extends Microinstruction<?>> clazz) {
-        return (ObservableList<Microinstruction<?>>)microMap.get(clazz);
+    public ListProperty<Microinstruction<?>> getMicrosUnchecked(Class<? extends Microinstruction<?>> clazz) {
+        return (ListProperty<Microinstruction<?>>)microMap.get(clazz);
     }
     
     /**
@@ -500,7 +537,7 @@ public class Machine extends Module<Machine> {
      */
     public List<List<Microinstruction<?>>> getAllMicros() {
         ImmutableList.Builder<List<Microinstruction<?>>> microBuilder = ImmutableList.builder();
-        getMicroClasses().stream().map(c -> machine.getMicrosUnsafe(c)).forEach(microBuilder::add);
+        getMicroClasses().stream().map(this::getMicrosUnchecked).forEach(microBuilder::add);
     
         return microBuilder.build();
     }
@@ -531,9 +568,12 @@ public class Machine extends Module<Machine> {
     }
 
     public int getStartingAddressForLoading() {
-        return startingAddressForLoading;
+        return startingAddressForLoading.get();
     }
 
+    public IntegerProperty startingAddressForLoadingProperty() {
+        return startingAddressForLoading;
+    }
 
     public boolean getIndexFromRight() {
         return indexFromRight.get();
@@ -556,7 +596,7 @@ public class Machine extends Module<Machine> {
     }
 
     public void setStartingAddressForLoading(int add) {
-        startingAddressForLoading = add;
+        startingAddressForLoading.set(add);
     }
 
     public ObjectProperty<Register> programCounterProperty() {
@@ -578,45 +618,39 @@ public class Machine extends Module<Machine> {
         moduleMap.put(RAM.class, rams);
     }
 
-
     private void initializeMicroMap() {
-        for (Class<? extends Microinstruction> microClazz : getMicroClasses())
-            microMap.put(microClazz, FXCollections.observableArrayList(new ArrayList<>()));
+        for (Class<? extends Microinstruction<?>> microClazz : getMicroClasses()) {
+            microMap.put(microClazz, new SimpleListProperty<>(FXCollections.observableArrayList()));
+        }
         getMicros(End.class).add(new End(this));
         getMicros(Comment.class).add(new Comment("Comment", IdentifiedObject.generateRandomID(),this));
     }
-    
-    
-    /**
-     *
-     * @return a new {@link ObservableList} containing all the registers of the machine
-     */
-    
-    // with the registers coming from register arrays at the end of the vector.
-    public ObservableList<Register> getAllRegisters() {
-        return allRegisters;
+
+    public void setFields(List<? extends Field> newFields) {
+        checkNotNull(newFields);
+
+        fields.clear();
+        fields.addAll(newFields);
     }
-    
-    /**
-     * @returns a new observable list containing all the RAMs of the machine.
-     */
-    public ObservableList<RAM> getAllRAMs() {
-        return getModule(RAM.class);
-    }
-    
+
     /**
      * Updates the machine instructions.
      * @param newInstructions
      */
-    public void setInstructions(Collection<? extends MachineInstruction> newInstructions) {
+    public void setInstructions(List<? extends MachineInstruction> newInstructions) {
+        checkNotNull(newInstructions);
+
         instructions.clear();
         instructions.addAll(newInstructions);
     }
 
     //-------------------------------
     // updates global EQUs
-    public void setEQUs(ObservableList<EQU> newEQUs) {
-        EQUs = newEQUs;
+    public void setEQUs(List<? extends EQU> newEQUs) {
+        checkNotNull(newEQUs);
+
+        this.EQUs.clear();
+        this.EQUs.addAll(newEQUs);
     }
 
     //-------------------------------
@@ -626,10 +660,11 @@ public class Machine extends Module<Machine> {
      * Removes a {@link Module} from the machine
      * @param module
      */
-    private void removeMicro(final Module<?> module) {
-        Map<Microinstruction, ObservableList<Microinstruction>> microsThatUseIt = getMicrosThatUse(module);
-        Set<Microinstruction> e = microsThatUseIt.keySet();
-        for (Microinstruction micro : e) {
+    private void removeModule(final Module<?> module) {
+        Map<Microinstruction<?>, ObservableList<Microinstruction<?>>> microsThatUseIt
+                = getMicrosThatUse(module);
+        Set<Microinstruction<?>> e = microsThatUseIt.keySet();
+        for (Microinstruction<?> micro : e) {
             //remove it from all machine instructions
             removeAllOccurencesOf(micro);
             //also remove the microinstruction from its list.
@@ -640,7 +675,7 @@ public class Machine extends Module<Machine> {
     public void setRegisters(List<Register> newRegisters) {
         for (Register oldRegister : registers) {
             if (!newRegisters.contains(oldRegister)) {
-                removeMicro(oldRegister);
+                removeModule(oldRegister);
             }
         }
 
@@ -652,7 +687,7 @@ public class Machine extends Module<Machine> {
 
         // test whether the program counter was deleted and, if so,
         // set the program counter to the place holder register
-        if(!newRegisters.contains(programCounter))
+        if(!newRegisters.contains(programCounter.getValue()))
             setProgramCounter(null);
     }
 
@@ -661,7 +696,7 @@ public class Machine extends Module<Machine> {
     public void setRegisterArrays(final List<RegisterArray> newRegisterArrays) {
         for (RegisterArray oldArray : registerArrays) {
             if (!newRegisterArrays.contains(oldArray)) {
-                removeMicro(oldArray);
+                removeModule(oldArray);
             }
         }
 
@@ -672,7 +707,7 @@ public class Machine extends Module<Machine> {
         // test whether the program counter was deleted and, if so,
         // set the program counter to the place holder register
         for(RegisterArray array : newRegisterArrays) {
-            if (array.registers().contains(programCounter))
+            if (array.getRegisters().contains(programCounter.getValue()))
                 return;
         }
         setProgramCounter(null);
@@ -682,13 +717,17 @@ public class Machine extends Module<Machine> {
     // returns a HashMap whose keys consist of all microinstructions that
     // use m and such that the value associated with each key is the List
     // of microinstructions that contains the key.
-    public Map<Microinstruction, ObservableList<Microinstruction>> getMicrosThatUse(Module<?> m) {
-        final Map<Microinstruction, ObservableList<Microinstruction>> result = new HashMap<>(getMicroClasses().size());
+    public Map<Microinstruction<?>, ObservableList<Microinstruction<?>>> getMicrosThatUse(Module<?> m) {
+        final Map<Microinstruction<?>, ObservableList<Microinstruction<?>>> result
+                = new HashMap<>(getMicroClasses().size());
 
-        for (Class<? extends Microinstruction> mc : getMicroClasses()) {
-            ObservableList<? extends Microinstruction> v = getMicros(mc);
-            v.stream().filter(micro -> micro.uses(m))
-                    .collect(Collectors.toMap(Function.identity(), _ignore -> v));
+        for (Class<? extends Microinstruction<?>> mc : getMicroClasses()) {
+            @SuppressWarnings("unchecked")
+            ObservableList<Microinstruction<?>> v = getMicrosUnchecked(mc);
+
+            result.putAll(v.stream()
+                    .filter(micro -> micro.uses(m))
+                    .collect(Collectors.toMap(Function.identity(), _ignore -> v)));
         }
 
         return result;
@@ -703,43 +742,33 @@ public class Machine extends Module<Machine> {
         ends.add(end);
     }
 
-    //-------------------------------
-    // updates the condition bits
-    public void setConditionBits(List<ConditionBit> newConditionBits) {
-        //first delete arithmetics, setCondBits, and increments that use
-        //any deleted ConditionBits, including removing
-        //these micros from all machine instructions that use them.
-
-        final List<Arithmetic> arithmetics = getMicros(Arithmetic.class);
-        arithmetics.stream().filter(micro ->
-                (((!newConditionBits.contains(micro.getOverflowBit())) &&
-                    (micro.getOverflowBit() != ConditionBit.none())) ||
-                    ((!newConditionBits.contains(micro.getCarryBit())) &&
-                            (micro.getCarryBit() != ConditionBit.none())))
-        ).forEach(m -> {
-            removeAllOccurencesOf(m);
-            arithmetics.remove(m);
-        });
-
-        final List<SetCondBit> setCondBits = getMicros(SetCondBit.class);
-        setCondBits.stream().filter(micro -> !newConditionBits.contains(micro.getBit()))
-                .forEach(micro -> {
-                    removeAllOccurencesOf(micro);
-                    setCondBits.remove(micro);
-                });
-
-        final List<Increment> increments = getMicros(Increment.class);
-        increments.stream().filter(micro ->
-                ((!newConditionBits.contains(micro.getOverflowBit())) &&
-                    (micro.getOverflowBit() != ConditionBit.none())))
-                .forEach(micro -> {
-                    removeAllOccurencesOf(micro);
-                    increments.remove(micro);
-                });
-
-        conditionBits.clear();
-        conditionBits.addAll(newConditionBits);
-    }
+//    //-------------------------------
+//    // updates the condition bits
+    // FIXME huh, this is never used.
+//    public void setConditionBits(Set<ConditionBit> newConditionBits) {
+//        //first delete arithmetics, setCondBits, and increments that use
+//        //any deleted ConditionBits, including removing
+//        //these micros from all machine instructions that use them.
+//
+//        final List<SetCondBit> setCondBits = getMicros(SetCondBit.class);
+//        setCondBits.stream().filter(micro -> !newConditionBits.contains(micro.getBit()))
+//                .forEach(micro -> {
+//                    removeAllOccurencesOf(micro);
+//                    setCondBits.remove(micro);
+//                });
+//
+//        final List<Increment> increments = getMicros(Increment.class);
+//        increments.stream().filter(micro ->
+//                ((!newConditionBits.contains(micro.getOverflowBit())) &&
+//                    (micro.getOverflowBit() != ConditionBit.none())))
+//                .forEach(micro -> {
+//                    removeAllOccurencesOf(micro);
+//                    increments.remove(micro);
+//                });
+//
+//        conditionBits.clear();
+//        conditionBits.addAll(newConditionBits);
+//    }
 
     //-------------------------------
     // updates the RAM arrays
@@ -772,8 +801,10 @@ public class Machine extends Module<Machine> {
         getMicros(microClazz).stream()
                 .filter(oldMicro -> !newMicros.contains(oldMicro))
                 .forEach(this::removeAllOccurencesOf);
-        
-        microMap.put(microClazz, newMicros);
+
+        ListProperty<U> micros = getMicros(microClazz);
+        micros.clear();
+        micros.addAll(newMicros);
     }
 
     //--------------------------------
@@ -806,14 +837,14 @@ public class Machine extends Module<Machine> {
      * Calls {@link Register#clear()} on all {@link Register} values.
      */
     public void clearAllRegisters() {
-        getModule(Register.class).forEach(Register::clear);
+        getModules(Register.class).forEach(Register::clear);
     }
 
     /**
      * Calls {@link Register#clear()} on all {@link Register} values.
      */
     public void clearAllRegisterArrays() {
-        getModule(RegisterArray.class).forEach(RegisterArray::clear);
+        getModules(RegisterArray.class).forEach(RegisterArray::clear);
     }
 
     /**
@@ -821,7 +852,7 @@ public class Machine extends Module<Machine> {
      * @since 2000-11-03
      */
     public void clearAllRAMs() {
-        getModule(RAM.class).forEach(RAM::clear);
+        getModules(RAM.class).forEach(RAM::clear);
     }
 
     /**
@@ -833,8 +864,8 @@ public class Machine extends Module<Machine> {
                 .collect(Collectors.toList());
         
         //don't forget the fetchSequence too.
-        if (fetchSequence.usesMicro(m)) {
-            result.add(fetchSequence);
+        if (fetchSequence.getValue().usesMicro(m)) {
+            result.add(fetchSequence.getValue());
         }
 
         return result;
@@ -857,34 +888,40 @@ public class Machine extends Module<Machine> {
 
     private void removeAllOccurencesOf(Microinstruction m) {
         instructions.forEach(in -> in.removeMicro(m));
-        fetchSequence.removeMicro(m);
+        fetchSequence.getValue().removeMicro(m);
     }
 
     //--------------------------------
     // get the control unit
 
     public ControlUnit getControlUnit() {
-        return controlUnit;
+        return controlUnit.get();
     }
 
+    public ObjectProperty<ControlUnit> controlUnitProperty() {
+        return controlUnit;
+    }
 
     //--------------------------------
     // get & set the fetch sequence
 
     public MachineInstruction getFetchSequence() {
-        return fetchSequence;
+        return fetchSequence.get();
     }
 
     public void setFetchSequence(MachineInstruction f) {
-        fetchSequence = f;
+        fetchSequence.set(f);
     }
 
+    public ObjectProperty<MachineInstruction> fetchSequenceProperty() {
+        return fetchSequence;
+    }
 
     public void visitMicros(final MicroinstructionVisitor visitor) {
         
         final List<Class<? extends Microinstruction<?>>> classes = microMap.keySet()
                 .stream()
-                .sorted((l, r) -> l.getSimpleName().compareTo(r.getSimpleName()))
+                .sorted(Comparator.comparing(Class::getSimpleName))
                 .map(c -> (Class<? extends Microinstruction<?>>)c)
                 .collect(Collectors.toList());
         
@@ -904,7 +941,7 @@ public class Machine extends Module<Machine> {
             }
 
             List<Microinstruction<?>> sortedMicros = microMap.get(mc).stream()
-                    .sorted((l, r) -> l.getName().compareTo(r.getName()))
+                    .sorted(Comparator.comparing(NamedObject::getName))
                     .map(v -> (Microinstruction<?>)v)
                     .collect(Collectors.toList());
             
@@ -954,11 +991,17 @@ public class Machine extends Module<Machine> {
         setRunMode(mode);
 
 
+        ControlUnit controlUnit = getControlUnit();
+
+        // FIXME Strategy pattern..
+
+
         if (mode == RunModes.COMMAND_LINE) {
             // do not use the GUI at all--purely command line execution
             // There is no stepping or backing up.  It executes in the
             // main (and only) thread until it finishes or the user
             // quits it from the command line (like with Ctrl-C).
+
             while (runMode != RunModes.STOP &&
                     runMode != RunModes.ABORT &&
                     haltBitsThatAreSet().size() == 0) {
@@ -1104,11 +1147,11 @@ public class Machine extends Module<Machine> {
      * TransferRtoR micros
      * TransferAtoR micros
      * TransferRtoA micros
-     * CpusimSet (Set) micros
+     * SetBits (Set) micros
      * Test micros
      */
     public void changeStartBits() {
-        for (ConditionBit cb : getModule(ConditionBit.class)) {
+        for (ConditionBit cb : getModules(ConditionBit.class)) {
             cb.setBit(cb.getRegister().getWidth() - cb.getBit() - 1);
         }
 
@@ -1133,7 +1176,7 @@ public class Machine extends Module<Machine> {
             test.setStart(test.getRegister().getWidth() - test.getNumBits() - test.getStart());
         }
 
-        for (CpusimSet set : getMicros(CpusimSet.class)) {
+        for (SetBits set : getMicros(SetBits.class)) {
             set.setStart(set.getRegister().getWidth() - set.getNumBits() - set.getStart());
         }
     }
@@ -1143,7 +1186,7 @@ public class Machine extends Module<Machine> {
     // specified by all Halt micros have value 1
 
     public List<ConditionBit> haltBitsThatAreSet() {
-        return getModule(ConditionBit.class).stream()
+        return getModules(ConditionBit.class).stream()
                 .filter(c -> c.getHalt() && c.isSet())
                 .collect(Collectors.toList());
     }
@@ -1156,7 +1199,7 @@ public class Machine extends Module<Machine> {
     public List<Comment> getCommentMicros() {
         // FIXME This doesn't actually get the #getMicros(Comment.class) results.. Is it supposed to?
         //go through all the instrs and get their Comment micros in a list.
-        List<Comment> result = new ArrayList<Comment>();
+        List<Comment> result = new ArrayList<>();
         for (MachineInstruction instr : instructions) {
             List<Microinstruction<?>> micros = instr.getMicros();
             for (Microinstruction micro : micros)
@@ -1165,12 +1208,14 @@ public class Machine extends Module<Machine> {
                 }
         }
         //now do the same for the fetch sequence
-        for (Microinstruction micro : fetchSequence.getMicros()) {
-            if (micro instanceof Comment) {
-                result.add((Comment) micro);
+        if (fetchSequence.getValue() != null) {
+            for (Microinstruction micro : fetchSequence.get().getMicros()) {
+                if (micro instanceof Comment) {
+                    result.add((Comment) micro);
+                }
             }
-        }
 
+        }
         return result;
     }
 
@@ -1184,10 +1229,51 @@ public class Machine extends Module<Machine> {
 		return getHTMLName();
 	}
 
+	private void copyModules(MachineComponent.IdentifierMap oldToNew, Class<? extends Module<?>> module) {
+        ListProperty<Module<?>> property = oldToNew.getNewMachine().getModuleUnchecked(module);
+        getModuleUnchecked(module).stream()
+                .map(r -> (Module<?>)r.cloneFor(oldToNew))
+                .forEach(property::add);
+    }
+
+    private void copyMicros(MachineComponent.IdentifierMap oldToNew, Class<? extends Microinstruction<?>> module) {
+        ListProperty<Microinstruction<?>> property = oldToNew.getNewMachine().getMicrosUnchecked(module);
+        property.clear();
+        getMicrosUnchecked(module).stream()
+                .map(r -> r.cloneFor(oldToNew))
+                .forEach(property::add);
+    }
+
 	@Override
-	public <U extends Machine> void copyTo(U other) {
-		throw new UnsupportedOperationException("Unimplemented.");
+	public Machine cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        checkNotNull(oldToNew);
+
+        // Don't clone execution state.. this should be separated :|
+        Machine newInst = new Machine(getName(), !getIndexFromRight());
+        oldToNew.setNewMachine(newInst);
+
+        getModuleClasses().forEach(mc -> copyModules(oldToNew, mc));
+        getMicroClasses().forEach(mc -> copyMicros(oldToNew, mc));
+
+        oldToNew.copyProperty(this, newInst, Machine::controlUnitProperty);
+        oldToNew.copyProperty(this, newInst, Machine::fetchSequenceProperty);
+        oldToNew.copyProperty(this, newInst, Machine::programCounterProperty);
+        oldToNew.copyProperty(this, newInst, Machine::codeStoreProperty);
+
+        oldToNew.copyListProperty(this, newInst, Machine::fieldsProperty);
+
+        newInst.indexFromRight.setValue(this.indexFromRight.getValue());
+        newInst.punctChars.clear();
+        newInst.punctChars.addAll(this.punctChars);
+
+        return newInst;
 	}
+
+    @Override
+    public <U extends Machine> void copyTo(U other) {
+        // FIXME
+        throw new UnsupportedOperationException("unimplemented");
+    }
     
     @Override
     public void validate() {
@@ -1235,100 +1321,5 @@ public class Machine extends Module<Machine> {
         VisitResult visitMicro(final Microinstruction<?> micro);
 
     }
-    
-    /**
-     * Type to map between older {@link String} names to {@link Class} instances. This is only for transitioning. Later,
-     * perhaps injection.
-     *
-     * @deprecated Do not use, transition to using {@link Class} values directly.
-     */
-    private enum MicroClassMapping {
-        ARITHMETIC("arithmetic", Arithmetic.class)
-        , BRANCH("branch", Branch.class)
-        , DECODE("decode", Decode.class)
-        , END("end", End.class)
-        , COMMENT("comment", Comment.class)
-        , INCREMENT("increment", Increment.class)
-        , IO("io", IO.class)
-        , LOGICAL("logical", Logical.class)
-        , MEMORY_ACCESS("memoryAccess", MemoryAccess.class)
-        , SET("set", CpusimSet.class)
-        , SET_COND_BIT("setCondBit", SetCondBit.class)
-        , SHIFT("shift", Shift.class)
-        , TEST("test", Test.class)
-        , TRANSFER_R2R("transferRtoR", TransferRtoR.class)
-        , TRANSFER_R2A("transferRtoA", TransferRtoA.class)
-        , TRANSFER_A2R("transferAtoR", TransferAtoR.class);
-
-        final String name;
-        final Class<? extends Microinstruction> instructionType;
-
-        private static final ImmutableMap<String, MicroClassMapping> FROM_NAME
-                = ImmutableMap.copyOf(Arrays.stream(MicroClassMapping.values())
-                .collect(Collectors.toMap(m -> m.name, Function.identity())));
-
-        MicroClassMapping(final String name, final Class<? extends Microinstruction> clazz) {
-            this.name = name;
-            this.instructionType = clazz;
-        }
-
-        /**
-         * Get the {@link MicroClassMapping} from the value stored from {@link #getName()}.
-         * @param name Name to find
-         *
-         * @throws NoSuchElementException if the {@code name} does not exist.
-         */
-        public static Class<? extends Microinstruction> fromName(final String name) {
-            final MicroClassMapping m = FROM_NAME.get(name);
-            if (m == null) {
-                throw new NoSuchElementException("Name does not exist: " + name);
-            }
-
-            return m.instructionType;
-        }
-    }
-
-
-    /**
-     *
-     * @deprecated This is a transition type between {@link String} values and {@link Class}-based {@link Map}.
-     */
-    private enum ModuleClassMapping {
-
-        REGISTER("arithmetic", Register.class)
-        , REGISTER_ARRAY("registerArrays", RegisterArray.class)
-        , RAM("rams", RAM.class)
-        , CONDITION_BIT("conditionBits", ConditionBit.class);
-
-        private final String name;
-        private final Class<? extends Module<?>> moduleType;
-
-
-        private static final ImmutableMap<String, ModuleClassMapping> FROM_NAME
-                = ImmutableMap.copyOf(Arrays.stream(ModuleClassMapping.values())
-                .collect(Collectors.toMap(m -> m.name, Function.identity())));
-
-        ModuleClassMapping(final String name, final Class<? extends Module<?>> clazz) {
-            this.name = name.toLowerCase();
-            this.moduleType = clazz;
-        }
-
-        /**
-         * Get the {@link ModuleClassMapping} from the value stored from {@link #getName()}.
-         * @param name Name to find
-         * @return
-         *
-         * @throws NoSuchElementException if the {@code name} does not exist.
-         */
-        public static Class<? extends Module<?>> fromName(final String name) {
-            final ModuleClassMapping m = FROM_NAME.get(name.toLowerCase());
-            if (m == null) {
-                throw new NoSuchElementException("Name does not exist: " + name);
-            }
-
-            return m.moduleType;
-        }
-    }
-
 
 }

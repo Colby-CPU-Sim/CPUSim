@@ -2,16 +2,16 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
-import cpusim.gui.util.table.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.gui.util.MachineBound;
 import cpusim.gui.util.MachineModificationController;
 import cpusim.gui.util.NamedColumnHandler;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Copyable;
+import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.Validatable;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -26,9 +26,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * MicroinstructionTableController class parent of all the microinstruction controllers
@@ -38,7 +37,7 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
         implements ControlButtonController.InteractionHandler<T>,
                     MachineModificationController,
                     cpusim.gui.util.HelpPageEnabled,
-                    MachineBound {
+        ReadOnlyMachineBound {
 
     protected final ObjectProperty<Machine> machine;      //the current machine being simulated
 
@@ -117,8 +116,8 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
     }
 
     @Override
-    public final Optional<Machine> getMachine() {
-        return Optional.ofNullable(machine.get());
+    public final Machine getMachine() {
+        return machine.get();
     }
 
     /**
@@ -146,8 +145,8 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
      * @return {@code true} if there is at least one {@link Register} available.
      */
     protected boolean areRegistersAvailable() {
-        return !(machine.get().getModule(Register.class).isEmpty()
-                && machine.get().getModule(RegisterArray.class).isEmpty());
+        return !(machine.get().getModules(Register.class).isEmpty()
+                && machine.get().getModules(RegisterArray.class).isEmpty());
     }
 
     /**

@@ -2,12 +2,14 @@ package cpusim.model.microinstruction;
 
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.Register.Access;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ValidationException;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -19,10 +21,11 @@ import java.util.UUID;
  * @since 2013-06-07
  */
 public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA> {
-    
-    private SimpleObjectProperty<Register> index;
-    private SimpleIntegerProperty indexStart;
-    private SimpleIntegerProperty indexNumBits;
+
+    @DependantComponent
+    private ObjectProperty<Register> index;
+    private IntegerProperty indexStart;
+    private IntegerProperty indexNumBits;
 
     /**
      * Constructor
@@ -50,34 +53,8 @@ public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA
         this.index = new SimpleObjectProperty<>(this, "index", index);
         this.indexStart = new SimpleIntegerProperty(this, "indexStart", indexStart);
         this.indexNumBits = new SimpleIntegerProperty(this, "indexNumBits", indexNumBits);
-    }
-    
-    /**
-     * Constructor
-     * creates a new Test object with input values.
-     *
-     * @param name name of the microinstruction.
-     * @param source the register whose value is to be tested.
-     * @param srcStartBit an integer indicting the leftmost or rightmost bit to be tested.
-     * @param dest the destination register.
-     * @param destStartBit an integer indicting the leftmost or rightmost bit to be changed.
-     * @param numBits a non-negative integer indicating the number of bits to be tested.
-     */
-    public TransferRtoA(String name, Machine machine,
-                        Register source,
-                        int srcStartBit,
-                        RegisterArray dest,
-                        int destStartBit,
-                        int numBits,
-                        Register index,
-                        int indexStart,
-                        int indexNumBits){
-        this(name, IdentifiedObject.generateRandomID(),
-                machine, source,
-                srcStartBit, dest,
-                destStartBit, numBits,
-                index, indexStart,
-                indexNumBits);
+
+        this.dependencies = MachineComponent.collectDependancies(this);
     }
     
     /**
@@ -145,12 +122,19 @@ public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA
     public void setIndexNumBits(int newIndexNumBits){
         indexNumBits.set(newIndexNumBits);
     }
-    
+
     @Override
-    public <U extends TransferRtoA> void copyTo(U newTransferRtoA)
-    {
+    public TransferRtoA cloneFor(IdentifierMap oldToNew) {
+        return new TransferRtoA(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                oldToNew.get(getSource()), getSrcStartBit(),
+                oldToNew.get(getDest()), getDestStartBit(),
+                getNumBits(),
+                oldToNew.get(getIndex()), getIndexStart(), getIndexNumBits());
+    }
+
+    @Override
+    public <U extends TransferRtoA> void copyTo(U newTransferRtoA) {
         super.copyTo(newTransferRtoA);
-       
         newTransferRtoA.setIndex(getIndex());
         newTransferRtoA.setIndexStart(getIndexStart());
         newTransferRtoA.setIndexNumBits(getIndexNumBits());
@@ -164,7 +148,7 @@ public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA
         //manipulate variables depending on the indexing scheme
         int indexLeftShift;
         int indexRightShift = 64 - indexNumBits.get();
-        if (!machine.getIndexFromRight()){
+        if (!getMachine().getIndexFromRight()){
             indexLeftShift = 64 - index.get().getWidth() + indexStart.get();            
         }
         else{
@@ -183,7 +167,7 @@ public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA
                     getName());
         
         //validate the ability to write to the destination register
-        Register destination = dest.get().registers().get((int) indexValue);
+        Register destination = dest.get().getRegisters().get((int) indexValue);
         if (destination.getAccess().equals(Access.readOnly())) {
             throw new ExecutionException("Attempt to write to read-only Register " +
                     destination.getName() + " in the transferRtoA " +
@@ -205,7 +189,7 @@ public class TransferRtoA extends Transfer<Register, RegisterArray, TransferRtoA
         int srcRightShift;
         int srcLeftShift;
         int srcOffsetShift = 64 - numBits.get();
-        if(!machine.getIndexFromRight()){
+        if(!getMachine().getIndexFromRight()){
             destRightShift = 64 - destStartBit.get();
             destLeftShift = destStartBit.get() + numBits.get();
             srcLeftShift = srcStartBit.get();

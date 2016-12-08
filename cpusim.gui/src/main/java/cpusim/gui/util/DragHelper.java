@@ -4,10 +4,12 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import cpusim.model.Field;
 import cpusim.model.Machine;
-import cpusim.model.Module;
+import cpusim.model.util.ReadOnlyMachineBound;
+import cpusim.model.module.Module;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.util.ClassCleaner;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -27,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Handles drag behaviour for {@link Microinstruction} values or {@link List} index positions.
  * @since 2016-12-04
  */
-public final class DragHelper implements MachineBound {
+public final class DragHelper implements ReadOnlyMachineBound {
 
     // Note: Can't use $ because Java classes use it :)
     private static final String ENCODING_CHAR = new String(Character.toChars('#'));
@@ -57,7 +59,7 @@ public final class DragHelper implements MachineBound {
     }
 
     @Override
-    public ObjectProperty<Machine> machineProperty() {
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
         return machine;
     }
 
@@ -119,7 +121,7 @@ public final class DragHelper implements MachineBound {
 
                     final Machine machine = this.machine.getValue();
 
-                    List<Microinstruction<?>> micros = machine.getMicrosUnsafe(microClass);
+                    List<Microinstruction<?>> micros = machine.getMicrosUnchecked(microClass);
                     Optional<Microinstruction<?>> microOpt = micros.stream()
                             .filter(m -> m.getID().equals(id))
                             .findFirst();

@@ -1,14 +1,8 @@
 package cpusim.model;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.Colors;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.NamedObject;
+import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchType;
@@ -19,7 +13,7 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,24 +27,32 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 1999-06-01
  */
 public class MachineInstruction
-        implements IdentifiedObject, NamedObject,
-                    LegacyXMLSupported, HTMLEncodable, Copyable<MachineInstruction> {
+        implements IdentifiedObject
+                , NamedObject
+                , LegacyXMLSupported
+                , HTMLEncodable
+                , ReadOnlyMachineBound
+                , MachineComponent
+                , Copyable<MachineInstruction> {
     
-    private StringProperty name;				//the name of the machine instruction
+    private final StringProperty name;				//the name of the machine instruction
     private final ReadOnlyObjectProperty<UUID> id;
-    private ObservableList<Microinstruction<?>> micros;	//all the microinstructions
+
+    @DependantComponent
+    private final ListProperty<Microinstruction<?>> micros;	//all the microinstructions
     private long opcode;					//the opcode of the instruction
-    private Machine machine;
+    private final Machine machine;
     
-    private ObservableList<Field> instructionFields;
-    private ObservableList<Field> assemblyFields;
+    private final ListProperty<Field> instructionFields;
+    private final ListProperty<Field> assemblyFields;
+
+    private final ReadOnlySetProperty<MachineComponent> dependants;
+    private final ReadOnlySetProperty<MachineComponent> children;
     
     /**
      * Create a new {@link MachineInstruction}.
-     *
-     * @param name Name (see {@link NamedObject#nameProperty()}
+     *  @param name Name (see {@link NamedObject#nameProperty()}
      * @param id Identifier (see {@link IdentifiedObject#idProperty()}
-     * @param machine machine this belongs to
      * @param opcode Start value for the opcode
      * @param instructionFields Instruction layout
      * @param assemblyFields Assembly layout
@@ -59,17 +61,31 @@ public class MachineInstruction
                               UUID id,
                               Machine machine,
                               long opcode,
-                              List<Field> instructionFields,
-                              List<Field> assemblyFields) {
+                              @Nullable List<Field> instructionFields,
+                              @Nullable List<Field> assemblyFields) {
         this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
         this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
         this.machine = machine;
         
         this.opcode = opcode;
         
-        this.micros = FXCollections.observableArrayList();
-        this.instructionFields = FXCollections.observableArrayList(instructionFields);
-        this.assemblyFields = FXCollections.observableArrayList(assemblyFields);
+        this.micros = new SimpleListProperty<>(this, "micros", FXCollections.observableArrayList());
+
+        this.instructionFields = new SimpleListProperty<>(this, "instructionFields",
+                FXCollections.observableArrayList());
+        this.assemblyFields = new SimpleListProperty<>(this, "assemblyFields",
+                FXCollections.observableArrayList());
+
+        if (instructionFields != null) {
+            this.instructionFields.addAll(instructionFields);
+        }
+
+        if (assemblyFields != null) {
+            this.assemblyFields.addAll(assemblyFields);
+        }
+
+        this.dependants = MachineComponent.collectDependancies(this);
+        this.children = MachineComponent.collectChildren(this);
     }
 
     /**
@@ -77,8 +93,8 @@ public class MachineInstruction
      * @param other instance to copy
      */
     public MachineInstruction(final MachineInstruction other) {
-        this(other.name.getValue(), IdentifiedObject.generateRandomID(),
-                other.machine, other.opcode, other.instructionFields, other.assemblyFields);
+        this(other.name.getValue(), UUID.randomUUID(), other.getMachine(),
+                other.opcode, other.instructionFields, other.assemblyFields);
     }
 
     //===================================
@@ -95,13 +111,14 @@ public class MachineInstruction
         return id;
     }
 
-    public Machine getMachine() {
-        return machine;
+    @Override
+    public ReadOnlyObjectProperty<Machine> machineProperty() {
+        return new ReadOnlyObjectWrapper<>(machine);
     }
 
-    public String getFormat()
-    {
-        return format;
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependants;
     }
 
     public ObservableList<Field> getAssemblyFields(){
@@ -131,25 +148,6 @@ public class MachineInstruction
     
     public ObservableList<Field> getInstructionFields(){
         return instructionFields;
-    }
-    
-    public void setInstructionColors(List<String> instructionColors){
-        this.instructionColors.clear();
-        this.instructionColors.addAll(instructionColors);
-    }
-    
-    public ObservableList<String> getInstructionColors(){
-        return this.instructionColors;
-    }
-    
-    public void setAssemblyColors(List<String> assemblyColors){
-        checkNotNull(assemblyColors);
-        this.instructionColors.clear();
-        this.instructionColors.addAll(assemblyColors);
-    }
-    
-    public ObservableList<String> getAssemblyColors(){
-        return this.assemblyColors;
     }
     
     /**
@@ -209,44 +207,45 @@ public class MachineInstruction
      * @return relative positions array
      */
     public int[] getRelativeOrderOfFields(){
-        
-        //get all instruction colors correponding to positive length fields that arent
-        //the opcode
-        List<String> iColors = new ArrayList<>(instructionColors);
-        iColors.remove(0);
 
-        //get all assembly colors correponding to positive length fields that arent
-        //the opcode
-        List<String> aColors = new ArrayList<>();
-        		
-        int i = 0;
-        for(Field field : assemblyFields){
-            if(field.getNumBits() > 0){
-                aColors.add(assemblyColors.get(i));
-            }
-            i++;
-        }
-        aColors.remove(0);
-        
-        //add any colors that correspond to ignored fields at the proper index
-        i = 0;
-        for (String color : iColors){
-            if (!aColors.contains(color)){
-                aColors.add(i, color);
-            }
-            i++;
-        }
-        
-        //fromRootController the relative positions of the instruction fields compared to the
-        //assembly fields
-        int[] relativePositions = new int[aColors.size()];
-        i = 0;
-        for (String color : iColors){
-            relativePositions[i] = aColors.indexOf(color);
-            i++;
-        }
-        
-        return relativePositions;
+        // FIXME Why do the colours matter? KB
+//        //get all instruction colors correponding to positive length fields that arent
+//        //the opcode
+//        List<String> iColors = new ArrayList<>(instructionColors);
+//        iColors.remove(0);
+//
+//        //get all assembly colors correponding to positive length fields that arent
+//        //the opcode
+//        List<String> aColors = new ArrayList<>();
+//
+//        int i = 0;
+//        for(Field field : assemblyFields){
+//            if(field.getNumBits() > 0){
+//                aColors.add(assemblyColors.get(i));
+//            }
+//            i++;
+//        }
+//        aColors.remove(0);
+//
+//        //add any colors that correspond to ignored fields at the proper index
+//        i = 0;
+//        for (String color : iColors){
+//            if (!aColors.contains(color)){
+//                aColors.add(i, color);
+//            }
+//            i++;
+//        }
+//
+//        //fromRootController the relative positions of the instruction fields compared to the
+//        //assembly fields
+//        int[] relativePositions = new int[aColors.size()];
+//        i = 0;
+//        for (String color : iColors){
+//            relativePositions[i] = aColors.indexOf(color);
+//            i++;
+//        }
+//
+        return new int[]{ 0, 1 };
     }
 
     public ObservableList<Microinstruction<?>> getMicros()
@@ -254,9 +253,9 @@ public class MachineInstruction
         return micros;
     }
 
-    public void setMicros(ObservableList<Microinstruction<?>> v)
-    {
-        micros = v;
+    public void setMicros(ObservableList<Microinstruction<?>> v) {
+        micros.clear();
+        micros.addAll(v);
     }
 
     public long getOpcode()
@@ -267,11 +266,6 @@ public class MachineInstruction
     public void setOpcode(long newOpcode)
     {
         opcode = newOpcode;
-    }
-
-    public void setMachine(Machine machine)
-    {
-        this.machine = machine;
     }
 
     //===================================
@@ -303,8 +297,7 @@ public class MachineInstruction
 
     //-----------------------------------
     // deletes every occurence of m in the micros list
-    public void removeMicro(Microinstruction m)
-    {
+    public void removeMicro(Microinstruction m) {
         boolean didRemoval = micros.remove(m);
         if (didRemoval)
             removeMicro(m); //recursively call to remove more occurences of m
@@ -316,8 +309,6 @@ public class MachineInstruction
     {
         return getInstructionFields().contains(f);
     }
-    
-    
 
     //-----------------------------------
     @Override
@@ -328,9 +319,7 @@ public class MachineInstruction
                 HtmlEncoder.sEncode(getName()) + "\" opcode=\"" +
                 Long.toHexString(getOpcode()) + "\" instructionFormat=\"" + 
                 ConvertStrings.fieldsToFormatString(instructionFields) + "\" assemblyFormat=\"" +
-                ConvertStrings.fieldsToFormatString(assemblyFields) + "\" instructionColors=\"" + 
-                Colors.toXML(instructionColors)+ "\" assemblyColors=\"" + 
-                Colors.toXML(assemblyColors)+ "\" >" + nl;
+                ConvertStrings.fieldsToFormatString(assemblyFields) + "\" >" + nl;
         for (Microinstruction micro : micros) {
             result += indent + "\t<Microinstruction microRef=\"" +
                     micro.getID() +
@@ -352,18 +341,15 @@ public class MachineInstruction
         
         for (int i=0; i<instructionFields.size(); i++){
             instrFormat += "<td align=\"center\" width=\""+Math.rint((((double)
-                    instructionFields.get(i).getNumBits())/length)*100)+"%\" bgcolor=\""
-                    +instructionColors.get(i)+
-                    "\">"+ instructionFields.get(i).getName()+"</td>";
+                    instructionFields.get(i).getNumBits())/length)*100)+"%\">"
+                    + instructionFields.get(i).getName()+"</td>";
         }
         
         instrFormat += "</tr></table>";
         
         for (int i=0; i<assemblyFields.size(); i++){
             assembFormat += "<td align=\"center\" width=\""+Math.rint((1.0
-                    /(double)assemblyFields.size())*100)+"%\" bgcolor=\""
-                    +assemblyColors.get(i)+
-                    "\">"+ assemblyFields.get(i).getName()+"</td>";
+                    /(double)assemblyFields.size())*100)+"%\">"+ assemblyFields.get(i).getName()+"</td>";
         }
         
         assembFormat += "</tr></table>";
@@ -383,10 +369,19 @@ public class MachineInstruction
         return indent + result + "</TD></TR>";
 	}
 
-	@Override
-	public <U extends MachineInstruction> void copyTo(U other) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method, copyTo");
-	}
-	
+    @Override
+    public MachineInstruction cloneFor(MachineComponent.IdentifierMap oldToNew) {
+        return new MachineInstruction(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+                getOpcode(), null, null);
+    }
+
+    @Override
+    public <U extends MachineInstruction> void copyTo(U other) {
+        checkNotNull(other);
+
+        other.setName(getName());
+        other.setOpcode(getOpcode());
+        other.setInstructionFields(getInstructionFields());
+        other.setAssemblyFields(getAssemblyFields());
+    }
 } // end class MachineInstruction

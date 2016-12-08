@@ -1,8 +1,12 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.Module;
-import cpusim.model.util.IdentifiedObject;
+import cpusim.model.module.ControlUnit;
+import cpusim.model.module.Module;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.MoreBindings;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlySetProperty;
 
 import java.util.UUID;
 
@@ -13,17 +17,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2000-06-01
  */
-public class End extends Microinstruction<End>
-{
+public class End extends Microinstruction<End> {
+
+    @DependantComponent
+    private ReadOnlyObjectProperty<ControlUnit> controlUnit;
+
+    private ReadOnlySetProperty<MachineComponent> dependencies;
 
     /**
      * Constructor
      * @param id Unique ID for the instruction
      * @param machine the machine that holds the micro
      */
-    public End(UUID id, Machine machine)
-    {
+    public End(UUID id, Machine machine) {
         super("End", id, machine);
+
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+        this.dependencies = MachineComponent.collectDependancies(this);
     } // end constructor
     
     /**
@@ -32,7 +42,7 @@ public class End extends Microinstruction<End>
      */
     public End(Machine machine)
     {
-        this(IdentifiedObject.generateRandomID(), machine);
+        this(UUID.randomUUID(), machine);
     } // end constructor
     
     /**
@@ -40,29 +50,37 @@ public class End extends Microinstruction<End>
      * @param other Instance to copy from
      */
     public End(End other) {
-    	this(other.machine);
+    	this(other.getMachine());
     }
-    
+
+    @Override
+    public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
+        return dependencies;
+    }
+
     @Override
     public boolean uses(Module<?> m)
     {
         return false;
     }
-    
+
     @Override
-    public void copyTo(final End other) {
+    public End cloneFor(IdentifierMap oldToNew) {
+        return new End(oldToNew.getNewMachine());
+    }
+
+    @Override
+    public <U extends End> void copyTo(U other) {
         checkNotNull(other);
     }
-    
+
     /**
      * execute the micro instruction from machine
      */
     @Override
-    public void execute()
-    {
-        machine.getControlUnit().setMicroIndex(0);
-        machine.getControlUnit().setCurrentInstruction(
-                machine.getFetchSequence());
+    public void execute() {
+        controlUnit.getValue().setMicroIndex(0);
+        controlUnit.getValue().setCurrentInstruction(getMachine().getFetchSequence());
     } // end execute()
 
     /**

@@ -123,6 +123,11 @@ public class RAMLocation {
         this.comment.set(comment);
     }
 
+
+    public StringProperty commentProperty() {
+        return comment;
+    }
+
     /**
      * get the sourceline
      * @return the source line

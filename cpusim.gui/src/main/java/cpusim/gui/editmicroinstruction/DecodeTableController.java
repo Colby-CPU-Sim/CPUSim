@@ -13,6 +13,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
  *
@@ -45,8 +47,7 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
         ir.prefWidthProperty().bind(prefWidthProperty().divide(100/50.0));
 
         Callback<TableColumn<Decode,Register>,TableCell<Decode,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
+                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
 
         ir.setCellValueFactory(new PropertyValueFactory<>("ir"));
 
@@ -66,9 +67,9 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
     public Decode createInstance() {
         final Machine machine = this.machine.get();
         
-        Register r = (machine.getAllRegisters().size() == 0 ? null :
-                machine.getAllRegisters().get(0));
-        return new Decode("???", IdentifiedObject.generateRandomID(), machine, r);
+        Register r = (machine.getRegisters().size() == 0 ? null :
+                machine.getRegisters().get(0));
+        return new Decode("???", UUID.randomUUID(), machine, r);
     }
 
     @Override

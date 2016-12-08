@@ -3,10 +3,8 @@ package cpusim.gui.editmachineinstruction.editfields;
 import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
+import cpusim.model.Machine;
+import cpusim.model.util.*;
 import cpusim.model.FieldValue;
 import cpusim.model.MachineInstruction;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
@@ -14,6 +12,8 @@ import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.util.Dialogs;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,7 +40,7 @@ import java.util.*;
  *
  * @since 2013-06/04
  */
-public class EditFieldsController implements Initializable {
+public class EditFieldsController implements Initializable, MachineBound {
 
     /** clone of all the Fields */
     ObservableList<Field> allFields;
@@ -65,6 +65,8 @@ public class EditFieldsController implements Initializable {
     @FXML Button duplicateButton;
     @FXML Button valuesButton;
 
+    private final ObjectProperty<Machine> machine;
+
     private Field selectedField;
     private EditMachineInstructionController editMachineInstructionController;
 
@@ -77,6 +79,9 @@ public class EditFieldsController implements Initializable {
             EditMachineInstructionController editMachineInstructionController,
             Stage stage) {
         allFields = FXCollections.observableArrayList();
+
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machine.bind(editMachineInstructionController.machineProperty());
         
         instructions = FXCollections.observableArrayList();
         
@@ -89,9 +94,13 @@ public class EditFieldsController implements Initializable {
             List<FieldValue> realFieldValues = field.getValues();
             ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
             for (FieldValue fieldValue : realFieldValues){
-                fieldValues.add(new FieldValue(fieldValue.getName(), fieldValue.getValue()));
+                fieldValues.add(new FieldValue(fieldValue.getName(), UUID.randomUUID(),
+                        getMachine(), fieldValue.getValue()));
             }
-            allFields.add(new Field(field.getName(), IdentifiedObject.generateRandomID(), field.getNumBits(), field.getRelativity(), fieldValues, field.getDefaultValue(), field.getSigned(), field.getType()
+            allFields.add(new Field(field.getName(), UUID.randomUUID(), getMachine(),
+                    field.getNumBits(), field.getRelativity(),
+                    fieldValues, field.getDefaultValue(),
+                    field.getSigned(), field.getType()
             ));
         }
 
@@ -119,11 +128,10 @@ public class EditFieldsController implements Initializable {
             }
             
             MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
-                    IdentifiedObject.generateRandomID(),
-                    editMachineInstructionController.getMachine().get(),
-                    newInstrFields, newAssemblyFields,
-                    instr.getOpcode()
-            );
+                    UUID.randomUUID(),
+                    getMachine(),
+                    instr.getOpcode(),
+                    newInstrFields, newAssemblyFields);
             
             instrToAdd.setMicros(instr.getMicros());
             
@@ -254,7 +262,12 @@ public class EditFieldsController implements Initializable {
                 
         table.setItems(allFields);
     }
-    
+
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
+    }
+
     /**
      * creates a new field with a unique name based off of '?'
      * @param ae unused action event
@@ -262,7 +275,7 @@ public class EditFieldsController implements Initializable {
     @FXML
     protected void handleNew(ActionEvent ae){
         String uniqueName = createUniqueName(table.getItems(), "?");
-        Field newField = new Field(uniqueName, IdentifiedObject.generateRandomID());
+        Field newField = new Field(uniqueName, UUID.randomUUID(), getMachine());
         allFields.add(0, newField);
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
@@ -369,14 +382,16 @@ public class EditFieldsController implements Initializable {
             for (Field field : instruction.getInstructionFields()){
                 if (!instruction.getAssemblyFields().contains(field) && field.getType() != Type.ignored){
                     instruction.getAssemblyFields().add(field);
-                    instruction.getAssemblyColors().add(instruction.getInstructionColors().get(
-                            instruction.getInstructionFields().indexOf(field)));
+                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                    instruction.getAssemblyColors().add(instruction.getInstructionColors().get(
+//                            instruction.getInstructionFields().indexOf(field)));
                 }
             }
             //removes ignored instruction fields and associated colors
             for (Field field : instruction.getAssemblyFields()){
                 if (field.getType() == Type.ignored){
-                    instruction.getAssemblyColors().remove(instruction.getAssemblyFields().indexOf(field));
+                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                    instruction.getAssemblyColors().remove(instruction.getAssemblyFields().indexOf(field));
                     instruction.getAssemblyFields().remove(field);
                 }
             }

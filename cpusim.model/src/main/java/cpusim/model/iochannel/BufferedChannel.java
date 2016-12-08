@@ -119,7 +119,7 @@ public class BufferedChannel implements IOChannel {
 			this.inputBuffer = new StringBuilder();
 		}
 		if (this.outputBuffer.length() != 0) {
-			state.writeString("Output: " + this.outputBuffer.toString()
+			state.writeString("Write: " + this.outputBuffer.toString()
 					+ LINE_SEPARATOR);
 			this.outputBuffer = new StringBuilder();
 		}
@@ -137,7 +137,7 @@ public class BufferedChannel implements IOChannel {
 		} else {
 			String inputFromChannel = 
 					state.readString("Enter Inputs, the first of which must be an Integer: ");
-			// Output directions if the user asks for "help"
+			// Write directions if the user asks for "help"
 			if(inputFromChannel.toLowerCase().equals("help")) {
 				state.writeString("Type in a decimal, binary, or hexadecimal " +
 						"integer and then press Enter. " +
@@ -163,7 +163,7 @@ public class BufferedChannel implements IOChannel {
 		} else {
 			String readState = 
 					state.readString("Enter Inputs, the first of which must be an Ascii character: ");
-			// Output directions if the user asks for "help"
+			// Write directions if the user asks for "help"
 			if(readState.toLowerCase().equals("help")) {
 				state.writeString("Type in a character with no surrounding " +
 						"quotes and then press Enter." + this.LINE_SEPARATOR +
@@ -189,7 +189,7 @@ public class BufferedChannel implements IOChannel {
 		} else {
 			String readState = 
 					state.readString("Enter Inputs, the first of which must be Unicode: ");
-			// Output directions if the user asks for "help"
+			// Write directions if the user asks for "help"
 			if(readState.toLowerCase().equals("help")) {
 				state.writeString("Type in a character with no surrounding " +
 						"quotes and then press Enter." + this.LINE_SEPARATOR +
@@ -225,7 +225,7 @@ public class BufferedChannel implements IOChannel {
 			this.outputBuffer.append(charValue);
 		} else { //new line character
 			if(this.outputBuffer.length() > 0) {
-				state.writeString("Output: "+ this.outputBuffer.toString() + this.LINE_SEPARATOR);
+				state.writeString("Write: "+ this.outputBuffer.toString() + this.LINE_SEPARATOR);
 				this.outputBuffer = new StringBuilder();
 			}
 		}
@@ -371,7 +371,7 @@ public class BufferedChannel implements IOChannel {
 		} else {
 			String inputFromChannel = 
 					state.readString("Enter String input, end with a newline: ");
-			// Output directions if the user asks for "help"
+			// Write directions if the user asks for "help"
 			if(inputFromChannel.toLowerCase().equals("help")) {
 				state.writeString("Type in a string of characters and then press Enter. " +
 						this.LINE_SEPARATOR +

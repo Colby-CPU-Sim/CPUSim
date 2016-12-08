@@ -4,7 +4,7 @@ import cpusim.Mediator;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.Machine;
-import cpusim.model.microinstruction.CpusimSet;
+import cpusim.model.microinstruction.SetBits;
 import cpusim.model.module.Register;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -14,12 +14,14 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the Set command in the EditMicroDialog.
  *
  * @since 2013-06-06
  */
-class SetTableController extends MicroinstructionTableController<CpusimSet> {
+class SetTableController extends MicroinstructionTableController<SetBits> {
 
     /**
      * Marker used when building tabs.
@@ -29,16 +31,16 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
     final static String FX_ID = "setTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<CpusimSet,Register> register;
+    private TableColumn<SetBits,Register> register;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<CpusimSet,Integer> start;
+    private TableColumn<SetBits,Integer> start;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<CpusimSet,Integer> numBits;
+    private TableColumn<SetBits,Integer> numBits;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<CpusimSet,Long> value;
+    private TableColumn<SetBits,Long> value;
     
 
     /**
@@ -46,7 +48,7 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
      * @param mediator the mediator used to store the machine
      */
     SetTableController(Mediator mediator) {
-        super(mediator, "SetTable.fxml", CpusimSet.class);
+        super(mediator, "SetTable.fxml", SetBits.class);
         loadFXML();
     }
 
@@ -61,13 +63,13 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
         numBits.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         value.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<CpusimSet,Integer>,TableCell<CpusimSet,Integer>> cellIntFactory =
+        Callback<TableColumn<SetBits,Integer>,TableCell<SetBits,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
-        Callback<TableColumn<CpusimSet,Long>,TableCell<CpusimSet,Long>> cellLongFactory =
+        Callback<TableColumn<SetBits,Long>,TableCell<SetBits,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();
-        Callback<TableColumn<CpusimSet,Register>,TableCell<CpusimSet,Register>> cellComboFactory =
+        Callback<TableColumn<SetBits,Register>,TableCell<SetBits,Register>> cellComboFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getAllRegisters());
+                        machine.get().getRegisters());
 
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         start.setCellValueFactory(new PropertyValueFactory<>("start"));
@@ -94,10 +96,10 @@ class SetTableController extends MicroinstructionTableController<CpusimSet> {
     }
     
     @Override
-    public CpusimSet createInstance() {
+    public SetBits createInstance() {
         final Machine machine = this.machine.get();
-        Register r = (machine.getAllRegisters().isEmpty() ? null : machine.getAllRegisters().get(0));
-        return new CpusimSet("???", machine, r, 0, 1, 0L);
+        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+        return new SetBits("???", UUID.randomUUID(), machine, r, 0, 1, 0L);
     }
 
     @Override

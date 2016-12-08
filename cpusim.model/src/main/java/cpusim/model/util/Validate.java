@@ -92,7 +92,7 @@ import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.Module;
+import cpusim.model.module.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.*;
@@ -155,7 +155,7 @@ public abstract class Validate
             //atMostOnePosLengthFieldIsOptional(instr); //not in this version
             opcodeFits(instr);
             fieldLengthsAreAtMost64(instr);
-            opcodeFieldIsFirst(instr);
+//            opcodeFieldIsFirst(instr);
         }
 
         allOpcodesAreUnique(instrs);
@@ -312,19 +312,20 @@ public abstract class Validate
                     instr.getName() + "\" has no fields.");
         }
     }
-    
-    /**
-     * checks that the first field in the assemblyFields list is the same as the first
-     * field in the instructionFields list (the opcode field)
-     * @param instr instruction whose first assembly field needs to be checked
-     */
-    public static void opcodeFieldIsFirst(MachineInstruction instr){
-        if (!instr.getAssemblyColors().get(0).equals(instr.getInstructionColors().get(0))){
-            throw new ValidationException("Your opcode (the first field in the instruction fields)"
-                    + " must be the first field in your assembly fields.  This is not the"
-                    + " case for instruction "+instr.getName()+".");
-        }
-    }
+
+    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//    /**
+//     * checks that the first field in the assemblyFields list is the same as the first
+//     * field in the instructionFields list (the opcode field)
+//     * @param instr instruction whose first assembly field needs to be checked
+//     */
+//    public static void opcodeFieldIsFirst(MachineInstruction instr){
+//        if (!instr.getAssemblyColors().get(0).equals(instr.getInstructionColors().get(0))){
+//            throw new ValidationException("Your opcode (the first field in the instruction fields)"
+//                    + " must be the first field in your assembly fields.  This is not the"
+//                    + " case for instruction "+instr.getName()+".");
+//        }
+//    }
 
     /**
      * checks if the first (opcode) field of the instruction has the
@@ -462,7 +463,7 @@ public abstract class Validate
      * @param transferRtoAs an array of {@link TransferRtoA}s to check.
      * TransferRtoR objects with all ranges all in Bounds properly.
      *
-     * @deprecated Use {@link Validatable#all(List)}
+     * @deprecated Use {@link Validatable#all(Iterable)}
      */
     public static void rangesAreInBoundTransferRToA(List<TransferRtoA> transferRtoAs)
     {
@@ -473,7 +474,7 @@ public abstract class Validate
      * check if the ranges are in bound.
      * @param transferRtoRs an array of TransferRtoRs to check.
      *
-     * @deprecated Use {@link Validatable#all(List)}
+     * @deprecated Use {@link Validatable#all(Iterable)}
      */
     public static void rangesAreInBound(List<TransferRtoR> transferRtoRs)
     {
@@ -524,12 +525,12 @@ public abstract class Validate
         //make a HashMap of old registers as keys and
         //old widths as Integer values
         Map<Module<?>, Integer> newWidths = new HashMap<>();
-        final List<Register> registers = machine.getModule(Register.class);
+        final List<Register> registers = machine.getModules(Register.class);
         for (Register r: registers) {
             newWidths.put(r, r.getWidth());
         }
         
-        for (RegisterArray array: machine.getModule(RegisterArray.class)) {
+        for (RegisterArray array: machine.getModules(RegisterArray.class)) {
             for (Register r: array) {
                 newWidths.put(r, r.getWidth());
             }
@@ -558,21 +559,21 @@ public abstract class Validate
         
         ObservableList<Logical> logicals = machine.getMicros(Logical.class);
         for (Logical logical : logicals) {
-            int source1Width = newWidths.get(logical.getSource1());
-            int source2Width = newWidths.get(logical.getSource2());
+            int source1Width = newWidths.get(logical.getLhs());
+            int source2Width = newWidths.get(logical.getRhs());
             int destWidth = newWidths.get(logical.getDestination());
             if (source1Width != destWidth || source2Width != destWidth) {
                 throw new ValidationException("The new width " + source1Width +
-                        " of register " + logical.getSource1() + ",\nnew width " +
-                        source2Width + " of register " + logical.getSource2() +
+                        " of register " + logical.getLhs() + ",\nnew width " +
+                        source2Width + " of register " + logical.getRhs() +
                         "\nand new width " + destWidth +
                         " of register " + logical.getDestination() +
                         "\ncause microinstruction " + logical + " to be invalid.");
             }
         }
         
-        ObservableList<CpusimSet> sets = machine.getMicros(CpusimSet.class);
-        for (CpusimSet set : sets) {
+        ObservableList<SetBits> sets = machine.getMicros(SetBits.class);
+        for (SetBits set : sets) {
             int newWidth = newWidths.get(set.getRegister());
             if (newWidth < set.getStart() + set.getNumBits()) {
                 throw new ValidationException("The new width " + newWidth +

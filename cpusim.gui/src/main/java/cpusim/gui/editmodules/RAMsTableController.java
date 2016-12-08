@@ -38,10 +38,9 @@ public class RAMsTableController extends ModuleTableController<RAM> {
 
     /**
      * Constructor
-     * @param mediator holds the machine and information needed
      */
-    RAMsTableController(Mediator mediator){
-        super(mediator, "RamTable.fxml", RAM.class);
+    RAMsTableController(){
+        super("RamTable.fxml", RAM.class);
     
         loadFXML();
     }

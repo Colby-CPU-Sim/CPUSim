@@ -4,7 +4,7 @@ import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.util.DialogButtonController;
 import cpusim.gui.util.HelpPageEnabled;
-import cpusim.gui.util.MachineBound;
+import cpusim.model.util.*;
 import cpusim.gui.util.MachineModificationController;
 import cpusim.gui.util.MicroinstructionTreeView;
 import cpusim.gui.util.list.StringPropertyListCell;
@@ -14,19 +14,13 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.Convert;
-import cpusim.model.util.Copyable;
-import cpusim.model.util.IdentifiedObject;
-import cpusim.model.util.NamedObject;
-import cpusim.model.util.Validatable;
-import cpusim.model.util.Validate;
-import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertLongs;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,6 +50,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -303,11 +298,13 @@ public class EditMachineInstructionController
                         (), event.getSceneY()).getX();
                 int index = getInstrFieldIndex(localX);
                 inst.getInstructionFields().add(index, draggingField);
-                inst.getInstructionColors().add(index, draggingColor);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                inst.getInstructionColors().add(index, draggingColor);
 
                 if (draggingField.getType() != Type.ignored) {
                     inst.getAssemblyFields().add(draggingIndex, draggingField);
-                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
+                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
                 }
 
                 /* let the source know whether the string was successfully
@@ -358,7 +355,8 @@ public class EditMachineInstructionController
                 int index = getAssemblyFieldIndex(localX);
 
                 inst.getAssemblyFields().add(index, draggingField);
-                inst.getAssemblyColors().add(index, draggingColor);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                inst.getAssemblyColors().add(index, draggingColor);
 
                 /* let the source know whether the string was successfully
                  * transferred and used */
@@ -373,10 +371,11 @@ public class EditMachineInstructionController
             MachineInstruction inst = currentInstr.getValue();
             if (originPane.equals(assemblyFormatPane) || draggingField.getNumBits() == 0) {
                 if (!dropped && draggingField.getNumBits() != 0) {
-                    inst.getAssemblyFields().add(draggingIndex,
-                            draggingField);
-                    inst.getAssemblyColors().add(draggingIndex,
-                            draggingColor);
+                    inst.getAssemblyFields().add(draggingIndex, draggingField);
+
+                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                    inst.getAssemblyColors().add(draggingIndex,
+//                            draggingColor);
                     exited = true;
                 }
 
@@ -394,7 +393,9 @@ public class EditMachineInstructionController
                         !inst.getAssemblyFields().isEmpty() &&
                         !inst.getInstructionFields().isEmpty()) {
                     inst.getAssemblyFields().remove(draggingIndex);
-                    inst.getAssemblyColors().remove(draggingIndex);
+
+                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                    inst.getAssemblyColors().remove(draggingIndex);
                     exited = false;
                 }
                 updateAssemblyDisplay();
@@ -584,10 +585,9 @@ public class EditMachineInstructionController
     protected void handleNewInstruction(ActionEvent ae) {
         int opcode = getUniqueOpcode();
         String uniqueName = NamedObject.createUniqueName(instructionList.getItems(), "?");
-        instructionList.getItems().add(0, new MachineInstruction(uniqueName, IdentifiedObject.generateRandomID(),
-                mediator.getMachine(),
-                new ArrayList<>(), new ArrayList<>(),
-                opcode));
+        instructionList.getItems().add(0,
+                new MachineInstruction(uniqueName, UUID.randomUUID(), getMachine(), opcode,
+                        null, null));
         instructionList.scrollTo(0);
         instructionList.getSelectionModel().selectFirst();
     }
@@ -789,8 +789,10 @@ public class EditMachineInstructionController
             fieldName.setPrefHeight(25);
             fieldWidth.setPrefHeight(25);
 
-            fieldWidth.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
-            fieldName.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
+
+            // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//            fieldWidth.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
+//            fieldName.setStyle("-fx-background-color:" + inst.getInstructionColors().get(i) + ";");
 
             fieldWidth.setAlignment(Pos.CENTER);
             fieldName.setAlignment(Pos.CENTER);
@@ -812,17 +814,20 @@ public class EditMachineInstructionController
                 final List<Field> fields1 = currentInstrValue.getInstructionFields();
 
                 draggingField = fields1.get(index);
-                draggingColor = currentInstrValue.getInstructionColors().get(index);
 
-                draggingIndex = currentInstrValue.getAssemblyColors().indexOf(draggingColor);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                draggingColor = currentInstrValue.getInstructionColors().get(index);
+
+                draggingIndex = currentInstrValue.getAssemblyFields().indexOf(draggingField);
                 originPane = instructionFormatPane;
 
                 currentInstrValue.getInstructionFields().remove(index);
-                currentInstrValue.getInstructionColors().remove(index);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                currentInstrValue.getInstructionColors().remove(index);
 
                 if (draggingField.getType() != Type.ignored) {
                     currentInstrValue.getAssemblyFields().remove(draggingIndex);
-                    currentInstrValue.getAssemblyColors().remove(draggingIndex);
+//                    currentInstrValue.getAssemblyColors().remove(draggingIndex);
                 }
 
                 updateInstructionDisplay();
@@ -866,7 +871,8 @@ public class EditMachineInstructionController
 
             fieldName.setAlignment(Pos.CENTER);
 
-            fieldName.setStyle("-fx-background-color:" + inst.getAssemblyColors().get(i) + ";");
+            // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//            fieldName.setStyle("-fx-background-color:" + inst.getAssemblyColors().get(i) + ";");
 
             fieldName.setPrefHeight(25);
 
@@ -890,11 +896,13 @@ public class EditMachineInstructionController
                 final List<Field> fields1 = currentInstruction.getAssemblyFields();
 
                 draggingField = fields1.get(index);
-                draggingColor = currentInstruction.getAssemblyColors().get(index);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                draggingColor = currentInstruction.getAssemblyColors().get(index);
                 originPane = assemblyFormatPane;
 
                 currentInstruction.getAssemblyFields().remove(index);
-                currentInstruction.getAssemblyColors().remove(index);
+                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+//                currentInstruction.getAssemblyColors().remove(index);
 
                 //it hasn't exited the pane as soon as the drag starts
                 exited = false;
