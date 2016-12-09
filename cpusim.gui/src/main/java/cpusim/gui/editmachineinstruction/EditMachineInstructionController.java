@@ -69,9 +69,6 @@ public class EditMachineInstructionController
     private TextField opcodeTextField;
 
     @FXML
-    private AnchorPane instructionFormatPane;
-
-    @FXML
     private AnchorPane assemblyFormatPane;
 
     @FXML
@@ -268,154 +265,154 @@ public class EditMachineInstructionController
 //            }
 //        });
 
-        instructionFormatPane.setOnDragOver(event -> {
-            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-                    draggingField.getNumBits() != 0) {
-                event.acceptTransferModes(TransferMode.COPY);
-
-                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
-                        (), event.getSceneY()).getX();
-
-                if (!currentInstr.getValue().getInstructionFields().isEmpty()) {
-                    int index = getInstrFieldIndex(localX);
-                    insertInstrField(draggingField, index);
-                }
-                dropped = false;
-
-
-                event.consume();
-            }
-        });
-        instructionFormatPane.setOnDragDropped(event -> {
-            /* data dropped */
-            /* if there is a string data on drag board, read it and use it */
-            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-                    draggingField.getNumBits() != 0) {
-
-                final MachineInstruction inst = currentInstr.getValue();
-
-                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
-                        (), event.getSceneY()).getX();
-                int index = getInstrFieldIndex(localX);
-                inst.getInstructionFields().add(index, draggingField);
-                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-//                inst.getInstructionColors().add(index, draggingColor);
-
-                if (draggingField.getType() != Type.ignored) {
-                    inst.getAssemblyFields().add(draggingIndex, draggingField);
-                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-//                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
-                }
-
-                /* let the source know whether the string was successfully
-                 * transferred and used */
-                event.setDropCompleted(true);
-                dropped = true;
-
-                event.consume();
-            }
-        });
-        instructionFormatPane.setOnDragExited(event -> {
-            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-                    draggingField.getNumBits() != 0) {
-                updateInstructionDisplay();
-                updateAssemblyDisplay();
-                event.consume();
-            }
-        });
+//        instructionFormatPane.setOnDragOver(event -> {
+//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
+//                    draggingField.getNumBits() != 0) {
+//                event.acceptTransferModes(TransferMode.COPY);
+//
+//                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
+//                        (), event.getSceneY()).getX();
+//
+//                if (!currentInstr.getValue().getInstructionFields().isEmpty()) {
+//                    int index = getInstrFieldIndex(localX);
+//                    insertInstrField(draggingField, index);
+//                }
+//                dropped = false;
+//
+//
+//                event.consume();
+//            }
+//        });
+//        instructionFormatPane.setOnDragDropped(event -> {
+//            /* data dropped */
+//            /* if there is a string data on drag board, read it and use it */
+//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
+//                    draggingField.getNumBits() != 0) {
+//
+//                final MachineInstruction inst = currentInstr.getValue();
+//
+//                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
+//                        (), event.getSceneY()).getX();
+//                int index = getInstrFieldIndex(localX);
+//                inst.getInstructionFields().add(index, draggingField);
+//                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+////                inst.getInstructionColors().add(index, draggingColor);
+//
+//                if (draggingField.getType() != Type.ignored) {
+//                    inst.getAssemblyFields().add(draggingIndex, draggingField);
+//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+////                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
+//                }
+//
+//                /* let the source know whether the string was successfully
+//                 * transferred and used */
+//                event.setDropCompleted(true);
+//                dropped = true;
+//
+//                event.consume();
+//            }
+//        });
+//        instructionFormatPane.setOnDragExited(event -> {
+//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
+//                    draggingField.getNumBits() != 0) {
+//                updateInstructionDisplay();
+//                updateAssemblyDisplay();
+//                event.consume();
+//            }
+//        });
     }
 
     /**
      * Initializes drag events for the assemblyFormatPane.
      */
     private void initializeAssemblyFormatPane() {
-        assemblyFormatPane.setOnDragOver(event -> {
-            if (currentInstr.getValue() != null) {
-                if (originPane.equals(assemblyFormatPane) || draggingField
-                        .getNumBits() == 0) {
-                    event.acceptTransferModes(TransferMode.COPY);
-                    double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
-                            (), event.getSceneY()).getX();
-                    int index = getAssemblyFieldIndex(localX);
-                    insertAssemblyField(draggingField, index);
-                    event.consume();
-                    dropped = false;
-                }
-
-            }
-        });
-        assemblyFormatPane.setOnDragDropped(event -> {
-            /* data dropped */
-            /* if there is a string data on dragboard, read it and use it */
-            MachineInstruction inst = currentInstr.getValue();
-            if (originPane.equals(assemblyFormatPane) || draggingField
-                    .getNumBits() == 0) {
-                double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
-                        (), event.getSceneY()).getX();
-                int index = getAssemblyFieldIndex(localX);
-
-                inst.getAssemblyFields().add(index, draggingField);
-                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-//                inst.getAssemblyColors().add(index, draggingColor);
-
-                /* let the source know whether the string was successfully
-                 * transferred and used */
-                event.setDropCompleted(true);
-                dropped = true;
-                exited = true;
-
-                event.consume();
-            }
-        });
-        assemblyFormatPane.setOnDragExited(event -> {
-            MachineInstruction inst = currentInstr.getValue();
-            if (originPane.equals(assemblyFormatPane) || draggingField.getNumBits() == 0) {
-                if (!dropped && draggingField.getNumBits() != 0) {
-                    inst.getAssemblyFields().add(draggingIndex, draggingField);
-
-                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-//                    inst.getAssemblyColors().add(draggingIndex,
-//                            draggingColor);
-                    exited = true;
-                }
-
-                updateAssemblyDisplay();
-                event.consume();
-            }
-        });
-        assemblyFormatPane.setOnDragEntered(event -> {
-            MachineInstruction inst = currentInstr.getValue();
-            if (originPane.equals(assemblyFormatPane) || draggingField
-                    .getNumBits() == 0) {
-                //so there aren't duplicate fields added whenever the user drags
-                //out of the field and back in again
-                if (!dropped && draggingField.getNumBits() != 0 && exited &&
-                        !inst.getAssemblyFields().isEmpty() &&
-                        !inst.getInstructionFields().isEmpty()) {
-                    inst.getAssemblyFields().remove(draggingIndex);
-
-                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-//                    inst.getAssemblyColors().remove(draggingIndex);
-                    exited = false;
-                }
-                updateAssemblyDisplay();
-                event.consume();
-            }
-        });
-
-        // set the preferred width of the instr and assm panes in case
-        // the width of the dialog changed
-        DoubleBinding formatPaneSizeBinding = mainPane.widthProperty()
-                .subtract(instructionList.widthProperty())
-                .subtract(fieldsList.widthProperty())
-                .subtract(Bindings.createDoubleBinding(() ->
-                                //sum of padding of instr list & format tab pane & field's VBox
-                                instructionList.getPadding().getLeft() +
-                                    formatTabPane.getPadding().getLeft() +
-                                    fieldsFormatVBox.getPadding().getLeft(),
-                        instructionList.paddingProperty(), formatTabPane.paddingProperty(), fieldsFormatVBox.paddingProperty()));
-        assemblyFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
-        instructionFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
+//        assemblyFormatPane.setOnDragOver(event -> {
+//            if (currentInstr.getValue() != null) {
+//                if (originPane.equals(assemblyFormatPane) || draggingField
+//                        .getNumBits() == 0) {
+//                    event.acceptTransferModes(TransferMode.COPY);
+//                    double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
+//                            (), event.getSceneY()).getX();
+//                    int index = getAssemblyFieldIndex(localX);
+//                    insertAssemblyField(draggingField, index);
+//                    event.consume();
+//                    dropped = false;
+//                }
+//
+//            }
+//        });
+//        assemblyFormatPane.setOnDragDropped(event -> {
+//            /* data dropped */
+//            /* if there is a string data on dragboard, read it and use it */
+//            MachineInstruction inst = currentInstr.getValue();
+//            if (originPane.equals(assemblyFormatPane) || draggingField
+//                    .getNumBits() == 0) {
+//                double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
+//                        (), event.getSceneY()).getX();
+//                int index = getAssemblyFieldIndex(localX);
+//
+//                inst.getAssemblyFields().add(index, draggingField);
+//                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+////                inst.getAssemblyColors().add(index, draggingColor);
+//
+//                /* let the source know whether the string was successfully
+//                 * transferred and used */
+//                event.setDropCompleted(true);
+//                dropped = true;
+//                exited = true;
+//
+//                event.consume();
+//            }
+//        });
+//        assemblyFormatPane.setOnDragExited(event -> {
+//            MachineInstruction inst = currentInstr.getValue();
+//            if (originPane.equals(assemblyFormatPane) || draggingField.getNumBits() == 0) {
+//                if (!dropped && draggingField.getNumBits() != 0) {
+//                    inst.getAssemblyFields().add(draggingIndex, draggingField);
+//
+//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+////                    inst.getAssemblyColors().add(draggingIndex,
+////                            draggingColor);
+//                    exited = true;
+//                }
+//
+//                updateAssemblyDisplay();
+//                event.consume();
+//            }
+//        });
+//        assemblyFormatPane.setOnDragEntered(event -> {
+//            MachineInstruction inst = currentInstr.getValue();
+//            if (originPane.equals(assemblyFormatPane) || draggingField
+//                    .getNumBits() == 0) {
+//                //so there aren't duplicate fields added whenever the user drags
+//                //out of the field and back in again
+//                if (!dropped && draggingField.getNumBits() != 0 && exited &&
+//                        !inst.getAssemblyFields().isEmpty() &&
+//                        !inst.getInstructionFields().isEmpty()) {
+//                    inst.getAssemblyFields().remove(draggingIndex);
+//
+//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
+////                    inst.getAssemblyColors().remove(draggingIndex);
+//                    exited = false;
+//                }
+//                updateAssemblyDisplay();
+//                event.consume();
+//            }
+//        });
+//
+//        // set the preferred width of the instr and assm panes in case
+//        // the width of the dialog changed
+//        DoubleBinding formatPaneSizeBinding = mainPane.widthProperty()
+//                .subtract(instructionList.widthProperty())
+//                .subtract(fieldsList.widthProperty())
+//                .subtract(Bindings.createDoubleBinding(() ->
+//                                //sum of padding of instr list & format tab pane & field's VBox
+//                                instructionList.getPadding().getLeft() +
+//                                    formatTabPane.getPadding().getLeft() +
+//                                    fieldsFormatVBox.getPadding().getLeft(),
+//                        instructionList.paddingProperty(), formatTabPane.paddingProperty(), fieldsFormatVBox.paddingProperty()));
+//        assemblyFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
+//        instructionFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
     }
 
     /**
@@ -706,12 +703,12 @@ public class EditMachineInstructionController
         // FIXME replace with Node#contains(pt)
         List<Double> cutoffXLocs = new ArrayList<>();
         cutoffXLocs.add(0.0);
-        for (int i = 0; i < instructionFormatPane.getChildren().size() - 1; i += 2) {
-            cutoffXLocs.add(instructionFormatPane.getChildren().get(i).getLayoutX() +
-                    ((Label) instructionFormatPane.getChildren().get(i)).getPrefWidth()
-                            * .5);
-        }
-        cutoffXLocs.add(instructionFormatPane.getPrefWidth());
+//        for (int i = 0; i < instructionFormatPane.getChildren().size() - 1; i += 2) {
+//            cutoffXLocs.add(instructionFormatPane.getChildren().get(i).getLayoutX() +
+//                    ((Label) instructionFormatPane.getChildren().get(i)).getPrefWidth()
+//                            * .5);
+//        }
+//        cutoffXLocs.add(instructionFormatPane.getPrefWidth());
 
         for (int i = 0; i < cutoffXLocs.size() - 1; i++) {
             if (localX > cutoffXLocs.get(i) && localX < cutoffXLocs.get(i + 1)) {
@@ -761,7 +758,7 @@ public class EditMachineInstructionController
 
         final MachineInstruction inst = currentInstr.getValue();
 
-        instructionFormatPane.getChildren().clear();
+//        instructionFormatPane.getChildren().clear();
 
         List<Field> fields = inst.getInstructionFields();
         int totalBits = 0;
@@ -779,8 +776,8 @@ public class EditMachineInstructionController
             fieldName.setText(field.getName());
             fieldWidth.setText(String.valueOf(field.getNumBits()));
 
-            fieldName.setPrefWidth(((float) field.getNumBits() / totalBits) *
-                    instructionFormatPane.getPrefWidth());
+//            fieldName.setPrefWidth(((float) field.getNumBits() / totalBits) *
+//                    instructionFormatPane.getPrefWidth());
             fieldWidth.setPrefWidth(30);
 
             fieldName.setLayoutY(30);
@@ -809,7 +806,7 @@ public class EditMachineInstructionController
 
                 Dragboard db = fieldName.startDragAndDrop(TransferMode.ANY);
 
-                int index = instructionFormatPane.getChildren().indexOf(fieldName) / 2;
+                int index = 0;//instructionFormatPane.getChildren().indexOf(fieldName) / 2;
 
                 final List<Field> fields1 = currentInstrValue.getInstructionFields();
 
@@ -819,7 +816,7 @@ public class EditMachineInstructionController
 //                draggingColor = currentInstrValue.getInstructionColors().get(index);
 
                 draggingIndex = currentInstrValue.getAssemblyFields().indexOf(draggingField);
-                originPane = instructionFormatPane;
+//                originPane = instructionFormatPane;
 
                 currentInstrValue.getInstructionFields().remove(index);
                 // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
@@ -839,7 +836,7 @@ public class EditMachineInstructionController
                 event.consume();
             });
 
-            instructionFormatPane.getChildren().addAll(fieldName, fieldWidth);
+//            instructionFormatPane.getChildren().addAll(fieldName, fieldWidth);
             i++;
         }
 
@@ -948,25 +945,25 @@ public class EditMachineInstructionController
             totalBits += field.getNumBits();
         }
         for (Field field : tempFields) {
-            double prefWidth = ((float) field.getNumBits() / totalBits) *
-                    instructionFormatPane.getPrefWidth();
+//            double prefWidth = ((float) field.getNumBits() / totalBits) *
+//                    instructionFormatPane.getPrefWidth();
 
             if (i / 2 == index && !openSpaceFilled) {
-                currentXPos += prefWidth;
+//                currentXPos += prefWidth;
                 openSpaceFilled = true;
                 continue;
             }
 
-            ((Label) instructionFormatPane.getChildren().get(i)).setPrefWidth(prefWidth);
-            ((Label) instructionFormatPane.getChildren().get(i + 1)).setPrefWidth(30);
-
-            instructionFormatPane.getChildren().get(i).setLayoutX(currentXPos);
-            instructionFormatPane.getChildren().get(i + 1).setLayoutX(currentXPos +
-                    (.5 * ((Label) instructionFormatPane.getChildren().get(i))
-                            .getPrefWidth()) - 15);
-
-
-            currentXPos += prefWidth;
+//            ((Label) instructionFormatPane.getChildren().get(i)).setPrefWidth(prefWidth);
+//            ((Label) instructionFormatPane.getChildren().get(i + 1)).setPrefWidth(30);
+//
+//            instructionFormatPane.getChildren().get(i).setLayoutX(currentXPos);
+//            instructionFormatPane.getChildren().get(i + 1).setLayoutX(currentXPos +
+//                    (.5 * ((Label) instructionFormatPane.getChildren().get(i))
+//                            .getPrefWidth()) - 15);
+//
+//
+//            currentXPos += prefWidth;
             i += 2;
         }
     }

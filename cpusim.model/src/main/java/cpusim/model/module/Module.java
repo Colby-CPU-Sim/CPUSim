@@ -20,6 +20,7 @@
 package cpusim.model.module;
 
 
+import com.google.common.base.MoreObjects;
 import cpusim.model.util.MachineComponent;
 import cpusim.model.Machine;
 import cpusim.model.util.*;
@@ -83,4 +84,30 @@ public abstract class Module<T extends Module<T>>
         NamedObject.super.validate();
     }
 
+    protected final MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(getClass())
+                .addValue(getID())
+                .add("name", getName())
+                .add("machine", getMachine() == null ? null : getMachine().getName());
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Module<?> module = (Module<?>) o;
+
+        return id.equals(module.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 } //end of class Module

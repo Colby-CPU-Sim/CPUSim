@@ -22,8 +22,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Collection of utilities for FXCollections.
- * 
- * @author Kevin Brightwell
+ *
  * @since 2016-09-20
  */
 public class MoreFXCollections {

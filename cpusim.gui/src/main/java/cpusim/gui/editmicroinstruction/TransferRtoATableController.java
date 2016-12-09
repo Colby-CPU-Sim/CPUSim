@@ -74,7 +74,9 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    void initializeTable() {
+    void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         final double FACTOR = 100.0/11.0;

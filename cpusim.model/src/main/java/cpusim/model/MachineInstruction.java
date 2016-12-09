@@ -1,5 +1,6 @@
 package cpusim.model;
 
+import com.google.common.base.MoreObjects;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.*;
@@ -10,6 +11,7 @@ import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
+import javafx.beans.property.adapter.JavaBeanLongPropertyBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -40,15 +42,20 @@ public class MachineInstruction
 
     @DependantComponent
     private final ListProperty<Microinstruction<?>> micros;	//all the microinstructions
-    private long opcode;					//the opcode of the instruction
+
+    /**
+     * the opcode of the instruction
+     */
+    private final LongProperty opcode;
     private final Machine machine;
-    
+
+    @DependantComponent
     private final ListProperty<Field> instructionFields;
+    @DependantComponent
     private final ListProperty<Field> assemblyFields;
 
     private final ReadOnlySetProperty<MachineComponent> dependants;
-    private final ReadOnlySetProperty<MachineComponent> children;
-    
+
     /**
      * Create a new {@link MachineInstruction}.
      *  @param name Name (see {@link NamedObject#nameProperty()}
@@ -67,7 +74,7 @@ public class MachineInstruction
         this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
         this.machine = machine;
         
-        this.opcode = opcode;
+        this.opcode = new SimpleLongProperty(this, "opcode", opcode);
         
         this.micros = new SimpleListProperty<>(this, "micros", FXCollections.observableArrayList());
 
@@ -86,8 +93,6 @@ public class MachineInstruction
 
         this.dependants = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependencies");
-        this.children = MachineComponent.collectChildren(this)
-                .buildSet(this, "children");
     }
 
     /**
@@ -96,7 +101,7 @@ public class MachineInstruction
      */
     public MachineInstruction(final MachineInstruction other) {
         this(other.name.getValue(), UUID.randomUUID(), other.getMachine(),
-                other.opcode, other.instructionFields, other.assemblyFields);
+                other.opcode.get(), other.instructionFields, other.assemblyFields);
     }
 
     //===================================
@@ -255,19 +260,22 @@ public class MachineInstruction
         return micros;
     }
 
-    public void setMicros(ObservableList<Microinstruction<?>> v) {
+    public void setMicros(List<? extends Microinstruction<?>> v) {
         micros.clear();
         micros.addAll(v);
     }
 
     public long getOpcode()
     {
-        return opcode;
+        return opcode.get();
     }
 
-    public void setOpcode(long newOpcode)
-    {
-        opcode = newOpcode;
+    public void setOpcode(long newOpcode) {
+        opcode.setValue(newOpcode);
+    }
+
+    public LongProperty opcodeProperty() {
+        return opcode;
     }
 
     //===================================
@@ -275,7 +283,16 @@ public class MachineInstruction
 
     @Override
     public String toString() {
-        return name.getValue();
+        MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(getClass())
+                .addValue(getID())
+                .add("name", getName())
+                .add("machine", getMachine().getName())
+                .add("opcode", getOpcode())
+                .add("micros", String.format("%s[%d]", Microinstruction.class.getSimpleName(), micros.size()))
+                .add("assembly", String.format("%s[%d]", Field.class.getSimpleName(), assemblyFields.size()))
+                .add("instructions", String.format("%s[%d]", Field.class.getSimpleName(), instructionFields.size()));
+
+        return helper.toString();
     }
     
 

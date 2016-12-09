@@ -17,6 +17,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+import org.fxmisc.easybind.EasyBind;
 
 import java.io.IOException;
 
@@ -63,40 +64,37 @@ public abstract class ModuleTableController<T extends Module<T>>
      * Initializes the table after {@link FXMLLoader#load()} is called.
      */
     @FXML @SuppressWarnings("unused")
-    private void initialize() {
+    protected void initialize() {
         Callback<TableColumn<T, String>, TableCell<T, String>> cellStrFactory = setStringTableColumn -> new EditingStrCell<>();
         
         name.setCellValueFactory(new PropertyValueFactory<>("name"));
         name.setCellFactory(cellStrFactory);
         name.setOnEditCommit(new NamedColumnHandler<>(this));
-        
-        initializeTable();
-    
-        ChangeListener<Machine> machineListener = (observable, oldValue, newValue) -> {
+
+        EasyBind.subscribe(machineProperty(), (newValue) -> {
             // Clone all of the modules already in use. This allows us to change the values of the machine without changing
             // the underlying machine values until we are done.
-            ObservableList<T> items = getItems();
-            items.clear();
-            newValue.getModules(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
-        };
-    
-        machine.addListener(machineListener);
-        machineListener.changed(machine, machine.getValue(), machine.getValue());
+            if (newValue != null) {
+                ObservableList<T> items = getItems();
+                items.clear();
+                newValue.getModules(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
+            }
+        });
+
+        initializeTable();
     }
 
     /**
      * Called after the {@link FXMLLoader#load()} is called.
      */
-    protected abstract void initializeTable();
+    protected void initializeTable() {};
 
     /**
      * Loads the FXML controller, running {@link FXMLLoader} pipeline.
      */
     protected void loadFXML() {
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, fxmlTablePath);
-
         try {
-            fxmlLoader.load();
+            FXMLLoaderFactory.fromRootController(this, fxmlTablePath).load();
         } catch (IOException ioe) {
             // should never happen
             throw new IllegalStateException("Unable to load file: " + fxmlTablePath, ioe);

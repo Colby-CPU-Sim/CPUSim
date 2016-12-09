@@ -59,7 +59,7 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
      * @throws IllegalStateException if a field is incorrectly annotated
      * @throws NullPointerException if {@code base} is null.
      */
-    static PropertyCollectionBuilder<MachineComponent> collectChildren(MachineComponent base) {
+    static ObservableCollectionBuilder<MachineComponent> collectChildren(MachineComponent base) {
         return collectMarkedComponents(base, ChildComponent.class);
     }
 
@@ -92,14 +92,14 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
      * @throws IllegalStateException if a field is incorrectly annotated
      * @throws NullPointerException if {@code base} is null.
      */
-    static PropertyCollectionBuilder<MachineComponent> collectDependancies(MachineComponent base) {
+    static ObservableCollectionBuilder<MachineComponent> collectDependancies(MachineComponent base) {
         return collectMarkedComponents(base, DependantComponent.class);
     }
 
-    static PropertyCollectionBuilder<MachineComponent> collectMarkedComponents(MachineComponent base, Class<? extends Annotation> annotationClazz) {
+    static ObservableCollectionBuilder<MachineComponent> collectMarkedComponents(MachineComponent base, Class<? extends Annotation> annotationClazz) {
         checkNotNull(base);
 
-        PropertyCollectionBuilder<MachineComponent> builder = new PropertyCollectionBuilder<>();
+        ObservableCollectionBuilder<MachineComponent> builder = new ObservableCollectionBuilder<>();
 
         Class<?> clazz = ClassCleaner.cleanClass(base.getClass());
 

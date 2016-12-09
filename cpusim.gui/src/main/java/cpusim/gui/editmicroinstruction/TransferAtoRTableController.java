@@ -80,7 +80,9 @@ class TransferAtoRTableController
     }
 
     @Override
-    void initializeTable() {
+    void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/12.0));
         source.prefWidthProperty().bind(prefWidthProperty().divide(100/11.0));

@@ -95,6 +95,21 @@ public final class DragHelper implements ReadOnlyMachineBound {
     }
 
     /**
+     * Inserts an {@link Microinstruction} reference from the {@link #machineProperty()} into the {@link Dragboard}
+     * @param field a {@code Field} to be used
+     *
+     * @return See {@link Dragboard#setContent(Map)}
+     */
+    public boolean setFieldContent(final Field field) {
+        checkNotNull(field);
+
+        clipboardContent.put(FIELD_FORMAT, field.getID().toString());
+
+        return setContent(clipboardContent);
+    }
+
+
+    /**
      * Parses the content of a {@link Dragboard} and attempts to call the correct {@link HandleDragBehaviour} method.
      * This is a designation of the Visitor pattern.
      *
@@ -110,12 +125,12 @@ public final class DragHelper implements ReadOnlyMachineBound {
                 // We have MICRO_FORMAT content
                 List<String> tokens = Splitter.on(ENCODING_CHAR)
                         .omitEmptyStrings()
-                        .splitToList((String)dragboard.getContent(format));
+                        .splitToList((String) dragboard.getContent(format));
                 checkArgument(tokens.size() == 2);
 
                 try {
                     @SuppressWarnings("unchecked") // if it's bad, it'll throw and be caught
-                    Class<? extends Microinstruction<?>> microClass
+                            Class<? extends Microinstruction<?>> microClass
                             = (Class<? extends Microinstruction<?>>) ClassCleaner.forName(tokens.get(0));
                     final UUID id = UUID.fromString(tokens.get(1));
 
@@ -138,6 +153,19 @@ public final class DragHelper implements ReadOnlyMachineBound {
                     handler.onOther(format, dragboard.getContent(format));
                 }
 
+            } else if (format == FIELD_FORMAT) {
+                UUID fieldId = UUID.fromString(dragboard.getString());
+
+                Optional<Field> field = getMachine().getFields().stream()
+                        .filter(f -> f.getID().equals(fieldId))
+                        .findFirst();
+
+                if (field.isPresent()) {
+                    handler.onDragField(field.get());
+                } else {
+                    logger.error("Field dragged, but unknown UUID found {}", fieldId);
+                    handler.onOther(format, dragboard.getContent(format));
+                }
             } else if (format == MODULE_FORMAT) {
                 // FIXME actually handle this :)
                 handler.onOther(format, dragboard.getContent(format));
@@ -152,13 +180,21 @@ public final class DragHelper implements ReadOnlyMachineBound {
      * Denotes behaviour for handling when something encoded by {@link DragHelper} is dropped
      * into a component. This is the "visitor" for this implementation.
      */
-    public interface HandleDragBehaviour {
+    public static class HandleDragBehaviour {
 
-        void onDragIndex(int value);
+        public void onDragIndex(int value) {
 
-        void onDragMicro(Microinstruction<?> micro);
+        }
 
-        default void onOther(DataFormat format, Object value) {
+        public void onDragMicro(Microinstruction<?> micro) {
+
+        }
+
+        public void onDragField(Field field) {
+
+        }
+
+        public void onOther(DataFormat format, Object value) {
             // no-opt
         }
 

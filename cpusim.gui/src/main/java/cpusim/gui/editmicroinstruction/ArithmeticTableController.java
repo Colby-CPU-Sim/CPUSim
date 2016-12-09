@@ -23,28 +23,19 @@ import java.util.UUID;
  *
  * @since 2013-10-27
  */
-class ArithmeticTableController extends MicroinstructionTableController<Arithmetic> {
+class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
 
     /**
      * Marker used when building tabs.
      */
     static final String FX_ID = "arithmeticTab";
 
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic, Register> lhs;
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic, Register> rhs;
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic, Register> destination;
-    
+
     @FXML @SuppressWarnings("unused")
     private TableColumn<Arithmetic, Arithmetic.Type> type;
-    
+
     @FXML @SuppressWarnings("unused")
     private TableColumn<Arithmetic, ConditionBit> overflowBit;
-    
     @FXML @SuppressWarnings("unused")
     private TableColumn<Arithmetic, ConditionBit> carryBit;
 
@@ -65,9 +56,9 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
      * hit enter to save the changes.
      */
     @Override
-    void initializeTable() {
-        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        
+    void initialize() {
+        super.initialize();
+
         final double FACTOR = 100/14.0;
         name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         lhs.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
@@ -77,40 +68,23 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
         overflowBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         carryBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-
-        Callback<TableColumn<Arithmetic,Register>,TableCell<Arithmetic,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
-
-        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList((ConditionBit) null);
-        condBit.addAll(machine.get().getModules(ConditionBit.class));
-        Callback<TableColumn<Arithmetic,ConditionBit>,TableCell<Arithmetic,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(condBit);
-
-        type.setCellValueFactory(new PropertyValueFactory<>("type"));
-        lhs.setCellValueFactory(new PropertyValueFactory<>("lhs"));
-        rhs.setCellValueFactory(new PropertyValueFactory<>("rhs"));
-        destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
-        overflowBit.setCellValueFactory(new PropertyValueFactory<>("overflowBit"));
-        carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
+        Callback<TableColumn<Arithmetic, ConditionBit>,TableCell<Arithmetic, ConditionBit>> cellCondFactory =
+                _ignore -> new ComboBoxTableCell<>(getMachine().getModules(ConditionBit.class));
 
         //Add for EdiCell of each field, in String or in Integer
+
+        type.setCellValueFactory(new PropertyValueFactory<>("type"));
         type.setCellFactory(new EnumCellFactory<>(Arithmetic.Type.class));
         type.setOnEditCommit(text -> text.getRowValue().setOperation(text.getNewValue()));
 
-        lhs.setCellFactory(cellRegFactory);
-        lhs.setOnEditCommit(text -> text.getRowValue().setLhs(text.getNewValue()));
-
-        rhs.setCellFactory(cellRegFactory);
-        rhs.setOnEditCommit(text -> text.getRowValue().setRhs(text.getNewValue()));
-
-        destination.setCellFactory(cellRegFactory);
-        destination.setOnEditCommit(text -> text.getRowValue().setDestination(text.getNewValue()));
-
+        overflowBit.setCellValueFactory(new PropertyValueFactory<>("overflowBit"));
         overflowBit.setCellFactory(cellCondFactory);
         overflowBit.setOnEditCommit(text -> text.getRowValue().setOverflowBit(text.getNewValue()));
 
+        carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
         carryBit.setCellFactory(cellCondFactory);
         carryBit.setOnEditCommit(text -> text.getRowValue().setCarryBit(text.getNewValue()));
+
     }
 
     @Override
@@ -130,15 +104,6 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
                 null, null, null);
     }
 
-    /**
-     * returns a string about the type of the 
-     * @return a string about the type of the 
-     */
-    @Override
-    public String toString()
-    {
-        return "Arithmetic";
-    }
 
     @Override
     public boolean isNewButtonEnabled() {

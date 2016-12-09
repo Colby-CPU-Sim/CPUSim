@@ -41,7 +41,9 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
 
 
     @Override
-    void initializeTable() {
+    void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/50.0));
         ir.prefWidthProperty().bind(prefWidthProperty().divide(100/50.0));

@@ -312,35 +312,16 @@ public class Machine extends Module<Machine> {
         initializeModuleMap();
         initializeMicroMap();
 
-        PropertyCollectionBuilder<MachineComponent> childrenBuilder = MachineComponent.collectChildren(this);
+        ObservableCollectionBuilder<MachineComponent> childrenBuilder = MachineComponent.collectChildren(this);
 
         this.components = childrenBuilder.buildMap(this, "components");
         this.children = childrenBuilder.buildSet(this, "children");
 
-        ObservableList<Register> allRegisters = FXCollections.observableArrayList();
-        this.children.addListener((SetChangeListener<MachineComponent>) c -> {
-            if (c.wasAdded()) {
-                MachineComponent comp = c.getElementAdded();
-                if (comp instanceof Register) {
-                    allRegisters.add((Register)comp);
-                }
-            }
-
-            if (c.wasRemoved()) {
-                MachineComponent comp = c.getElementRemoved();
-                if (comp instanceof Register) {
-                    allRegisters.remove(comp);
-                }
-            }
-        });
-
-        this.children.stream()
-                .filter(c -> Register.class.isAssignableFrom(c.getClass()))
-                .map(c -> (Register)c)
-                .forEach(allRegisters::add);
-
-        this.allRegisters = new SimpleListProperty<>(this, "allRegisters",
-                allRegisters.sorted(Comparator.comparing(Register::getName)));
+        ObservableList<Register> allRegisters =
+                MoreBindings.concat(
+                        FXCollections.observableArrayList(registers,
+                                MoreBindings.flatMapValue(registerArrays, RegisterArray::getRegisters)));
+        this.allRegisters = new SimpleListProperty<>(this, "allRegisters", allRegisters);
     }
 
     /**

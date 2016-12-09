@@ -2,13 +2,11 @@ package cpusim.gui.editmachineinstruction;
 
 import cpusim.gui.util.DragHelper;
 import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.model.util.MachineBound;
-import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.util.MachineBound;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;

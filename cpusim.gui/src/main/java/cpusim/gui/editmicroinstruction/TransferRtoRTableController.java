@@ -51,7 +51,9 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    void initializeTable() {
+    void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/17.0));
         source.prefWidthProperty().bind(prefWidthProperty().divide(100/17.0));

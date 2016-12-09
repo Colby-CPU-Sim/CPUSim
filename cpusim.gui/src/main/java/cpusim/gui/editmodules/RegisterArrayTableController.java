@@ -181,7 +181,7 @@ public class RegisterArrayTableController extends ModuleTableController<Register
     @Override
     public RegisterArray createInstance() {
         return new RegisterArray("???", UUID.randomUUID(), getMachine(),
-                4, 32, 0);
+                4, 32, 0, Register.Access.readWrite());
     }
 
     /**

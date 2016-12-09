@@ -415,7 +415,7 @@ public class MachineReader {
 		}
 		
 		UUID id = idToUUID(attrs.getValue("id"));
-		RegisterArray r = new RegisterArray(name, id, machine, length, width, 0);
+		RegisterArray r = new RegisterArray(name, id, machine, length, width, 0, Register.Access.readWrite());
 		components.put(id, r);
 		machine.getModules(RegisterArray.class).add(r);
 

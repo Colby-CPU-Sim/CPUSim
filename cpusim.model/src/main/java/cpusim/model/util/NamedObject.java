@@ -7,6 +7,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +21,7 @@ import static com.google.common.base.Preconditions.*;
  * Defines that an object has a `name` and `ID` property.
  * @since 2000-11-01
  */
-public interface NamedObject extends Validatable {
+public interface NamedObject extends Validatable, Comparable<NamedObject> {
 	/**
      * Get the name of a component
      */
@@ -46,7 +47,12 @@ public interface NamedObject extends Validatable {
     default void validate() {
         NamedObject.validateName(getName());
     }
-    
+
+    @Override
+    default int compareTo(@Nonnull NamedObject o) {
+        return getName().compareTo(o.getName());
+    }
+
     /**
      * Converts a collection of {@link NamedObject} instances into a {@link Map} from {@link #getName()} to the values.
      * 

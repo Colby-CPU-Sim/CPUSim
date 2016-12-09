@@ -11,13 +11,12 @@ import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
-import cpusim.model.util.ReadOnlyMachineBound;
+import cpusim.model.util.MachineBound;
 import cpusim.model.Machine;
 import cpusim.model.module.Module;
 import cpusim.model.module.RAM;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -37,7 +36,8 @@ import static com.google.common.base.Preconditions.*;
  * This class is the controller for the dialog box that is used for
  * editing the properties of each register in a register array.
  */
-public final class EditModulesController extends BorderPane implements DialogButtonController.InteractionHandler, ReadOnlyMachineBound {
+public final class EditModulesController extends BorderPane
+        implements DialogButtonController.InteractionHandler, MachineBound {
     
     private final Mediator mediator;
     private final ObjectProperty<Machine> machine;
@@ -64,7 +64,6 @@ public final class EditModulesController extends BorderPane implements DialogBut
         registersTableController = new RegistersTableController();
         registerArrayTableController = new RegisterArrayTableController();
         conditionBitTableController = new ConditionBitTableController(
-                mediator,
                 registersTableController,
                 registerArrayTableController);
         
@@ -72,6 +71,11 @@ public final class EditModulesController extends BorderPane implements DialogBut
         registerArrayTableController.setConditionBitController(conditionBitTableController);
         
         ramsTableController = new RAMsTableController();
+
+        registersTableController.machineProperty().bindBidirectional(machineProperty());
+        registerArrayTableController.machineProperty().bindBidirectional(machineProperty());
+        conditionBitTableController.machineProperty().bindBidirectional(machineProperty());
+        ramsTableController.machineProperty().bindBidirectional(machineProperty());
     }
 
     @FXML
@@ -184,7 +188,7 @@ public final class EditModulesController extends BorderPane implements DialogBut
     }
     
     @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
+    public ObjectProperty<Machine> machineProperty() {
         return machine;
     }
 

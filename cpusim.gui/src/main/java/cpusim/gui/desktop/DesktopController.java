@@ -2370,7 +2370,7 @@ public class DesktopController implements Initializable
         URL url = getClass().getResource("/images/icons/cpusim_icon.jpg");
         Image icon = new Image(url.toExternalForm());
         dialogStage.getIcons().add(icon);
-        Pane dialogRoot = null;
+        Pane dialogRoot;
 
         try {
             dialogRoot = fxmlLoader.load();

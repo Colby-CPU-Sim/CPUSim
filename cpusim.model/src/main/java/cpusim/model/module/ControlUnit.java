@@ -28,16 +28,22 @@ import static com.google.common.base.Preconditions.*;
  * The Control Unit class
  */
 public class ControlUnit extends Module<ControlUnit> {
-    
-    //the instr currently or about to be executed
+
+    /**
+     * the instr currently or about to be executed
+     */
     @DependantComponent
     private final ObjectProperty<MachineInstruction> currentInstruction;
-    
-    //the index of the micro sequence
+
+    /**
+     * the index of the micro sequence
+     */
     private final IntegerProperty microIndex;
 
+    /**
+     * Dependencies for the {@link ControlUnit}
+     */
     private final ReadOnlySetProperty<MachineComponent> dependencies;
-
 
     /**
      * Constructor

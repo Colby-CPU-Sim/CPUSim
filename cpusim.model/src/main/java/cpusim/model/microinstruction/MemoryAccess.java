@@ -5,7 +5,7 @@ import cpusim.model.module.Module;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import cpusim.model.util.PropertyCollectionBuilder;
+import cpusim.model.util.ObservableCollectionBuilder;
 import javafx.beans.property.*;
 
 import java.util.UUID;
@@ -56,7 +56,7 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
         this.data = new SimpleObjectProperty<>(this, "data", data);
         this.address = new SimpleObjectProperty<>(this, "address", address);
 
-        this.dependants = (new PropertyCollectionBuilder<MachineComponent>())
+        this.dependants = (new ObservableCollectionBuilder<MachineComponent>())
                 .add(this.memory)
                 .add(this.data)
                 .add(this.address)

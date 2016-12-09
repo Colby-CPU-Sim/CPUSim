@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 
-<fx:root id="ramTable" fx:id="table" editable="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="300.0" prefHeight="400.0" prefWidth="350.0" type="javafx.scene.control.TableView" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<fx:root id="ramTable" fx:id="table" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="400.0" minWidth="300.0" prefHeight="400.0" prefWidth="350.0" type="javafx.scene.control.TableView" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
   <columns>
-    <TableColumn fx:id="name" text="name" />
-    <TableColumn fx:id="length" text="length" />
-    <TableColumn fx:id="cellSize" text="cellSize" />
+    <TableColumn fx:id="name" text="Name" />
+    <TableColumn fx:id="length" text="Length" />
+    <TableColumn fx:id="cellSize" text="Cell Size" />
   </columns>
 </fx:root>

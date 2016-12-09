@@ -16,7 +16,12 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.MoreBindings;
+import cpusim.model.util.ObservableCollectionBuilder;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyListProperty;
+import javafx.beans.property.ReadOnlyListWrapper;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -28,6 +33,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+import org.fxmisc.easybind.EasyBind;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -42,54 +48,35 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     static final String FX_ID = "conditionBitsTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<ConditionBit,Register> register;
+    private TableColumn<ConditionBit, Register> register;
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<ConditionBit,Integer> bit;
+    private TableColumn<ConditionBit, Integer> bit;
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<ConditionBit,Boolean> halt;
-
-    private final ObjectProperty<ObservableList<Register>> ctrlRegisterListProperty;
-    private final ObjectProperty<ObservableList<RegisterArray>> ctrlRegisterArrayListProperty;
+    private TableColumn<ConditionBit, Boolean> halt;
     
-    private final ObservableList<Register> registerList;
-    
-    private final ListChangeListener<Register> registerListChangeListener = _ignore -> updateRegisters();
-    private final ListChangeListener<RegisterArray> registerArrListChangeListener = _ignore -> updateRegisters();
+    private final ReadOnlyListProperty<Register> registerList;
 
     /**
      * Constructor
-     * @param mediator store the machine and other information needed
      * @param registerTableController Controller for {@link Register} table.
      * @param registerArrayTableController Controller for {@link RegisterArray} table.
      */
-    ConditionBitTableController(Mediator mediator,
-                                RegistersTableController registerTableController,
+    ConditionBitTableController(RegistersTableController registerTableController,
                                 RegisterArrayTableController registerArrayTableController){
         super("ConditionBitTable.fxml", ConditionBit.class);
-        this.ctrlRegisterListProperty = checkNotNull(registerTableController).itemsProperty();
-        this.ctrlRegisterArrayListProperty = checkNotNull(registerArrayTableController).itemsProperty();
-    
-        registerList = FXCollections.observableArrayList();
         
         // Add some listeners so when they update, it will update the registers that condition bits can use
-    
-        this.ctrlRegisterListProperty.get().addListener(registerListChangeListener);
-        this.ctrlRegisterArrayListProperty.get().addListener(registerArrListChangeListener);
-    
-        this.ctrlRegisterListProperty.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                newValue.addListener(registerListChangeListener);
-            }
-        });
-    
-        this.ctrlRegisterArrayListProperty.addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                newValue.addListener(registerArrListChangeListener);
-            }
-        });
-        
+
+        ObservableList<Register> registers = checkNotNull(registerTableController).getItems();
+        ObservableList<? extends Register> fromArrays =
+                MoreBindings.flatMapValue(checkNotNull(registerArrayTableController).getItems(), RegisterArray::registersProperty);
+
+        ObservableList<Register> concatRegisters = MoreBindings.concat(FXCollections.observableArrayList(registers, fromArrays));
+
+        registerList = new ReadOnlyListWrapper<>(this, "allRegisters", concatRegisters);
+
         fixItemsToUseClones(registerTableController, registerArrayTableController);
         
         loadFXML();
@@ -97,38 +84,37 @@ public class ConditionBitTableController extends ModuleTableController<Condition
 
 
     @Override
-    public void initializeTable() {
+    public void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        name.prefWidthProperty().bind(prefWidthProperty().divide(100.0/30.0));
-        register.prefWidthProperty().bind(prefWidthProperty().divide(100.0/30.0));
-        bit.prefWidthProperty().bind(prefWidthProperty().divide(100.0/20.0));
-        halt.prefWidthProperty().bind(prefWidthProperty().divide(100.0/20.0));
+        name.prefWidthProperty().bind(prefWidthProperty().multiply(3.0/8.0));
+        register.prefWidthProperty().bind(prefWidthProperty().multiply(3.0/8.0));
+        bit.prefWidthProperty().bind(prefWidthProperty().multiply(2.0/8.0));
+        halt.prefWidthProperty().bind(prefWidthProperty().multiply(2.0/8.0));
 
-        Callback<TableColumn<ConditionBit,Integer>,TableCell<ConditionBit,Integer>> cellIntFactory =
+        Callback<TableColumn<ConditionBit, Integer>,TableCell<ConditionBit, Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         
-        Callback<TableColumn<ConditionBit,Register>,TableCell<ConditionBit,Register>> cellRegFactory =
+        Callback<TableColumn<ConditionBit, Register>,TableCell<ConditionBit, Register>> cellRegFactory =
                 conditionBitRegisterTableColumn -> new ComboBoxTableCell<>(registerList);
 
-        Callback<TableColumn<ConditionBit,Boolean>,TableCell<ConditionBit,Boolean>> cellHaltFactory =
+        Callback<TableColumn<ConditionBit, Boolean>,TableCell<ConditionBit, Boolean>> cellHaltFactory =
                 conditionBitBooleanTableColumn -> new CheckBoxTableCell<>();
 
-        register.setCellValueFactory(new PropertyValueFactory<>("register"));
-        bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
-        halt.setCellValueFactory(new PropertyValueFactory<>("halt"));
-
         //Add for Editable Cell of each field, in String or in Integer
+        register.setCellValueFactory(new PropertyValueFactory<>("register"));
         register.setCellFactory(cellRegFactory);
         register.setOnEditCommit(text -> text.getRowValue().setRegister(text.getNewValue()));
 
+        bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
         bit.setCellFactory(cellIntFactory);
         bit.setOnEditCommit(text -> text.getRowValue().setBit(text.getNewValue()));
 
+        halt.setCellValueFactory(new PropertyValueFactory<>("halt"));
         halt.setCellFactory(cellHaltFactory);
         halt.setOnEditCommit(text -> text.getRowValue().setHalt(text.getNewValue()));
-        
-        updateRegisters();
     }
 
     @Override
@@ -177,18 +163,6 @@ public class ConditionBitTableController extends ModuleTableController<Condition
         }
         
         return new ConditionBit("???", UUID.randomUUID(), getMachine(), defaultRegister, 0, false);
-    }
-
-    /**
-     * updates the registers shown in the {@link javafx.scene.control.ComboBox}, this reads from the
-     * {@link #ctrlRegisterArrayListProperty} and {@link #ctrlRegisterListProperty}.
-     */
-    private void updateRegisters() {
-        registerList.clear();
-        registerList.addAll(ctrlRegisterListProperty.getValue());
-        for (RegisterArray r : ctrlRegisterArrayListProperty.getValue()) {
-            registerList.addAll(r.getRegisters());
-        }
     }
 
     /**

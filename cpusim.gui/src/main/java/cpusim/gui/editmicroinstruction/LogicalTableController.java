@@ -21,21 +21,12 @@ import java.util.UUID;
  *
  * @since 2013-06-06
  */
-class LogicalTableController extends MicroinstructionTableController<Logical> {
+class LogicalTableController extends ALUOpTableController<Logical> {
 
     /**
      * Marker used when building tabs.
      */
     final static String FX_ID = "logicalTab";
-
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Logical,Register> source1;
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Logical,Register> source2;
-    
-    @FXML @SuppressWarnings("unused")
-    private TableColumn<Logical,Register> destination;
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<Logical, Logical.Type> type;
@@ -46,40 +37,25 @@ class LogicalTableController extends MicroinstructionTableController<Logical> {
      */
     LogicalTableController(Mediator mediator){
         super(mediator, "LogicalTable.fxml", Logical.class);
+
         loadFXML();
     }
 
     @Override
-    public void initializeTable() {
+    public void initialize() {
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
         final double FACTOR = 100/20.0;
         name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
-        source1.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
-        source2.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        lhs.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        rhs.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         destination.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         type.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<Logical,Register>,TableCell<Logical,Register>> cellComboFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
-
-        type.setCellValueFactory(new PropertyValueFactory<>("operation"));
-        source1.setCellValueFactory(new PropertyValueFactory<>("lhs"));
-        source2.setCellValueFactory(new PropertyValueFactory<>("rhs"));
-        destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
-
         //Add for Editable Cell of each field, in String or in Integer
+        type.setCellValueFactory(new PropertyValueFactory<>("operation"));
         type.setCellFactory(new EnumCellFactory<>(Logical.Type.class));
         type.setOnEditCommit(text -> text.getRowValue().setOperation(text.getNewValue()));
-
-        source1.setCellFactory(cellComboFactory);
-        source1.setOnEditCommit(text -> text.getRowValue().setLhs(text.getNewValue()));
-
-        source2.setCellFactory(cellComboFactory);
-        source2.setOnEditCommit(text -> text.getRowValue().setRhs(text.getNewValue()));
-
-        destination.setCellFactory(cellComboFactory);
-        destination.setOnEditCommit(text -> text.getRowValue().setDestination(text.getNewValue()));
     }
 
     @Override
@@ -98,12 +74,6 @@ class LogicalTableController extends MicroinstructionTableController<Logical> {
     @Override
     public boolean isNewButtonEnabled() {
         return areRegistersAvailable();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Logical";
     }
     
     @Override

@@ -1,52 +1,23 @@
-    ///////////////////////////////////////////////////////////////////////////////
-// File:    	Register.java
-// Type:    	java application file
-// Author:		Dale Skrien
-// Project: 	CPU Sim
-// Date:    	June, 1999
-//
-// Description:
-//   This file contains the code for the Register module.  Currently, registers
-//   can have width of at most 64 bits.
-//
-// Things to do:
-//   1.  Implement the rest of this class storing the value in a long, as started below.
-//		 The advantage of this method is that you can easily extract bits via
-//       Java's shift and bit operators.
-//   2.  Implement the rest of this class storing the value in an array of 0's and 1's
-//	 	 The advantage is that you can use registers with more than 64 bits.
-//   3.  Implement the rest of this class storing the value in an array of booleans.
-//		 The advantage is that you needn't worry about an array accidentally containing
-//		 ints other than 0's and 1's.
-//   4.  Decide how to proceed if in constructor or in setValue or in setWidth
-//       the value becomes too big for the register.
-//
-///////////////////////////////////////////////////////////////////////////////
-// the package in which our project resides
-
-/*1.) Added a field read-only which stores if the register is read-only.
- * 2.) Modified the constructor so that it initialize the read-only field.
- * 3.) Modified getHTMLDescription() and getXMLDescription() so it writes the values to machine.
- * 4.) Modified clone() and copyDateTo() method to copy the read-only property to new register.
-*/  
 package cpusim.model.module;
 
-    import cpusim.model.Machine;
-    import cpusim.model.microinstruction.Microinstruction;
-    import cpusim.model.util.MachineComponent;
-    import cpusim.model.util.ValidationException;
-    import cpusim.model.util.units.ArchType;
-    import javafx.beans.property.*;
-    import javafx.collections.FXCollections;
+import cpusim.model.Machine;
+import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.util.MachineComponent;
+import cpusim.model.util.ValidationException;
+import cpusim.model.util.units.ArchType;
+import javafx.beans.property.*;
 
-    import java.math.BigInteger;
-    import java.util.EnumSet;
-    import java.util.UUID;
+import java.math.BigInteger;
+import java.util.EnumSet;
+import java.util.UUID;
 
-    import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Edit the parameters associated with any register or fromRootController new or delete old registers.
+ * This file contains the code for the Register module. Currently, registers can have width of at most 64 bits.
+ *
+ * @since 1999-06-01
  */
 public class Register extends Module<Register> implements Sized<Register>
 {
@@ -105,6 +76,11 @@ public class Register extends Module<Register> implements Sized<Register>
 			return EnumSet.of(Read, Write);
 		}
 	}
+
+    /**
+     * Maximum width for a {@code Register}
+     */
+	private static final int REGISTER_MAX_WIDTH = 64;
 	
     //------------------------
     //instance variables
@@ -131,6 +107,7 @@ public class Register extends Module<Register> implements Sized<Register>
         this.width = new SimpleIntegerProperty(this, "width", width);
         this.initialValue = new SimpleLongProperty(this, "initialValue", initialValue);
         this.access = new SimpleObjectProperty<>(this, "access", access);
+
         setValue(initialValue);
     }
     
@@ -230,8 +207,10 @@ public class Register extends Module<Register> implements Sized<Register>
      */
     public void setWidth(int w)
     {
-        checkArgument(w > 0, "Register.setWidth() called with a parameter <= 0");
-        
+        checkArgument(w > 0 && w < REGISTER_MAX_WIDTH,
+                "Register.setWidth() called with width, %d, must be between 0..%d exclusive",
+                w, REGISTER_MAX_WIDTH);
+
         if (w < width.get()) {
             setValue(0); //narrowing of width causes the value to be cleared
         }
@@ -335,9 +314,9 @@ public class Register extends Module<Register> implements Sized<Register>
             throw new ValidationException("You must specify a positive value for the " +
                     "bitwise width\nof the Register " + getName() + ".");
         }
-        if (width > 64) {
-            throw new ValidationException("Register " + getName() +
-                    " can have a width of at most 64 bits.");
+        if (width > REGISTER_MAX_WIDTH) {
+            throw new ValidationException("Register " + getName() + " can have a width of at most " +
+                    REGISTER_MAX_WIDTH + " bits.");
         }
         
         // The intial value is within the set bounds:
@@ -364,5 +343,4 @@ public class Register extends Module<Register> implements Sized<Register>
                     microName + " is read-only.");
         }
     }
-
 } //end class Register

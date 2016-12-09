@@ -9,7 +9,6 @@ import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.Validatable;
@@ -75,7 +74,7 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
     }
 
     @FXML @SuppressWarnings("unused")
-    final void initialize() {
+    void initialize() {
         // This is duplicated within ModuleTableController, but it will likely change thus its not worth
         // actually moving to a common interface/class.
         Callback<TableColumn<T, String>, TableCell<T, String>> cellStrFactory = setStringTableColumn -> new EditingStrCell<>();
@@ -102,7 +101,7 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
      * Initializes the {@link TableView} and it's {@link TableColumn} values. This is called after the
      * {@link FXMLLoader#load()} call.
      */
-    abstract void initializeTable();
+    protected void initializeTable() {}
 
     /**
      * Get the {@code fx:id} used for this controller.
@@ -145,8 +144,7 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
      * @return {@code true} if there is at least one {@link Register} available.
      */
     protected boolean areRegistersAvailable() {
-        return !(machine.get().getModules(Register.class).isEmpty()
-                && machine.get().getModules(RegisterArray.class).isEmpty());
+        return !getMachine().getAllRegisters().isEmpty();
     }
 
     /**

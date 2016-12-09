@@ -5,7 +5,6 @@ import cpusim.model.module.Module;
 import cpusim.model.module.ControlUnit;
 import cpusim.model.util.MachineComponent;
 import cpusim.model.util.MoreBindings;
-import cpusim.model.util.PropertyCollectionBuilder;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 

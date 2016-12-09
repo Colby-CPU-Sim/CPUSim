@@ -5,7 +5,7 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import cpusim.model.util.PropertyCollectionBuilder;
+import cpusim.model.util.ObservableCollectionBuilder;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 
@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Common {@link Microinstruction} between {@link Arithmetic} and {@link Logical}
  * @since 2016-12-07
  */
-abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
+public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
         extends Microinstruction<T> {
 
     /**
@@ -43,9 +43,13 @@ abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
     @DependantComponent
     private final ObjectProperty<Register> destination;
 
+    @DependantComponent
     private final ObjectProperty<ConditionBit> carryBit;
+    @DependantComponent
     private final ObjectProperty<ConditionBit> negativeBit;
+    @DependantComponent
     private final ObjectProperty<ConditionBit> overflowBit;
+    @DependantComponent
     private final ObjectProperty<ConditionBit> zeroBit;
 
     @DependantComponent
@@ -68,7 +72,7 @@ abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
         this.overflowBit = new SimpleObjectProperty<>(this, "overflowBit", overflowBit);
         this.zeroBit = new SimpleObjectProperty<>(this, "zeroBit", zeroBit);
 
-        PropertyCollectionBuilder<ConditionBit> conditionBits = new PropertyCollectionBuilder<>();
+        ObservableCollectionBuilder<ConditionBit> conditionBits = new ObservableCollectionBuilder<>();
         conditionBits.add(this.carryBit)
                 .add(this.negativeBit)
                 .add(this.overflowBit)
