@@ -84,8 +84,10 @@ public class MachineInstruction
             this.assemblyFields.addAll(assemblyFields);
         }
 
-        this.dependants = MachineComponent.collectDependancies(this);
-        this.children = MachineComponent.collectChildren(this);
+        this.dependants = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
+        this.children = MachineComponent.collectChildren(this)
+                .buildSet(this, "children");
     }
 
     /**

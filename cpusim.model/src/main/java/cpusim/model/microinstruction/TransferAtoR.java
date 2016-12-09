@@ -54,7 +54,8 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
         this.indexStart = new SimpleIntegerProperty(this, "indexStart", indexStart);
         this.indexNumBits = new SimpleIntegerProperty(this, "indexNumBits", indexNumBits);
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
 
     /**

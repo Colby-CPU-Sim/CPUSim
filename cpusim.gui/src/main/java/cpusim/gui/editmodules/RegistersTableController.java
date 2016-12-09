@@ -50,6 +50,7 @@ import javafx.util.Callback;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -174,8 +175,8 @@ public class RegistersTableController extends ModuleTableController<Register> {
     @Override
     public Register createInstance() {
         return new Register("???",
-                IdentifiedObject.generateRandomID(),
-                machine.get(),
+                UUID.randomUUID(),
+                getMachine(),
                 16,
                 0,
                 Register.Access.readWrite());
@@ -204,7 +205,7 @@ public class RegistersTableController extends ModuleTableController<Register> {
         Map<Register, Integer> table = registers.stream()
                 .collect(Collectors.toMap(Function.identity(), Register::getWidth));
         
-        final Machine machine = this.machine.get();
+        final Machine machine = getMachine();
         
         Validate.registerWidthsAreOkayForMicros(machine, table);
         

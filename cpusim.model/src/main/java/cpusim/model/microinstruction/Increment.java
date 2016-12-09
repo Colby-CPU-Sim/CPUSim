@@ -5,6 +5,7 @@ import cpusim.model.module.Module;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
+import cpusim.model.util.units.ArchValue;
 import javafx.beans.property.*;
 
 import java.math.BigInteger;
@@ -49,7 +50,8 @@ public class Increment extends Microinstruction<Increment> {
                      UUID id,
                      Machine machine,
                      Register register,
-                     long delta, ConditionBit carryBit, ConditionBit overflowBit, ConditionBit zeroBit) {
+                     long delta,
+                     ConditionBit carryBit, ConditionBit overflowBit, ConditionBit zeroBit) {
         super(name, id, machine);
         this.register = new SimpleObjectProperty<>(this, "register", register);
         this.carryBit = new SimpleObjectProperty<>(this, "carryBit", carryBit);
@@ -57,7 +59,8 @@ public class Increment extends Microinstruction<Increment> {
         this.zeroBit = new SimpleObjectProperty<>(this, "zeroBit", zeroBit);
         this.delta = new SimpleLongProperty(this, "delta", delta);
 
-        dependencies = MachineComponent.collectDependancies(this);
+        dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependantComponents");
     }
 
     /**
@@ -200,28 +203,27 @@ public class Increment extends Microinstruction<Increment> {
     {
         BigInteger bigValue = BigInteger.valueOf(register.get().getValue());
         BigInteger bigDelta = BigInteger.valueOf(delta.get());
-        BigInteger bigResult;
+        BigInteger bigResult = bigValue.add(bigDelta);
 
-        bigResult = bigValue.add(bigDelta);
+        final int width = register.get().getWidth();
 
-        //handle overflow
-        int width = register.get().getWidth();
-        BigInteger twoToWidthMinusOne = BigInteger.valueOf(2).pow(width - 1);
-        if (bigResult.compareTo(twoToWidthMinusOne) >= 0 ||
-                bigResult.compareTo(twoToWidthMinusOne.negate()) < 0)
-            overflowBit.get().set(1);
-        else
-            overflowBit.get().set(0);
+        getOverflowBit().ifPresent(overflowBit -> {
+            //handle overflow
+            BigInteger twoToWidthMinusOne = BigInteger.valueOf(2).pow(width - 1);
+            boolean overflowSet = (bigResult.compareTo(twoToWidthMinusOne) >= 0 ||
+                    bigResult.compareTo(twoToWidthMinusOne.negate()) < 0);
+            overflowBit.set(overflowSet);
+        });
 
-        if ((bigValue.intValue() < 0 && bigDelta.intValue() < 0) ||
-                        (bigValue.intValue() < 0 && bigDelta.intValue() >= -bigValue.intValue()) ||
-                        (bigDelta.intValue() < 0 && bigValue.intValue() >= -bigDelta.intValue()))
-            carryBit.get().set(1);
-        else
-            carryBit.get().set(0);
+        getCarryBit().ifPresent(carryBit -> {
+            boolean carrySet = ((bigValue.intValue() < 0 && bigDelta.intValue() < 0) ||
+                    (bigValue.intValue() < 0 && bigDelta.intValue() >= -bigValue.intValue()) ||
+                    (bigDelta.intValue() < 0 && bigValue.intValue() >= -bigDelta.intValue()));
+            carryBit.set(carrySet);
+        });
 
         //set destination's value to the result
-        long result = bigResult.longValue();
+        long result = bigResult.longValue() & ArchValue.bits(width).mask();
 
         getZeroBit().ifPresent(zeroBit -> zeroBit.set(result == 0));
 

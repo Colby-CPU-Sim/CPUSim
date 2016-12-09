@@ -12,15 +12,11 @@ import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
 import cpusim.model.util.*;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
+import javafx.collections.*;
 import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -187,43 +183,69 @@ public class Machine extends Module<Machine> {
 
     private Logger logger = LogManager.getLogger(Machine.class);
 
-    private ObservableMap<UUID, MachineComponent> components;
+    private final ReadOnlyMapProperty<UUID, MachineComponent> components;
+
+    private final ReadOnlySetProperty<MachineComponent> children;
 
     /**
      * the hardware modules making up the machine
      */
+    @ChildComponent
     private final ListProperty<RAM> rams;
+
+    @ChildComponent
     private final ListProperty<Register> registers;
+
+    @ChildComponent
     private final ListProperty<RegisterArray> registerArrays;
+
+    @ChildComponent
     private final ListProperty<ConditionBit> conditionBits;
 
+    /**
+     * Property of all of the registers internal to the {@link Machine}.
+     */
+    private final ReadOnlyListProperty<Register> allRegisters;
+
     // Machine instructions
-    private ListProperty<MachineInstruction> instructions;
+    @ChildComponent
+    private final ListProperty<MachineInstruction> instructions;
     // EQUs
     private ListProperty<EQU> EQUs;
 
     // key = micro name, value = list of microinstructions
-    private Map<Class<? extends Microinstruction<?>>, ListProperty<? extends Microinstruction<?>>> microMap;
+    @ChildComponent
+    private final Map<Class<? extends Microinstruction<?>>, ListProperty<? extends Microinstruction<?>>> microMap;
+
     // key = module type, value = list of modules
-    private Map<Class<? extends Module<?>>, ListProperty<? extends Module<?>>> moduleMap;
+    @ChildComponent
+    private final Map<Class<? extends Module<?>>, ListProperty<? extends Module<?>>> moduleMap;
+
     // Control unit for keeping track of index of micro within machine instruction
-    private ObjectProperty<ControlUnit> controlUnit;
+    @ChildComponent
+    private final ObjectProperty<ControlUnit> controlUnit;
+
     // The machine's fetch sequence
-    private ObjectProperty<MachineInstruction> fetchSequence;
+    @ChildComponent
+    private final ObjectProperty<MachineInstruction> fetchSequence;
 
     // Fields of the machine instructions
-    private ListProperty<Field> fields;
+    @ChildComponent
+    private final ListProperty<Field> fields;
 
     // RAM where the code store resides
-    private ObjectProperty<RAM> codeStore;
+    @ChildComponent
+    private final ObjectProperty<RAM> codeStore;
+
+    // Register used for stopping at break points--initially null
+    @ChildComponent
+    private final ObjectProperty<Register> programCounter;
+
     // True if bit indexing starts of the right side, false if on the left
     private BooleanProperty indexFromRight;
-    // Register used for stopping at break points--initially null
-    private ObjectProperty<Register> programCounter;
 
     // Address to start when loading RAM with a program
     private IntegerProperty startingAddressForLoading;
-
 
     // Array of PunctChars.
     private final ListProperty<PunctChar> punctChars;
@@ -258,30 +280,6 @@ public class Machine extends Module<Machine> {
                 FXCollections.observableArrayList());
         conditionBits = new SimpleListProperty<>(this, "conditionBits",
                 FXCollections.observableArrayList());
-
-        components = FXCollections.observableHashMap();
-
-        ListChangeListener<? extends MachineComponent> componentsListener = c -> {
-            while (c.next()) {
-                if (c.wasRemoved()) {
-                    c.getRemoved().stream()
-                            .map(IdentifiedObject::getID)
-                            .forEach(components::remove);
-                } else if (c.wasAdded()) {
-                    c.getAddedSubList().forEach(i -> components.put(i.getID(), i));
-                } else if (c.wasPermutated()) {
-                    // don't care about permutations
-                }
-            }
-        };
-
-        getModuleClasses().forEach(mc -> getModuleUnchecked(mc).addListener(
-                (ListChangeListener<Module<?>>)componentsListener
-        ));
-
-        getMicroClasses().forEach(mc -> getMicrosUnchecked(mc).addListener(
-                (ListChangeListener<Microinstruction<?>>)componentsListener
-        ));
         
         // We bind the "allRegisters" array to listen to the changes to the registers and registerArray lists,
         // this way when they change, the allRegisters array is always up to date!
@@ -313,6 +311,36 @@ public class Machine extends Module<Machine> {
         justBroke = false;
         initializeModuleMap();
         initializeMicroMap();
+
+        PropertyCollectionBuilder<MachineComponent> childrenBuilder = MachineComponent.collectChildren(this);
+
+        this.components = childrenBuilder.buildMap(this, "components");
+        this.children = childrenBuilder.buildSet(this, "children");
+
+        ObservableList<Register> allRegisters = FXCollections.observableArrayList();
+        this.children.addListener((SetChangeListener<MachineComponent>) c -> {
+            if (c.wasAdded()) {
+                MachineComponent comp = c.getElementAdded();
+                if (comp instanceof Register) {
+                    allRegisters.add((Register)comp);
+                }
+            }
+
+            if (c.wasRemoved()) {
+                MachineComponent comp = c.getElementRemoved();
+                if (comp instanceof Register) {
+                    allRegisters.remove(comp);
+                }
+            }
+        });
+
+        this.children.stream()
+                .filter(c -> Register.class.isAssignableFrom(c.getClass()))
+                .map(c -> (Register)c)
+                .forEach(allRegisters::add);
+
+        this.allRegisters = new SimpleListProperty<>(this, "allRegisters",
+                allRegisters.sorted(Comparator.comparing(Register::getName)));
     }
 
     /**
@@ -332,8 +360,7 @@ public class Machine extends Module<Machine> {
 
     @Override
     public ReadOnlySetProperty<MachineComponent> getChildrenComponents() {
-        // FIXME
-        throw new UnsupportedOperationException("unimplemented");
+        return this.children;
     }
 
     @Override
@@ -784,6 +811,14 @@ public class Machine extends Module<Machine> {
 
         rams.clear();
         rams.addAll(newRams);
+    }
+
+    public ObservableList<Register> getAllRegisters() {
+        return allRegisters.get();
+    }
+
+    public ReadOnlyListProperty<Register> allRegistersProperty() {
+        return allRegisters;
     }
 
     //-------------------------------

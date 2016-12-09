@@ -54,7 +54,8 @@ public class SetBits extends Microinstruction<SetBits> {
         this.numBits = new SimpleIntegerProperty(numBits);
         this.value = new SimpleLongProperty(value);
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
 
     

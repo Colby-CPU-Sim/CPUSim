@@ -52,7 +52,8 @@ public class ControlUnit extends Module<ControlUnit> {
         // When the current instruction changes, we reset the value to 0
         EasyBind.subscribe(currentInstruction, newValue -> setMicroIndex(0));
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
 
     @Override

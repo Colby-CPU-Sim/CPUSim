@@ -4,10 +4,12 @@
 package cpusim.model;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 import cpusim.model.util.IdentifiedObject;
 import org.junit.Test;
 
+import javax.crypto.Mac;
 import java.util.UUID;
 
 /**
@@ -21,7 +23,7 @@ public class FieldTest {
 	 */
 	@Test
 	public void testField() {
-		final Field f = new Field("?", UUID.randomUUID(), null);
+		final Field f = new Field("?", UUID.randomUUID(), mock(Machine.class));
 		
 		assertEquals("?", f.getName());
 	}

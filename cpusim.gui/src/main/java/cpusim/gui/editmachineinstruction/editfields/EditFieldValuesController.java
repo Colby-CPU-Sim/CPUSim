@@ -1,34 +1,20 @@
-/*
- * Ben Borchard
- * 
- * Last Modified 6/4/13s
- */
-
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Removed the isAbleToClose and checkValidity method
- * 2.) Removed the validation of names upon closing becuase we now do that dynamically
- * 3.) Changed the onEditCommit for the name tableColumn so that it dynamically checks 
- * the validity of the name the user gives.  It will change the invalid name to the old
- * name as soon the user enters
- * 4.) Added an updateTable method so that to allow for dynamic validity checking of the
- * name tableColumn
- */
 package cpusim.gui.editmachineinstruction.editfields;
 
+import cpusim.gui.util.MachineModificationController;
+import cpusim.gui.util.NamedColumnHandler;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
 import cpusim.model.FieldValue;
+import cpusim.model.Machine;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -38,17 +24,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * FXML Controller class
  *
- * @author Ben Borchard
+ * @since 2013-06-04
  */
-public class EditFieldValuesController implements Initializable {
-    
+public class EditFieldValuesController implements MachineModificationController {
+
+    private final ObjectProperty<Machine> machine;
+
     private ObservableList<FieldValue> allFieldValues;
     
     private Stage stage;
@@ -79,20 +67,18 @@ public class EditFieldValuesController implements Initializable {
         this.stage = stage;
         
         allFieldValues = field.getValues();
+
+        machine = new SimpleObjectProperty<>(this, "machine", null);
     }
 
     /**
      * Initializes the controller class.
      */
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    @FXML
+    public void initialize() {
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 //        name.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.5));
 //        value.prefWidthProperty().bind(table.widthProperty().subtract(2).multiply(.5));
-        
-        selectedFieldValueName = null;
-        delete.setDisable(true);
-        duplicate.setDisable(true);
         
         Callback<TableColumn<FieldValue, String>,
                 TableCell<FieldValue, String>> cellStrFactory =
@@ -108,20 +94,7 @@ public class EditFieldValuesController implements Initializable {
         
         //Add for Editable Cell of each field, in String or in Integer
         name.setCellFactory(cellStrFactory);
-        name.setOnEditCommit(
-                text -> {
-                    String newName = text.getNewValue();
-                    String oldName = text.getOldValue();
-                    ( text.getRowValue()).setName(newName);
-                    try{
-                        NamedObject.validateUniqueAndNonempty(table.getItems());
-                    }
-                    catch(ValidationException ex) {
-                        (text.getRowValue()).setName(oldName);
-                    }
-                    updateTable();
-                }
-        );
+        name.setOnEditCommit(new NamedColumnHandler<>(table));
 
         value.setCellFactory(cellLongFactory);
         value.setOnEditCommit(
@@ -136,7 +109,12 @@ public class EditFieldValuesController implements Initializable {
                 
         table.setItems(allFieldValues);
     }
-    
+
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return this.machine;
+    }
+
     /**
      * creates a new field name with a unique name based on '?'
      * @param ae unused action event
@@ -144,7 +122,7 @@ public class EditFieldValuesController implements Initializable {
     @FXML @SuppressWarnings("unused")
     protected void handleNew(ActionEvent ae){
         String uniqueName = NamedObject.createUniqueName(table.getItems());
-        allFieldValues.add(0, new FieldValue(uniqueName, 0));
+        allFieldValues.add(0, new FieldValue(uniqueName, UUID.randomUUID(), getMachine(), 0));
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
     }
@@ -156,14 +134,14 @@ public class EditFieldValuesController implements Initializable {
      */
     @FXML
     protected void handleDuplicate(ActionEvent ae){
-        String newName = selectedFieldValueName.getName()+"copy";
+        String newName = selectedFieldValueName.getName()+"_copy";
         int i = 2;
         while (fieldValueNameTaken(newName)){
-            newName = selectedFieldValueName.getName()+"copy"+i;
+            newName = selectedFieldValueName.getName()+"_copy"+i;
             i++;
         }
-        allFieldValues.add(0, new FieldValue(newName, 
-                selectedFieldValueName.getValue()));
+        allFieldValues.add(0, new FieldValue(newName, UUID.randomUUID(),
+                getMachine(), selectedFieldValueName.getValue()));
         table.scrollTo(0);
         table.getSelectionModel().selectFirst();
     }
@@ -197,7 +175,7 @@ public class EditFieldValuesController implements Initializable {
     @FXML
     protected void handleOkay(ActionEvent ae){
         try {
-            Field.validateFieldValues(field, allFieldValues);
+            checkValidity();
         }
         catch (ValidationException ex) {
             Dialogs.createErrorDialog(stage, "Field Value Error",
@@ -225,7 +203,7 @@ public class EditFieldValuesController implements Initializable {
      */
     private boolean isAbleToClose(){
         
-        ArrayList<String> fieldNames = new ArrayList<>();
+        List<String> fieldNames = new ArrayList<>();
         for (FieldValue fieldValue : allFieldValues){
             if (fieldValue.getName().contains(" ")){
                 Dialogs.createErrorDialog(stage, "Field Name Error",
@@ -244,6 +222,17 @@ public class EditFieldValuesController implements Initializable {
         }
         return true;
     }
+
+
+    @Override
+    public void updateMachine() {
+
+    }
+
+    @Override
+    public void checkValidity() {
+        Field.validateFieldValues(field, allFieldValues);
+    }
     
     private boolean fieldValueNameTaken(String newName) {
         for (FieldValue field : allFieldValues){
@@ -252,13 +241,5 @@ public class EditFieldValuesController implements Initializable {
             }
         }
         return false;
-    }
-    
-    private void updateTable() {
-        name.setVisible(false);
-        name.setVisible(true);
-        double w =  table.getWidth();
-        table.setPrefWidth(w-1);
-        table.setPrefWidth(w);
     }
 }

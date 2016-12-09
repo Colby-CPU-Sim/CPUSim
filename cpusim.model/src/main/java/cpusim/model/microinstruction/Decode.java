@@ -51,7 +51,8 @@ public class Decode extends Microinstruction<Decode> {
 
         this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
 
-        this.dependants = MachineComponent.collectDependancies(this);
+        this.dependants = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependantComponents");
     }
     
     /**

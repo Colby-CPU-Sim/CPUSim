@@ -60,7 +60,8 @@ public class Shift extends Transfer<Register, Register, Shift> {
         this.direction = new SimpleObjectProperty<>(this, "direction", checkNotNull(direction));
         this.distance = new SimpleIntegerProperty(this, "distance", distance);
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
     
     /**

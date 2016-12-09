@@ -18,13 +18,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2015-02-12
  */
 public class MemoryAccess extends Microinstruction<MemoryAccess> {
-	
-    private ObjectProperty<IODirection> direction;
-    private ObjectProperty<RAM> memory;
-    private ObjectProperty<Register> data;
-    private ObjectProperty<Register> address;
 
-    private ReadOnlySetProperty<MachineComponent> dependants;
+    @DependantComponent
+    private final ObjectProperty<IODirection> direction;
+    @DependantComponent
+    private final ObjectProperty<RAM> memory;
+    @DependantComponent
+    private final ObjectProperty<Register> data;
+    @DependantComponent
+    private final ObjectProperty<Register> address;
+
+    private final ReadOnlySetProperty<MachineComponent> dependants;
 
 
     /**

@@ -37,7 +37,8 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
                         int numBits){
         super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
 
     /**

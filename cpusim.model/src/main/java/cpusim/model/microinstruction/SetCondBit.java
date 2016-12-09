@@ -39,7 +39,8 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
         this.value = new SimpleBooleanProperty(this, "value", value);
         this.bit = new SimpleObjectProperty<>(this, "bit", bit);
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
     
     /**

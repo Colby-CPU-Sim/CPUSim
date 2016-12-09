@@ -62,7 +62,7 @@ public final class EditModulesController extends BorderPane implements DialogBut
         this.desktop = desktop;
 
         registersTableController = new RegistersTableController();
-        registerArrayTableController = new RegisterArrayTableController(registersTableController);
+        registerArrayTableController = new RegisterArrayTableController();
         conditionBitTableController = new ConditionBitTableController(
                 mediator,
                 registersTableController,
@@ -142,17 +142,19 @@ public final class EditModulesController extends BorderPane implements DialogBut
         
         final Machine machine = this.machine.get();
 
-        List<RAM> rams = machine.getModules(RAM.class);
-        if (!rams.contains(machine.getCodeStore())) {
-            //the code store was deleted so set a different
-            //RAM to be the code store
-            if (rams.size() != 0) {
-                machine.setCodeStore(rams.get(0));
+        machine.getCodeStore().ifPresent(codeStore -> {
+            List<RAM> rams = machine.getModules(RAM.class);
+            if (!rams.contains(codeStore)) {
+                //the code store was deleted so set a different
+                //RAM to be the code store
+                if (rams.size() != 0) {
+                    machine.setCodeStore(rams.get(0));
+                }
+                else {
+                    machine.setCodeStore(null);
+                }
             }
-            else {
-                machine.setCodeStore(null);
-            }
-        }
+        });
 
         desktop.adjustTablesForNewModules();
         mediator.setMachineDirty(true);

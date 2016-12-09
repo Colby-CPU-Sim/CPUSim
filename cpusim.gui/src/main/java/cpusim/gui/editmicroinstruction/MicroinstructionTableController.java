@@ -164,14 +164,6 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
         // no-op
     }
 
-    /**
-     * returns the type of the controller
-     *
-     * @return the type of the controller
-     */
-    @Override
-    public abstract String toString();
-
     @Override
     public abstract T createInstance();
 

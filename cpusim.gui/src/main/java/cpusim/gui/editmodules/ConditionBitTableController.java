@@ -29,10 +29,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.*;
@@ -174,13 +171,12 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * @return the prototype of the subclass
      */
     public ConditionBit createInstance() {
-        
         Register defaultRegister = null;
         if (!registerList.isEmpty()) {
             defaultRegister = registerList.get(0);
         }
         
-        return new ConditionBit("???", 0, false);
+        return new ConditionBit("???", UUID.randomUUID(), getMachine(), defaultRegister, 0, false);
     }
 
     /**
@@ -191,7 +187,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
         registerList.clear();
         registerList.addAll(ctrlRegisterListProperty.getValue());
         for (RegisterArray r : ctrlRegisterArrayListProperty.getValue()) {
-            registerList.addAll(r.registers());
+            registerList.addAll(r.getRegisters());
         }
     }
 
@@ -213,7 +209,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      */
     List<ConditionBit> getBitClonesThatUse(RegisterArray array) {
         final Set<Register> arrSet = new HashSet<>();
-        arrSet.addAll(array.registers());
+        arrSet.addAll(array.getRegisters());
 
         return getItems().stream()
                 .filter(cl -> arrSet.contains(cl.getRegister()))

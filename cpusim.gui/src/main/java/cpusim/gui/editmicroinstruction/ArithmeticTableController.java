@@ -31,10 +31,10 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
     static final String FX_ID = "arithmeticTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic, Register> source1;
+    private TableColumn<Arithmetic, Register> lhs;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Arithmetic, Register> source2;
+    private TableColumn<Arithmetic, Register> rhs;
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<Arithmetic, Register> destination;
@@ -70,8 +70,8 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
         
         final double FACTOR = 100/14.0;
         name.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
-        source1.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
-        source2.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        lhs.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
+        rhs.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         destination.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         type.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         overflowBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
@@ -87,8 +87,8 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
                 setStringTableColumn -> new ComboBoxTableCell<>(condBit);
 
         type.setCellValueFactory(new PropertyValueFactory<>("type"));
-        source1.setCellValueFactory(new PropertyValueFactory<>("source1"));
-        source2.setCellValueFactory(new PropertyValueFactory<>("source2"));
+        lhs.setCellValueFactory(new PropertyValueFactory<>("lhs"));
+        rhs.setCellValueFactory(new PropertyValueFactory<>("rhs"));
         destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
         overflowBit.setCellValueFactory(new PropertyValueFactory<>("overflowBit"));
         carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
@@ -97,11 +97,11 @@ class ArithmeticTableController extends MicroinstructionTableController<Arithmet
         type.setCellFactory(new EnumCellFactory<>(Arithmetic.Type.class));
         type.setOnEditCommit(text -> text.getRowValue().setOperation(text.getNewValue()));
 
-        source1.setCellFactory(cellRegFactory);
-        source1.setOnEditCommit(text -> text.getRowValue().setLhs(text.getNewValue()));
+        lhs.setCellFactory(cellRegFactory);
+        lhs.setOnEditCommit(text -> text.getRowValue().setLhs(text.getNewValue()));
 
-        source2.setCellFactory(cellRegFactory);
-        source2.setOnEditCommit(text -> text.getRowValue().setRhs(text.getNewValue()));
+        rhs.setCellFactory(cellRegFactory);
+        rhs.setOnEditCommit(text -> text.getRowValue().setRhs(text.getNewValue()));
 
         destination.setCellFactory(cellRegFactory);
         destination.setOnEditCommit(text -> text.getRowValue().setDestination(text.getNewValue()));

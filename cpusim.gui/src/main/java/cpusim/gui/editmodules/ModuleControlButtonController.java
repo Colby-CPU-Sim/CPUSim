@@ -51,27 +51,24 @@ class ModuleControlButtonController<T extends Module<T>> extends ControlButtonCo
         //now test to see if it is used by any micros and if so,
         //warn the user that those micros will be deleted too.
         
-        Optional<Machine> machineOpt = moduleController.getMachine();
-        if (machineOpt.isPresent()) {
-            Map<Microinstruction, ObservableList<Microinstruction>> microsThatUseIt
-                    = machineOpt.get().getMicrosThatUse(toDelete);
+        Machine machine = moduleController.getMachine();
+        Map<Microinstruction<?>, ObservableList<Microinstruction<?>>> microsThatUseIt
+                    = machine.getMicrosThatUse(toDelete);
             
-            if (!microsThatUseIt.isEmpty()) {
-                StringBuilder message = new StringBuilder(toDelete.toString());
-                message.append(" is used by the following microinstructions: \n  ");
-        
-                Joiner.on(", ").appendTo(message, microsThatUseIt.keySet());
-        
-                message.append(".\n  If you delete it, all these microinstructions will also be deleted.  ");
-                message.append("Really delete it?");
-                Optional<ButtonType> result = Dialogs.createConfirmationDialog(moduleController.getScene().getWindow(),
-                        "Confirm Deletion", message.toString()).showAndWait();
-                shouldDelete = !(result.get() == ButtonType.CANCEL ||
-                        result.get() == ButtonType.NO ||
-                        result.get() == ButtonType.CLOSE);
-            }
+        if (!microsThatUseIt.isEmpty()) {
+            StringBuilder message = new StringBuilder(toDelete.toString());
+            message.append(" is used by the following microinstructions: \n  ");
+
+            Joiner.on(", ").appendTo(message, microsThatUseIt.keySet());
+
+            message.append(".\n  If you delete it, all these microinstructions will also be deleted.  ");
+            message.append("Really delete it?");
+            Optional<ButtonType> result = Dialogs.createConfirmationDialog(moduleController.getScene().getWindow(),
+                    "Confirm Deletion", message.toString()).showAndWait();
+            shouldDelete = !(result.get() == ButtonType.CANCEL ||
+                    result.get() == ButtonType.NO ||
+                    result.get() == ButtonType.CLOSE);
         }
-        
         
         return shouldDelete;
     }

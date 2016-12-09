@@ -12,23 +12,38 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created by kevin on 08/12/2016.
+ * Tests for the static methods
+ * @since 2016-12-08
  */
 public class MachineComponentStaticTest {
 
-    abstract class TestComponent implements MachineComponent {
+    class TestComponent implements MachineComponent {
 
         @DependantComponent
         final ObjectProperty<Register> register = new SimpleObjectProperty<>(this, "register", null);
 
+        @Override
+        public ReadOnlyObjectProperty<Machine> machineProperty() {
+            return null;
+        }
 
+        @Override
+        public ReadOnlyProperty<UUID> idProperty() {
+            return null;
+        }
+
+        @Override
+        public MachineComponent cloneFor(IdentifierMap oldToNew) {
+            return null;
+        }
     }
 
     @Test
     public void collectDependancies() throws Exception {
-        TestComponent testComponent = mock(TestComponent.class);
+        TestComponent testComponent = new TestComponent();
 
-        ReadOnlySetProperty<MachineComponent> dependents = MachineComponent.collectDependancies(testComponent);
+        ReadOnlySetProperty<MachineComponent> dependents =
+                MachineComponent.collectDependancies(testComponent).buildSet();
 
         assertEquals(0, dependents.size());
 

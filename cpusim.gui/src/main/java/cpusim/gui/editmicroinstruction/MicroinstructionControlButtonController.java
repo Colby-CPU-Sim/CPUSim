@@ -47,30 +47,27 @@ class MicroinstructionControlButtonController<T extends Microinstruction<T>>
     protected boolean checkDelete(T toDelete) {
         boolean shouldDelete = true;
         
-        final Optional<Machine> machineOpt = microinsController.getMachine();
-        if (machineOpt.isPresent()) {
-            final Machine machine = machineOpt.get();
+        final Machine machine = microinsController.getMachine();
     
-            //now test to see if it is used by any instructions that use the micro and if so,
-            //warn the user that those micros will be deleted too.
-            final List<MachineInstruction> instrsThatUseIt = machine.getInstructionsThatUse(toDelete);
-            if (!instrsThatUseIt.isEmpty()) {
-                StringBuilder bld = new StringBuilder();
-                bld.append(toDelete.getName());
-                bld.append(" is used by the following machine instructions: \n  ");
-                Joiner.on(", ").appendTo(bld, instrsThatUseIt);
-                bld.append(".\nReally delete it?");
-        
-                Alert dialog = Dialogs.createConfirmationDialog(microinsController.getScene().getWindow(),
-                        "Confirm Deletion", bld.toString());
-                final Optional<ButtonType> result = dialog.showAndWait();
-        
-                if (result.isPresent()) {
-                    final ButtonType res = result.get();
-                    shouldDelete = !(res == ButtonType.CANCEL ||
-                            res == ButtonType.NO ||
-                            res == ButtonType.CLOSE);
-                }
+        //now test to see if it is used by any instructions that use the micro and if so,
+        //warn the user that those micros will be deleted too.
+        final List<MachineInstruction> instrsThatUseIt = machine.getInstructionsThatUse(toDelete);
+        if (!instrsThatUseIt.isEmpty()) {
+            StringBuilder bld = new StringBuilder();
+            bld.append(toDelete.getName());
+            bld.append(" is used by the following machine instructions: \n  ");
+            Joiner.on(", ").appendTo(bld, instrsThatUseIt);
+            bld.append(".\nReally delete it?");
+
+            Alert dialog = Dialogs.createConfirmationDialog(microinsController.getScene().getWindow(),
+                    "Confirm Deletion", bld.toString());
+            final Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isPresent()) {
+                final ButtonType res = result.get();
+                shouldDelete = !(res == ButtonType.CANCEL ||
+                        res == ButtonType.NO ||
+                        res == ButtonType.CLOSE);
             }
         }
 

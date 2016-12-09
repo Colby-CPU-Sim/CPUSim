@@ -9,10 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -21,6 +18,8 @@ import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -30,12 +29,13 @@ import static org.mockito.Mockito.*;
  */
 public class DragHelperTest extends ApplicationTest {
 
+    private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(new Machine("test"));
     private Branch branchMicro;
-    private DragHelper helper;
     private DragHelper.HandleDragBehaviour handler;
 
     private final UUID branchUUID = UUID.randomUUID();
     private final int dragIndex = 2;
+    private final List<File> files = Lists.newArrayList(Paths.get(".").toAbsolutePath().toFile());
 
 
     @Override
@@ -51,7 +51,8 @@ public class DragHelperTest extends ApplicationTest {
         microLabel.setOnDragDetected(ev -> {
             Dragboard db = microLabel.startDragAndDrop(TransferMode.ANY);
 
-            helper.setMicroContent(db, branchMicro);
+            DragHelper helper = new DragHelper(machineProperty, db);
+            helper.setMicroContent(branchMicro);
 
             ev.setDragDetect(true);
             ev.consume();
@@ -64,7 +65,8 @@ public class DragHelperTest extends ApplicationTest {
         indexLabel.setOnDragDetected(ev -> {
             Dragboard db = indexLabel.startDragAndDrop(TransferMode.ANY);
 
-            helper.setMicroContent(db, dragIndex);
+            DragHelper helper = new DragHelper(machineProperty, db);
+            helper.setIndexContent(dragIndex);
 
             ev.setDragDetect(true);
             ev.consume();
@@ -78,7 +80,7 @@ public class DragHelperTest extends ApplicationTest {
             Dragboard db = otherLabel.startDragAndDrop(TransferMode.ANY);
 
             ClipboardContent cc = new ClipboardContent();
-            cc.putFiles(Lists.newArrayList(new File(".")));
+            cc.putFiles(files);
             db.setContent(cc);
 
             ev.setDragDetect(true);
@@ -92,8 +94,7 @@ public class DragHelperTest extends ApplicationTest {
             ev.consume();
         });
         dropLabel.setOnDragDropped(ev -> {
-            Dragboard db = ev.getDragboard();
-
+            DragHelper helper = new DragHelper(machineProperty, ev.getDragboard());
             helper.visit(handler);
 
             ev.setDropCompleted(true);
@@ -111,12 +112,9 @@ public class DragHelperTest extends ApplicationTest {
 
     @Before
     public void setupMock() {
-        ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(new Machine("test"));
         branchMicro = mock(Branch.class);
         when(branchMicro.getID()).thenReturn(branchUUID);
         machineProperty.getValue().getMicros(Branch.class).add(branchMicro);
-
-        helper = new DragHelper(machineProperty);
 
         handler = mock(DragHelper.HandleDragBehaviour.class);
     }
@@ -141,6 +139,6 @@ public class DragHelperTest extends ApplicationTest {
     public void insertOther() throws Exception {
         drag("#other", MouseButton.PRIMARY).dropTo("#end");
 
-        verify(handler).onOther();
+        verify(handler).onOther(DataFormat.FILES, files);
     }
 }

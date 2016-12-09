@@ -160,7 +160,7 @@ public class OptionsController {
     public OptionsController(Mediator med) {
         mediator = med;
         registers = mediator.getMachine().getAllRegisters();
-        RAMs = mediator.getMachine().getAllRAMs();
+        RAMs = mediator.getMachine().getModules(RAM.class);
     }
 
     /**

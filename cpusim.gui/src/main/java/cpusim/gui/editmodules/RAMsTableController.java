@@ -23,6 +23,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import java.util.UUID;
+
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
  */
@@ -78,7 +80,7 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      */
     @Override
     public RAM createInstance() {
-        return new RAM("???", IdentifiedObject.generateRandomID(), machine.get(), 128, 8);
+        return new RAM("???", UUID.randomUUID(), getMachine(), 128, 8);
     }
 
     /**

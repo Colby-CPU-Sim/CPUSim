@@ -101,7 +101,8 @@ abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
             }
         };
 
-        dependantComponents = MachineComponent.collectDependancies(this);
+        dependantComponents = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependantComponents");
     }
 
     public abstract Set<? extends ALUOperator> validOperations();

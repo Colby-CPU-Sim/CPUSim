@@ -82,7 +82,8 @@ public class RegisterArray extends Module<RegisterArray>
             (int)Math.floor(Math.log10(size.intValue() - 1)) + 1));
         this.numIndexDigits = numIndexDigits;
 
-        children = MachineComponent.collectChildren(this);
+        children = MachineComponent.collectChildren(this)
+                .buildSet(this, "children");
     }
 
     /**

@@ -25,7 +25,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Implements the controller for the buttons at the bottom of the dialogs (e.g. OK, Cancel and ?).
  *
- * @since 30/11/2016.
+ * @since 2016-11-30
  */
 public final class DialogButtonController extends VBox implements ReadOnlyMachineBound {
 
@@ -88,11 +88,6 @@ public final class DialogButtonController extends VBox implements ReadOnlyMachin
             helpButton.setDisable(newValue == null);
         });
         helpButton.setDisable(currentHelpable.get() == null);
-    }
-
-    @Override
-    public Machine getMachine() {
-        return Optional.ofNullable(machine.get());
     }
 
     @Override

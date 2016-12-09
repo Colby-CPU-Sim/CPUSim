@@ -66,7 +66,8 @@ public class IO extends Microinstruction<IO> {
         this.direction = new SimpleObjectProperty<>(this, "direction", checkNotNull(direction));
         this.connection = connection;
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependantComponents");
     }
     
     /**

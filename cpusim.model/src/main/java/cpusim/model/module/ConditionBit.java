@@ -55,7 +55,8 @@ public class ConditionBit extends Module<ConditionBit> {
         this.bit = new SimpleIntegerProperty(bit);
         this.halt = new SimpleBooleanProperty(halt);
 
-        this.dependants = MachineComponent.collectDependancies(this);
+        this.dependants = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
 
     @Override
@@ -74,6 +75,10 @@ public class ConditionBit extends Module<ConditionBit> {
 
     public ObjectProperty<Register> registerProperty() {
         return register;
+    }
+
+    public void setRegister(Register register) {
+        this.register.set(register);
     }
 
     /**
@@ -201,12 +206,12 @@ public class ConditionBit extends Module<ConditionBit> {
         else {
             leftShift = register.get().getWidth() - bit.get() - 1;
         }
-        long mask = 1L << (leftShift);
+        long mask = 1L << leftShift;
         long value = register.get().getValue();
         if (bitValue == 1)
-            value = value | mask;
+            value |= mask;
         else
-            value = value & ~mask;
+            value &= ~mask;
         //value may be too big for register, so convert it to a negative by shifting
         value = (value << (64 - register.get().getWidth())) >> (64 - register.get().getWidth());
         register.get().setValue(value);
@@ -227,7 +232,7 @@ public class ConditionBit extends Module<ConditionBit> {
     public boolean isSet()
     {
         long registerValue = register.get().getValue();
-        
+
         int leftShift;
         if (machineProperty().getValue().getIndexFromRight()) {
             leftShift = 64 - bit.get() - 1;

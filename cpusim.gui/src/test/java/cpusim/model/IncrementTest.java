@@ -7,53 +7,75 @@ import cpusim.model.module.Register;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
+
 public class IncrementTest {
 
     @Test
     public void test() {
         Machine machine = new Machine("test",true);
-        Register reg = new Register("reg", machine, 4, 0, Register.Access.readWrite());
-        Register statusReg = new Register("Status", machine, 2, 0, Register.Access.readWrite());
-        ConditionBit ofBit = new ConditionBit("ofBit", 0, false);
-        ConditionBit cBit = new ConditionBit("cBit", 1, false);
-        Increment incInstr = new Increment("Test", machine, reg, ofBit, cBit, 7L);
+        Register reg = new Register("reg", UUID.randomUUID(), machine,
+                4, 0, Register.Access.readWrite());
+        Register statusReg = new Register("Status", UUID.randomUUID(), machine,
+                3, 0, Register.Access.readWrite());
+
+        ConditionBit ofBit = new ConditionBit("ofBit", UUID.randomUUID(), machine,
+                statusReg, 0, false);
+        ConditionBit cBit = new ConditionBit("cBit", UUID.randomUUID(), machine,
+                statusReg, 1, false);
+        ConditionBit zBit = new ConditionBit("zBit", UUID.randomUUID(), machine,
+                statusReg, 2, false);
+
+        Increment incInstr = new Increment("Test", UUID.randomUUID(), machine,
+                reg, 7L, cBit, ofBit, zBit);
 
         incInstr.execute();
         Assert.assertEquals(reg.getValue(),7);
         Assert.assertEquals(cBit.isSet(), false);
-        Assert.assertEquals(ofBit.isSet(), false);
+        Assert.assertEquals(false, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
 
         incInstr.execute();
-        Assert.assertEquals(reg.getValue(),-2);
-        Assert.assertEquals(cBit.isSet(), false);
-        Assert.assertEquals(ofBit.isSet(), true);
+        Assert.assertEquals(-2, reg.getValue());
+        Assert.assertEquals(false, cBit.isSet());
+        Assert.assertEquals(true, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
 
         incInstr.execute();
         Assert.assertEquals(reg.getValue(),5);
-        Assert.assertEquals(cBit.isSet(), true);
-        Assert.assertEquals(ofBit.isSet(), false);
+        Assert.assertEquals(true, cBit.isSet());
+        Assert.assertEquals(false, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
 
         reg.setWidth(6);
+        reg.setValue(-1);
+        incInstr.setDelta(1);
+
+        incInstr.execute();
+        Assert.assertEquals(0, reg.getValue());
+        Assert.assertEquals(true, cBit.isSet());
+        Assert.assertEquals(false, ofBit.isSet());
+        Assert.assertEquals(true, zBit.isSet());
+
         incInstr.setDelta(31L);
         reg.setValue(0);
 
         incInstr.execute();
-        Assert.assertEquals(reg.getValue(),31);
-        Assert.assertEquals(cBit.isSet(), false);
-        Assert.assertEquals(ofBit.isSet(), false);
+        Assert.assertEquals(31, reg.getValue());
+        Assert.assertEquals(false, cBit.isSet());
+        Assert.assertEquals(false, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
 
         incInstr.execute();
-        Assert.assertEquals(reg.getValue(),-2);
-        Assert.assertEquals(cBit.isSet(), false);
-        Assert.assertEquals(ofBit.isSet(), true);
+        Assert.assertEquals(-2, reg.getValue());
+        Assert.assertEquals(false, cBit.isSet());
+        Assert.assertEquals(true, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
 
         incInstr.execute();
-        Assert.assertEquals(reg.getValue(),29);
-        Assert.assertEquals(cBit.isSet(), true);
-        Assert.assertEquals(ofBit.isSet(), false);
-
-        reg.setWidth(6);
-        incInstr.setDelta(31L);
-
+        Assert.assertEquals(29, reg.getValue());
+        Assert.assertEquals(true, cBit.isSet());
+        Assert.assertEquals(false, ofBit.isSet());
+        Assert.assertEquals(false, zBit.isSet());
     }
 }

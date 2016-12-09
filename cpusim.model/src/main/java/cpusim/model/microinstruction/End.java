@@ -20,9 +20,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class End extends Microinstruction<End> {
 
     @DependantComponent
-    private ReadOnlyObjectProperty<ControlUnit> controlUnit;
+    private final ReadOnlyObjectProperty<ControlUnit> controlUnit;
 
-    private ReadOnlySetProperty<MachineComponent> dependencies;
+    private final ReadOnlySetProperty<MachineComponent> dependencies;
 
     /**
      * Constructor
@@ -33,7 +33,8 @@ public class End extends Microinstruction<End> {
         super("End", id, machine);
 
         this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     } // end constructor
     
     /**

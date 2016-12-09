@@ -59,7 +59,7 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
      * @throws IllegalStateException if a field is incorrectly annotated
      * @throws NullPointerException if {@code base} is null.
      */
-    static ReadOnlySetProperty<MachineComponent> collectChildren(MachineComponent base) {
+    static PropertyCollectionBuilder<MachineComponent> collectChildren(MachineComponent base) {
         return collectMarkedComponents(base, ChildComponent.class);
     }
 
@@ -72,6 +72,7 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
     @interface DependantComponent {
 
     }
+
 
     /**
      * Gets any dependant components that are bound within a {@link MachineComponent}.
@@ -91,11 +92,11 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
      * @throws IllegalStateException if a field is incorrectly annotated
      * @throws NullPointerException if {@code base} is null.
      */
-    static ReadOnlySetProperty<MachineComponent> collectDependancies(MachineComponent base) {
+    static PropertyCollectionBuilder<MachineComponent> collectDependancies(MachineComponent base) {
         return collectMarkedComponents(base, DependantComponent.class);
     }
 
-    static ReadOnlySetProperty<MachineComponent> collectMarkedComponents(MachineComponent base, Class<? extends Annotation> annotationClazz) {
+    static PropertyCollectionBuilder<MachineComponent> collectMarkedComponents(MachineComponent base, Class<? extends Annotation> annotationClazz) {
         checkNotNull(base);
 
         PropertyCollectionBuilder<MachineComponent> builder = new PropertyCollectionBuilder<>();
@@ -105,19 +106,19 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
         while (clazz != Object.class) {
 
             for (Field f : clazz.getDeclaredFields()) {
-                if (Modifier.isStatic(f.getModifiers())) {
-                    throw new IllegalArgumentException(
-                            String.format("Type, %s, has static field, %s, annotated with %s this is not allowed.",
-                                    clazz.getName(), f.getName(), annotationClazz.getName()));
-                }
-
-                if (!Modifier.isFinal(f.getModifiers())) {
-                    throw new IllegalArgumentException(
-                            String.format("Type, %s, has non-final field, %s, annotated with %s this is not allowed.",
-                                    clazz.getName(), f.getName(), annotationClazz.getName()));
-                }
-
                 if (f.getAnnotation(annotationClazz) != null) {
+                    if (Modifier.isStatic(f.getModifiers())) {
+                        throw new IllegalArgumentException(
+                                String.format("Type, %s, has static field, %s, annotated with %s this is not allowed.",
+                                        clazz.getName(), f.getName(), annotationClazz.getName()));
+                    }
+
+                    if (!Modifier.isFinal(f.getModifiers())) {
+                        throw new IllegalArgumentException(
+                                String.format("Type, %s, has non-final field, %s, annotated with %s this is not allowed.",
+                                        clazz.getName(), f.getName(), annotationClazz.getName()));
+                    }
+
                     // now we know the field was marked as a dependant, so lets get the content:
                     try {
                         f.setAccessible(true); // force it to be accessible
@@ -145,6 +146,13 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
                             ReadOnlyObjectProperty<? extends MachineComponent> comp =
                                     (ReadOnlyObjectProperty<? extends MachineComponent>) fValue;
                             builder.add(comp);
+                        } else if (Map.class.isAssignableFrom(f.getType())) {
+
+                            // This is an odd one, it's for Machine..
+                            @SuppressWarnings("unchecked")
+                            Map<?, ListProperty<? extends MachineComponent>> map =
+                                    (Map<?, ListProperty<? extends MachineComponent>>)fValue;
+                            map.values().forEach(builder::addAll);
                         } else if (Collection.class.isAssignableFrom(f.getType())) {
                             // it's collection of values
                             // This should be safe, but we don't know, it'll throw if its bad
@@ -173,7 +181,7 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
             clazz = clazz.getSuperclass();
         }
 
-        return builder.buildSet(base, "dependantComponents");
+        return builder;
     }
 
 

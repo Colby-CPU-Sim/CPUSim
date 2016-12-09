@@ -5,7 +5,6 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -13,6 +12,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
+
+import java.util.UUID;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
@@ -32,7 +33,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     private TableColumn<SetCondBit,ConditionBit> bit;
     
     @FXML @SuppressWarnings("unused")
-    private TableColumn<SetCondBit,String> value;
+    private TableColumn<SetCondBit, Boolean> value;
 
     /**
      * Constructor
@@ -50,12 +51,6 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
         bit.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
         value.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
 
-        Callback<TableColumn<SetCondBit,String>,TableCell<SetCondBit,String>> cellIntFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        FXCollections.observableArrayList(
-                                "0",
-                                "1"
-                        ));
         Callback<TableColumn<SetCondBit,ConditionBit>,TableCell<SetCondBit,ConditionBit>> cellCondFactory =
                 setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getModules(ConditionBit.class));
 
@@ -66,7 +61,19 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
         bit.setCellFactory(cellCondFactory);
         bit.setOnEditCommit(text -> text.getRowValue().setBit(text.getNewValue()));
 
-        value.setCellFactory(cellIntFactory);
+        value.setCellFactory(param ->
+                new TableCell<SetCondBit, Boolean>() {
+                    @Override
+                    protected void updateItem(Boolean item, boolean empty) {
+                        super.updateItem(item, empty);
+
+                        if (!empty || item == null) {
+                            setText(null);
+                        } else {
+                            setText(item.toString());
+                        }
+                    }
+                });
         value.setOnEditCommit(text -> text.getRowValue().setValue(text.getNewValue()));
     }
 
@@ -80,13 +87,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
         final Machine machine = this.machine.get();
         ConditionBit cBit = (machine.getModules(ConditionBit.class).isEmpty() ? null :
                 machine.getModules(ConditionBit.class).get(0));
-        return new SetCondBit("???", machine, cBit, "0");
-    }
-
-    @Override
-    public String toString()
-    {
-        return "SetCondBit";
+        return new SetCondBit("???", UUID.randomUUID(), machine, cBit, false);
     }
 
     @Override

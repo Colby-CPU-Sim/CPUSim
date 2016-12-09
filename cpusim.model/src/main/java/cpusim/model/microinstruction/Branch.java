@@ -45,7 +45,8 @@ public class Branch extends Microinstruction<Branch>
 
         this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
 
-        dependants = MachineComponent.collectDependancies(this);
+        dependants = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependantComponents");
     }
 
     /**

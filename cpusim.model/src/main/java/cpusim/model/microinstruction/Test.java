@@ -91,7 +91,8 @@ public class Test extends Microinstruction<Test> {
 
         this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
 
-        this.dependencies = MachineComponent.collectDependancies(this);
+        this.dependencies = MachineComponent.collectDependancies(this)
+                .buildSet(this, "dependencies");
     }
     
     /**
