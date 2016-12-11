@@ -4,6 +4,8 @@ import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.util.ValidateControllers;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -36,20 +39,6 @@ public class RegistersForArrayTableController extends RegistersTableController {
 
     public ObjectProperty<RegisterArray> currentArrayProperty() {
         return currentArray;
-    }
-
-    /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
-    @Override
-    public Register createInstance() {
-        return new Register("???",
-                UUID.randomUUID(),
-                getMachine(),
-                16,
-                0,
-                Register.Access.readWrite());
     }
 
     /**

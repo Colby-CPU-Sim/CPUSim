@@ -9,6 +9,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
@@ -56,8 +57,8 @@ class BranchTableController extends MicroinstructionTableController<Branch> {
     }
 
     @Override
-    public Branch createInstance() {
-        return new Branch("???", UUID.randomUUID(), machine.get(), 0);
+    public Supplier<Branch> supplierBinding() {
+        return () -> new Branch("???", UUID.randomUUID(), machine.get(), 0);
     }
 
     /**

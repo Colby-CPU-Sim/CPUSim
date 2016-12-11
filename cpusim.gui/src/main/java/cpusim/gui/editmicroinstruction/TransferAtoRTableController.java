@@ -23,6 +23,9 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -32,6 +35,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link TransferAtoR} command in the {@link EditMicroinstructionsController}.
@@ -142,21 +146,25 @@ class TransferAtoRTableController
 
     
     @Override
-    public TransferAtoR createInstance() {
-        final Machine machine = this.machine.get();
-        
-        RegisterArray a = (machine.getModules(RegisterArray.class).isEmpty() ? null :
-                machine.getModules(RegisterArray.class).get(0));
-        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
-        return new TransferAtoR("???", UUID.randomUUID(), machine, a, 0,
-                r, 0, 0, r,0, 0);
+    public Supplier<TransferAtoR> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            RegisterArray a = (machine.getModules(RegisterArray.class).isEmpty() ? null :
+                    machine.getModules(RegisterArray.class).get(0));
+            Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+            return new TransferAtoR("???", UUID.randomUUID(), machine, a, 0,
+                    r, 0, 0, r, 0, 0);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         // Need at least one RegisterArray AND Register
-        return !machine.get().getModules(RegisterArray.class).isEmpty()
-                && !machine.get().getModules(Register.class).isEmpty();
+        ObservableList<RegisterArray> arrays = machine.get().getModules(RegisterArray.class);
+        ObservableList<Register> registers = machine.get().getModules(Register.class);
+
+        return super.newButtonEnabledBinding().and(Bindings.isNotEmpty(arrays))
+                .and(Bindings.isNotEmpty(registers));
     }
 
     @Override

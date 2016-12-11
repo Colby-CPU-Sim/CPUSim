@@ -5,13 +5,15 @@ import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.module.Module;
 import cpusim.model.util.Validatable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,6 +22,7 @@ import javafx.util.Callback;
 import org.fxmisc.easybind.EasyBind;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -87,7 +90,7 @@ public abstract class ModuleTableController<T extends Module<T>>
     /**
      * Called after the {@link FXMLLoader#load()} is called.
      */
-    protected void initializeTable() {};
+    protected void initializeTable() {}
 
     /**
      * Loads the FXML controller, running {@link FXMLLoader} pipeline.
@@ -112,13 +115,6 @@ public abstract class ModuleTableController<T extends Module<T>>
         return new ModuleControlButtonController<>(this, false);
     }
     
-    /**
-     * Called when a table's tab gets selected, by default this implementation is no-op.
-     */
-    void onTabSelected() {
-        // no-op
-    }
-    
     @Override
     public ObjectProperty<Machine> machineProperty() {
         return machine;
@@ -138,7 +134,7 @@ public abstract class ModuleTableController<T extends Module<T>>
     }
 
     @Override
-    public abstract T createInstance();
+    public abstract Supplier<T> supplierBinding();
 
     @Override
     public String getHelpPageID()
@@ -149,28 +145,38 @@ public abstract class ModuleTableController<T extends Module<T>>
 
     
     // -- Implementations for ControlButtonController.InteractionHandler
-    @Override
-    public boolean isNewButtonEnabled() {
-        return true;
-    }
-    
-    @Override
-    public boolean isDelButtonEnabled() {
-        return !getSelectionModel().isEmpty();
-    }
-    
-    @Override
-    public boolean isDupButtonEnabled() {
-        return !getSelectionModel().isEmpty();
-    }
-    
-    @Override
-    public boolean isPropButtonEnabled() {
-        return !getSelectionModel().isEmpty();
+
+    protected final BooleanBinding selectedItemIsNotNullBinding() {
+        return ControlButtonController.selectedItemIsNotNullBinding(selectionModelProperty());
     }
 
     @Override
-    public final TableView<T> getTableView() {
-        return this;
+    public BooleanBinding newButtonEnabledBinding() {
+        return Bindings.createBooleanBinding(() -> true);
+    }
+
+    @Override
+    public BooleanBinding deleteButtonEnabledBinding() {
+        return selectedItemIsNotNullBinding();
+    }
+
+    @Override
+    public BooleanBinding duplicateButtonEnabledBinding() {
+        return selectedItemIsNotNullBinding();
+    }
+
+    @Override
+    public BooleanBinding propertiesButtonEnabledBinding() {
+        return selectedItemIsNotNullBinding();
+    }
+
+    @Override
+    public ObjectBinding<ObservableList<T>> itemsBinding() {
+        return Bindings.createObjectBinding(() -> itemsProperty().get(), itemsProperty());
+    }
+
+    @Override
+    public ObjectBinding<SelectionModel<T>> selectionModelBinding() {
+        return Bindings.createObjectBinding(() -> selectionModelProperty().get(), selectionModelProperty());
     }
 }

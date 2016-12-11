@@ -1,15 +1,3 @@
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
- * which throws a ValidationException in lieu of returning a boolean value
- * 3.) Moved widthsAreInBound and initialValueAreInBound methods to the Validate class and changed the return value to void
- * from boolean
- */
-
 package cpusim.gui.editmodules;
 
 import com.google.common.base.Joiner;
@@ -22,6 +10,7 @@ import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -43,6 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -72,7 +62,9 @@ public class RegisterArrayTableController extends ModuleTableController<Register
     }
 
     @Override
-    public void initializeTable() {
+    public void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/40.0));
         length.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
@@ -137,8 +129,6 @@ public class RegisterArrayTableController extends ModuleTableController<Register
                         });
 
                 dialogStage.show();
-
-                updateControlButtonStatus();
             }
     
             @Override
@@ -170,8 +160,8 @@ public class RegisterArrayTableController extends ModuleTableController<Register
     }
     
     @Override
-    public boolean isPropButtonEnabled() {
-        return !getSelectionModel().isEmpty();
+    public BooleanBinding propertiesButtonEnabledBinding() {
+        return selectedItemIsNotNullBinding();
     }
     
     /**
@@ -179,9 +169,9 @@ public class RegisterArrayTableController extends ModuleTableController<Register
      * @return the prototype of the subclass
      */
     @Override
-    public RegisterArray createInstance() {
-        return new RegisterArray("???", UUID.randomUUID(), getMachine(),
-                4, 32, 0, Register.Access.readWrite());
+    public Supplier<RegisterArray> supplierBinding() {
+        return () -> new RegisterArray("???", UUID.randomUUID(), getMachine(),
+                        4, 32, 0, Register.Access.readWrite());
     }
 
     /**

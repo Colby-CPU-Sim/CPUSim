@@ -4,7 +4,7 @@ import cpusim.Mediator;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -14,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
@@ -66,22 +67,17 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
     }
 
     @Override
-    public Decode createInstance() {
-        final Machine machine = this.machine.get();
-        
-        Register r = (machine.getRegisters().size() == 0 ? null :
-                machine.getRegisters().get(0));
-        return new Decode("???", UUID.randomUUID(), machine, r);
+    public Supplier<Decode> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            Register r = (machine.getRegisters().size() == 0 ? null :
+                    machine.getRegisters().get(0));
+            return new Decode("???", UUID.randomUUID(), machine, r);
+        };
     }
 
     @Override
-    public String toString()
-    {
-        return "Decode";
-    }
-
-    @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 

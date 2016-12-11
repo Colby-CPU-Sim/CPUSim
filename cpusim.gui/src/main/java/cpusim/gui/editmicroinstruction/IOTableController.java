@@ -6,6 +6,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.microinstruction.IODirection;
 import cpusim.model.module.Register;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link IO} command in the {@link EditMicroinstructionsController}.
@@ -81,15 +83,17 @@ class IOTableController extends MicroinstructionTableController<IO> {
     }
 
     @Override
-    public IO createInstance() {
-        final Machine machine = this.machine.get();
-        Register r = (machine.getRegisters().size() == 0 ? null :
-                machine.getRegisters().get(0));
-        return new IO("???", UUID.randomUUID(), machine, IO.Type.Integer, r, IODirection.Read, null);
+    public Supplier<IO> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            Register r = (machine.getRegisters().size() == 0 ? null :
+                    machine.getRegisters().get(0));
+            return new IO("???", UUID.randomUUID(), machine, IO.Type.Integer, r, IODirection.Read, null);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 

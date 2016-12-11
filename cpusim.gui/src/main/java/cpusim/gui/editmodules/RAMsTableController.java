@@ -1,21 +1,7 @@
-/*
- * Michael Goldenberg, Jinghui Yu, and Ben Borchard modified this file on 10/27/13
- * with the following changes:
- * 
- * 1.) Changed the return value of checkValidity from a boolean to void (the functionality
- * enabled by that boolean value is now controlled by throwing ValidationException)
- * 2.) Changed the edit commit method on the name column so that it calls Validate.nameableObjects()
- * which throws a ValidationException in lieu of returning a boolean value
- * 3.) Moved cellSizesAreValid and lengthsArePositive method to the Validate class and changed the return value to void
- * from boolean
- */
 package cpusim.gui.editmodules;
 
-import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.RAM;
-
-import cpusim.model.util.IdentifiedObject;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -24,9 +10,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
- * The controller for editing the Branch command in the EditMicroDialog.
+ * The controller for editing {@link RAM} components
  */
 public class RAMsTableController extends ModuleTableController<RAM> {
 
@@ -53,7 +40,9 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      * hit enter to save the changes.
      */
     @Override
-    public void initializeTable() {
+    public void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/40.0));
         length.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
@@ -79,8 +68,8 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      * @return the prototype of the subclass
      */
     @Override
-    public RAM createInstance() {
-        return new RAM("???", UUID.randomUUID(), getMachine(), 128, 8);
+    public Supplier<RAM> supplierBinding() {
+        return () -> new RAM("???", UUID.randomUUID(), getMachine(), 128, 8);
     }
 
     /**

@@ -5,8 +5,7 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,10 +14,8 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the shift command in the EditMicroDialog
@@ -104,15 +101,17 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
     }
     
     @Override
-    public Shift createInstance() {
-        final Register r = (machine.get().getRegisters().size() == 0 ? null :
-                machine.get().getRegisters().get(0));
-        return new Shift("???", UUID.randomUUID(), machine.get(), r, r,
-                Shift.ShiftType.Logical, Shift.ShiftDirection.Left, 1);
+    public Supplier<Shift> supplierBinding() {
+        return () -> {
+            final Register r = (machine.get().getRegisters().size() == 0 ? null :
+                    machine.get().getRegisters().get(0));
+            return new Shift("???", UUID.randomUUID(), machine.get(), r, r,
+                    Shift.ShiftType.Logical, Shift.ShiftDirection.Left, 1);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 

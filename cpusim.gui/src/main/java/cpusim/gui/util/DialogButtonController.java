@@ -5,6 +5,7 @@ import cpusim.model.Machine;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -84,10 +85,7 @@ public final class DialogButtonController extends VBox implements ReadOnlyMachin
 
     @FXML @SuppressWarnings("unused")
     private void initialize() {
-        this.currentHelpable.addListener((observable, oldValue, newValue) -> {
-            helpButton.setDisable(newValue == null);
-        });
-        helpButton.setDisable(currentHelpable.get() == null);
+        helpButton.disableProperty().bind(currentHelpable.isNotNull());
     }
 
     @Override
@@ -121,7 +119,7 @@ public final class DialogButtonController extends VBox implements ReadOnlyMachin
      * Get the property for the current instance that can be "helped".
      * @return Read-only version of the property.
      */
-    public ReadOnlyObjectProperty<HelpPageEnabled> currentHelpableProperty() {
+    public ObjectProperty<HelpPageEnabled> currentHelpableProperty() {
         return currentHelpable;
     }
 

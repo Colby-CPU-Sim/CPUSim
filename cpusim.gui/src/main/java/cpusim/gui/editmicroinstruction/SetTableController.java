@@ -6,6 +6,7 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetBits;
 import cpusim.model.module.Register;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the Set command in the EditMicroDialog.
@@ -96,20 +98,17 @@ class SetTableController extends MicroinstructionTableController<SetBits> {
     }
     
     @Override
-    public SetBits createInstance() {
-        final Machine machine = this.machine.get();
-        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
-        return new SetBits("???", UUID.randomUUID(), machine, r, 0, 1, 0L);
+    public Supplier<SetBits> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+            return new SetBits("???", UUID.randomUUID(), machine, r, 0, 1, 0L);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
-    }
-
-    @Override
-    public String toString() {
-        return "Set";
     }
     
     @Override

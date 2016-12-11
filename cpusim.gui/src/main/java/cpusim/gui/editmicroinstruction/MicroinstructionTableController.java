@@ -12,12 +12,16 @@ import cpusim.model.module.Register;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.Validatable;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -25,6 +29,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -143,8 +148,8 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
      * Checks if the underling {@link Machine} has registers present. This is a convenience method.
      * @return {@code true} if there is at least one {@link Register} available.
      */
-    protected boolean areRegistersAvailable() {
-        return !getMachine().getAllRegisters().isEmpty();
+    protected BooleanBinding areRegistersAvailable() {
+        return Bindings.createBooleanBinding(() -> getMachine().getAllRegisters().isEmpty(), machine);
     }
 
     /**
@@ -155,38 +160,40 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
         return new MicroinstructionControlButtonController<>(this);
     }
 
-    /**
-     * Called when a table's tab gets selected, by default this implementation is no-op.
-     */
-    void onTabSelected() {
-        // no-op
+    protected BooleanBinding getSelectedItemNotNullBinding() {
+        return ControlButtonController.selectedItemIsNotNullBinding(selectionModelProperty());
     }
 
     @Override
-    public abstract T createInstance();
+    public abstract Supplier<T> supplierBinding();
 
     @Override
-    public boolean isNewButtonEnabled() {
-        return true;
+    public BooleanBinding newButtonEnabledBinding() {
+        return Bindings.createBooleanBinding(() -> true);
     }
 
     @Override
-    public boolean isDelButtonEnabled() {
-        return !getSelectionModel().isEmpty();
+    public BooleanBinding deleteButtonEnabledBinding() {
+        return getSelectedItemNotNullBinding();
     }
 
     @Override
-    public boolean isDupButtonEnabled() {
-        return !getSelectionModel().isEmpty();
+    public BooleanBinding duplicateButtonEnabledBinding() {
+        return getSelectedItemNotNullBinding();
     }
 
     @Override
-    public boolean isPropButtonEnabled() {
-        return false;
+    public BooleanBinding propertiesButtonEnabledBinding() {
+        return Bindings.createBooleanBinding(() -> false);
     }
 
     @Override
-    public final TableView<T> getTableView() {
-        return this;
+    public ObjectBinding<ObservableList<T>> itemsBinding() {
+        return Bindings.createObjectBinding(() -> itemsProperty().get(), itemsProperty());
+    }
+
+    @Override
+    public ObjectBinding<SelectionModel<T>> selectionModelBinding() {
+        return Bindings.createObjectBinding(() -> selectionModelProperty().get(), selectionModelProperty());
     }
 }

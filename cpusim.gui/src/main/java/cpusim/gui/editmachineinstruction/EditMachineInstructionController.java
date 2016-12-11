@@ -2,11 +2,7 @@ package cpusim.gui.editmachineinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
-import cpusim.gui.util.DialogButtonController;
-import cpusim.gui.util.HelpPageEnabled;
-import cpusim.model.util.*;
-import cpusim.gui.util.MachineModificationController;
-import cpusim.gui.util.MicroinstructionTreeView;
+import cpusim.gui.util.*;
 import cpusim.gui.util.list.StringPropertyListCell;
 import cpusim.model.Field;
 import cpusim.model.Field.Type;
@@ -14,10 +10,10 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -29,29 +25,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.fxmisc.easybind.EasyBind;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * FXML Controller class for modifying {@link MachineInstruction} values.
@@ -90,7 +77,7 @@ public class EditMachineInstructionController
     private VBox fieldsFormatVBox;
 
     @FXML
-    private ListView<Field> fieldsList;
+    private FieldListControl fieldList;
 
     @FXML
     private Label lengthLabel;
@@ -105,16 +92,10 @@ public class EditMachineInstructionController
     private TabPane implTabPane;
 
     @FXML @SuppressWarnings("unused")
-    private Button newButton;
-
-    @FXML @SuppressWarnings("unused")
-    private Button dupButton;
-
-    @FXML @SuppressWarnings("unused")
-    private Button deleteButton;
-
-    @FXML @SuppressWarnings("unused")
     private MachineInstructionImplTableController instImplTableController;
+
+    @FXML
+    private ControlButtonController<MachineInstruction> instButtonController;
 
     @FXML @SuppressWarnings("unused")
     private MicroinstructionTreeView microinstTreeView;
@@ -156,16 +137,16 @@ public class EditMachineInstructionController
 
         initializeOpcodeTextField();
 
-        BooleanBinding isInstructionSelected = instructionList.getSelectionModel().selectedItemProperty().isNull();
-        dupButton.disableProperty().bind(isInstructionSelected);
-        deleteButton.disableProperty().bind(isInstructionSelected);
+        ReadOnlyObjectProperty<MachineInstruction> currentInstruct =
+                instructionList.getSelectionModel().selectedItemProperty();
+        currentInstr.bind(currentInstruct);
+
+        BooleanBinding isInstructionSelected = currentInstruct.isNull();
         implTabPane.disableProperty().bind(isInstructionSelected);
 
-        currentInstr.bind(instructionList.getSelectionModel().selectedItemProperty());
-        
-        currentInstr.addListener((ob, oldValue, newValue) -> {
+        EasyBind.subscribe(this.currentInstr, newValue -> {
             currentInstructionTitle.textProperty().unbind();
-            
+
             if (newValue != null) {
                 currentInstructionTitle.textProperty().bind(newValue.nameProperty());
             } else {
@@ -422,21 +403,21 @@ public class EditMachineInstructionController
      * the machine.
      */
     private void updateViewsFromMachine() {
-        List<Field> realAllFields = machine.getValue().getFields();
-        ObservableList<Field> listFields = fieldsList.getItems();
-
-        listFields.clear();
-        List<Field> cloned = realAllFields.stream()
-                .map(Field::new)
-                .collect(Collectors.toList());
-        listFields.addAll(cloned); // do addAll to ease the change listener calls
-
-        ObservableList<MachineInstruction> insViewItems = instructionList.getItems();
-        insViewItems.clear();
-        List<MachineInstruction> clonedInst = machine.getValue().getInstructions().stream()
-                .map(Copyable::cloneOf)
-                .collect(Collectors.toList());
-        insViewItems.addAll(clonedInst);
+//        List<Field> realAllFields = machine.getValue().getFields();
+//        ObservableList<Field> listFields = fieldsList.getItems();
+//
+//        listFields.clear();
+//        List<Field> cloned = realAllFields.stream()
+//                .map(Field::new)
+//                .collect(Collectors.toList());
+//        listFields.addAll(cloned); // do addAll to ease the change listener calls
+//
+//        ObservableList<MachineInstruction> insViewItems = instructionList.getItems();
+//        insViewItems.clear();
+//        List<MachineInstruction> clonedInst = machine.getValue().getInstructions().stream()
+//                .map(Copyable::cloneOf)
+//                .collect(Collectors.toList());
+//        insViewItems.addAll(clonedInst);
 
 
 
@@ -678,7 +659,6 @@ public class EditMachineInstructionController
 ////                commitCommentEdit();
 //            }
         mediator.getMachine().setInstructions(instructionList.getItems());
-        mediator.getMachine().setFields(fieldsList.getItems());
         mediator.setMachineDirty(true);
     }
 
@@ -1171,25 +1151,25 @@ public class EditMachineInstructionController
 //        }
     }
 
-    /**
-     * returns the fields as they have been changed so far in the dialog
-     *
-     * @return the fields as they have been changed so far in the dialog
-     */
-    public ObservableList<Field> getFields() {
-        return fieldsList.getItems();
-    }
+//    /**
+//     * returns the fields as they have been changed so far in the dialog
+//     *
+//     * @return the fields as they have been changed so far in the dialog
+//     */
+//    public ObservableList<Field> getFields() {
+//        return fieldsList.getItems();
+//    }
 
-    /**
-     * sets the fields as they have been changed so far in the dialog
-     *
-     * @param fields the fields to set as the fields as they have been changed so far
-     *               in the dialog
-     */
-    public void setFields(List<Field> fields) {
-        fieldsList.getItems().clear();
-        fieldsList.getItems().addAll(fields);
-    }
+//    /**
+//     * sets the fields as they have been changed so far in the dialog
+//     *
+//     * @param fields the fields to set as the fields as they have been changed so far
+//     *               in the dialog
+//     */
+//    public void setFields(List<Field> fields) {
+//        fieldsList.getItems().clear();
+//        fieldsList.getItems().addAll(fields);
+//    }
 
 //    /**
 //     * returns the index at which the micro being dragged would be inserted into the

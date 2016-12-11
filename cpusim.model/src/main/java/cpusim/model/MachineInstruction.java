@@ -137,6 +137,10 @@ public class MachineInstruction
         this.assemblyFields.addAll(assemblyFields);
     }
 
+    public ListProperty<Field> assemblyFieldsProperty() {
+        return assemblyFields;
+    }
+
     /**
      * This method checks the validity of the format for the instruction.
      * If it is valid, it updates the fields to match this format.
@@ -156,7 +160,11 @@ public class MachineInstruction
     public ObservableList<Field> getInstructionFields(){
         return instructionFields;
     }
-    
+
+    public ListProperty<Field> instructionFieldsProperty() {
+        return instructionFields;
+    }
+
     /**
      * returns the number of bits in the machine instruction
      * @return the number of bits in the machine instruction

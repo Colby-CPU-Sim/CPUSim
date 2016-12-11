@@ -92,11 +92,6 @@ public class MachineInstructionImplTableController extends TitledPane implements
             DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
             helper.visit(new DragHelper.HandleDragBehaviour() {
                 @Override
-                public void onDragIndex(int value) {
-                    // do nothing
-                }
-
-                @Override
                 public void onDragMicro(Microinstruction<?> micro) {
                     if (executeSequenceTable.getItems().isEmpty()) {
                         // set the index to zero, this is because it will not get set by the row onDragOver
@@ -134,11 +129,6 @@ public class MachineInstructionImplTableController extends TitledPane implements
             ObservableList<Microinstruction<?>> items = executeSequenceTable.getItems();
             DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
             helper.visit(new DragHelper.HandleDragBehaviour() {
-                @Override
-                public void onDragIndex(int value) {
-                    
-                }
-
                 @Override
                 public void onDragMicro(Microinstruction<?> micro) {
                     int index = items.indexOf(micro);

@@ -11,19 +11,15 @@
  */
 package cpusim.gui.editmodules;
 
-import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.MoreBindings;
-import cpusim.model.util.ObservableCollectionBuilder;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -33,9 +29,9 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
-import org.fxmisc.easybind.EasyBind;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.*;
@@ -118,13 +114,8 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
-        return super.isNewButtonEnabled() && !registerList.isEmpty();
-    }
-
-    @Override
-    void onTabSelected() {
-        super.onTabSelected();
+    public BooleanBinding newButtonEnabledBinding() {
+        return super.newButtonEnabledBinding().and(registerList.emptyProperty().not());
     }
 
     /**
@@ -156,13 +147,15 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public ConditionBit createInstance() {
-        Register defaultRegister = null;
-        if (!registerList.isEmpty()) {
-            defaultRegister = registerList.get(0);
-        }
-        
-        return new ConditionBit("???", UUID.randomUUID(), getMachine(), defaultRegister, 0, false);
+    public Supplier<ConditionBit> supplierBinding() {
+        return () -> {
+            Register defaultRegister = null;
+            if (!registerList.isEmpty()) {
+                defaultRegister = registerList.get(0);
+            }
+
+            return new ConditionBit("???", UUID.randomUUID(), getMachine(), defaultRegister, 0, false);
+        };
     }
 
     /**

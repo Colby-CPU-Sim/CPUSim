@@ -31,17 +31,12 @@ class ModuleControlButtonController<T extends Module<T>> extends ControlButtonCo
 
     ModuleControlButtonController(ModuleTableController<T> moduleController,
                                   final boolean hasExtendedProperties) {
-        super(hasExtendedProperties, moduleController);
+        super(hasExtendedProperties);
         this.moduleController = moduleController;
     
         loadFXML();
-    }
 
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        moduleController.getSelectionModel().selectedItemProperty().addListener(getButtonChangeListener());
+        setInteractionHandler(moduleController);
     }
 
     @Override

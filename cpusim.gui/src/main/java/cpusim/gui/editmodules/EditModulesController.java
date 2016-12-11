@@ -15,6 +15,7 @@ import cpusim.model.util.MachineBound;
 import cpusim.model.Machine;
 import cpusim.model.module.Module;
 import cpusim.model.module.RAM;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -72,10 +73,10 @@ public final class EditModulesController extends BorderPane
         
         ramsTableController = new RAMsTableController();
 
-        registersTableController.machineProperty().bindBidirectional(machineProperty());
-        registerArrayTableController.machineProperty().bindBidirectional(machineProperty());
-        conditionBitTableController.machineProperty().bindBidirectional(machineProperty());
-        ramsTableController.machineProperty().bindBidirectional(machineProperty());
+        registersTableController.machineProperty().bind(machineProperty());
+        registerArrayTableController.machineProperty().bind(machineProperty());
+        conditionBitTableController.machineProperty().bind(machineProperty());
+        ramsTableController.machineProperty().bind(machineProperty());
     }
 
     @FXML
@@ -86,11 +87,6 @@ public final class EditModulesController extends BorderPane
             if (source != null && !source.isSelected()) {
                 // This means the source is LEAVING
                 source.getTableController().checkValidity();
-            }
-
-            final ModuleTab<?> target = (ModuleTab<?>) event.getTarget();
-            if (target != null && target.isSelected()) {
-                target.onTabSelected();
             }
         };
 
@@ -137,6 +133,12 @@ public final class EditModulesController extends BorderPane
                 registersTableController,
                 registerArrayTableController,
                 ramsTableController);
+
+        dialogButtonController.currentHelpableProperty()
+                .bind(Bindings.createObjectBinding(() -> {
+                    ModuleTab<?> tab = (ModuleTab<?>)modulePane.getSelectionModel().getSelectedItem();
+                    return tab.getTableController();
+                }, modulePane.getSelectionModel().selectedItemProperty()));
     }
 
     @Override
@@ -230,17 +232,6 @@ public final class EditModulesController extends BorderPane
          */
         ModuleTableController<T> getTableController() {
             return tableCtrlr;
-        }
-    
-        /**
-         * Called when selecting a new tab
-         */
-        void onTabSelected() {
-            tableCtrlr.onTabSelected();
-            buttonCtrlr.updateControlButtonStatus();
-
-            // Tell the DialogButtonController that we have a helpable now.
-            dialogButtonController.setCurrentHelpable(tableCtrlr);
         }
     }
 }

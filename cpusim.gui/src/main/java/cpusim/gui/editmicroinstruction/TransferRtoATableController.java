@@ -17,6 +17,9 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -26,6 +29,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link TransferRtoA} command in the {@link EditMicroinstructionsController}.
@@ -146,32 +150,32 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
     }
     
     @Override
-    public TransferRtoA createInstance() {
-        Machine machine = this.machine.get();
-        final RegisterArray a = (machine.getModules(RegisterArray.class).size() == 0 ? null :
-                machine.getModules(RegisterArray.class).get(0));
-        final Register r = (machine.getRegisters().size() == 0 ? null :
-                machine.getRegisters().get(0));
-        return new TransferRtoA("???", UUID.randomUUID(), machine, r, 0, a,
-                0, 0, r,0, 0);
+    public Supplier<TransferRtoA> supplierBinding() {
+        return () -> {
+            Machine machine = this.machine.get();
+            final RegisterArray a = (machine.getModules(RegisterArray.class).size() == 0 ? null :
+                    machine.getModules(RegisterArray.class).get(0));
+            final Register r = (machine.getRegisters().size() == 0 ? null :
+                    machine.getRegisters().get(0));
+            return new TransferRtoA("???", UUID.randomUUID(), machine, r, 0, a,
+                    0, 0, r,0, 0);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         // Need at least one RegisterArray AND Register
-        return !machine.get().getModules(RegisterArray.class).isEmpty()
-                && !machine.get().getModules(Register.class).isEmpty();
+        // Need at least one RegisterArray AND Register
+        ObservableList<RegisterArray> arrays = machine.get().getModules(RegisterArray.class);
+        ObservableList<Register> registers = machine.get().getModules(Register.class);
+
+        return super.newButtonEnabledBinding().and(Bindings.isNotEmpty(arrays))
+                .and(Bindings.isNotEmpty(registers));
     }
 
     @Override
     public String getHelpPageID()
     {
         return "Transfer";
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TransferRtoA";
     }
 }

@@ -6,6 +6,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.Increment;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -17,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the Increment command in the EditMicroDialog.
@@ -99,11 +101,13 @@ class IncrementTableController
     }
 
     @Override
-    public Increment createInstance() {
-        final Machine machine = this.machine.get();
-        Register r = (machine.getRegisters().size() == 0 ? null : machine.getRegisters().get(0));
-        return new Increment("???", UUID.randomUUID(), machine, r, 1L,
-                null, null, null);
+    public Supplier<Increment> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            Register r = (machine.getRegisters().size() == 0 ? null : machine.getRegisters().get(0));
+            return new Increment("???", UUID.randomUUID(), machine, r, 1L,
+                    null, null, null);
+        };
     }
 
     @Override
@@ -113,7 +117,7 @@ class IncrementTableController
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 

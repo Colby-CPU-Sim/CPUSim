@@ -13,6 +13,11 @@ dependencies {
 
     // http://search.maven.org/#artifactdetails%7Corg.controlsfx%7Ccontrolsfx%7C8.40.12%7C
     compile 'org.controlsfx:controlsfx:8.40.12'
+
+    // http://aalmiray.github.io/ikonli/#_download
+    compile 'org.kordamp.ikonli:ikonli-javafx:1.8.0'
+    // http://aalmiray.github.io/ikonli/#_fontawesome
+    compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.8.0'
     
     compile project(':cpusim.model')
     

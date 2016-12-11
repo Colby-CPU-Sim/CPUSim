@@ -3,22 +3,32 @@ package cpusim.gui.util;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.NamedArg;
+import javafx.beans.binding.*;
+import javafx.beans.property.*;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.SelectionModel;
-import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import org.fxmisc.easybind.EasyBind;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Controller for a "New", "Duplicate", and "Remove" button.
  * @since 2016-11-29
  */
-public abstract class ControlButtonController<T extends NamedObject & Copyable<T>> extends HBox {
+public class ControlButtonController<T extends NamedObject & Copyable<T>> extends HBox {
 
     /**
      * Defines the FXML file used to load the controls.
@@ -34,23 +44,64 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
     @FXML @SuppressWarnings("unused")
     private Button propertiesButton;
 
-    private InteractionHandler<T> interactionHandler;
+    // all of the buttons
+    private List<Button> allButtons;
 
-    private final ButtonChangeListener buttonListener;
+    private final ListProperty<T> items;
+    private final ObjectProperty<SelectionModel<T>> selectionModel;
+    private final ObjectProperty<Supplier<T>> supplier;
 
-    private final boolean hasExtendedProperties;
+    private final BooleanProperty hasProperties;
 
-    public ControlButtonController(final boolean hasExtendedProperties, InteractionHandler<T> interactionHandler) {
-        this.hasExtendedProperties = hasExtendedProperties;
-        this.interactionHandler = interactionHandler;
-        this.buttonListener = new ButtonChangeListener();
+    private final DoubleProperty minIconWidth;
+
+    private final BooleanProperty prefIconOnly;
+
+    public ControlButtonController(@NamedArg("hasProperties") final boolean initHasProperties,
+                                   @NamedArg("prefIconOnly") boolean initPrefIcon) {
+        this.hasProperties = new SimpleBooleanProperty(this, "hasProperties", initHasProperties);
+        this.prefIconOnly = new SimpleBooleanProperty(this, "prefIconOnly", initPrefIcon);
+        this.items = new SimpleListProperty<>(this, "items", null);
+        this.selectionModel = new SimpleObjectProperty<>(this, "selectionModel", null);
+        this.supplier = new SimpleObjectProperty<>(this, "supplier", null);
+
+        this.minIconWidth = new SimpleDoubleProperty(this, "minIconWidth");
+
+        IntegerBinding sizeBinding = Bindings.size(getChildren());
+        minWidthProperty().bind(EasyBind.combine(sizeBinding, spacingProperty(), (size, spacing) ->
+                    size.intValue() * 30 - (size.intValue() - 1) * spacing.intValue()));
+
+        this.minIconWidth.bind(sizeBinding.multiply(90));
+
+        prefWidthProperty().bind(EasyBind.combine(prefIconOnly, sizeBinding, spacingProperty(),
+                (iconOnly, size, spacing) -> {
+
+                    int cWidth = (iconOnly ? 24 : 75);
+                    return size.intValue() * cWidth - (size.intValue() - 1) * spacing.intValue();
+                }));
     }
 
     /**
      * Default constructor so it can be used within the Scene Builder
      */
-    ControlButtonController() {
-        this(true, null);
+    public ControlButtonController() {
+        this(true, false);
+    }
+
+    public ControlButtonController(@NamedArg("prefIconOnly") boolean initPrefIcon) {
+        this(true, initPrefIcon);
+    }
+
+    public void setInteractionHandler(InteractionHandler<T> handler) {
+        checkNotNull(handler);
+
+        newButton.disableProperty().bind(handler.newButtonEnabledBinding().not());
+        duplicateButton.disableProperty().bind(handler.duplicateButtonEnabledBinding().not());
+        deleteButton.disableProperty().bind(handler.deleteButtonEnabledBinding().not());
+        propertiesButton.disableProperty().bind(handler.propertiesButtonEnabledBinding().not());
+
+        items.bind(handler.itemsBinding());
+        selectionModel.bind(handler.selectionModelBinding());
     }
 
     /**
@@ -66,25 +117,45 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
 
     @FXML @SuppressWarnings("unused")
     protected void initialize() {
-        if (!hasExtendedProperties) {
-            getChildren().remove(propertiesButton);
-        }
+        allButtons = Arrays.asList(newButton, duplicateButton, deleteButton, propertiesButton);
+
+        allButtons.forEach(this::bindHidingContentDisplay);
+
+        EasyBind.subscribe(hasProperties, hasProperties -> {
+            if (!hasProperties) {
+                getChildren().remove(propertiesButton);
+            } else {
+                getChildren().set(3, propertiesButton);
+            }
+        });
+
+        EasyBind.subscribe(prefIconOnly, iconOnly -> {
+            if (iconOnly) {
+                allButtons.forEach(btn -> btn.getStyleClass().add("icon-only"));
+            } else {
+                allButtons.forEach(btn -> btn.getStyleClass().remove("icon-only"));
+            }
+        });
     }
 
-    /**
-     * Gets a {@link ChangeListener} that updates the "enabled" state of the buttons in the control if there is a
-     * change.
-     * @return Non-{@code null} ChangeListener.
-     */
-    protected ChangeListener<T> getButtonChangeListener() {
-        return buttonListener;
+    private void bindHidingContentDisplay(Labeled control) {
+        final ContentDisplay initialDisplay = control.getContentDisplay();
+        ObjectBinding<ContentDisplay> binding = Bindings.createObjectBinding(() -> {
+                if (getWidth() < minIconWidth.get()) {
+                    return ContentDisplay.GRAPHIC_ONLY;
+                } else {
+                    return initialDisplay;
+                }
+            }, widthProperty(), minIconWidth, hasProperties);
+        control.contentDisplayProperty().bind(binding);
     }
 
-    public void updateControlButtonStatus() {
-        newButton.setDisable(!interactionHandler.isNewButtonEnabled());
-        deleteButton.setDisable(!interactionHandler.isDelButtonEnabled());
-        duplicateButton.setDisable(!interactionHandler.isDupButtonEnabled());
-        propertiesButton.setDisable(!interactionHandler.isPropButtonEnabled());
+    public BooleanProperty hasPropertiesProperty() {
+        return hasProperties;
+    }
+
+    public BooleanProperty prefIconOnlyProperty() {
+        return prefIconOnly;
     }
 
     /**
@@ -95,15 +166,17 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
     @FXML @SuppressWarnings("unused")
     protected void onNewButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
-        TableView<T> table = interactionHandler.getTableView();
-        String uniqueName = NamedObject.createUniqueName(table.getItems(), '?');
-        final T newValue = interactionHandler.createInstance();
+        ObservableList<T> items = this.items.get();
+        checkState(items != null,
+                "No interaction information set or null items, " +
+                        "call #setInteractionHandler(InteractionHandler)");
+
+        String uniqueName = NamedObject.createUniqueName(items, '?');
+        final T newValue = supplier.getValue().get();
         newValue.setName(uniqueName);
 
-        table.getItems().add(newValue);
-        table.getSelectionModel().select(newValue);
-
-        updateControlButtonStatus();
+        items.add(newValue);
+        selectionModel.get().select(newValue);
     }
 
     /**
@@ -115,7 +188,9 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
      * @param toDelete Value that is requested to be deleted.
      * @return {@code true} if the deletion is allowed.
      */
-    protected abstract boolean checkDelete(T toDelete);
+    protected boolean checkDelete(T toDelete) {
+        return true;
+    }
 
     /**
      * deletes an existing instruction when clicking on Delete button.
@@ -124,23 +199,19 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
      */
     @FXML @SuppressWarnings("unused")
     protected void onDeleteButtonClick(ActionEvent e) {
-        TableView<T> table = interactionHandler.getTableView();
-        SelectionModel<T> selectionModel = table.getSelectionModel();
+        ObservableList<T> items = this.items.get();
+        checkState(items != null,
+                "No interaction information set or null items, " +
+                        "call #setInteractionHandler(InteractionHandler)");
+
+        SelectionModel<T> selectionModel = this.selectionModel.get();
         final T selectedValue = selectionModel.getSelectedItem();
 
         if (!checkDelete(selectedValue)) {
             return;
         }
 
-        table.getItems().remove(selectionModel.getSelectedIndex());
-        final int selected = selectionModel.getSelectedIndex();
-        if (selected == 0) {
-            selectionModel.select(0);
-        } else {
-            selectionModel.select(selected - 1);
-        }
-
-        updateControlButtonStatus();
+        items.remove(selectionModel.getSelectedIndex());
     }
 
     /**
@@ -151,15 +222,18 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
     @FXML @SuppressWarnings("unused")
     protected void onDuplicateButtonClick(ActionEvent e) {
         //add a new item at the end of the list.
-        final TableView<T> table = interactionHandler.getTableView();
-        final T newObject = table.getSelectionModel().getSelectedItem().cloneOf();
+        ObservableList<T> items = this.items.get();
+        checkState(items != null,
+                "No interaction information set or null items, " +
+                        "call #setInteractionHandler(InteractionHandler)");
+
+        SelectionModel<T> selectionModel = this.selectionModel.get();
+
+        final T newObject = selectionModel.getSelectedItem().cloneOf();
+        final int selectedIndex = selectionModel.getSelectedIndex();
         newObject.setName(newObject.getName() + "_copy");
-        table.getItems().add(0, newObject);
-
-        table.scrollTo(0);
-        table.getSelectionModel().select(0);
-
-        updateControlButtonStatus();
+        items.add(selectedIndex + 1, newObject);
+        selectionModel.select(selectedIndex + 1);
     }
 
     /**
@@ -169,12 +243,22 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
      */
     @FXML @SuppressWarnings("unused")
     protected void onPropertiesButtonClick(ActionEvent e) {
-        if (!hasExtendedProperties) {
+        if (!hasProperties.get()) {
             throw new IllegalStateException("Called onPropertiesButtonClick on something with no extended properties");
         } else {
             throw new Error("The method, onPropertiesButtonClick(ActionEvent) must be implemented if advanced " +
                     "properties are present.");
         }
+    }
+
+    public static <T> BooleanBinding selectedItemIsNotNullBinding(ObjectProperty<? extends SelectionModel<T>> property) {
+        return Bindings.createBooleanBinding(() -> {
+            if (property.get() == null) {
+                return false;
+            } else {
+                return !property.get().isEmpty();
+            }
+        }, property);
     }
 
     /**
@@ -186,48 +270,43 @@ public abstract class ControlButtonController<T extends NamedObject & Copyable<T
          * Denotes if the "New" button is enabled
          * @return {@code true} if the button is enabled.
          */
-        boolean isNewButtonEnabled();
+        BooleanBinding newButtonEnabledBinding();
 
         /**
          * Denotes if the delete button is enabled.
          * @return {@code true} if the button is enabled.
          */
-        boolean isDelButtonEnabled();
+        BooleanBinding deleteButtonEnabledBinding();
 
         /**
          * Denotes if the delete button is enabled.
          * @return {@code true} if the button is enabled.
          */
-        boolean isDupButtonEnabled();
+        BooleanBinding duplicateButtonEnabledBinding();
 
         /**
          * Denotes if the properties button is enabled.
          * @return {@code true} if the button is enabled.
          */
-        boolean isPropButtonEnabled();
+        default BooleanBinding propertiesButtonEnabledBinding() {
+            return Bindings.createBooleanBinding(() -> false);
+        }
 
         /**
-         * Get the {@link TableView} this control is associated with.
-         * @return Reference to the {@link TableView}
+         * Gets a binding to a {@link ListBinding} for modifications.
          */
-        TableView<T> getTableView();
+        ObjectBinding<ObservableList<T>> itemsBinding();
+
+        /**
+         * Get the currently selected Item from the {@link #itemsBinding()} {@code List}.
+         * @return Binding to the currently selected item.
+         */
+        ObjectBinding<SelectionModel<T>> selectionModelBinding();
 
         /**
          * Creates a new instance
          * @return a new, non-{@code null} instance
          */
-        T createInstance();
-    }
-
-    /**
-     * a listener listening for changes to the table selection and
-     * update the status of buttons.
-     */
-    private class ButtonChangeListener implements ChangeListener<T> {
-
-        @Override
-        public void changed(ObservableValue<? extends T> selected, T oldModule, T newModule) {
-            updateControlButtonStatus();
-        }
+        Supplier<T> supplierBinding();
     }
 }

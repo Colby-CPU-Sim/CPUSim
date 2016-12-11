@@ -6,17 +6,16 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the arithmetic command in the EditMicroDialog.
@@ -97,16 +96,18 @@ class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
      * @return the prototype of the subclass
      */
     @Override
-    public Arithmetic createInstance() {
-        final Machine machine = this.machine.get();
-        final Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
-        return new Arithmetic("???", UUID.randomUUID(), machine, Arithmetic.Type.ADD, r, r, r,
-                null, null, null);
+    public Supplier<Arithmetic> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            final Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+            return new Arithmetic("???", UUID.randomUUID(), machine, Arithmetic.Type.ADD, r, r, r,
+                    null, null, null);
+        };
     }
 
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
     

@@ -7,6 +7,8 @@ import cpusim.model.microinstruction.IODirection;
 import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -16,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link MemoryAccess} command in the {@link EditMicroinstructionsController}.
@@ -99,23 +102,19 @@ class MemoryAccessTableController
     }
 
     @Override
-    public MemoryAccess createInstance() {
-        final Machine machine = this.machine.get();
-        
-        Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
-        RAM ram = (machine.getModules(RAM.class).isEmpty() ? null : machine.getModules(RAM.class).get(0));
-        return new MemoryAccess("???", UUID.randomUUID(), machine, IODirection.Read, ram, r, r);
+    public Supplier<MemoryAccess> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+
+            Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
+            RAM ram = (machine.getModules(RAM.class).isEmpty() ? null : machine.getModules(RAM.class).get(0));
+            return new MemoryAccess("???", UUID.randomUUID(), machine, IODirection.Read, ram, r, r);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
-        return areRegistersAvailable() && !machine.get().getModules(RAM.class).isEmpty();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "MemoryAccess";
+    public BooleanBinding newButtonEnabledBinding() {
+        return areRegistersAvailable().and(Bindings.isNotEmpty(machine.get().getModules(RAM.class)));
     }
 
     @Override

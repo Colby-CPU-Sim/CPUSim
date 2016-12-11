@@ -25,7 +25,6 @@
 package cpusim.gui.editmodules;
 
 import com.google.common.base.Joiner;
-import cpusim.Mediator;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
@@ -35,10 +34,10 @@ import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -52,6 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.*;
@@ -84,7 +84,9 @@ public class RegistersTableController extends ModuleTableController<Register> {
     }
 
     @Override
-    public void initializeTable() {
+    public void initialize() {
+        super.initialize();
+
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/30.0));
         width.prefWidthProperty().bind(prefWidthProperty().divide(100/20.0));
@@ -168,18 +170,14 @@ public class RegistersTableController extends ModuleTableController<Register> {
                 .findFirst();
     }
 
-    /**
-     * getter for prototype of the right subclass
-     * @return the prototype of the subclass
-     */
     @Override
-    public Register createInstance() {
-        return new Register("???",
-                UUID.randomUUID(),
-                getMachine(),
-                16,
-                0,
-                Register.Access.readWrite());
+    public Supplier<Register> supplierBinding() {
+        return () -> new Register("???",
+                        UUID.randomUUID(),
+                        getMachine(),
+                        16,
+                        0,
+                        Register.Access.readWrite());
     }
 
     /**

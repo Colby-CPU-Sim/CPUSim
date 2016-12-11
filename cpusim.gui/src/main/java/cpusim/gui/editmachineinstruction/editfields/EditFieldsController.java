@@ -90,19 +90,20 @@ public class EditFieldsController implements Initializable, MachineBound {
         this.stage = stage;
 
         // clone all the fields to fill up allFields
-        for (Field field : editMachineInstructionController.getFields()){
-            List<FieldValue> realFieldValues = field.getValues();
-            ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
-            for (FieldValue fieldValue : realFieldValues){
-                fieldValues.add(new FieldValue(fieldValue.getName(), UUID.randomUUID(),
-                        getMachine(), fieldValue.getValue()));
-            }
-            allFields.add(new Field(field.getName(), UUID.randomUUID(), getMachine(),
-                    field.getNumBits(), field.getRelativity(),
-                    fieldValues, field.getDefaultValue(),
-                    field.getSigned(), field.getType()
-            ));
-        }
+        // FIXME KB
+//        for (Field field : editMachineInstructionController.getFields()){
+//            List<FieldValue> realFieldValues = field.getValues();
+//            ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
+//            for (FieldValue fieldValue : realFieldValues){
+//                fieldValues.add(new FieldValue(fieldValue.getName(), UUID.randomUUID(),
+//                        getMachine(), fieldValue.getValue()));
+//            }
+//            allFields.add(new Field(field.getName(), UUID.randomUUID(), getMachine(),
+//                    field.getNumBits(), field.getRelativity(),
+//                    fieldValues, field.getDefaultValue(),
+//                    field.getSigned(), field.getType()
+//            ));
+//        }
 
         // clone the machine instructions using the cloned fields
         for (MachineInstruction instr : editMachineInstructionController.getInstructions()){
@@ -397,7 +398,7 @@ public class EditFieldsController implements Initializable, MachineBound {
             }
         }
         
-        editMachineInstructionController.setFields(allFields);
+        //editMachineInstructionController.setFields(allFields);
         // FIXME KB
 //        editMachineInstructionController.setInstructions(instructions);
         stage.close();

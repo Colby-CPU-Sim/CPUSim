@@ -185,5 +185,13 @@
     -fx-text-fill: black;
 }
 
+.table-control-buttons .button {
+    -fx-icon-size: 10px;
+    -fx-font-size: 12px;
+}
+
+.button .icon-only {
+    -fx-pref-width: 18px;
+}
 
 

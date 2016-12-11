@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<fx:root type="VBox" fx:id="fieldsFormatVBox" alignment="CENTER" maxHeight="1.7976931348623157E308" spacing="5.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <padding>
+        <Insets bottom="3.0" left="3.0" right="5.0" top="3.0" />
+    </padding>
+    <children>
+        <Label text="All Fields" />
+        <ListView fx:id="fieldListView" maxHeight="1.7976931348623157E308" minWidth="150.0" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+        <Button fx:id="editFieldsButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleEditFields" text="Edit Fields..." />
+    </children>
+</fx:root>

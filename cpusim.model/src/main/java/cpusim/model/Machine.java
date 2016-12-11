@@ -477,7 +477,7 @@ public class Machine extends Module<Machine> {
         return fields;
     }
 
-    private ListProperty<Field> fieldsProperty() {
+    public ListProperty<Field> fieldsProperty() {
         return fields;
     }
     

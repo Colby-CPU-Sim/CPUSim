@@ -5,6 +5,8 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -14,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the Branch command in the EditMicroDialog.
@@ -83,11 +86,13 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     }
     
     @Override
-    public SetCondBit createInstance() {
-        final Machine machine = this.machine.get();
-        ConditionBit cBit = (machine.getModules(ConditionBit.class).isEmpty() ? null :
-                machine.getModules(ConditionBit.class).get(0));
-        return new SetCondBit("???", UUID.randomUUID(), machine, cBit, false);
+    public Supplier<SetCondBit> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            ConditionBit cBit = (machine.getModules(ConditionBit.class).isEmpty() ? null :
+                    machine.getModules(ConditionBit.class).get(0));
+            return new SetCondBit("???", UUID.randomUUID(), machine, cBit, false);
+        };
     }
 
     @Override
@@ -100,9 +105,9 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     }
 
     @Override
-    public boolean isNewButtonEnabled()
+    public BooleanBinding newButtonEnabledBinding()
     {
-        return !machine.get().getModules(ConditionBit.class).isEmpty();
+        return Bindings.isNotEmpty(machine.get().getModules(ConditionBit.class));
     }
 
     @Override

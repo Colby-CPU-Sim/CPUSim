@@ -2,12 +2,14 @@ package cpusim.gui.editmicroinstruction;
 
 import com.google.common.collect.ImmutableMap;
 import cpusim.Mediator;
+import cpusim.gui.editmodules.EditModulesController;
 import cpusim.gui.util.ControlButtonController;
 import cpusim.gui.util.DialogButtonController;
 import cpusim.model.util.MachineBound;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
+import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -113,11 +115,6 @@ public class EditMicroinstructionsController extends BorderPane
                 // This means the source is LEAVING
                 source.getTableController().checkValidity();
             }
-
-            final MicroinstructionTab<?> target = (MicroinstructionTab<?>) event.getTarget();
-            if (target != null && target.isSelected()) {
-                target.onTabSelected();
-            }
         };
 
 
@@ -221,6 +218,12 @@ public class EditMicroinstructionsController extends BorderPane
                 transferAtoRTableController,
                 transferRtoATableController,
                 transferRtoRTableController);
+
+        dialogButtonController.currentHelpableProperty()
+                .bind(Bindings.createObjectBinding(() -> {
+                    MicroinstructionTab<?> tab = (MicroinstructionTab<?>)contentPane.getSelectionModel().getSelectedItem();
+                    return tab.getTableController();
+                }, contentPane.getSelectionModel().selectedItemProperty()));
     }
 
     /**
@@ -323,17 +326,6 @@ public class EditMicroinstructionsController extends BorderPane
          */
         MicroinstructionTableController<T> getTableController() {
             return tableCtrlr;
-        }
-
-        /**
-         * Called when selecting a new tab
-         */
-        void onTabSelected() {
-            tableCtrlr.onTabSelected();
-            buttonCtrlr.updateControlButtonStatus();
-
-            // Tell the DialogButtonController that we have a helpable now.
-            dialogButtonController.setCurrentHelpable(tableCtrlr);
         }
     }
 }

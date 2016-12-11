@@ -4,6 +4,7 @@ import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -13,6 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link TransferRtoR} command in the {@link EditMicroinstructionsController}.
@@ -99,15 +101,17 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    public TransferRtoR createInstance() {
-        final Register r = (machine.get().getRegisters().size() == 0 ? null :
-                machine.get().getRegisters().get(0));
-        return new TransferRtoR("???", UUID.randomUUID(), machine.get(),
-                r, 0, r, 0, 0);
+    public Supplier<TransferRtoR> supplierBinding() {
+        return () -> {
+            final Register r = (machine.get().getRegisters().size() == 0 ? null :
+                    machine.get().getRegisters().get(0));
+            return new TransferRtoR("???", UUID.randomUUID(), machine.get(),
+                    r, 0, r, 0, 0);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 
@@ -119,12 +123,6 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
         for (TransferRtoR micro: getItems()) {
             Register.validateIsNotReadOnly(micro.getDest(), micro.getName());
         }
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TransferRtoR";
     }
 
     @Override

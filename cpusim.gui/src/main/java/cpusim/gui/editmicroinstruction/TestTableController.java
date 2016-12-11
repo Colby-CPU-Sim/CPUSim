@@ -7,6 +7,7 @@ import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
+import javafx.beans.binding.BooleanBinding;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -16,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * The controller for editing the {@link Test} command in the {@link EditMicroinstructionsController}.
@@ -114,17 +116,19 @@ class TestTableController extends MicroinstructionTableController<Test> {
     }
 
     @Override
-    public Test createInstance() {
-        final Machine machine = this.machine.get();
-        final Register r = (machine.getRegisters().size() == 0 ? null :
-                machine.getRegisters().get(0));
-        return new Test("???", UUID.randomUUID(), machine, r,
-                0, 1, Test.Operation.EQ,
-                0, 0);
+    public Supplier<Test> supplierBinding() {
+        return () -> {
+            final Machine machine = this.machine.get();
+            final Register r = (machine.getRegisters().size() == 0 ? null :
+                    machine.getRegisters().get(0));
+            return new Test("???", UUID.randomUUID(), machine, r,
+                    0, 1, Test.Operation.EQ,
+                    0, 0);
+        };
     }
 
     @Override
-    public boolean isNewButtonEnabled() {
+    public BooleanBinding newButtonEnabledBinding() {
         return areRegistersAvailable();
     }
 

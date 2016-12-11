@@ -25,22 +25,16 @@ class MicroinstructionControlButtonController<T extends Microinstruction<T>>
     /**
      * Default constructor for JavaFX SceneBuilder.
      */
-    MicroinstructionControlButtonController() {
+    public MicroinstructionControlButtonController() {
         this(null);
     }
 
-    MicroinstructionControlButtonController(MicroinstructionTableController<T> microinsController) {
-        super(false, microinsController);
+    public MicroinstructionControlButtonController(MicroinstructionTableController<T> microinsController) {
+        super(false);
         this.microinsController = microinsController;
     
         loadFXML();
-    }
-
-    @Override
-    protected void initialize() {
-        super.initialize();
-
-        microinsController.getSelectionModel().selectedItemProperty().addListener(getButtonChangeListener());
+        setInteractionHandler(microinsController);
     }
 
     @Override
@@ -72,13 +66,5 @@ class MicroinstructionControlButtonController<T extends Microinstruction<T>>
         }
 
         return shouldDelete;
-    }
-
-    public Optional<MicroinstructionTableController<T>> getMicroinsController() {
-        return Optional.ofNullable(microinsController);
-    }
-
-    public void setMicroinsController(MicroinstructionTableController<T> microinsController) {
-        this.microinsController = microinsController;
     }
 }
