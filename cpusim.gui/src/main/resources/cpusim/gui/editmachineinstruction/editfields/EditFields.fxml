@@ -1,71 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import cpusim.gui.editmachineinstruction.FieldListControl?>
+<?import cpusim.gui.util.DefaultControlButtonController?>
+<?import cpusim.gui.util.DialogButtonController?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:id="mainPane" styleClass="root" xmlns="http://javafx.com/javafx/8"
-            xmlns:fx="http://javafx.com/fxml" minWidth="310">
-    <center>
-        <StackPane>
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-            </padding>
-        <TableView fx:id="table" editable="true">
-            <columns>
-                <TableColumn fx:id="name" minWidth="50.0" text="Name"/>
-                <TableColumn fx:id="type" minWidth="50.0" text="Type"/>
-                <TableColumn fx:id="numBits" minWidth="50.0" text="NumBits"/>
-                <TableColumn fx:id="defaultValue" minWidth="50.0" text="DefaultVal"/>
-                <TableColumn fx:id="relativity" minWidth="50.0" text="Relativity"/>
-                <TableColumn fx:id="signed" minWidth="50.0" text="Signed"/>
-            </columns>
-        </TableView>
-        </StackPane>
-    </center>
+<fx:root prefHeight="533.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+
+    <left>
+        <VBox>
+            <FieldListControl fx:id="fieldsList" allowDrag="false" allowEditing="true" prefHeight="473.0" prefWidth="59.0" VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
     <bottom>
         <VBox id="VBox" alignment="CENTER" spacing="5.0">
-            <children>
-                <HBox id="HBox" alignment="CENTER" spacing="15.0">
-                    <children>
-                        <Button id="new" graphicTextGap="15.0" mnemonicParsing="false"
-                                onAction="#handleNew" text="    New    "/>
-                        <Button fx:id="deleteButton" graphicTextGap="15.0"
-                                mnemonicParsing="false" onAction="#handleDelete"
-                                text="   Delete   "/>
-                        <Button fx:id="duplicateButton" graphicTextGap="15.0"
-                                mnemonicParsing="false" onAction="#handleDuplicate"
-                                text="  Duplicate  "/>
-                        <Button fx:id="valuesButton" graphicTextGap="15.0"
-                                mnemonicParsing="false" onAction="#handleValues"
-                                text="   Values...   "/>
-                    </children>
-                </HBox>
-                <Separator/>
-                <HBox id="HBox" alignment="CENTER" spacing="15.0">
-                    <children>
-                        <Button defaultButton="true" minHeight="30"
-                                mnemonicParsing="false" onAction="#handleOkay"
-                                styleClass="roundBlueButton"
-                                text="          OK          "/>
-                        <Button cancelButton="true" minHeight="30" mnemonicParsing="false"
-                                onAction="#handleCancel" styleClass="roundButton"
-                                text="       Cancel       "/>
-                    </children>
-                </HBox>
-            </children>
             <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
+
+            <DialogButtonController fx:id="dialogButtons" />
         </VBox>
     </bottom>
     <stylesheets>
-        <URL value="@../../css/Dialogs.css"/>
+        <URL value="@../../css/Dialogs.css" />
     </stylesheets>
-</BorderPane>
+   <center>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <TitledPane animated="false" text="Properties" VBox.vgrow="SOMETIMES">
+               <content>
+                  <GridPane hgap="5.0" prefHeight="200.0" prefWidth="0.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="NEVER" minWidth="40.0" prefWidth="50.0" />
+                      <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="40.0" prefWidth="60.0" />
+                        <ColumnConstraints hgrow="NEVER" minWidth="40.0" prefWidth="50.0" />
+                        <ColumnConstraints hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="40.0" prefWidth="60.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Name" />
+                        <TextField fx:id="nameText" GridPane.columnIndex="1" GridPane.columnSpan="3" />
+                        <Label text="Type" GridPane.rowIndex="1" />
+                        <ChoiceBox fx:id="typeChoice" maxWidth="1.7976931348623157E308" minWidth="100.0" prefHeight="25.0" prefWidth="160.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+
+                         <Label text="Bits" GridPane.rowIndex="2" />
+                        <Spinner fx:id="bitsSpinner" editable="true" initialValue="1" max="63" min="1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="Default" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                        <Spinner fx:id="defaultValueSpinner" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                        <Label text="Relativity" GridPane.rowIndex="3" />
+                        <CheckBox fx:id="unsignedCheckbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="174.0" text="Unsigned" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                        <ChoiceBox fx:id="relativityChoice" prefHeight="25.0" prefWidth="174.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                     </children>
+                     <padding>
+                        <Insets left="5.0" right="5.0" />
+                     </padding>
+                  </GridPane>
+               </content>
+            </TitledPane>
+            <TitledPane collapsible="false" prefHeight="244.0" prefWidth="264.0" text="Values" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox prefHeight="266.0" prefWidth="262.0" spacing="5.0">
+                      <padding>
+                          <Insets bottom="3.0" left="3.0" right="5.0" top="3.0" />
+                      </padding>
+                     <children>
+                        <TableView fx:id="valuesTable" editable="true">
+                            <columns>
+                                <TableColumn fx:id="nameColumn" minWidth="30.0" text="Name" />
+                                <TableColumn fx:id="valueColumn" minWidth="30.0" text="Value" />
+                            </columns>
+                        </TableView>
+                          <DefaultControlButtonController fx:id="valueControls" prefIconOnly="false" spacing="8.0" />
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+         </children>
+      </VBox>
+   </center>
+</fx:root>

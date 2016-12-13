@@ -57,7 +57,7 @@ class BranchTableController extends MicroinstructionTableController<Branch> {
     }
 
     @Override
-    public Supplier<Branch> supplierBinding() {
+    public Supplier<Branch> getSupplier() {
         return () -> new Branch("???", UUID.randomUUID(), machine.get(), 0);
     }
 

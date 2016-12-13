@@ -5,12 +5,13 @@ import cpusim.gui.util.table.EnumCellFactory;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Logical;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -62,7 +63,7 @@ class LogicalTableController extends ALUOpTableController<Logical> {
     }
 
     @Override
-    public Supplier<Logical> supplierBinding() {
+    public Supplier<Logical> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             Register r = (machine.getRegisters().size() == 0 ? null :
@@ -72,8 +73,8 @@ class LogicalTableController extends ALUOpTableController<Logical> {
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
     
     @Override

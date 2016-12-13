@@ -4,7 +4,7 @@ import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -13,6 +13,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -101,7 +102,7 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    public Supplier<TransferRtoR> supplierBinding() {
+    public Supplier<TransferRtoR> getSupplier() {
         return () -> {
             final Register r = (machine.get().getRegisters().size() == 0 ? null :
                     machine.get().getRegisters().get(0));
@@ -111,8 +112,8 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
 
     @Override

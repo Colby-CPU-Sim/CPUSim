@@ -13,10 +13,7 @@ import cpusim.model.util.Copyable;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.Validatable;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -28,6 +25,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -147,9 +145,10 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
     /**
      * Checks if the underling {@link Machine} has registers present. This is a convenience method.
      * @return {@code true} if there is at least one {@link Register} available.
+     * @param toBind
      */
-    protected BooleanBinding areRegistersAvailable() {
-        return Bindings.createBooleanBinding(() -> getMachine().getAllRegisters().isEmpty(), machine);
+    protected void bindAreRegistersNotAvailable(BooleanProperty toBind) {
+        toBind.bind(Bindings.isEmpty(getMachine().getAllRegisters()));
     }
 
     /**
@@ -160,40 +159,35 @@ abstract class MicroinstructionTableController<T extends Microinstruction<T>>
         return new MicroinstructionControlButtonController<>(this);
     }
 
-    protected BooleanBinding getSelectedItemNotNullBinding() {
-        return ControlButtonController.selectedItemIsNotNullBinding(selectionModelProperty());
+    private void bindSelectedItemIsNull(@Nonnull BooleanProperty toBind) {
+        ControlButtonController.bindSelectedItemIsNull(toBind, selectionModelProperty());
     }
 
     @Override
-    public abstract Supplier<T> supplierBinding();
+    public abstract Supplier<T> getSupplier();
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return Bindings.createBooleanBinding(() -> true);
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        toBind.bind(new ReadOnlyBooleanWrapper(false));
     }
 
     @Override
-    public BooleanBinding deleteButtonEnabledBinding() {
-        return getSelectedItemNotNullBinding();
+    public void bindDeleteButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNull(toBind);
     }
 
     @Override
-    public BooleanBinding duplicateButtonEnabledBinding() {
-        return getSelectedItemNotNullBinding();
+    public void bindDuplicateButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNull(toBind);
     }
 
     @Override
-    public BooleanBinding propertiesButtonEnabledBinding() {
-        return Bindings.createBooleanBinding(() -> false);
+    public void bindItems(@Nonnull Property<ObservableList<T>> toBind) {
+        toBind.bind(itemsProperty());
     }
 
     @Override
-    public ObjectBinding<ObservableList<T>> itemsBinding() {
-        return Bindings.createObjectBinding(() -> itemsProperty().get(), itemsProperty());
-    }
-
-    @Override
-    public ObjectBinding<SelectionModel<T>> selectionModelBinding() {
-        return Bindings.createObjectBinding(() -> selectionModelProperty().get(), selectionModelProperty());
+    public void selectionModelBinding(@Nonnull ObjectProperty<SelectionModel<T>> toBind) {
+        toBind.bind(selectionModelProperty());
     }
 }

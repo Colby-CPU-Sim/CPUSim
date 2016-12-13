@@ -6,7 +6,7 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetBits;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,6 +15,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -98,7 +99,7 @@ class SetTableController extends MicroinstructionTableController<SetBits> {
     }
     
     @Override
-    public Supplier<SetBits> supplierBinding() {
+    public Supplier<SetBits> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
@@ -107,8 +108,8 @@ class SetTableController extends MicroinstructionTableController<SetBits> {
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
     
     @Override

@@ -1,115 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import cpusim.gui.editmachineinstruction.FieldLayoutPane?>
 <?import cpusim.gui.editmachineinstruction.FieldListControl?>
-<?import cpusim.gui.editmachineinstruction.MachineInstructionButtonController?>
+<?import cpusim.gui.util.DefaultControlButtonController?>
 <?import cpusim.gui.editmachineinstruction.MachineInstructionImplTableController?>
 <?import cpusim.gui.util.DialogButtonController?>
 <?import cpusim.gui.util.MicroinstructionTreeView?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <BorderPane fx:id="mainPane" maxHeight="-Infinity" maxWidth="-Infinity" styleClass="root" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <left>
+        <VBox id="VBox" alignment="CENTER" spacing="5" HBox.hgrow="NEVER">
+            <padding>
+                <Insets bottom="3" left="3" right="3" top="3" />
+            </padding>
+            <children>
+                <Label text="Instructions" HBox.hgrow="NEVER" />
+                <ListView fx:id="instructionList" editable="true" VBox.vgrow="ALWAYS" />
+                <DefaultControlButtonController fx:id="instButtonController" VBox.vgrow="NEVER" />
+            </children>
+        </VBox>
+    </left>
     <center>
-        <HBox>
+        <VBox HBox.hgrow="ALWAYS">
            <children>
-               <VBox id="VBox" alignment="CENTER" spacing="5" HBox.hgrow="NEVER">
-                   <padding>
-                       <Insets bottom="3" left="3" right="3" top="3" />
-                   </padding>
-                  <children>
-                      <Label text="Instructions" HBox.hgrow="NEVER"/>
-                      <ListView fx:id="instructionList" editable="true" VBox.vgrow="ALWAYS" />
-                      <MachineInstructionButtonController fx:id="instButtonController" VBox.vgrow="NEVER" />
-                  </children>
-               </VBox>
-            <VBox HBox.hgrow="ALWAYS">
-               <children>
-                  <HBox spacing="8.0" VBox.vgrow="NEVER">
-                     <children>
-                         <Label text="Current:">
-                             <font>
-                                 <Font name="System Bold" size="18.0" />
-                             </font>
-                         </Label>
-                        <Label fx:id="currentInstructionTitle" maxWidth="1.7976931348623157E308" text="Unspecified">
-                           <font>
-                              <Font name="System Bold" size="18.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                     <TabPane fx:id="implTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                        <tabs>
-                            <Tab text="Format">
-                               <content>
-                                   <BorderPane fx:id="formatTabPane">
-                                       <padding>
-                                           <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" fx:id="x2" />
-                                       </padding>
-                                       <center>
-                                           <VBox id="VBox" alignment="CENTER" spacing="5.0">
-                                              <children>
-                                                  <VBox id="HBox" alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
-                                                      <padding>
-                                                          <Insets left="15.0" fx:id="x1" />
-                                                      </padding>
-                                                     <children>
-                                                         <Label contentDisplay="CENTER" text="Instruction" />
-                                                         <HBox id="HBox" alignment="CENTER_LEFT" padding="$x1" spacing="5.0">
-                                                            <children>
-                                                                <Label text="Length:" />
-                                                                <Label fx:id="lengthLabel" text="Length" />
-                                                                <Label text="          Opcode" />
-                                                                <TextField fx:id="opcodeTextField" prefColumnCount="5" style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;" text="" />
-                                                            </children>
-                                                         </HBox>
-                                                     </children>
-                                                  </VBox>
-                                          <HBox fx:id="instructionFormatPane" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                                  <Separator />
-                                                  <VBox fx:id="noFieldsLabel">
-                                                     <children>
-                                                         <Label text="To add fields, drag them in from the list of fields on the right." wrapText="true" />
-                                                         <Label text="To delete fields, drag them out away from the other fields." wrapText="true" />
-                                                     </children>
-                                                  </VBox>
-                                                  <Separator />
-                                                  <HBox id="HBox" fx:id="assemblyFieldPane" alignment="CENTER_LEFT" padding="$x1" spacing="5.0" VBox.vgrow="ALWAYS">
-                                                     <children>
-                                                         <Label text="Assembly" />
-                                                     </children>
-                                                  </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                                              </children>
-                                           </VBox>
-                                       </center>
-                                       <right>
-                                            <FieldListControl fx:id="fieldList"/>
-                                       </right>
-                                   </BorderPane>
-                               </content>
-                            </Tab>
-                            <Tab text="Implementation">
-                               <content>
-                                   <HBox fx:id="implHBox" maxWidth="1.7976931348623157E308" spacing="10.0">
-                                 <padding>
-                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                 </padding>
-      
-                                       <MachineInstructionImplTableController fx:id="instImplTableController" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" text="Execute sequence" HBox.hgrow="SOMETIMES" />
-                                       <MicroinstructionTreeView fx:id="microinstTreeView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="260.0" HBox.hgrow="ALWAYS" />
-                                   </HBox>
-                               </content>
-            
-                            </Tab>
-                        </tabs>
-                     </TabPane>
-               </children>
-            </VBox>
+              <HBox spacing="8.0" VBox.vgrow="NEVER">
+                 <children>
+                     <Label text="Current:">
+                         <font>
+                             <Font name="System Bold" size="18.0" />
+                         </font>
+                     </Label>
+                    <Label fx:id="currentInstructionTitle" maxWidth="1.7976931348623157E308" text="Unspecified">
+                       <font>
+                          <Font name="System Bold" size="18.0" />
+                       </font>
+                    </Label>
+                 </children>
+              </HBox>
+                 <TabPane fx:id="implTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                    <tabs>
+                        <Tab text="Format">
+                           <content>
+                               <BorderPane fx:id="formatTabPane">
+                                   <padding>
+                                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" fx:id="x2" />
+                                   </padding>
+                                   <center>
+                                       <VBox id="VBox" alignment="CENTER" spacing="5.0">
+                                          <children>
+                                               <Label contentDisplay="CENTER" text="Instruction" />
+                                              <VBox id="HBox" alignment="CENTER_LEFT" VBox.vgrow="SOMETIMES">
+                                                  <padding>
+                                                      <Insets left="15.0" fx:id="x1" />
+                                                  </padding>
+                                                 <children>
+                                                     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0">
+                                                        <children>
+                                                            <Label text="Length:" HBox.hgrow="NEVER" />
+                                                            <Label fx:id="lengthLabel" text="Length" HBox.hgrow="SOMETIMES" />
+                                                            <Label text="Opcode" />
+                                                            <TextField fx:id="opcodeTextField" prefColumnCount="5" style="-fx-border-width:1; -fx-border-color:black; -fx-border-style:solid;" text="" HBox.hgrow="SOMETIMES" />
+                                                        </children>
+                                                     </HBox>
+                                                 </children>
+                                              </VBox>
+                                              <FieldLayoutPane fx:id="instructionLayout" fieldType="Instruction" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                              <Separator />
+                                              <VBox fx:id="noFieldsLabel">
+                                                 <children>
+                                                     <Label text="To add fields, drag them in from the list of fields on the right." wrapText="true" />
+                                                     <Label text="To delete fields, drag them out away from the other fields." wrapText="true" />
+                                                 </children>
+                                              </VBox>
+                                              <Separator />
+                                              <Label text="Assembly" VBox.vgrow="NEVER" />
+                                              <FieldLayoutPane fx:id="assemblyLayout" fieldType="Assembly" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                          </children>
+                                       </VBox>
+                                   </center>
+                                   <right>
+                                        <FieldListControl fx:id="fieldList" allowEditing="false" allowDrag="true"
+                                                          VBox.vgrow="ALWAYS" onShowEditAction="#handleEditFields"/>
+                                   </right>
+                               </BorderPane>
+                           </content>
+                        </Tab>
+                        <Tab text="Implementation">
+
+                            <HBox fx:id="implHBox" maxWidth="1.7976931348623157E308" spacing="10.0">
+                                <padding>
+                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                </padding>
+                                <MachineInstructionImplTableController fx:id="instImplTableController"
+                                                                       maxHeight="1.7976931348623157E308"
+                                                                       maxWidth="1.7976931348623157E308"
+                                                                       prefHeight="300.0" text="Execute sequence"
+                                                                       HBox.hgrow="SOMETIMES"/>
+                                <MicroinstructionTreeView fx:id="microinstTreeView"
+                                                          maxHeight="1.7976931348623157E308"
+                                                          maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                                                          minWidth="-Infinity" prefHeight="300.0" prefWidth="260.0"
+                                                          HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                        </Tab>
+                    </tabs>
+                 </TabPane>
            </children>
-        </HBox>
+        </VBox>
     </center>
     <bottom>
         <DialogButtonController fx:id="dialogButtonController" />

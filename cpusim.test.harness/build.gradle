@@ -1,0 +1,21 @@
+
+apply plugin: 'java'
+
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+dependencies {
+    compile project(':cpusim.model')
+
+    compile 'junit:junit:4.12'
+
+    compile "org.testfx:testfx-core:4.0.+"
+    compile "org.testfx:testfx-junit:4.0.+"
+}

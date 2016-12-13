@@ -1,22 +1,17 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.model.Field;
-import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.util.MachineBound;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import cpusim.model.util.Colors;
+import javafx.beans.NamedArg;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import org.fxmisc.easybind.EasyBind;
 
 import java.util.List;
@@ -31,7 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2016-12-06
  */
-public class FieldLayoutControl extends HBox {
+public class FieldLayoutPane extends HBox {
 
     public enum FieldType {
         Assembly,
@@ -44,10 +39,14 @@ public class FieldLayoutControl extends HBox {
 
     private final ObjectProperty<MachineInstruction> currentInstruction;
 
-    public FieldLayoutControl() {
+    private final MapProperty<Field, Color> fieldColorMap;
+
+    public FieldLayoutPane(@NamedArg("fieldType") FieldType fieldType) {
         this.currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", null);
         this.fields = new SimpleListProperty<>(this, "fields", FXCollections.observableArrayList());
-        this.fieldType = new SimpleObjectProperty<>(this, "fieldType", FieldType.Assembly);
+        this.fieldType = new SimpleObjectProperty<>(this, "fieldType", fieldType);
+
+        this.fieldColorMap = new SimpleMapProperty<>(this, "fieldColorMap", FXCollections.observableHashMap());
 
         ObservableList<Node> children = getChildren();
 
@@ -126,6 +125,8 @@ public class FieldLayoutControl extends HBox {
 
         FieldLabel(Field field) {
             this.field = checkNotNull(field);
+
+            this.setTextFill(fieldColorMap.computeIfAbsent(field, f2 -> Colors.generateRandomLightColor()));
         }
 
         public Field getField() {

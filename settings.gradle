@@ -3,3 +3,5 @@ rootProject.name = "cpusim"
 include 'cpusim.gui'
 //include 'cpusim.annotations'
 include 'cpusim.model'
+include 'cpusim.test.harness'
+

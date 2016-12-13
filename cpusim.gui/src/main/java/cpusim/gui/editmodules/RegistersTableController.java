@@ -171,7 +171,7 @@ public class RegistersTableController extends ModuleTableController<Register> {
     }
 
     @Override
-    public Supplier<Register> supplierBinding() {
+    public Supplier<Register> getSupplier() {
         return () -> new Register("???",
                         UUID.randomUUID(),
                         getMachine(),

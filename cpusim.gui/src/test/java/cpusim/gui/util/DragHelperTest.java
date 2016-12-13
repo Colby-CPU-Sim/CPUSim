@@ -1,6 +1,7 @@
 package cpusim.gui.util;
 
 import com.google.common.collect.Lists;
+import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Branch;
 import javafx.beans.property.ObjectProperty;
@@ -10,8 +11,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.input.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,17 +33,18 @@ public class DragHelperTest extends ApplicationTest {
     private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(new Machine("test"));
     private Branch branchMicro;
     private DragHelper.HandleDragBehaviour handler;
+    private Field field;
 
-    private final UUID branchUUID = UUID.randomUUID();
+    private final UUID testUUID = UUID.randomUUID();
     private final int dragIndex = 2;
     private final List<File> files = Lists.newArrayList(Paths.get(".").toAbsolutePath().toFile());
 
 
     @Override
     public void start(Stage stage) throws Exception {
-        StackPane pane = new StackPane();
+        BorderPane pane = new BorderPane();
 
-        HBox layout = new HBox();
+        VBox layout = new VBox();
         ObservableList<Node> children = layout.getChildren();
 
         Label microLabel = new Label("micro!");
@@ -73,6 +75,20 @@ public class DragHelperTest extends ApplicationTest {
         });
         children.add(indexLabel);
 
+        Label fieldLabel = new Label("field!");
+        fieldLabel.setId("startField");
+
+        fieldLabel.setOnDragDetected(ev -> {
+            Dragboard db = fieldLabel.startDragAndDrop(TransferMode.ANY);
+
+            DragHelper helper = new DragHelper(machineProperty, db);
+            helper.setFieldContent(field);
+
+            ev.setDragDetect(true);
+            ev.consume();
+        });
+        children.add(fieldLabel);
+
         Label otherLabel = new Label("other?");
         otherLabel.setId("other");
 
@@ -88,6 +104,12 @@ public class DragHelperTest extends ApplicationTest {
         });
         children.add(otherLabel);
 
+        pane.setLeft(layout);
+
+        // Drop this side
+
+        VBox right = new VBox();
+
         Label dropLabel = new Label("Drop here.");
         dropLabel.setOnDragOver(ev -> {
             ev.acceptTransferModes(TransferMode.ANY);
@@ -101,11 +123,11 @@ public class DragHelperTest extends ApplicationTest {
             ev.consume();
         });
         dropLabel.setId("end");
-        children.add(dropLabel);
+        right.getChildren().add(dropLabel);
 
-        pane.getChildren().add(layout);
+        pane.setRight(right);
 
-        Scene scene = new Scene(pane, 200, 50);
+        Scene scene = new Scene(pane);
         stage.setScene(scene);
         stage.show();
     }
@@ -113,14 +135,19 @@ public class DragHelperTest extends ApplicationTest {
     @Before
     public void setupMock() {
         branchMicro = mock(Branch.class);
-        when(branchMicro.getID()).thenReturn(branchUUID);
+        when(branchMicro.getID()).thenReturn(testUUID);
         machineProperty.getValue().getMicros(Branch.class).add(branchMicro);
+
+        field = mock(Field.class);
+        when(field.getID()).thenReturn(testUUID);
+
+        machineProperty.getValue().getFields().add(field);
 
         handler = mock(DragHelper.HandleDragBehaviour.class);
     }
 
     @Test
-    public void insertIntoDragboardMicro() throws Exception {
+    public void insertMicro() throws Exception {
         drag("#startMicro", MouseButton.PRIMARY).dropTo("#end");
 
         verify(branchMicro, atLeast(1)).getID();
@@ -129,10 +156,19 @@ public class DragHelperTest extends ApplicationTest {
     }
 
     @Test
-    public void insertIntoDragboardIndex() throws Exception {
+    public void insertIndex() throws Exception {
         drag("#startIndex", MouseButton.PRIMARY).dropTo("#end");
 
         verify(handler).onDragIndex(dragIndex);
+    }
+
+    @Test
+    public void insertField() throws Exception {
+        drag("#startField", MouseButton.PRIMARY).dropTo("#end");
+
+        verify(field, atLeast(1)).getID();
+
+        verify(handler).onDragField(field);
     }
 
     @Test

@@ -5,11 +5,7 @@ import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.module.Module;
 import cpusim.model.util.Validatable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ObjectBinding;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 import org.fxmisc.easybind.EasyBind;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.function.Supplier;
 
@@ -83,14 +80,7 @@ public abstract class ModuleTableController<T extends Module<T>>
                 newValue.getModules(moduleClass).stream().map(Module::cloneOf).forEach(items::add);
             }
         });
-
-        initializeTable();
     }
-
-    /**
-     * Called after the {@link FXMLLoader#load()} is called.
-     */
-    protected void initializeTable() {}
 
     /**
      * Loads the FXML controller, running {@link FXMLLoader} pipeline.
@@ -134,7 +124,7 @@ public abstract class ModuleTableController<T extends Module<T>>
     }
 
     @Override
-    public abstract Supplier<T> supplierBinding();
+    public abstract Supplier<T> getSupplier();
 
     @Override
     public String getHelpPageID()
@@ -146,37 +136,37 @@ public abstract class ModuleTableController<T extends Module<T>>
     
     // -- Implementations for ControlButtonController.InteractionHandler
 
-    protected final BooleanBinding selectedItemIsNotNullBinding() {
-        return ControlButtonController.selectedItemIsNotNullBinding(selectionModelProperty());
+    final void bindSelectedItemIsNullBinding(BooleanProperty toBind) {
+        ControlButtonController.bindSelectedItemIsNull(toBind, selectionModelProperty());
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return Bindings.createBooleanBinding(() -> true);
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        toBind.bind(new ReadOnlyBooleanWrapper(true));
     }
 
     @Override
-    public BooleanBinding deleteButtonEnabledBinding() {
-        return selectedItemIsNotNullBinding();
+    public void bindDeleteButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNullBinding(toBind);
     }
 
     @Override
-    public BooleanBinding duplicateButtonEnabledBinding() {
-        return selectedItemIsNotNullBinding();
+    public void bindDuplicateButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNullBinding(toBind);
     }
 
     @Override
-    public BooleanBinding propertiesButtonEnabledBinding() {
-        return selectedItemIsNotNullBinding();
+    public void bindPropertiesButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNullBinding(toBind);
     }
 
     @Override
-    public ObjectBinding<ObservableList<T>> itemsBinding() {
-        return Bindings.createObjectBinding(() -> itemsProperty().get(), itemsProperty());
+    public void bindItems(Property<ObservableList<T>> toBind) {
+        toBind.bind(itemsProperty());
     }
 
     @Override
-    public ObjectBinding<SelectionModel<T>> selectionModelBinding() {
-        return Bindings.createObjectBinding(() -> selectionModelProperty().get(), selectionModelProperty());
+    public void selectionModelBinding(ObjectProperty<SelectionModel<T>> toBind) {
+        toBind.bind(selectionModelProperty());
     }
 }

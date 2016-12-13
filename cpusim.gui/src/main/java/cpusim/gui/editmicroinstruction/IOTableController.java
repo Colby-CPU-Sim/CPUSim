@@ -6,7 +6,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.microinstruction.IODirection;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,6 +15,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -83,7 +84,7 @@ class IOTableController extends MicroinstructionTableController<IO> {
     }
 
     @Override
-    public Supplier<IO> supplierBinding() {
+    public Supplier<IO> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             Register r = (machine.getRegisters().size() == 0 ? null :
@@ -93,14 +94,8 @@ class IOTableController extends MicroinstructionTableController<IO> {
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
-    }
-
-    @Override
-    public String toString()
-    {
-        return "IO";
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
 
     @Override

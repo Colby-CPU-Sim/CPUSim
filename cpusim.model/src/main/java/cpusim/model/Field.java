@@ -144,7 +144,7 @@ public class Field
      * 
      * @param name - Name of Field.
      * @param id
-     * @param length - Numbits of field.
+     * @param numBits - Numbits of field.
      * @param relativity - Enum relativity type.
      * @param values - Map of name to {@link FieldValue}.
      * @param defaultValue - The default int value.
@@ -157,7 +157,7 @@ public class Field
     public Field(@JsonProperty("name") String name,
                  @JsonProperty("id") final UUID id,
                  final Machine machine,
-                 @JsonProperty("numBits") int length,
+                 @JsonProperty("numBits") int numBits,
                  @JsonProperty("relativity") Relativity relativity,
                  @JsonProperty("values") ObservableList<FieldValue> values,
                  @JsonProperty("defaultValue") long defaultValue,
@@ -167,7 +167,7 @@ public class Field
         this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
         this.machine = checkNotNull(machine);
         this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
-        this.numBits = new SimpleIntegerProperty(this, "numBits", length);
+        this.numBits = new SimpleIntegerProperty(this, "numBits", numBits);
         this.relativity = new SimpleObjectProperty<>(this, "relativity", checkNotNull(relativity));
         this.defaultValue = new SimpleLongProperty(this, "defaultValue", defaultValue);
         this.signed = new SimpleObjectProperty<>(this, "signed", checkNotNull(signed));
@@ -252,7 +252,7 @@ public class Field
     public boolean isSigned() {
         return signed.get() == SignedType.Signed;
     }
-    
+
     public SignedType getSigned() {
     	return signed.get();
     }
@@ -354,7 +354,29 @@ public class Field
     public String toString() {
         return name.get();
     }
-    
+
+    @Override
+    public int hashCode() {
+        return getID().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Field field = (Field) o;
+        if (getID().equals(field.getID())) return true;
+
+        if (getNumBits() != field.getNumBits()) return false;
+        if (getDefaultValue() != field.getDefaultValue()) return false;
+        if (!getName().equals(field.getName())) return false;
+        if (!getType().equals(field.getType())) return false;
+        if (!getRelativity().equals(field.getRelativity())) return false;
+        if (!getSigned().equals(field.getSigned())) return false;
+        return getValues().equals(field.getValues());
+    }
+
     @Override
     public String getXMLDescription(String indent) {
         String nl = System.getProperty("line.separator");

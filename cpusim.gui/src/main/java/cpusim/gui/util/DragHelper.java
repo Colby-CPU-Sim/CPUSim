@@ -119,9 +119,9 @@ public final class DragHelper implements ReadOnlyMachineBound {
         checkNotNull(handler);
 
         for (DataFormat format: dragboard.getContentTypes()) {
-            if (format == INDEX_FORMAT) {
+            if (format.equals(INDEX_FORMAT)) {
                 handler.onDragIndex((Integer)dragboard.getContent(format));
-            } else if (format == MICRO_FORMAT) {
+            } else if (format.equals(MICRO_FORMAT)) {
                 // We have MICRO_FORMAT content
                 List<String> tokens = Splitter.on(ENCODING_CHAR)
                         .omitEmptyStrings()
@@ -153,8 +153,8 @@ public final class DragHelper implements ReadOnlyMachineBound {
                     handler.onOther(format, dragboard.getContent(format));
                 }
 
-            } else if (format == FIELD_FORMAT) {
-                UUID fieldId = UUID.fromString(dragboard.getString());
+            } else if (format.equals(FIELD_FORMAT)) {
+                UUID fieldId = UUID.fromString((String)dragboard.getContent(FIELD_FORMAT));
 
                 Optional<Field> field = getMachine().getFields().stream()
                         .filter(f -> f.getID().equals(fieldId))
@@ -166,7 +166,7 @@ public final class DragHelper implements ReadOnlyMachineBound {
                     logger.error("Field dragged, but unknown UUID found {}", fieldId);
                     handler.onOther(format, dragboard.getContent(format));
                 }
-            } else if (format == MODULE_FORMAT) {
+            } else if (format.equals(MODULE_FORMAT)) {
                 // FIXME actually handle this :)
                 handler.onOther(format, dragboard.getContent(format));
             } else {
@@ -187,11 +187,12 @@ public final class DragHelper implements ReadOnlyMachineBound {
         }
 
         public void onDragMicro(Microinstruction<?> micro) {
+            checkNotNull(micro);
 
         }
 
         public void onDragField(Field field) {
-
+            checkNotNull(field);
         }
 
         public void onOther(DataFormat format, Object value) {

@@ -4,7 +4,7 @@ import cpusim.Mediator;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -13,6 +13,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -67,7 +68,7 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
     }
 
     @Override
-    public Supplier<Decode> supplierBinding() {
+    public Supplier<Decode> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             Register r = (machine.getRegisters().size() == 0 ? null :
@@ -77,8 +78,8 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
 
     @Override

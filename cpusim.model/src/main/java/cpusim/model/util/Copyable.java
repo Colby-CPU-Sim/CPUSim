@@ -36,10 +36,28 @@ public interface Copyable<T extends Copyable<T>> {
     @SuppressWarnings("unchecked")
     default T cloneOf() {
         try {
-            final Constructor<T> ctor = (Constructor<T>)this.getClass().getConstructor(getClass());
-            return ctor.newInstance(this);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | InstantiationException e) {
-            throw new IllegalStateException(e);
+            Class<T> clazz = (Class<T>)getClass();
+
+            try {
+                final Constructor<T> ctor = clazz.getDeclaredConstructor(clazz);
+                ctor.setAccessible(true);
+
+                return ctor.newInstance(this);
+            } catch (NoSuchMethodException nsme) {
+                // try the other option
+                final Constructor<T> ctor = clazz.getDeclaredConstructor();
+                ctor.setAccessible(true);
+
+                final T instance = ctor.newInstance(this);
+                this.copyTo(instance);
+
+                return instance;
+            }
+        } catch (NoSuchMethodException nsme) {
+            throw new IllegalStateException("Could not execute constructor, " +
+                    "likely no copy-constructor or default constructor specified", nsme);
+        } catch (InvocationTargetException | IllegalAccessException | InstantiationException e){
+            throw new IllegalStateException("Invalid access to constructor", e);
         }
     }
 

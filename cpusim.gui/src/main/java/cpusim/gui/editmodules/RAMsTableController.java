@@ -68,7 +68,7 @@ public class RAMsTableController extends ModuleTableController<RAM> {
      * @return the prototype of the subclass
      */
     @Override
-    public Supplier<RAM> supplierBinding() {
+    public Supplier<RAM> getSupplier() {
         return () -> new RAM("???", UUID.randomUUID(), getMachine(), 128, 8);
     }
 

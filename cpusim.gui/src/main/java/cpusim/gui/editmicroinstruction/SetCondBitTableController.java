@@ -6,7 +6,7 @@ import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -15,6 +15,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -86,7 +87,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     }
     
     @Override
-    public Supplier<SetCondBit> supplierBinding() {
+    public Supplier<SetCondBit> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             ConditionBit cBit = (machine.getModules(ConditionBit.class).isEmpty() ? null :
@@ -105,9 +106,8 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding()
-    {
-        return Bindings.isNotEmpty(machine.get().getModules(ConditionBit.class));
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        toBind.bind(Bindings.isNotEmpty(machine.get().getModules(ConditionBit.class)));
     }
 
     @Override

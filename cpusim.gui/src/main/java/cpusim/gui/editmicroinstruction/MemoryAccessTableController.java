@@ -8,7 +8,7 @@ import cpusim.model.microinstruction.MemoryAccess;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -17,6 +17,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -102,7 +103,7 @@ class MemoryAccessTableController
     }
 
     @Override
-    public Supplier<MemoryAccess> supplierBinding() {
+    public Supplier<MemoryAccess> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
 
@@ -113,8 +114,8 @@ class MemoryAccessTableController
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable().and(Bindings.isNotEmpty(machine.get().getModules(RAM.class)));
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        toBind.bind(Bindings.isEmpty(machine.get().getModules(RAM.class)));
     }
 
     @Override

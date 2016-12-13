@@ -6,7 +6,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -14,6 +14,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -83,7 +84,6 @@ class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
         carryBit.setCellValueFactory(new PropertyValueFactory<>("carryBit"));
         carryBit.setCellFactory(cellCondFactory);
         carryBit.setOnEditCommit(text -> text.getRowValue().setCarryBit(text.getNewValue()));
-
     }
 
     @Override
@@ -96,7 +96,7 @@ class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
      * @return the prototype of the subclass
      */
     @Override
-    public Supplier<Arithmetic> supplierBinding() {
+    public Supplier<Arithmetic> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             final Register r = (machine.getRegisters().isEmpty() ? null : machine.getRegisters().get(0));
@@ -107,8 +107,8 @@ class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
 
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return areRegistersAvailable();
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindAreRegistersNotAvailable(toBind);
     }
     
     @Override

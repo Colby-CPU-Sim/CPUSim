@@ -24,7 +24,7 @@ import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -34,6 +34,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -146,7 +147,7 @@ class TransferAtoRTableController
 
     
     @Override
-    public Supplier<TransferAtoR> supplierBinding() {
+    public Supplier<TransferAtoR> getSupplier() {
         return () -> {
             final Machine machine = this.machine.get();
             RegisterArray a = (machine.getModules(RegisterArray.class).isEmpty() ? null :
@@ -158,13 +159,12 @@ class TransferAtoRTableController
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
         // Need at least one RegisterArray AND Register
         ObservableList<RegisterArray> arrays = machine.get().getModules(RegisterArray.class);
         ObservableList<Register> registers = machine.get().getModules(Register.class);
 
-        return super.newButtonEnabledBinding().and(Bindings.isNotEmpty(arrays))
-                .and(Bindings.isNotEmpty(registers));
+        toBind.bind(Bindings.isEmpty(arrays).or(Bindings.isEmpty(registers)));
     }
 
     @Override
@@ -180,12 +180,6 @@ class TransferAtoRTableController
     @Override
     String getFxId() {
         return FX_ID;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "TransferAtoR";
     }
 
     @Override

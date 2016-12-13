@@ -10,7 +10,7 @@ import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,6 +26,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -160,8 +161,8 @@ public class RegisterArrayTableController extends ModuleTableController<Register
     }
     
     @Override
-    public BooleanBinding propertiesButtonEnabledBinding() {
-        return selectedItemIsNotNullBinding();
+    public void bindPropertiesButtonDisabled(@Nonnull BooleanProperty toBind) {
+        bindSelectedItemIsNullBinding(toBind);
     }
     
     /**
@@ -169,7 +170,7 @@ public class RegisterArrayTableController extends ModuleTableController<Register
      * @return the prototype of the subclass
      */
     @Override
-    public Supplier<RegisterArray> supplierBinding() {
+    public Supplier<RegisterArray> getSupplier() {
         return () -> new RegisterArray("???", UUID.randomUUID(), getMachine(),
                         4, 32, 0, Register.Access.readWrite());
     }

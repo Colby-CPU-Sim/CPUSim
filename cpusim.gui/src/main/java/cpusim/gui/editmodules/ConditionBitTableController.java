@@ -16,7 +16,7 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.MoreBindings;
-import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.collections.FXCollections;
@@ -30,6 +30,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -114,8 +115,8 @@ public class ConditionBitTableController extends ModuleTableController<Condition
     }
 
     @Override
-    public BooleanBinding newButtonEnabledBinding() {
-        return super.newButtonEnabledBinding().and(registerList.emptyProperty().not());
+    public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+        toBind.bind(registerList.emptyProperty());
     }
 
     /**
@@ -147,7 +148,7 @@ public class ConditionBitTableController extends ModuleTableController<Condition
      * getter for prototype of the right subclass
      * @return the prototype of the subclass
      */
-    public Supplier<ConditionBit> supplierBinding() {
+    public Supplier<ConditionBit> getSupplier() {
         return () -> {
             Register defaultRegister = null;
             if (!registerList.isEmpty()) {

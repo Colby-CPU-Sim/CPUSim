@@ -4,11 +4,15 @@ import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
 import javafx.beans.NamedArg;
-import javafx.beans.binding.*;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.binding.ListBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Labeled;
@@ -16,6 +20,7 @@ import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.HBox;
 import org.fxmisc.easybind.EasyBind;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -51,15 +56,17 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
     private final ObjectProperty<SelectionModel<T>> selectionModel;
     private final ObjectProperty<Supplier<T>> supplier;
 
-    private final BooleanProperty hasProperties;
+    private InteractionHandler<T> handler;
+
+    private final BooleanProperty isExtendedProperties;
 
     private final DoubleProperty minIconWidth;
 
     private final BooleanProperty prefIconOnly;
 
-    public ControlButtonController(@NamedArg("hasProperties") final boolean initHasProperties,
+    public ControlButtonController(@NamedArg("isExtendedProperties") final boolean initHasProperties,
                                    @NamedArg("prefIconOnly") boolean initPrefIcon) {
-        this.hasProperties = new SimpleBooleanProperty(this, "hasProperties", initHasProperties);
+        this.isExtendedProperties = new SimpleBooleanProperty(this, "isExtendedProperties", initHasProperties);
         this.prefIconOnly = new SimpleBooleanProperty(this, "prefIconOnly", initPrefIcon);
         this.items = new SimpleListProperty<>(this, "items", null);
         this.selectionModel = new SimpleObjectProperty<>(this, "selectionModel", null);
@@ -93,15 +100,16 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
     }
 
     public void setInteractionHandler(InteractionHandler<T> handler) {
-        checkNotNull(handler);
+        this.handler = checkNotNull(handler);
 
-        newButton.disableProperty().bind(handler.newButtonEnabledBinding().not());
-        duplicateButton.disableProperty().bind(handler.duplicateButtonEnabledBinding().not());
-        deleteButton.disableProperty().bind(handler.deleteButtonEnabledBinding().not());
-        propertiesButton.disableProperty().bind(handler.propertiesButtonEnabledBinding().not());
+        handler.bindNewButtonDisabled(newButton.disableProperty());
+        handler.bindDuplicateButtonDisabled(duplicateButton.disableProperty());
+        handler.bindDeleteButtonDisabled(deleteButton.disableProperty());
+        handler.bindPropertiesButtonDisabled(propertiesButton.disableProperty());
 
-        items.bind(handler.itemsBinding());
-        selectionModel.bind(handler.selectionModelBinding());
+        handler.bindItems(items);
+        handler.selectionModelBinding(selectionModel);
+        supplier.set(handler.getSupplier());
     }
 
     /**
@@ -121,19 +129,16 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
 
         allButtons.forEach(this::bindHidingContentDisplay);
 
-        EasyBind.subscribe(hasProperties, hasProperties -> {
-            if (!hasProperties) {
-                getChildren().remove(propertiesButton);
-            } else {
-                getChildren().set(3, propertiesButton);
-            }
-        });
+        EasyBind.subscribe(isExtendedProperties, hasProperties -> {
+            ObservableList<Node> children = this.getChildren();
 
-        EasyBind.subscribe(prefIconOnly, iconOnly -> {
-            if (iconOnly) {
-                allButtons.forEach(btn -> btn.getStyleClass().add("icon-only"));
-            } else {
-                allButtons.forEach(btn -> btn.getStyleClass().remove("icon-only"));
+            if (hasProperties ^ children.contains(propertiesButton)) {
+                // The children must be changed
+                if (!hasProperties) {
+                    children.remove(propertiesButton);
+                } else {
+                    children.add(3, propertiesButton);
+                }
             }
         });
     }
@@ -141,17 +146,25 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
     private void bindHidingContentDisplay(Labeled control) {
         final ContentDisplay initialDisplay = control.getContentDisplay();
         ObjectBinding<ContentDisplay> binding = Bindings.createObjectBinding(() -> {
-                if (getWidth() < minIconWidth.get()) {
+                if (prefIconOnly.get() || getWidth() < minIconWidth.get()) {
                     return ContentDisplay.GRAPHIC_ONLY;
                 } else {
                     return initialDisplay;
                 }
-            }, widthProperty(), minIconWidth, hasProperties);
+            }, widthProperty(), minIconWidth, isExtendedProperties, prefIconOnly);
         control.contentDisplayProperty().bind(binding);
     }
 
-    public BooleanProperty hasPropertiesProperty() {
-        return hasProperties;
+    public void setExtendedProperties(boolean isExtendedProperties) {
+        this.isExtendedProperties.set(isExtendedProperties);
+    }
+
+    public boolean isExtendedProperties() {
+        return isExtendedProperties.get();
+    }
+
+    public BooleanProperty isExtendedPropertiesProperty() {
+        return isExtendedProperties;
     }
 
     public BooleanProperty prefIconOnlyProperty() {
@@ -174,6 +187,8 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
         String uniqueName = NamedObject.createUniqueName(items, '?');
         final T newValue = supplier.getValue().get();
         newValue.setName(uniqueName);
+
+        handler.onNewValueCreated(newValue);
 
         items.add(newValue);
         selectionModel.get().select(newValue);
@@ -207,7 +222,7 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
         SelectionModel<T> selectionModel = this.selectionModel.get();
         final T selectedValue = selectionModel.getSelectedItem();
 
-        if (!checkDelete(selectedValue)) {
+        if (!checkDelete(selectedValue) && !handler.checkDelete(selectedValue)) {
             return;
         }
 
@@ -232,6 +247,9 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
         final T newObject = selectionModel.getSelectedItem().cloneOf();
         final int selectedIndex = selectionModel.getSelectedIndex();
         newObject.setName(newObject.getName() + "_copy");
+
+        handler.onNewValueCreated(newObject);
+
         items.add(selectedIndex + 1, newObject);
         selectionModel.select(selectedIndex + 1);
     }
@@ -243,7 +261,7 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
      */
     @FXML @SuppressWarnings("unused")
     protected void onPropertiesButtonClick(ActionEvent e) {
-        if (!hasProperties.get()) {
+        if (!isExtendedProperties.get()) {
             throw new IllegalStateException("Called onPropertiesButtonClick on something with no extended properties");
         } else {
             throw new Error("The method, onPropertiesButtonClick(ActionEvent) must be implemented if advanced " +
@@ -251,14 +269,10 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
         }
     }
 
-    public static <T> BooleanBinding selectedItemIsNotNullBinding(ObjectProperty<? extends SelectionModel<T>> property) {
-        return Bindings.createBooleanBinding(() -> {
-            if (property.get() == null) {
-                return false;
-            } else {
-                return !property.get().isEmpty();
-            }
-        }, property);
+    public static <T> void bindSelectedItemIsNull(BooleanProperty toBind,
+                                                  ObjectProperty<? extends SelectionModel<T>> property) {
+        toBind.bind(Bindings.createBooleanBinding(() ->
+                property.get() == null || property.get().isEmpty(), property));
     }
 
     /**
@@ -269,44 +283,64 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
         /**
          * Denotes if the "New" button is enabled
          * @return {@code true} if the button is enabled.
+         * @param toBind
          */
-        BooleanBinding newButtonEnabledBinding();
+        void bindNewButtonDisabled(@Nonnull BooleanProperty toBind);
 
         /**
          * Denotes if the delete button is enabled.
          * @return {@code true} if the button is enabled.
+         * @param toBind
          */
-        BooleanBinding deleteButtonEnabledBinding();
+        void bindDeleteButtonDisabled(@Nonnull BooleanProperty toBind);
 
         /**
          * Denotes if the delete button is enabled.
          * @return {@code true} if the button is enabled.
+         * @param toBind
          */
-        BooleanBinding duplicateButtonEnabledBinding();
+        void bindDuplicateButtonDisabled(@Nonnull BooleanProperty toBind);
 
         /**
          * Denotes if the properties button is enabled.
          * @return {@code true} if the button is enabled.
+         * @param toBind
          */
-        default BooleanBinding propertiesButtonEnabledBinding() {
-            return Bindings.createBooleanBinding(() -> false);
+        default void bindPropertiesButtonDisabled(@Nonnull BooleanProperty toBind) {
+            toBind.bind(new ReadOnlyBooleanWrapper(false));
         }
 
         /**
          * Gets a binding to a {@link ListBinding} for modifications.
+         * @param toBind
          */
-        ObjectBinding<ObservableList<T>> itemsBinding();
+        void bindItems(@Nonnull Property<ObservableList<T>> toBind);
 
         /**
-         * Get the currently selected Item from the {@link #itemsBinding()} {@code List}.
+         * Get the currently selected Item from the {@link #bindItems(Property)} {@code List}.
          * @return Binding to the currently selected item.
+         * @param toBind
          */
-        ObjectBinding<SelectionModel<T>> selectionModelBinding();
+        void selectionModelBinding(@Nonnull ObjectProperty<SelectionModel<T>> toBind);
 
         /**
          * Creates a new instance
          * @return a new, non-{@code null} instance
          */
-        Supplier<T> supplierBinding();
+        Supplier<T> getSupplier();
+
+        /**
+         * Called when a new value gets created by either a duplication or from the {@link #getSupplier()}.
+         *
+         * @param newValue Non-{@code null} value
+         */
+        default void onNewValueCreated(@Nonnull T newValue) {
+            checkNotNull(newValue);
+        }
+
+        default boolean checkDelete(@Nonnull T value) {
+            checkNotNull(value);
+            return true;
+        }
     }
 }

@@ -194,4 +194,7 @@
     -fx-pref-width: 18px;
 }
 
+.field-layout-panel {
+    -fx-border-color: whitesmoke;
+}
 
