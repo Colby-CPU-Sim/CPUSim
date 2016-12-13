@@ -39,8 +39,7 @@ import java.util.function.Supplier;
  * FXML Controller class for modifying {@link MachineInstruction} values.
  */
 public class EditMachineInstructionController
-        implements MachineBound,
-                    DialogButtonController.InteractionHandler,
+        implements DialogButtonController.InteractionHandler,
                     HelpPageEnabled,
                     MachineModificationController,
                     ControlButtonController.InteractionHandler<MachineInstruction> {

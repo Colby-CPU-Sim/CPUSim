@@ -19,7 +19,8 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root prefHeight="533.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.control.ComboBox?>
+<fx:root fx:id="rootPane" prefHeight="533.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
 
     <left>
         <VBox>
@@ -39,7 +40,7 @@
         <URL value="@../../css/Dialogs.css" />
     </stylesheets>
    <center>
-      <VBox BorderPane.alignment="CENTER">
+      <VBox disable="true" BorderPane.alignment="CENTER">
          <children>
             <TitledPane animated="false" text="Properties" VBox.vgrow="SOMETIMES">
                <content>
@@ -60,7 +61,7 @@
                         <Label text="Name" />
                         <TextField fx:id="nameText" GridPane.columnIndex="1" GridPane.columnSpan="3" />
                         <Label text="Type" GridPane.rowIndex="1" />
-                        <ChoiceBox fx:id="typeChoice" maxWidth="1.7976931348623157E308" minWidth="100.0" prefHeight="25.0" prefWidth="160.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                        <ComboBox fx:id="typeChoice" maxWidth="1.7976931348623157E308" minWidth="100.0" prefHeight="25.0" prefWidth="160.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
 
                          <Label text="Bits" GridPane.rowIndex="2" />
                         <Spinner fx:id="bitsSpinner" editable="true" initialValue="1" max="63" min="1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -68,7 +69,7 @@
                         <Spinner fx:id="defaultValueSpinner" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                         <Label text="Relativity" GridPane.rowIndex="3" />
                         <CheckBox fx:id="unsignedCheckbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="174.0" text="Unsigned" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
-                        <ChoiceBox fx:id="relativityChoice" prefHeight="25.0" prefWidth="174.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
+                        <ComboBox fx:id="relativityChoice" prefHeight="25.0" prefWidth="174.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
                      </children>
                      <padding>
                         <Insets left="5.0" right="5.0" />

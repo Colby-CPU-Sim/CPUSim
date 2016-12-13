@@ -1,20 +1,13 @@
 package cpusim.model.harness;
 
-import cpusim.model.Machine;
-import cpusim.model.util.MachineBound;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,47 +56,19 @@ public class CPUSimRunner extends BlockJUnit4ClassRunner {
 
         Object testInst = super.createTest();
 
-        Machine machine = new Machine(testClazz.getCanonicalName());
-        ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(testInst, "machine", machine);
-        machineSetupMethods.forEach(m -> {
-            try {
-                m.invoke(testInst, machineProperty);
-            } catch (InvocationTargetException ite) {
-                throw new IllegalStateException(ite);
-            } catch (IllegalAccessException iae) {
-                throw new IllegalStateException("This should never happen, Method#setAccessible(boolean) " +
-                        "is already called.", iae);
-            }
-        });
-
-        injectFields(testInst, machineProperty);
+//        Machine machine = new Machine(testClazz.getCanonicalName());
+//        ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(testInst, "machine", machine);
+//        machineSetupMethods.forEach(m -> {
+//            try {
+//                m.invoke(testInst, machineProperty);
+//            } catch (InvocationTargetException ite) {
+//                throw new IllegalStateException(ite);
+//            } catch (IllegalAccessException iae) {
+//                throw new IllegalStateException("This should never happen, Method#setAccessible(boolean) " +
+//                        "is already called.", iae);
+//            }
+//        });
 
         return testInst;
-    }
-
-    private void injectFields(Object instance, ObjectProperty<Machine> machineProperty) {
-        // find them all, we need to reverse the List after to call super classes first
-        Class<?> iterClazz = instance.getClass();
-        while (iterClazz != Object.class) {
-            for (Field f : iterClazz.getDeclaredFields()) {
-                if (f.isAnnotationPresent(MachineSetup.class) &&
-                        MachineBound.class.isAssignableFrom(f.getType())) {
-                    f.setAccessible(true);
-//                    try {
-//                        MachineBound bound = (MachineBound)f.get(instance);
-//                        bound.machineProperty().bind(machineProperty);
-//                    } catch (IllegalAccessException iae) {
-//                        throw new IllegalStateException(iae);
-//                    }
-                }
-            }
-
-            iterClazz = iterClazz.getSuperclass();
-        }
-    }
-
-    @Override
-    protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        super.runChild(method, notifier);
     }
 }

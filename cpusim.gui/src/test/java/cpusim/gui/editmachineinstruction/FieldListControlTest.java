@@ -1,6 +1,7 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.gui.harness.FXHarness;
+import cpusim.gui.harness.FXRunner;
 import cpusim.gui.util.DragHelper;
 import cpusim.model.Field;
 import cpusim.model.Machine;
@@ -36,7 +37,7 @@ public class FieldListControlTest extends FXHarness {
 
     @Before
     public void setup() {
-        Machine machine = getMachine();
+        Machine machine = new Machine("test");//getMachine();
 
         Field f1 = new Field("f1", UUID.randomUUID(), machine, 8,
                 Field.Relativity.absolute, null, 0x00,
@@ -52,7 +53,7 @@ public class FieldListControlTest extends FXHarness {
         handler = mock(DragHelper.HandleDragBehaviour.class);
     }
 
-    @Override
+    @FXRunner.StageSetup
     public void start(Stage stage) throws Exception {
         underTest = new FieldListControl(true, true);
 

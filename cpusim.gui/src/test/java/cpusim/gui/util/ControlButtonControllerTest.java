@@ -1,12 +1,24 @@
 package cpusim.gui.util;
 
 import cpusim.gui.harness.FXHarness;
+import cpusim.gui.harness.FXRunner;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.NamedObject;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -19,7 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 import static cpusim.gui.harness.FXMatchers.forItem;
 import static cpusim.model.harness.CPUSimMatchers.isNamed;
 import static org.junit.Assert.*;
@@ -50,8 +62,8 @@ public class ControlButtonControllerTest extends FXHarness {
     private Button getButton(@Nonnull String selector) {
         return lookup(selector).query();
     }
-
-    @Override
+    
+    @FXRunner.StageSetup
     public void start(Stage stage) throws Exception {
         buttonController = new DefaultControlButtonController<>(false);
         buttonController.setExtendedProperties(true);

@@ -1,5 +1,6 @@
 package cpusim.model;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import cpusim.model.assembler.EQU;
@@ -1289,6 +1290,14 @@ public class Machine extends Module<Machine> {
     public <U extends Machine> void copyTo(U other) {
         // FIXME
         throw new UnsupportedOperationException("unimplemented");
+    }
+    
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(Machine.class)
+                .addValue(getID())
+                .add("name", getName())
+                .toString();
     }
     
     @Override

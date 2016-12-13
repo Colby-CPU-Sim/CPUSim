@@ -10,7 +10,7 @@ import org.testfx.api.FxRobot;
 /**
  * @since 2016-12-12
  */
-@RunWith(CPUSimRunner.class)
+@RunWith(FXRunner.class)
 public abstract class FXHarness extends FxRobot implements MachineBound {
 
     private ObjectProperty<Machine> machineProperty;

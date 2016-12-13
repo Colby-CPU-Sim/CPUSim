@@ -17,7 +17,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.SelectionModel;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
@@ -53,7 +60,7 @@ public class EditFieldsController
     private TextField nameText;
 
     @FXML
-    private ChoiceBox<Field.Type> typeChoice;
+    private ComboBox<Field.Type> typeChoice;
 
     @FXML
     private Spinner<Long> defaultValueSpinner;
@@ -65,7 +72,7 @@ public class EditFieldsController
     private Spinner<Integer> bitsSpinner;
 
     @FXML
-    private ChoiceBox<Field.Relativity> relativityChoice;
+    private ComboBox<Field.Relativity> relativityChoice;
 
     private final ObjectProperty<Machine> machine;
 
@@ -151,8 +158,7 @@ public class EditFieldsController
         ObservableList<Field.Relativity> realitivityTypes = FXCollections.observableArrayList();
         Collections.addAll(realitivityTypes, Field.Relativity.values());
         relativityChoice.setItems(realitivityTypes);
-
-
+        
         LongSpinnerValueFactory defaultValueFactory = new LongSpinnerValueFactory();
         defaultValueFactory.setValue(0L);
 
