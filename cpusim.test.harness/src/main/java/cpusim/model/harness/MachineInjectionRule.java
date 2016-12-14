@@ -2,6 +2,7 @@ package cpusim.model.harness;
 
 import cpusim.model.Machine;
 import cpusim.model.util.MachineBound;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -55,7 +56,8 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         while (iterClazz != Object.class) {
             for (Field f : iterClazz.getDeclaredFields()) {
                 if (f.isAnnotationPresent(BindMachine.class) &&
-                        MachineBound.class.isAssignableFrom(f.getType())) {
+                        (MachineBound.class.isAssignableFrom(f.getType())
+                         || ObjectProperty.class.isAssignableFrom(f.getType()))) {
                     f.setAccessible(true);
                     fieldsToBind.add(f);
                 }
@@ -79,9 +81,9 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
             @Override
             public void evaluate() throws Throwable {
                 MachineInjectionRule.this.set(createMachine());
-                
-                base.evaluate();
+    
                 injectFields();
+                base.evaluate();
             }
         };
     }
@@ -91,8 +93,14 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         fieldsToBind.forEach(f -> {
             try {
                 f.setAccessible(true);
-                MachineBound bound = (MachineBound) f.get(testInstance);
-                bound.machineProperty().bind(this);
+                Object instance = f.get(testInstance);
+                if (MachineBound.class.isAssignableFrom(f.getType())) {
+                    MachineBound bound = (MachineBound) instance;
+                    bound.machineProperty().bind(this);
+                } else {
+                    ObjectProperty<Machine> property = (ObjectProperty<Machine>) instance;
+                    property.bind(this);
+                }
             } catch (IllegalAccessException iae) {
                 throw new IllegalStateException(iae);
             }

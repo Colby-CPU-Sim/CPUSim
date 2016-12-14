@@ -5,6 +5,7 @@ import cpusim.gui.harness.FXRunner;
 import cpusim.gui.util.DragHelper;
 import cpusim.model.Field;
 import cpusim.model.Machine;
+import cpusim.model.harness.MachineInjectionRule;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -14,8 +15,8 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.testfx.matcher.control.ListViewMatchers;
 
@@ -23,7 +24,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
+import static org.testfx.api.FxAssert.verifyThat;
 
 /**
  *
@@ -31,13 +34,17 @@ import static org.mockito.Mockito.*;
  */
 public class FieldListControlTest extends FXHarness {
 
-    private FieldListControl underTest;
-
     private DragHelper.HandleDragBehaviour handler;
+    
+    @MachineInjectionRule.BindMachine
+    private FieldListControl underTest;
+    
+    @Rule
+    public MachineInjectionRule machineProperty = new MachineInjectionRule(this);
 
     @Before
     public void setup() {
-        Machine machine = new Machine("test");//getMachine();
+        Machine machine = getMachine();
 
         Field f1 = new Field("f1", UUID.randomUUID(), machine, 8,
                 Field.Relativity.absolute, null, 0x00,
@@ -46,9 +53,9 @@ public class FieldListControlTest extends FXHarness {
                 Field.Relativity.absolute, null, 0x00,
                 Field.SignedType.Signed, Field.Type.required);
 
-        machine.getFields().addAll(Arrays.asList(f1, f2));
-
-        underTest.machineProperty().bind(machineProperty());
+        interact(() -> {
+            machine.getFields().addAll(Arrays.asList(f1, f2));
+        });
 
         handler = mock(DragHelper.HandleDragBehaviour.class);
     }
@@ -92,7 +99,7 @@ public class FieldListControlTest extends FXHarness {
         ListView<Field> list = lookup("#fieldListView").query();
 
         for (Field f : getMachine().getFields()) {
-            MatcherAssert.assertThat(list, ListViewMatchers.hasListCell(f));
+            verifyThat(list, ListViewMatchers.hasListCell(f));
         }
     }
 
@@ -119,11 +126,11 @@ public class FieldListControlTest extends FXHarness {
 
         drag(emptyCell, MouseButton.PRIMARY).dropTo(end);
 
-        verify(handler, never());
+        verify(handler, never()).onOther(null, null);
     }
 
     @Test
     public void addNewItem() {
-
+        fail("unimplemented");
     }
 }
