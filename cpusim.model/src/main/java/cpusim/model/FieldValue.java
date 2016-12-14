@@ -7,10 +7,7 @@ package cpusim.model;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import cpusim.model.util.MachineComponent;
-import cpusim.model.util.LegacyXMLSupported;
-import cpusim.model.util.MoreFXCollections;
-import cpusim.model.util.NamedObject;
+import cpusim.model.util.*;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
 
@@ -21,7 +18,7 @@ import java.util.UUID;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class FieldValue implements NamedObject, LegacyXMLSupported, MachineComponent {
+public class FieldValue implements NamedObject, LegacyXMLSupported, MachineComponent, Copyable<FieldValue> {
 
 	private ReadOnlyObjectProperty<UUID> id;
 	private StringProperty name;
@@ -104,23 +101,25 @@ public class FieldValue implements NamedObject, LegacyXMLSupported, MachineCompo
 		return new FieldValue(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), getValue());
 	}
 
-
-
-	/**
-     * Gives the XML description of this FieldValue.
-     */
 	@Override
 	public String getXMLDescription(String indent) {
         return "<FieldValue name=\"" + HtmlEncoder.sEncode(getName()) +
                 "\" value=\"" + getValue() + "\" />";
     }
-    
-    /* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
+
+	@Override
+	public <U extends FieldValue> void copyTo(U other) {
+		checkNotNull(other);
+		other.setName(getName());
+		other.setValue(getValue());
+	}
+
+	/* (non-Javadoc)
+         * @see java.lang.Object#hashCode()
+         */
 	@Override
 	public int hashCode() {
-		return Objects.hash(name, value);
+		return Objects.hash(getID());
 	}
 
 	/* (non-Javadoc)
@@ -137,15 +136,18 @@ public class FieldValue implements NamedObject, LegacyXMLSupported, MachineCompo
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
+
 		FieldValue other = (FieldValue) obj;
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
+
+		if (getID().equals(other.getID())) {
+		    return true;
+        }
+
+		if (!getName().equals(other.getName())) {
+		    return false;
 		}
-		if (value != other.value) {
+
+		if (getValue() != other.getValue()) {
 			return false;
 		}
 		return true;
@@ -157,8 +159,8 @@ public class FieldValue implements NamedObject, LegacyXMLSupported, MachineCompo
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(FieldValue.class)
-        		.addValue(name)
-        		.add("value", value).toString();
+        		.addValue(getName())
+        		.add("value", getValue()).toString();
     }
 
 }

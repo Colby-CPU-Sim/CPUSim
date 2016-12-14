@@ -5,11 +5,8 @@
 
 package cpusim.gui.util.table;
 
-import cpusim.model.util.Convert;
-import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.Dialogs;
-
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -96,10 +93,10 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
     private void createTextField() {
         textField = new TextField(getString());
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.focusedProperty().addListener((arg0, arg1, arg2) -> {
+        textField.focusedProperty().addListener((arg0, oldValue, newValue) -> {
             Window parentDialog = textField.getScene() == null ? null :
                                     textField.getScene().getWindow();
-            if (!arg2) { // focus moved away from this field
+            if (!newValue) { // focus moved away from this field
                 try {
                     long newLong = ConvertStrings.toLong(textField.getText());
                     commitEdit(newLong);

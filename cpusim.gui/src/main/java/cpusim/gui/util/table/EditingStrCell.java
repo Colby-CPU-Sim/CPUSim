@@ -5,14 +5,9 @@
 
 package cpusim.gui.util.table;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 /**
  * An editable cell class that allows the user to modify the string in the cell.
@@ -92,23 +87,16 @@ public class EditingStrCell<T> extends TableCell<T, String> {
     protected void createTextField() {
         textField = new TextField(getString());
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> arg0,
-                                Boolean arg1, Boolean arg2) {
-                if (!arg2) {
-                    commitEdit(textField.getText());
-                }
+        textField.focusedProperty().addListener((arg0, arg1, arg2) -> {
+            if (!arg2) {
+                commitEdit(textField.getText());
             }
         });
-        textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent t) {
-                if (t.getCode() == KeyCode.ENTER) {
-                    commitEdit(textField.getText());
-                } else if (t.getCode() == KeyCode.ESCAPE) {
-                    cancelEdit();
-                }
+        textField.setOnKeyPressed(t -> {
+            if (t.getCode() == KeyCode.ENTER) {
+                commitEdit(textField.getText());
+            } else if (t.getCode() == KeyCode.ESCAPE) {
+                cancelEdit();
             }
         });
     }

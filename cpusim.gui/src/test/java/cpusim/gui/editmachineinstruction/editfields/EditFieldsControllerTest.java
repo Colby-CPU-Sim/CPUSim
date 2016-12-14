@@ -2,14 +2,19 @@ package cpusim.gui.editmachineinstruction.editfields;
 
 import cpusim.gui.editmachineinstruction.FieldListControl;
 import cpusim.gui.harness.FXHarness;
+import cpusim.gui.harness.FXMatchers;
 import cpusim.gui.harness.FXRunner;
+import cpusim.gui.util.ControlButtonController;
 import cpusim.model.Field;
+import cpusim.model.FieldValue;
 import cpusim.model.Machine;
+import cpusim.model.harness.BindMachine;
+import cpusim.model.harness.CPUSimMatchers;
 import cpusim.model.harness.MachineInjectionRule;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.hamcrest.Matchers;
@@ -17,16 +22,23 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testfx.matcher.control.ListViewMatchers;
+import org.testfx.matcher.control.TableViewMatchers;
 import org.testfx.matcher.control.TextInputControlMatchers;
+import org.textfx.matcher.control.CheckBoxMatchers;
+import org.textfx.matcher.control.MoreTableViewMatchers;
+import org.textfx.matcher.control.SpinnerMatchers;
 
 import java.util.UUID;
 
 import static cpusim.gui.harness.FXMatchers.allItems;
 import static cpusim.gui.harness.FXMatchers.hasValue;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyString;
+import static org.junit.Assert.assertThat;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.*;
+import static org.textfx.matcher.control.ComboBoxMatchers.hasSelectedItem;
 
 /**
  *
@@ -38,7 +50,7 @@ public class EditFieldsControllerTest extends FXHarness {
     private Field f2;
 
     
-    @MachineInjectionRule.BindMachine
+    @BindMachine
     private EditFieldsController underTest;
     
     @Rule
@@ -51,9 +63,12 @@ public class EditFieldsControllerTest extends FXHarness {
         f1 = new Field("f1", UUID.randomUUID(), machine, 8,
                 Field.Relativity.absolute, null, 0x00,
                 Field.SignedType.Unsigned, Field.Type.required);
+        f1.getValues().addAll(new FieldValue("a", UUID.randomUUID(), machine, 1));
         f2 = new Field("f2", UUID.randomUUID(), machine, 4,
                 Field.Relativity.absolute, null, 0x00,
                 Field.SignedType.Signed, Field.Type.required);
+        f2.getValues().addAll(new FieldValue("b", UUID.randomUUID(), machine, 2),
+                new FieldValue("c", UUID.randomUUID(), machine, 3));
     }
 
     @FXRunner.StageSetup
@@ -99,15 +114,162 @@ public class EditFieldsControllerTest extends FXHarness {
         verifyThat(bitsSpinner, hasValue(Spinner.class, Spinner<Integer>::getValue, Matchers.is(4)));
     
         Spinner<Long> defaultValueSpinner = lookup("#defaultValueSpinner").query();
-        verifyThat(defaultValueSpinner, hasValue(Spinner.class, Spinner<Long>::getValue, Matchers.is(0l)));
+        verifyThat(defaultValueSpinner, hasValue(Spinner.class, Spinner<Long>::getValue, Matchers.is(0L)));
     
         verifyThat("#unsignedCheckbox", hasValue(CheckBox.class, CheckBox::isSelected, is(Boolean.FALSE)));
     }
-    
+
     
 
     @Test
-    public void test() {
+    public void clickFields() {
+        ObservableList<Field> fields = getMachine().getFields();
+
+        interact(() -> fields.addAll(f1, f2));
+
+        FieldListControl parent = lookup("#fieldsList").query();
+        for (Field f : fields) {
+            clickOn(from(parent).lookup(".list-cell")
+                    .match(FXMatchers.forItem(is(f)))
+                    .<ListCell<Field>>query());
+            verifyFieldShown(f);
+        }
     }
-    
+
+    public void clickFieldValue(Field f, FieldValue fv) {
+        ObservableList<Field> fields = getMachine().getFields();
+
+        interact(() -> fields.add(f));
+
+        FieldListControl parent = lookup("#fieldsList").query();
+        clickOn(from(parent).lookup(".list-cell")
+            .match(FXMatchers.forItem(is(f)))
+            .<ListCell<Field>>query());
+        verifyFieldShown(f);
+
+        verifyThat("#valuesTable", isVisible());
+
+        ControlButtonController<FieldValue> buttons = lookup("#valuesButtons").query();
+        verifyThat(from(buttons).lookup("#newButton"), isEnabled());
+        verifyThat(from(buttons).lookup("#duplicateButton"), isDisabled());
+        verifyThat(from(buttons).lookup("#deleteButton"), isDisabled());
+
+        TableView<FieldValue> valuesTable = lookup("#valuesTable").query();
+        TableRow<FieldValue> row = from(valuesTable).lookup(".table-row-cell")
+                .match(MoreTableViewMatchers.rowItem(is(fv)))
+                .query();
+        clickOn(row);
+
+        verifyThat(from(buttons).lookup("#newButton"), isEnabled());
+        verifyThat(from(buttons).lookup("#duplicateButton"), isEnabled());
+        verifyThat(from(buttons).lookup("#deleteButton"), isEnabled());
+    }
+
+    @Test
+    public void duplicateFieldValue() {
+        clickFieldValue(f1, f1.getValues().get(0));
+
+        ControlButtonController<FieldValue> buttons = lookup("#valuesButtons").query();
+        Button duplicate = from(buttons).lookup("#duplicateButton").query();
+        Button delete = from(buttons).lookup("#deleteButton").query();
+
+        verifyThat(duplicate, isEnabled());
+        verifyThat(delete, isEnabled());
+
+        clickOn(duplicate);
+
+        verifyThat(duplicate, isEnabled());
+        verifyThat(delete, isEnabled());
+
+        verifyThat(lookup("#valuesTable"), TableViewMatchers.hasItems(2));
+
+        assertThat(f1.getValues(), hasSize(2));
+        f1.getValues().forEach(fv -> verifyThat("#valuesTable", MoreTableViewMatchers.hasRowWith(fv)));
+    }
+
+    @Test
+    public void deleteFieldValue() {
+        clickFieldValue(f2, f1.getValues().get(0));
+
+        ControlButtonController<FieldValue> buttons = lookup("#valuesButtons").query();
+        Button duplicate = from(buttons).lookup("#duplicateButton").query();
+        Button delete = from(buttons).lookup("#deleteButton").query();
+
+        verifyThat(duplicate, isEnabled());
+        verifyThat(delete, isEnabled());
+
+        clickOn(delete);
+
+        verifyThat(duplicate, isEnabled());
+        verifyThat(delete, isEnabled());
+
+        assertThat(f2.getValues(), hasSize(1));
+        verifyThat("#valuesTable", TableViewMatchers.hasItems(f2.getValues().size()));
+        f2.getValues().forEach(fv -> verifyThat("#valuesTable", MoreTableViewMatchers.hasRowWith(fv)));
+
+        clickOn(delete);
+
+        verifyThat(duplicate, isDisabled());
+        verifyThat(delete, isDisabled());
+
+        assertThat(f2.getValues(), hasSize(0));
+        verifyThat("#valuesTable", TableViewMatchers.hasItems(0));
+    }
+
+    @Test
+    public void editFieldValues() {
+        FieldValue fv = f1.getValues().get(0);
+        clickFieldValue(f1, fv);
+
+        String newName = "new_name";
+
+        TableRow<FieldValue> row = lookup("#valuesTable")
+                .lookup(".table-row-cell")
+                .match(MoreTableViewMatchers.rowItem(CPUSimMatchers.isId(fv.getID())))
+                .query();
+
+        TableCell<FieldValue, String> nameCell = from(row)
+                .lookup(".table-cell")
+                .match(MoreTableViewMatchers.cellItem(is(fv.getName())))
+                .query();
+
+        TableCell<FieldValue, Long> valueCell = from(row)
+                .lookup(".table-cell")
+                .match(MoreTableViewMatchers.cellItem(is(fv.getValue())))
+                .query();
+
+        doubleClickOn(nameCell)
+            .write(newName)
+            .press(KeyCode.ENTER);
+
+        assertThat(fv.getName(), is(newName));
+        verifyThat(nameCell, MoreTableViewMatchers.cellItem(is(newName)));
+
+        long newValue = 0xDEAD;
+
+        doubleClickOn(valueCell)
+                .write("0x" + Long.toHexString(newValue))
+                .press(KeyCode.ENTER);
+
+        interact(() -> {});
+
+        assertThat(fv.getValue(), is(newValue));
+        verifyThat(valueCell, MoreTableViewMatchers.cellItem(is(newValue)));
+    }
+
+    private void verifyFieldShown(Field f) {
+        verifyThat("#nameText", TextInputControlMatchers.hasText(f.getName()));
+        verifyThat("#typeChoice", hasSelectedItem(f.getType()));
+        verifyThat("#relativityChoice", hasSelectedItem(f.getRelativity()));
+        verifyThat("#bitsSpinner", SpinnerMatchers.hasValue(f.getNumBits()));
+        verifyThat("#defaultValueSpinner", SpinnerMatchers.hasValue(f.getDefaultValue()));
+        verifyThat("#unsignedCheckbox",
+                CheckBoxMatchers.isSelected(f.getSigned() == Field.SignedType.Unsigned));
+
+        verifyThat("#valuesTable", TableViewMatchers.hasItems(f.getValues().size()));
+        for (FieldValue fv : f.getValues()) {
+            verifyThat("#valuesTable", MoreTableViewMatchers.hasRowWith(fv));
+        }
+    }
+
 }

@@ -1,7 +1,7 @@
 package cpusim.gui.harness;
 
 import cpusim.model.Machine;
-import cpusim.model.harness.MachineInjectionRule;
+import cpusim.model.harness.BindMachine;
 import cpusim.model.util.MachineBound;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -13,9 +13,9 @@ import org.testfx.api.FxRobot;
  */
 @RunWith(FXRunner.class)
 public abstract class FXHarness extends FxRobot implements MachineBound {
-    
-    @MachineInjectionRule.BindMachine
-    private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(this, "machine", null);
+
+    @BindMachine
+    private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(this, "machine");
 
     @Override
     public ObjectProperty<Machine> machineProperty() {

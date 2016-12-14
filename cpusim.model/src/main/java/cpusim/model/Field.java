@@ -3,6 +3,7 @@ package cpusim.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
 import cpusim.model.util.*;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
@@ -171,7 +172,13 @@ public class Field
         this.relativity = new SimpleObjectProperty<>(this, "relativity", checkNotNull(relativity));
         this.defaultValue = new SimpleLongProperty(this, "defaultValue", defaultValue);
         this.signed = new SimpleObjectProperty<>(this, "signed", checkNotNull(signed));
-        this.values = new SimpleListProperty<>(this, "values", values);
+        this.values = new SimpleListProperty<>(this, "values");
+
+        if (values == null) {
+            this.values.set(FXCollections.observableArrayList());
+        } else {
+            this.values.set(values);
+        }
     }
 
     ////////////////// Setters and getters //////////////////
@@ -352,7 +359,15 @@ public class Field
      */
     @Override
     public String toString() {
-        return name.get();
+        return MoreObjects.toStringHelper(Field.class)
+                .addValue(getID())
+                .add("name", getName())
+                .add("type", getType())
+                .add("signed", getSigned())
+                .add("width", getNumBits())
+                .add("default", getDefaultValue())
+                .add("relativity", getRelativity())
+                .toString();
     }
 
     @Override

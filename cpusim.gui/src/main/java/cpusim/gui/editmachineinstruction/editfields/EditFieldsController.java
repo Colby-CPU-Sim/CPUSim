@@ -1,7 +1,12 @@
 package cpusim.gui.editmachineinstruction.editfields;
 
 import cpusim.gui.editmachineinstruction.FieldListControl;
+import cpusim.gui.util.ControlButtonController;
+import cpusim.gui.util.DefaultControlButtonController;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.NamedColumnHandler;
+import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
@@ -9,30 +14,25 @@ import cpusim.model.util.MachineBound;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.SelectionModel;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.util.Callback;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Supplier;
 
 /**
  * Dialog for adding/editing fields
@@ -52,9 +52,14 @@ public class EditFieldsController
     @FXML
     private TableView<FieldValue> valuesTable;
 
+    @FXML
     private TableColumn<FieldValue, String> nameColumn;
 
+    @FXML
     private TableColumn<FieldValue, Long> valueColumn;
+
+    @FXML
+    private DefaultControlButtonController<FieldValue> valuesButtons;
 
     @FXML
     private TextField nameText;
@@ -174,11 +179,15 @@ public class EditFieldsController
         List<Subscription> currentSubs = new ArrayList<>();
 
         this.selectedField.bind(fieldsList.selectedFieldProperty());
+        getCenter().disableProperty().bind(this.selectedField.isNull());
+
         this.selectedField.addListener((v, oldField, currentField) -> {
             if (oldField != null) {
                 Bindings.unbindBidirectional(nameText.textProperty(), oldField.nameProperty());
                 currentSubs.forEach(Subscription::unsubscribe);
                 currentSubs.clear();
+
+                valuesTable.setItems(FXCollections.observableArrayList());
             }
 
             if (currentField != null) {
@@ -252,8 +261,38 @@ public class EditFieldsController
                         currentField.relativityProperty().set(fromControl);
                     }
                 }));
+
+                valuesTable.setItems(currentField.getValues());
             }
         });
+
+        // Initialize the values table:
+
+        valuesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        nameColumn.prefWidthProperty().bind(valuesTable.widthProperty().multiply(.67));
+        valueColumn.prefWidthProperty().bind(valuesTable.widthProperty().multiply(.33));
+
+        Callback<TableColumn<FieldValue, String>, TableCell<FieldValue, String>> cellStrFactory =
+                setStringTableColumn -> new EditingStrCell<>();
+        Callback<TableColumn<FieldValue, Long>, TableCell<FieldValue, Long>> cellLongFactory =
+                setIntegerTableColumn -> new EditingLongCell<>();
+
+        nameColumn.setCellValueFactory(
+                new PropertyValueFactory<>("name"));
+        valueColumn.setCellValueFactory(
+                new PropertyValueFactory<>("value"));
+
+        //Add for Editable Cell of each field, in String or in Integer
+        nameColumn.setCellFactory(cellStrFactory);
+        nameColumn.setOnEditCommit(new NamedColumnHandler<>(valuesTable));
+
+        valueColumn.setCellFactory(cellLongFactory);
+        valueColumn.setOnEditCommit(text -> text.getRowValue().setValue(text.getNewValue()));
+
+        ValuesHandler valuesHandler = new ValuesHandler();
+        valuesHandler.selectedItem.bind(valuesTable.getSelectionModel().selectedItemProperty());
+
+        valuesButtons.setInteractionHandler(valuesHandler);
     }
 
     @Override
@@ -401,4 +440,40 @@ public class EditFieldsController
 //        }
 //        return true;
 //    }
+
+    class ValuesHandler implements ControlButtonController.InteractionHandler<FieldValue> {
+
+        private ObjectProperty<FieldValue> selectedItem =
+                new SimpleObjectProperty<>(this, "selectedItem", null);
+
+        @Override
+        public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
+            toBind.bind(new ReadOnlyBooleanWrapper(false));
+        }
+
+        @Override
+        public void bindDeleteButtonDisabled(@Nonnull BooleanProperty toBind) {
+            toBind.bind(selectedItem.isNull());
+        }
+
+        @Override
+        public void bindDuplicateButtonDisabled(@Nonnull BooleanProperty toBind) {
+            toBind.bind(selectedItem.isNull());
+        }
+
+        @Override
+        public void bindItems(@Nonnull Property<ObservableList<FieldValue>> toBind) {
+            toBind.bind(valuesTable.itemsProperty());
+        }
+
+        @Override
+        public void selectionModelBinding(@Nonnull ObjectProperty<SelectionModel<FieldValue>> toBind) {
+            toBind.bind(valuesTable.selectionModelProperty());
+        }
+
+        @Override
+        public Supplier<FieldValue> getSupplier() {
+            return () -> new FieldValue("?", UUID.randomUUID(), getMachine(), 0L);
+        }
+    }
 }

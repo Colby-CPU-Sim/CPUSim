@@ -8,10 +8,6 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,16 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2016-12-13.
  */
 public class MachineInjectionRule extends SimpleObjectProperty<Machine> implements TestRule {
-    
-    /**
-     * Denotes a {@link Field} to bind to via {@link MachineBound#machineProperty()}.
-     */
-    @Target(ElementType.FIELD)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface BindMachine {
-        
-    }
-    
+
     private final Object testInstance;
     
     private final List<Field> fieldsToBind;
@@ -77,11 +64,11 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
     
     @Override
     public Statement apply(final Statement base, final Description description) {
+        MachineInjectionRule.this.set(createMachine());
+
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                MachineInjectionRule.this.set(createMachine());
-    
                 injectFields();
                 base.evaluate();
             }
@@ -98,6 +85,7 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
                     MachineBound bound = (MachineBound) instance;
                     bound.machineProperty().bind(this);
                 } else {
+                    @SuppressWarnings("unchecked") // this is safe because of how the fields are collected
                     ObjectProperty<Machine> property = (ObjectProperty<Machine>) instance;
                     property.bind(this);
                 }

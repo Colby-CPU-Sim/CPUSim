@@ -307,7 +307,7 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
          * @param toBind
          */
         default void bindPropertiesButtonDisabled(@Nonnull BooleanProperty toBind) {
-            toBind.bind(new ReadOnlyBooleanWrapper(false));
+            toBind.bind(new ReadOnlyBooleanWrapper(true));
         }
 
         /**

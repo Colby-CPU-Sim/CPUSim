@@ -5,6 +5,7 @@ import cpusim.gui.harness.FXRunner;
 import cpusim.gui.util.DragHelper;
 import cpusim.model.Field;
 import cpusim.model.Machine;
+import cpusim.model.harness.BindMachine;
 import cpusim.model.harness.MachineInjectionRule;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -34,10 +35,10 @@ import static org.testfx.api.FxAssert.verifyThat;
  */
 public class FieldListControlTest extends FXHarness {
 
-    private DragHelper.HandleDragBehaviour handler;
-    
-    @MachineInjectionRule.BindMachine
+    @BindMachine
     private FieldListControl underTest;
+
+    private DragHelper.HandleDragBehaviour handler;
     
     @Rule
     public MachineInjectionRule machineProperty = new MachineInjectionRule(this);

@@ -64,4 +64,18 @@ public abstract class CPUSimMatchers {
             }
         };
     }
+
+    /**
+     * Returns a {@link Matcher} implementation for a {@link IdentifiedObject}, checking the
+     * {@link IdentifiedObject#getID()} value.
+     *
+     * @param object Object with an ID to check for
+     * @param <T>
+     * @return Matcher instance for use in JUnit
+     *
+     * @see #isId(UUID)
+     */
+    public static <T extends IdentifiedObject> Matcher<T> isId(final IdentifiedObject object) {
+        return isId(object.getID());
+    }
 }

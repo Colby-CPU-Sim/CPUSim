@@ -3,23 +3,21 @@
  */
 package cpusim.model.util.conversion;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
-
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.util.NamedObject;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * 
@@ -85,10 +83,9 @@ public abstract class ConvertStrings {
         	trimmedString = trimmedString.substring(1);
         }
         
-        if (trimmedString.codePointAt(0) == '0') {
+        if (trimmedString.length() >= 3 && trimmedString.codePointAt(0) == '0') {
         	// it's either binary, hex, or octal
         	int substrIdx = 2;
-        	
         	if (trimmedString.codePointAt(1) == 'b') {
                 radix = 2;
             } else if (trimmedString.codePointAt(1) == 'x') {

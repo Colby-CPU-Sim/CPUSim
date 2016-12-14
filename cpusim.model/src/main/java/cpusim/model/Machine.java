@@ -474,7 +474,7 @@ public class Machine extends Module<Machine> {
         throw new IllegalStateException("No comment char found in the machine's punctChars");
     }
 
-    public List<Field> getFields() {
+    public ObservableList<Field> getFields() {
         return fields;
     }
 
