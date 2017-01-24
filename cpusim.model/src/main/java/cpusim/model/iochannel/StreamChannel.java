@@ -16,16 +16,19 @@
  */
 package cpusim.model.iochannel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import cpusim.model.util.units.ArchType;
+import cpusim.model.util.units.ArchValue;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Scanner;
+import java.util.Arrays;
 
-import cpusim.model.util.Convert;
-import cpusim.model.util.conversion.ConvertStrings;
-import cpusim.model.util.units.ArchType;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class implements IOChannel using the terminal/command line.  It is
@@ -35,8 +38,6 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 
 	private final InputStream in;
 	private final PrintStream out;
-	
-	private final Scanner scanner;
 	
 	private static final StreamChannel CONSOLE_CHANNEL_HELPER = new StreamChannel();
 	
@@ -72,8 +73,6 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	public StreamChannel(final InputStream in, final PrintStream out) {
 		this.in = checkNotNull(in);
 		this.out = checkNotNull(out);
-		
-		this.scanner = new Scanner(in);
 	}
 	
 	
@@ -81,7 +80,7 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	public void close() throws IOException {
 		if (in != null && in != System.in) {
 			// don't close System.in for obvious reasons, but we compare with == since reference it correct
-			scanner.close();
+			in.close();
 		}
 		
 		if (out != null && out != System.out) {
@@ -112,9 +111,37 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	 * @return
 	 */
 	private String getLine() {
-		return scanner.nextLine();
+
+		StringBuilder buff = new StringBuilder();
+		try {
+			int c;
+			while ((c = in.read()) != '\n' && c != '\r') { // god damn carriage return.
+				buff.append((char) c);
+			}
+		} catch (IOException ioe) {
+			throw new IllegalArgumentException(ioe);
+		}
+
+		return buff.toString();
 	}
-	
+
+	private void readBytes(byte[] buffer, int amount) {
+		checkNotNull(buffer);
+		checkArgument(buffer.length >= amount,
+				"Must specify buffer[%s] larger than amount, %s", buffer.length, amount);
+
+		try {
+			int c, i = 0;
+			while ((c = in.read()) != '\n' && i < buffer.length) {
+				buffer[i++] = (byte)c;
+			}
+
+			Arrays.fill(buffer, i, buffer.length, (byte)0);
+		} catch (IOException ioe) {
+			throw new IllegalArgumentException(ioe);
+		}
+	}
+
 	/**
 	 * displays an output to the user
 	 * @param s - the output displayed to the user
@@ -139,21 +166,29 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	
 	@Override
 	public long readLong(int numBits) {
-		final String line = getLine();
-		final long init = Long.parseLong(line);
-		return init & ArchType.Bit.getMask(numBits);
+		final ArchValue value = ArchType.Bit.of(numBits);
+		final byte[] buffer = new byte[Longs.BYTES];
+		readBytes(buffer, (int)value.as(ArchType.Byte));
+
+		return Longs.fromByteArray(buffer) & value.mask();
 	}
 	
 	@Override
 	public char readAscii() {
-		final String line = getLine();
-		return (char)Convert.fromAsciiStringToLong(line, 8, 0);
+		final ArchValue value = ArchType.Byte.of(1);
+		final byte[] buffer = new byte[Chars.BYTES];
+		readBytes(buffer, (int)value.as(ArchType.Byte));
+
+		return Chars.fromByteArray(buffer);
 	}
 	
 	@Override
 	public int readUnicode() {
-		final String line = getLine();
-		return (int)ConvertStrings.from16WToLong(line, ArchType.Byte.of(2));
+		final ArchValue value = ArchType.Byte.of(2);
+		final byte[] buffer = new byte[Ints.BYTES];
+		readBytes(buffer, (int)value.as(ArchType.Byte));
+
+		return Ints.fromByteArray(buffer) & value.imask();
 	}
 	
 	@Override

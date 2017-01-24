@@ -17,6 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testfx.matcher.control.ListViewMatchers;
@@ -130,7 +131,7 @@ public class FieldListControlTest extends FXHarness {
         verify(handler, never()).onOther(null, null);
     }
 
-    @Test
+    @Test @Ignore
     public void addNewItem() {
         fail("unimplemented");
     }

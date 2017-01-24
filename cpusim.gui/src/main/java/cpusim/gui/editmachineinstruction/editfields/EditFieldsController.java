@@ -1,10 +1,8 @@
 package cpusim.gui.editmachineinstruction.editfields;
 
+import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.FieldListControl;
-import cpusim.gui.util.ControlButtonController;
-import cpusim.gui.util.DefaultControlButtonController;
-import cpusim.gui.util.FXMLLoaderFactory;
-import cpusim.gui.util.NamedColumnHandler;
+import cpusim.gui.util.*;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Field;
@@ -12,6 +10,7 @@ import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.util.MachineBound;
 import cpusim.model.util.ValidationException;
+import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.util.Dialogs;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -23,6 +22,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.fxmisc.easybind.EasyBind;
 import org.fxmisc.easybind.Subscription;
 
@@ -41,7 +41,9 @@ import java.util.function.Supplier;
  */
 public class EditFieldsController
         extends BorderPane
-        implements MachineBound {
+        implements MachineBound,
+                   HelpPageEnabled,
+                   DialogButtonController.InteractionHandler {
 
 
     private static final String FXML_FILE = "EditFields.fxml";
@@ -79,15 +81,24 @@ public class EditFieldsController
     @FXML
     private ComboBox<Field.Relativity> relativityChoice;
 
+    @FXML
+    private DialogButtonController dialogButtons;
+
     private final ObjectProperty<Machine> machine;
 
     private final ObjectProperty<Field> selectedField;
 
+    private final Mediator mediator;
+
+    public EditFieldsController() {
+        this(null);
+    }
+
     /**
      * constructor
      */
-    public EditFieldsController() {
-
+    public EditFieldsController(Mediator mediator) {
+        this.mediator = mediator;
         this.machine = new SimpleObjectProperty<>(this, "machine", null);
         this.selectedField = new SimpleObjectProperty<>(this, "selectedField", null);
 
@@ -171,10 +182,23 @@ public class EditFieldsController
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 63, 4);
 
         defaultValueFactory.maxProperty().bind(Bindings.createIntegerBinding(() ->
-                (1 << (bitsSpinnerFactory.getValue() + 1)) - 1));
+                1 << (bitsSpinnerFactory.getValue() + 1), bitsSpinnerFactory.valueProperty()));
 
         defaultValueSpinner.setValueFactory(defaultValueFactory);
+        // commit the spinner: http://stackoverflow.com/a/39380146
+        // Stupid hack.
+        defaultValueSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                defaultValueSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
         bitsSpinner.setValueFactory(bitsSpinnerFactory);
+        // commit the spinner: http://stackoverflow.com/a/39380146
+        bitsSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                bitsSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
 
         List<Subscription> currentSubs = new ArrayList<>();
 
@@ -287,17 +311,57 @@ public class EditFieldsController
         nameColumn.setOnEditCommit(new NamedColumnHandler<>(valuesTable));
 
         valueColumn.setCellFactory(cellLongFactory);
-        valueColumn.setOnEditCommit(text -> text.getRowValue().setValue(text.getNewValue()));
+        valueColumn.setOnEditCommit(ev -> ev.getRowValue().setValue(ev.getNewValue()));
 
         ValuesHandler valuesHandler = new ValuesHandler();
         valuesHandler.selectedItem.bind(valuesTable.getSelectionModel().selectedItemProperty());
 
         valuesButtons.setInteractionHandler(valuesHandler);
+
+        dialogButtons.setInteractionHandler(this);
     }
 
     @Override
     public ObjectProperty<Machine> machineProperty() {
         return machine;
+    }
+
+    @Override
+    public boolean onOkButtonClick() {
+        try {
+            fieldsList.checkValidity();
+        } catch(ValidationException ex) {
+            Dialogs.createErrorDialog(fieldsList.getScene().getWindow(),
+                    "Field Error", ex.getMessage()).showAndWait();
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onMachineUpdated() {
+        //editMachineInstructionController.setFields(allFields);
+    }
+
+    @Override
+    public boolean onHelpButtonClick() {
+        return true;
+    }
+
+    @Override
+    public void displayHelpDialog(String helpPageId) {
+        mediator.getDesktopController().showHelpDialog(helpPageId);
+    }
+
+    @Override
+    public boolean onCancelButtonClick() {
+        return false;
+    }
+
+    @Override
+    public String getHelpPageID() {
+        return "Fields";
     }
 
     @FXML
@@ -306,14 +370,7 @@ public class EditFieldsController
 //        Stage stage = (Stage) table.getScene().getWindow();
 
         // check that all the editing done results in legal fields
-        try {
-            fieldsList.checkValidity();
-        }
-        catch(ValidationException ex) {
-            Dialogs.createErrorDialog(fieldsList.getScene().getWindow(),
-                    "Field Error", ex.getMessage()).showAndWait();
-            return;
-        }
+
 
 //        for (MachineInstruction instruction : instructions){
 //            //adds ignored instruction fields and associated colors to the assembly fields
@@ -335,22 +392,7 @@ public class EditFieldsController
 //            }
 //        }
         
-        //editMachineInstructionController.setFields(allFields);
-        // FIXME KB
-//        editMachineInstructionController.setInstructions(instructions);
-//        stage.close();
-    }
 
-    /**
-     * closes the window without saving any changes made
-     * @param ae the ActionEvent referring to the cancel action
-     */
-    @FXML
-    protected void handleCancel(ActionEvent ae){
-        //get a handle to the stage.
-//        Stage stage = (Stage) table.getScene().getWindow();
-//
-//        //close window.
 //        stage.close();
     }
 
@@ -361,6 +403,18 @@ public class EditFieldsController
         public LongSpinnerValueFactory(long min, long max) {
             this.min = new SimpleLongProperty(this, "min", min);
             this.max = new SimpleLongProperty(this, "max", max);
+
+            super.setConverter(new StringConverter<Long>() {
+                @Override
+                public String toString(Long object) {
+                    return object.toString();
+                }
+
+                @Override
+                public Long fromString(String string) {
+                    return ConvertStrings.toLong(string);
+                }
+            });
         }
 
         public LongSpinnerValueFactory() {

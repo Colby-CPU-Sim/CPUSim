@@ -610,7 +610,7 @@ public class EditMachineInstructionController
     protected void handleEditFields(ActionEvent ae) {
         final Stage fieldStage = new Stage();
 
-        final EditFieldsController controller = new EditFieldsController();
+        final EditFieldsController controller = new EditFieldsController(mediator);
         controller.machineProperty().bind(machineProperty());
 
         final FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(controller, "EditFields.fxml");

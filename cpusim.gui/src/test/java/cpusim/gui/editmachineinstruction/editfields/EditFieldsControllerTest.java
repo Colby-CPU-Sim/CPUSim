@@ -11,6 +11,7 @@ import cpusim.model.Machine;
 import cpusim.model.harness.BindMachine;
 import cpusim.model.harness.CPUSimMatchers;
 import cpusim.model.harness.MachineInjectionRule;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -32,9 +33,7 @@ import java.util.UUID;
 
 import static cpusim.gui.harness.FXMatchers.allItems;
 import static cpusim.gui.harness.FXMatchers.hasValue;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.*;
@@ -136,15 +135,16 @@ public class EditFieldsControllerTest extends FXHarness {
         }
     }
 
-    public void clickFieldValue(Field f, FieldValue fv) {
+    private void clickField(Field f) {
         ObservableList<Field> fields = getMachine().getFields();
 
         interact(() -> fields.add(f));
 
         FieldListControl parent = lookup("#fieldsList").query();
-        clickOn(from(parent).lookup(".list-cell")
-            .match(FXMatchers.forItem(is(f)))
-            .<ListCell<Field>>query());
+        ListCell<Field> cell = from(parent).lookup(".list-cell")
+                .match(FXMatchers.forItem(is(f)))
+                .query();
+        interact(() -> clickOn(cell));
         verifyFieldShown(f);
 
         verifyThat("#valuesTable", isVisible());
@@ -153,6 +153,10 @@ public class EditFieldsControllerTest extends FXHarness {
         verifyThat(from(buttons).lookup("#newButton"), isEnabled());
         verifyThat(from(buttons).lookup("#duplicateButton"), isDisabled());
         verifyThat(from(buttons).lookup("#deleteButton"), isDisabled());
+    }
+
+    public void clickFieldValue(Field f, FieldValue fv) {
+        clickField(f);
 
         TableView<FieldValue> valuesTable = lookup("#valuesTable").query();
         TableRow<FieldValue> row = from(valuesTable).lookup(".table-row-cell")
@@ -160,6 +164,7 @@ public class EditFieldsControllerTest extends FXHarness {
                 .query();
         clickOn(row);
 
+        ControlButtonController<FieldValue> buttons = lookup("#valuesButtons").query();
         verifyThat(from(buttons).lookup("#newButton"), isEnabled());
         verifyThat(from(buttons).lookup("#duplicateButton"), isEnabled());
         verifyThat(from(buttons).lookup("#deleteButton"), isEnabled());
@@ -189,7 +194,7 @@ public class EditFieldsControllerTest extends FXHarness {
 
     @Test
     public void deleteFieldValue() {
-        clickFieldValue(f2, f1.getValues().get(0));
+        clickFieldValue(f2, f2.getValues().get(0));
 
         ControlButtonController<FieldValue> buttons = lookup("#valuesButtons").query();
         Button duplicate = from(buttons).lookup("#duplicateButton").query();
@@ -217,11 +222,10 @@ public class EditFieldsControllerTest extends FXHarness {
     }
 
     @Test
-    public void editFieldValues() {
-        FieldValue fv = f1.getValues().get(0);
-        clickFieldValue(f1, fv);
+    public void editFieldValues() throws Exception {
+        clickField(f1);
 
-        String newName = "new_name";
+        FieldValue fv = f1.getValues().get(0);
 
         TableRow<FieldValue> row = lookup("#valuesTable")
                 .lookup(".table-row-cell")
@@ -238,23 +242,55 @@ public class EditFieldsControllerTest extends FXHarness {
                 .match(MoreTableViewMatchers.cellItem(is(fv.getValue())))
                 .query();
 
-        doubleClickOn(nameCell)
-            .write(newName)
-            .press(KeyCode.ENTER);
-
-        assertThat(fv.getName(), is(newName));
-        verifyThat(nameCell, MoreTableViewMatchers.cellItem(is(newName)));
-
+        // Set the value
         long newValue = 0xDEAD;
 
         doubleClickOn(valueCell)
                 .write("0x" + Long.toHexString(newValue))
-                .press(KeyCode.ENTER);
-
-        interact(() -> {});
+                .type(KeyCode.ENTER);
 
         assertThat(fv.getValue(), is(newValue));
         verifyThat(valueCell, MoreTableViewMatchers.cellItem(is(newValue)));
+
+        // Set the name
+        String newName = "new_name";
+
+        doubleClickOn(nameCell)
+                .write(newName)
+                .type(KeyCode.ENTER);
+
+        verifyThat(nameCell, MoreTableViewMatchers.cellItem(is(newName)));
+        assertThat(fv.getName(), is(newName));
+    }
+
+    @Test
+    public void editField() throws Exception {
+        clickField(f1);
+
+        Field changeField = new Field("check", UUID.randomUUID(), getMachine(), 16,
+                Field.Relativity.pcRelativePostIncr, FXCollections.observableArrayList(f1.getValues()),
+                0xffff, Field.SignedType.Signed, Field.Type.ignored);
+
+        interact("#nameText", this::doubleClickOn);
+        // Write the field name
+        interact(() -> write(changeField.getName()));
+
+        clickComboBoxOption(lookup("#typeChoice"), changeField.getType());
+
+        interact("#bitsSpinner", this::doubleClickOn);
+        interact(() -> write(Long.toString(changeField.getNumBits())));
+        // need to make sure to click on something else now
+        // change unfortunately commits when focus is lost... :(
+
+        // Set the default value after, since it is bound to the #bitsSpinner
+        interact("#defaultValueSpinner", this::doubleClickOn);
+        interact(() -> write("0x" + Long.toHexString(changeField.getDefaultValue())));
+
+        interact("#unsignedCheckbox", this::clickOn);
+
+        clickComboBoxOption(lookup("#relativityChoice"), changeField.getRelativity());
+
+        verifyFieldShown(changeField);
     }
 
     private void verifyFieldShown(Field f) {

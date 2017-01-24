@@ -3,17 +3,19 @@
  */
 package cpusim.model.util.units;
 
-import static com.google.common.base.Preconditions.*;
-
-import java.math.BigInteger;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.MoreObjects;
+import com.google.common.primitives.Ints;
 
 import javax.annotation.Generated;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+import java.math.BigInteger;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Consists of a wrapped integer that has width information that allows it to store and perform math related to 
@@ -154,6 +156,17 @@ public class ArchValue implements Comparable<ArchValue> {
 				"Can not create mask from ArchValue with content: " + value + ", must be between 0 <= value <= 64.");
 		
 		return type.getMask((int)value);
+	}
+
+	/**
+	 * Create a mask of <code>this</code> units wide.
+	 *
+	 * @return bit mask.
+	 */
+	public int imask() {
+		checkState(Ints.BYTES >= as(ArchType.Byte),
+				"Can not get int mask with %s", this);
+		return (int)mask();
 	}
 	
 	/**

@@ -15,10 +15,15 @@ import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
+import com.google.common.primitives.Chars;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 
+import javafx.scene.shape.Arc;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,7 +123,6 @@ public class StreamChannelTest {
 	@Test
 	public void testReadLong() throws IOException {
 		try (PipedOutputStream pos = new PipedOutputStream();
-			 PrintWriter pw = new PrintWriter(pos);
 			 PipedInputStream in = new PipedInputStream(pos)) {
 
 			outStream = mock(PrintStream.class);
@@ -126,13 +130,12 @@ public class StreamChannelTest {
 			
 			final ArchValue bytes = ArchType.Byte.of(4);
 			final long INPUT = 0xDEADBEEF & bytes.mask();
-			
-			pw.write(Long.toString(INPUT));
-			pw.write(System.getProperty("line.separator"));
-			pw.flush();
-			
+			pos.write(Longs.toByteArray(INPUT));
+			pos.write(Chars.toByteArray('\n'));
+			pos.flush();
+
 			assertTrue(in.available() > 0);
-			assertEquals(INPUT, sc.readLong((int)bytes.as()));
+			assertEquals(INPUT, sc.readLong((int)bytes.as(ArchType.Bit)));
 		}
 	}
 
@@ -143,17 +146,16 @@ public class StreamChannelTest {
 	@Test
 	public void testReadAscii() throws IOException {
 		try (PipedOutputStream pos = new PipedOutputStream();
-			 PrintWriter pw = new PrintWriter(pos);
 			 PipedInputStream in = new PipedInputStream(pos)) {
 
 			outStream = mock(PrintStream.class);
 			sc = new StreamChannel(in, outStream);
 			
 			final char INPUT = '$';
-			
-			pw.write(INPUT);
-			pw.write(System.getProperty("line.separator"));
-			pw.flush();
+
+			pos.write(Chars.toByteArray(INPUT));
+			pos.write('\n');
+			pos.flush();
 			
 			assertTrue(in.available() > 0);
 			
@@ -167,7 +169,6 @@ public class StreamChannelTest {
 	@Test
 	public void testReadUnicode() throws IOException {
 		try (PipedOutputStream pos = new PipedOutputStream();
-			 PrintWriter pw = new PrintWriter(pos);
 			 PipedInputStream in = new PipedInputStream(pos)) {
 
 			outStream = mock(PrintStream.class);
@@ -175,10 +176,19 @@ public class StreamChannelTest {
 			
 			final ArchValue bytes = ArchType.Byte.of(2);
 			final int INPUT = (int) (0xDEADBEEF & bytes.mask());
-			
-			pw.write(ConvertLongs.to16WString(INPUT, bytes));
-			pw.write(System.getProperty("line.separator"));
-			pw.flush();
+
+			int[] breakdown = new int[(int)Math.ceil(Integer.bitCount(INPUT) / (8.0 * Short.BYTES))];
+			byte[] asBytes = Ints.toByteArray(INPUT);
+			final int breakdownOffset = (breakdown.length * 2);
+			for (int i = asBytes.length - breakdownOffset, j = 0; i < asBytes.length && j < breakdown.length; i += 2, ++j) {
+				breakdown[j] = (int)Shorts.fromBytes(asBytes[i], asBytes[i+1]) & bytes.imask();
+			}
+
+			for (int b: breakdown) {
+				pos.write(Ints.toByteArray(b));
+			}
+			pos.write('\n');
+			pos.flush();
 			
 			assertTrue(in.available() > 0);
 			assertEquals(INPUT, sc.readUnicode());

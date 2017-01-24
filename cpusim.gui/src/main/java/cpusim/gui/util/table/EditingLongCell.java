@@ -6,12 +6,12 @@
 package cpusim.gui.util.table;
 
 import cpusim.model.util.conversion.ConvertStrings;
-import cpusim.util.Dialogs;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Window;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -36,6 +36,8 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
             createTextField();
             setText(null);
             setGraphic(textField);
+
+            textField.requestFocus();
             textField.selectAll();
         }
     }
@@ -66,16 +68,12 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
         if (empty) {
             setText(null);
             setGraphic(null);
-        }
-        else if (isEditing()) {
-            if (textField != null) {
-                textField.setText(getString());
-            }
+        } else if (isEditing()) {
+            textField.setText(getItem().toString());
             setText(null);
             setGraphic(textField);
-        }
-        else {
-            setText(getString());
+        } else {
+            setText(getItem().toString());
             setGraphic(null);
             setTooltip(new Tooltip("Binary: " + Long.toBinaryString(item) +
                     System.getProperty("line.separator") +
@@ -86,59 +84,40 @@ public class EditingLongCell<T> extends TableCell<T, Long> {
     }
 
 
+    private void tryCommitEdit() {
+        checkNotNull(textField);
+
+        try {
+            long newLong = ConvertStrings.toLong(textField.getText());
+            commitEdit(newLong);
+        } catch (NumberFormatException e) {
+            // Show an error
+            textField.requestFocus();
+            textField.setStyle("-fx-background-color:red;");
+            textField.setTooltip(new Tooltip("You need to enter an integer"));
+        }
+    }
+
     /**
      * creates a text field with listeners so that that edits will be committed
      * at the proper time
      */
     private void createTextField() {
-        textField = new TextField(getString());
-        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.focusedProperty().addListener((arg0, oldValue, newValue) -> {
-            Window parentDialog = textField.getScene() == null ? null :
-                                    textField.getScene().getWindow();
+        textField = new TextField(getItem().toString());
+
+        textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) { // focus moved away from this field
-                try {
-                    long newLong = ConvertStrings.toLong(textField.getText());
-                    commitEdit(newLong);
-                } catch (NumberFormatException e) {
-                    //didn't work because of issues with the focus
-                    //textField.requestFocus();
-                    //textField.setStyle("-fx-background-color:red;");
-                    //textField.setTooltip(new Tooltip("You need to enter an integer"));
-                    Dialogs.createErrorDialog(parentDialog, "Integer Error",
-                            "This column requires integer values").showAndWait();
-                    cancelEdit();
-                }
+                tryCommitEdit();
             }
         });
         textField.setOnKeyPressed(t -> {
             if (t.getCode() == KeyCode.ENTER) {
-                try {
-                    long newLong = ConvertStrings.toLong(textField.getText());
-                    commitEdit(newLong);
-                } catch (NumberFormatException e) {
-                    textField.setStyle("-fx-background-color:red;");
-                    textField.setTooltip(new Tooltip("You need to enter an integer"));
-                    //The following code crashes the program
-                    //Dialogs.showErrorDialog(
-                    //        (Stage)textField.getScene().getWindow(),
-                    //        "This column requires integer values",
-                    //        "Error Dialog", "title");
-                    //cancelEdit();
-                }
-            }
-            else if (t.getCode() == KeyCode.ESCAPE) {
+                tryCommitEdit();
+                t.consume();
+            } else if (t.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
+                t.consume();
             }
         });
-    }
-
-    /**
-     * returns a string value of the item in the table cell
-     *
-     * @return a string value of the item in the table cell
-     */
-    private String getString() {
-        return getItem() == null ? "" : getItem().toString();
     }
 }

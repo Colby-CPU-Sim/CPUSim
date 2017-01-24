@@ -22,7 +22,7 @@ public abstract class FXMatchers {
      */
     public static <T, C extends Cell<T>> Matcher<C> forItem(Matcher<? extends T> onItem) {
         return new BaseMatcher<C>() {
-            @Override
+            @Override @SuppressWarnings("unchecked")
             public boolean matches(Object item) {
                 if (item != null && Cell.class.isAssignableFrom(item.getClass())) {
                     return onItem.matches(((C)item).getItem());

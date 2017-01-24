@@ -202,7 +202,7 @@ public class ControlButtonControllerTest extends FXHarness {
     @Test
     public void onDeleteButtonClick() throws Exception {
         Data supplied = new Data("Test");
-        listView.getItems().add(supplied);
+        interact(() -> listView.getItems().add(supplied));
         verifyThat(".list-view", hasListCell(supplied));
 
         buttonController.setInteractionHandler(listHandler(supplied));
@@ -222,7 +222,7 @@ public class ControlButtonControllerTest extends FXHarness {
     @Test
     public void onDuplicateButtonClick() throws Exception {
         Data supplied = new Data("Test");
-        listView.getItems().add(supplied);
+        interact(() -> listView.getItems().add(supplied));
         verifyThat(".list-view", hasListCell(supplied));
 
         buttonController.setInteractionHandler(listHandler(supplied));

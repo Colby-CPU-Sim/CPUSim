@@ -9,19 +9,15 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An editable cell class that allows the user to modify the string in the cell.
  */
 public class EditingStrCell<T> extends TableCell<T, String> {
 
-    protected TextField textField;
-    protected int cellSize;
+    private TextField textField;
     protected boolean valid;
-    protected String errorMessage;
-
-    public EditingStrCell(int cellSize) {
-        this.cellSize = cellSize;
-    }
 
     public EditingStrCell() {
 
@@ -38,6 +34,7 @@ public class EditingStrCell<T> extends TableCell<T, String> {
             createTextField();
             setText(null);
             setGraphic(textField);
+            textField.requestFocus();
             textField.selectAll();
         }
     }
@@ -50,7 +47,7 @@ public class EditingStrCell<T> extends TableCell<T, String> {
     public void cancelEdit() {
         super.cancelEdit();
 
-        setText((String) getItem());
+        setText(getItem());
         setGraphic(null);
     }
 
@@ -63,20 +60,17 @@ public class EditingStrCell<T> extends TableCell<T, String> {
     public void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
 
-        if (empty) {
+        if (empty || item == null) {
             setText(null);
             setGraphic(null);
+        } else if (isEditing()) {
+            textField.setText(getItem());
+
+            setText(getItem());
+            setGraphic(textField);
         } else {
-            if (isEditing()) {
-                if (textField != null) {
-                    textField.setText(getString());
-                }
-                setText(null);
-                setGraphic(textField);
-            } else {
-                setText(getString());
-                setGraphic(null);
-            }
+            setText(getItem());
+            setGraphic(null);
         }
     }
 
@@ -84,28 +78,25 @@ public class EditingStrCell<T> extends TableCell<T, String> {
      * creates a text field with listeners so that that edits will be committed 
      * at the proper time
      */
-    protected void createTextField() {
-        textField = new TextField(getString());
-        textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
-        textField.focusedProperty().addListener((arg0, arg1, arg2) -> {
-            if (!arg2) {
+    private void createTextField() {
+        checkNotNull(getItem());
+
+        textField = new TextField(getItem());
+
+        textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
                 commitEdit(textField.getText());
             }
         });
+
         textField.setOnKeyPressed(t -> {
             if (t.getCode() == KeyCode.ENTER) {
                 commitEdit(textField.getText());
+                t.consume();
             } else if (t.getCode() == KeyCode.ESCAPE) {
                 cancelEdit();
+                t.consume();
             }
         });
-    }
-
-    /**
-     * returns a string value of the item in the table cell
-     * @return a string value of the item in the table cell
-     */
-    protected String getString() {
-        return getItem() == null ? "" : getItem().toString();
     }
 }

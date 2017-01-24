@@ -19,7 +19,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<fx:root fx:id="rootPane" prefHeight="533.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root fx:id="rootPane" prefHeight="533.0" prefWidth="500.0" type="BorderPane" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
 
     <left>
         <VBox>
@@ -65,7 +65,7 @@
                          <Label text="Bits" GridPane.rowIndex="2" />
                         <Spinner fx:id="bitsSpinner" editable="true" initialValue="1" max="63" min="1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Label text="Default" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                        <Spinner fx:id="defaultValueSpinner" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                        <Spinner fx:id="defaultValueSpinner" editable="true" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                         <Label text="Relativity" GridPane.rowIndex="3" />
                         <CheckBox fx:id="unsignedCheckbox" mnemonicParsing="false" prefHeight="17.0" prefWidth="174.0" text="Unsigned" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                         <ComboBox fx:id="relativityChoice" prefHeight="25.0" prefWidth="174.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" />
