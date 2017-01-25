@@ -449,12 +449,12 @@ public abstract class Validate
         final List<Integer> fieldLengths = instr.getPositiveFieldLengths();
         final int sum = fieldLengths.stream().mapToInt(Integer::intValue).sum();
         
-        if (sum <= 0 || sum > 64) {
+        if (sum < 0 || sum > 64) {
             throw new ValidationException(
                     "The values of the field lengths" +
                     " of instruction \"" + instr.getName() +
                     "\"\nmust add up to a positive number " +
-                    "less than or equal to 64.");
+                    "less than or equal to 64, currently sum is " + sum + ".");
         }
     }
 

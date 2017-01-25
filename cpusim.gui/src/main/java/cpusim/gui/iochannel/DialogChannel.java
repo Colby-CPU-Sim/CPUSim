@@ -20,14 +20,12 @@ package cpusim.gui.iochannel;
 
 import com.google.common.base.MoreObjects;
 import cpusim.model.ExecutionException;
-import cpusim.model.iochannel.IOChannel;
-import cpusim.model.util.units.ArchType;
 import cpusim.util.Dialogs;
 import cpusim.util.FXUtilities;
 import javafx.stage.Stage;
 
-import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * This class implements IOChannel using Dialog Boxes.
@@ -47,9 +45,20 @@ public class DialogChannel extends AbstractStringChannel {
      *
      * @param name - The name given to the console channel.
      */
-    public DialogChannel(String name) {
+    public DialogChannel(UUID id, String name) {
+        super(id);
         this.name = name;
         this.stage = null;
+    }
+
+    /**
+     * Creates a new dialog channel. There is only
+     * one DialogChannel that is used, {@link cpusim.util.GUIChannels#DIALOG}
+     *
+     * @param name - The name given to the console channel.
+     */
+    public DialogChannel(String name) {
+        this(UUID.randomUUID(), name);
     }
 
     /**

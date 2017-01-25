@@ -16,6 +16,7 @@
 package cpusim.model.iochannel;
 
 import cpusim.model.ExecutionException;
+import cpusim.model.util.IdentifiedObject;
 
 /**
  * Interface that any channels we want to use for input or output
@@ -23,7 +24,7 @@ import cpusim.model.ExecutionException;
  *
  * @since 2013-08-01
  */
-public interface IOChannel {
+public interface IOChannel extends IdentifiedObject {
 	
 	/**
      * returns the next integer from input as a long that fits in the given

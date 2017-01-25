@@ -3,6 +3,12 @@ package cpusim.gui.iochannel;
 import cpusim.model.ExecutionException;
 import cpusim.model.iochannel.IOChannel;
 import cpusim.model.util.units.ArchType;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Base class for both {@link ConsoleChannel} and {@link DialogChannel} that fills in the "blanks" from the
@@ -14,7 +20,20 @@ import cpusim.model.util.units.ArchType;
  * @since 2016-11-10
  */
 abstract class AbstractStringChannel implements IOChannel {
-    
+
+    private final ReadOnlyProperty<UUID> id;
+
+    AbstractStringChannel(UUID id) {
+        checkNotNull(id);
+
+        this.id = new SimpleObjectProperty<>(this, "id", id);
+    }
+
+    @Override
+    public ReadOnlyProperty<UUID> idProperty() {
+        return id;
+    }
+
     @Override
     public long readLong(final int numBits) {
         final String sLong = readString("Enter integer (" + numBits + " bits): ");

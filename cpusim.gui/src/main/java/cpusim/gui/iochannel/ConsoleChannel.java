@@ -33,10 +33,11 @@ package cpusim.gui.iochannel;
 import cpusim.Mediator;
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.iochannel.IOChannel;
 import javafx.application.Platform;
 import javafx.scene.input.KeyCode;
 import org.fxmisc.richtext.StyledTextArea;
+
+import java.util.UUID;
 
 /**
  * This class implements IOChannel using a console that appears as a
@@ -68,16 +69,21 @@ public class ConsoleChannel extends AbstractStringChannel {
 	/** added user input field */
 	private String userInput;
 
-	/**
-	 * Constructor for new Console Channel. There is only
-	 * one Console channel that is used, {@link cpusim.util.GUIChannels#CONSOLE}.
-	 * 
-	 * @param name - The name given to the console channel.
-	 */
-	public ConsoleChannel(String name) {
+	public ConsoleChannel(UUID id,  String name) {
+		super(id);
 		this.name = name;
 		this.ioConsole = null;
 		inputCancelled = false;
+	}
+
+	/**
+	 * Constructor for new Console Channel. There is only
+	 * one Console channel that is used, {@link cpusim.util.GUIChannels#CONSOLE}.
+	 *
+	 * @param name - The name given to the console channel.
+	 */
+	public ConsoleChannel(String name) {
+		this(UUID.randomUUID(), name);
 	}
         
         /**

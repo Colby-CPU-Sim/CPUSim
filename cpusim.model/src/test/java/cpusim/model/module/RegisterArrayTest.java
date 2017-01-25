@@ -73,11 +73,6 @@ public class RegisterArrayTest {
         }
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void modifyRegisters() {
-        array.getRegisters().add(null);
-    }
-
     @Test
     public void addRegister() throws Exception {
         ObservableList<Register> registers = FXCollections.observableArrayList();

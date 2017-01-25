@@ -12,13 +12,17 @@
  */
 package cpusim.model.iochannel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import cpusim.model.ExecutionException;
 import cpusim.model.util.MoreStrings;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class represents an IOChannel that uses the State pattern to
@@ -36,7 +40,8 @@ import cpusim.model.util.conversion.ConvertStrings;
  * @since 2013-11-01
  */
 public class BufferedChannel implements IOChannel {
-	
+
+	private ReadOnlyProperty<UUID> uuidProperty;
 	private String name;
 	private IOChannel state;
 
@@ -56,11 +61,24 @@ public class BufferedChannel implements IOChannel {
 	 * @param s - The actual channel this concrete channel
 	 * uses to execute any instructions.
 	 */
-	public BufferedChannel(String n, IOChannel s) {
+	public BufferedChannel(UUID id, String n, IOChannel s) {
 		this.state = s;
 		this.name = n;
 		this.inputBuffer = new StringBuilder();
 		this.outputBuffer = new StringBuilder();
+
+		this.uuidProperty = new SimpleObjectProperty<>(this, "id", UUID.randomUUID());
+	}
+
+	/**
+	 * The constructor to fromRootController a ConcreteChannel.
+	 *
+	 * @param n - The name of the channel.
+	 * @param s - The actual channel this concrete channel
+	 * uses to execute any instructions.
+	 */
+	public BufferedChannel(String n, IOChannel s) {
+		this(UUID.randomUUID(), n, s);
 	}
 
 	/**
@@ -80,6 +98,11 @@ public class BufferedChannel implements IOChannel {
 	 */
 	public BufferedChannel(String n) {
 		this(n, null);
+	}
+
+	@Override
+	public ReadOnlyProperty<UUID> idProperty() {
+		return uuidProperty;
 	}
 
 	/**

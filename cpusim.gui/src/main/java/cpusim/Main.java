@@ -115,7 +115,8 @@ public class Main {
             return;
         }
         
-        final Machine machine = reader.getMachine();
+        final Machine machine = reader.getMachine()
+                .orElseThrow(() -> new IllegalArgumentException("Could not read machine file: " + machineFileName));
         checkState(machine.getCodeStore().isPresent(), "No codeStore set for machine, " + machine);
 
         //assemble and load the program in the text file

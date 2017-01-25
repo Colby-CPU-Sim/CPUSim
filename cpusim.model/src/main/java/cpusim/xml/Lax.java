@@ -12,12 +12,17 @@ package cpusim.xml;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Lax extends org.xml.sax.helpers.DefaultHandler
 {
@@ -239,19 +244,14 @@ public class Lax extends org.xml.sax.helpers.DefaultHandler
         return m;
     }
 
-    //--------------------------
     /**
-     * Reimplement this method to use a parser from a different vendor. See your
-     * parser package documentation for details.
-     * @param isValidating boolean
-     * @param handler org.xml.sax.DocumentHandler
-     * @param sFile java.io.File -- the file to be parsed
-     * @throws Exception if the file is not found
+     * Creates a {@link SAXParser} instance using the {@link SAXParserFactory}.
+     * @param isValidating
+     * @return
+     * @throws ParserConfigurationException
+     * @throws SAXException
      */
-    public void parseDocument(boolean isValidating, DefaultHandler handler,
-                              File sFile)
-            throws Exception
-    {
+    private SAXParser createSaxParser(boolean isValidating) throws ParserConfigurationException, SAXException {
         // Get a "parser factory", an an object that creates parsers
         SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 
@@ -259,11 +259,47 @@ public class Lax extends org.xml.sax.helpers.DefaultHandler
         saxParserFactory.setValidating(isValidating);
         saxParserFactory.setNamespaceAware(false); // Not this month...
 
-        SAXParser parser = saxParserFactory.newSAXParser();
+        return saxParserFactory.newSAXParser();
+    }
 
+    //--------------------------
+    /**
+     * Reimplement this method to use a parser from a different vendor. See your
+     * parser package documentation for details.
+     * @param isValidating boolean Indicates whether or not the factory is configured to produce parsers which validate
+     *                     the XML content during parse.
+     * @param handler org.xml.sax.DocumentHandler
+     * @param sFile java.io.File -- the file to be parsed
+     * @throws Exception if the file is not found
+     *
+     * @throws NullPointerException if the {@code sFile} is {@code null}
+     *
+     * @see SAXParserFactory#isValidating()
+     */
+    public void parseDocument(boolean isValidating,
+                              DefaultHandler handler,
+                              File sFile)
+            throws ParserConfigurationException, SAXException, IOException {
+        checkNotNull(sFile);
+        SAXParser parser = createSaxParser(isValidating);
         parser.parse(sFile, handler);
-        //presumably this method closes the file in a try block if an exception
-        //is thrown during reading.
+    }
+
+    /**
+     * Reimplement this method to use a parser from a different vendor. See your
+     * parser package documentation for details.
+     * @param isValidating boolean
+     * @param handler org.xml.sax.DocumentHandler
+     * @param instream Stream to be parsed, this does not close the stream.
+     * @throws Exception if the file is not found
+     * @throws NullPointerException if {@code instream} is null
+     */
+    public void parseDocument(boolean isValidating, DefaultHandler handler,
+                              InputStream instream) throws ParserConfigurationException, SAXException, IOException {
+        checkNotNull(instream);
+
+        SAXParser parser = createSaxParser(isValidating);
+        parser.parse(instream, handler);
     }
 
     //--------------------------

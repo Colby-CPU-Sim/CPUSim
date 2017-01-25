@@ -447,6 +447,7 @@ public class Mediator {
         try {
             reader.parseDataFromFile(fileToOpen);
         } catch (Exception ex) {
+            ex.printStackTrace();
             errorMessage = ex.getMessage();
             if (errorMessage == null) {
                 errorMessage = "The error type is unknown.";
@@ -477,7 +478,7 @@ public class Mediator {
         setMachineFile(fileToOpen);
         setMachineDirty(false);
 
-        machine = reader.getMachine();
+        machine = reader.getMachine().orElseThrow(() -> new IllegalStateException("Could not load Machine from reader."));
         setMachine(machine);
         this.desktopController.getHighlightManager().setRegisterRAMPairs(
                 FXCollections.observableList(reader.getRegisterRAMPairs()));

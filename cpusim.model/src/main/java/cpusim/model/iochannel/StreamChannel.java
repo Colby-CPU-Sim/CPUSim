@@ -21,11 +21,15 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,6 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class StreamChannel implements IOChannel, AutoCloseable {
 
+	private final ReadOnlyObjectProperty<UUID> uuidProperty;
 	private final InputStream in;
 	private final PrintStream out;
 	
@@ -63,7 +68,20 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	public StreamChannel() {
 		this(System.in, System.out);
 	}
-	
+
+	/**
+	 * Creates a channel from an {@link InputStream} and a {@link PrintStream}.
+	 *
+	 * @param in
+	 * @param out
+	 */
+	public StreamChannel(final UUID id, final InputStream in, final PrintStream out) {
+		this.in = checkNotNull(in);
+		this.out = checkNotNull(out);
+
+		this.uuidProperty = new SimpleObjectProperty<>(this, "id", id);
+	}
+
 	/**
 	 * Creates a channel from an {@link InputStream} and a {@link PrintStream}. 
 	 * 
@@ -71,11 +89,14 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	 * @param out
 	 */
 	public StreamChannel(final InputStream in, final PrintStream out) {
-		this.in = checkNotNull(in);
-		this.out = checkNotNull(out);
+		this(UUID.randomUUID(), in, out);
 	}
-	
-	
+
+	@Override
+	public ReadOnlyProperty<UUID> idProperty() {
+		return uuidProperty;
+	}
+
 	@Override
 	public void close() throws IOException {
 		if (in != null && in != System.in) {

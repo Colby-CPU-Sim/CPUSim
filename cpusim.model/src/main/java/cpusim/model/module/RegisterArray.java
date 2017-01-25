@@ -33,7 +33,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.fxmisc.easybind.EasyBind;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.UUID;
@@ -164,7 +163,7 @@ public class RegisterArray extends Module<RegisterArray>
     }
 
     public ObservableList<Register> getRegisters() {
-        return FXCollections.unmodifiableObservableList(registers.getValue());
+        return registers.getValue();
     }
 
     @Override

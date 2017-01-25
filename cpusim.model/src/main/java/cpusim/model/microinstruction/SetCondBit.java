@@ -21,7 +21,7 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
     private BooleanProperty value;
 
     @DependantComponent
-    private ObjectProperty<ConditionBit> bit;
+    private final ObjectProperty<ConditionBit> bit;
 
     private ReadOnlySetProperty<MachineComponent> dependencies;
 

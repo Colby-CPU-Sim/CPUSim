@@ -12,19 +12,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 // the package in which our project resides
 
-package cpusim.model.util;
+package cpusim.xml;
 
 
 /**
  * This class represents exceptions thrown when attempting to read a machine from an XML
  * file.
  */
-public class MachineReaderException extends RuntimeException
-{
+public class MachineReaderException extends RuntimeException {
 
-    public MachineReaderException(String message)
-    {
+    MachineReaderException(String message) {
         super(message);
+    }
+
+
+    MachineReaderException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 }
