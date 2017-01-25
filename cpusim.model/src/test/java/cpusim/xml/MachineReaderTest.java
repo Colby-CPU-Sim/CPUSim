@@ -35,8 +35,22 @@ public class MachineReaderTest {
     }
 
     @Test
-    public void parseWombat1() throws Exception {
-        Machine newMachine = parseMachine("/Wombat1.cpu");
+    public void parseEmptyMachine() throws Exception {
+        Machine newMachine = parseMachine("/cpus/empty.cpu");
+
+        // TODO add more verifications here
+        assertEquals("empty", newMachine.getName());
+        assertTrue(newMachine.getIndexFromRight());
+        assertThat(newMachine.getRegisters(), hasSize(0));
+    }
+
+
+    // LEGACY PARSING
+
+
+    @Test
+    public void legacy_parseWombat1() throws Exception {
+        Machine newMachine = parseMachine("/cpus/legacy/Wombat1.cpu");
 
         // TODO add more verifications here
         assertEquals("Wombat1", newMachine.getName());
@@ -45,8 +59,8 @@ public class MachineReaderTest {
     }
 
     @Test @Ignore
-    public void parseWombat2() throws Exception {
-        Machine newMachine = parseMachine("/Wombat2.cpu");
+    public void legacy_parseWombat2() throws Exception {
+        Machine newMachine = parseMachine("/cpus/legacy/Wombat2.cpu");
 
         // TODO add more verifications here
         assertEquals("Wombat2", newMachine.getName());
@@ -55,8 +69,8 @@ public class MachineReaderTest {
     }
 
     @Test @Ignore
-    public void parseJVM() throws Exception {
-        Machine newMachine = parseMachine("/JVM2.cpu");
+    public void legacy_parseJVM() throws Exception {
+        Machine newMachine = parseMachine("/cpus/legacy/JVM2.cpu");
         // TODO add more verifications here
         assertEquals("JVM", newMachine.getName());
         assertFalse(newMachine.getIndexFromRight());

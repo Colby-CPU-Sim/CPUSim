@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpu:Machine name="empty.cpu" xmlns:cpu="http://www.cs.colby.edu/djskrien/CPUSim/cpu">
+	<!--............. Punctuation Options .............-->
+	<cpu:PunctChars>
+		<cpu:PunctChar char="!" use="symbol" />
+		<cpu:PunctChar char="#" use="symbol" />
+		<cpu:PunctChar char="$" use="symbol" />
+		<cpu:PunctChar char="%" use="symbol" />
+		<cpu:PunctChar char="&amp;" use="symbol" />
+		<cpu:PunctChar char="^" use="symbol" />
+		<cpu:PunctChar char="_" use="symbol" />
+		<cpu:PunctChar char="`" use="symbol" />
+		<cpu:PunctChar char="*" use="symbol" />
+		<cpu:PunctChar char="?" use="symbol" />
+		<cpu:PunctChar char="@" use="symbol" />
+		<cpu:PunctChar char="~" use="symbol" />
+		<cpu:PunctChar char="+" use="symbol" />
+		<cpu:PunctChar char="-" use="symbol" />
+		<cpu:PunctChar char="(" use="token" />
+		<cpu:PunctChar char=")" use="token" />
+		<cpu:PunctChar char="," use="token" />
+		<cpu:PunctChar char="/" use="token" />
+		<cpu:PunctChar char="=" use="token" />
+		<cpu:PunctChar char="[" use="token" />
+		<cpu:PunctChar char="\" use="token" />
+		<cpu:PunctChar char="]" use="token" />
+		<cpu:PunctChar char="{" use="token" />
+		<cpu:PunctChar char="|" use="token" />
+		<cpu:PunctChar char="}" use="token" />
+		<cpu:PunctChar char="." use="pseudo" />
+		<cpu:PunctChar char=":" use="label" />
+		<cpu:PunctChar char=";" use="comment" />
+	</cpu:PunctChars>
+	
+
+	<!--......... machine instruction fields ............-->
+	<!-- none -->
+
+	<!--............. FileChannels .................-->
+	<!-- none -->
+
+	<!--............. Register .............-->
+	<!-- none -->
+
+	<!--............. RegisterArray .............-->
+	<!-- none -->
+
+	<!--............. RAM .............-->
+	<!-- none -->
+
+	<!--............. ConditionBit .............-->
+	<!-- none -->
+
+	<!--............. Arithmetic .............-->
+	<!-- none -->
+
+	<!--............. Branch .............-->
+	<!-- none -->
+
+	<!--............. Decode .............-->
+	<!-- none -->
+
+	<!--............. End .............-->
+
+
+	<!--............. Comment .............-->
+			<cpu:Comment name="Comment" id="e82a06d7-98e7-449f-8a70-52b08f3e440c" />
+
+	<!--............. Increment .............-->
+	<!-- none -->
+
+	<!--............. IO .............-->
+	<!-- none -->
+
+	<!--............. Logical .............-->
+	<!-- none -->
+
+	<!--............. MemoryAccess .............-->
+	<!-- none -->
+
+	<!--............. SetBits .............-->
+	<!-- none -->
+
+	<!--............. SetCondBit .............-->
+	<!-- none -->
+
+	<!--............. Shift .............-->
+	<!-- none -->
+
+	<!--............. Test .............-->
+	<!-- none -->
+
+	<!--............. TransferRtoR .............-->
+	<!-- none -->
+
+	<!--............. TransferRtoA .............-->
+	<!-- none -->
+
+	<!--............. TransferAtoR .............-->
+	<!-- none -->
+
+	<!--............. global equs ..................-->
+	<!-- none -->
+
+	<!--............. fetch sequence ................-->
+	<cpu:FetchSequence>
+	</cpu:FetchSequence>
+
+	<!--............. machine instructions ..........-->
+	<!-- none -->
+
+	<!--............. highlighting info .............-->
+	<cpu:HighlightingInfo>
+	</cpu:HighlightingInfo>
+
+	<!--............. loading info ..................-->
+
+	<!--............. indexing info ............-->
+	<cpu:IndexingInfo indexFromRight="true" />
+
+	<!--............. program counter info ..................-->
+
+</cpu:Machine>

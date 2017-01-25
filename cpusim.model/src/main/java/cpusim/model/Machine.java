@@ -2,6 +2,7 @@ package cpusim.model;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
@@ -12,8 +13,11 @@ import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
 import cpusim.model.util.*;
+import cpusim.util.Gullectors;
 import javafx.beans.property.*;
-import javafx.collections.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -513,6 +517,11 @@ public class Machine extends Module<Machine> {
         Machine.getModuleClasses().stream().map(this::getModuleUnchecked).forEach(moduleBuilder::add);
         return moduleBuilder.build();
     }
+
+    public ImmutableMap<Class<? extends Module<?>>, List<? extends Module<?>>> getModuleMap() {
+        return Machine.getModuleClasses().stream()
+                .collect(Gullectors.toImmutableMap(Function.identity(), this::getModuleUnchecked));
+    }
     
     /**
      * A getter method for all microinstructions
@@ -549,6 +558,11 @@ public class Machine extends Module<Machine> {
         getMicroClasses().stream().map(this::getMicrosUnchecked).forEach(microBuilder::add);
     
         return microBuilder.build();
+    }
+
+    public ImmutableMap<Class<? extends Microinstruction<?>>, List<Microinstruction<?>>> getMicrosMap() {
+        return Machine.getMicroClasses().stream()
+                .collect(Gullectors.toImmutableMap(Function.identity(), this::getMicrosUnchecked));
     }
 
     /**

@@ -32,13 +32,10 @@ package cpusim.xml;
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.module.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.FileChannel;
 import cpusim.model.iochannel.IOChannel;
-import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RegisterRAMPair;
 import javafx.collections.ObservableList;
@@ -54,11 +51,10 @@ import java.util.Set;
 ///////////////////////////////////////////////////////////////////////////////
 // the MachineWriter class
 
-public class MachineWriter
-{
-    private String[] moduleHeaders, microHeaders;
-    private String ls = System.getProperty("line.separator");
-    private String internalDTD = "<!DOCTYPE Machine [" + ls +
+public class MachineWriter {
+
+    private final String ls = System.getProperty("line.separator");
+    private final String internalDTD = "<!DOCTYPE Machine [" + ls +
             "<!ELEMENT Machine (PunctChar*," +
             " Field*, FileChannel*, Register*, RegisterArray*," +
             " ConditionBit*, RAM*, Set*, Test*, Increment*, Shift*, Logical*," +
@@ -201,30 +197,8 @@ public class MachineWriter
 
     //----------------------
     // constructor
-    public MachineWriter()
-    {
-        moduleHeaders = new String[]{
-            "<!--............. registers .....................-->",
-            "<!--............. register arrays ...............-->",
-            "<!--............. condition bits ................-->",
-            "<!--............. rams ..........................-->"
-        };
-        microHeaders = new String[]{
-            "<!--............. set ...........................-->",
-            "<!--............. test ..........................-->",
-            "<!--............. increment .....................-->",
-            "<!--............. shift .........................-->",
-            "<!--............. logical .......................-->",
-            "<!--............. arithmetic ....................-->",
-            "<!--............. branch ........................-->",
-            "<!--............. transferRtoR ..................-->",
-            "<!--............. transferRtoA ..................-->",
-            "<!--............. transferAtoR ..................-->",
-            "<!--............. decode ........................-->",
-            "<!--............. set condition bit .............-->",
-            "<!--............. io ............................-->",
-            "<!--............. memory access .................-->"
-        };
+    public MachineWriter() {
+       // no-op?
     }
 
     //----------------------
@@ -235,10 +209,7 @@ public class MachineWriter
     //      3 assembly language options
     // The rrPairs are the register/ram pairs for highlighting
     // The module windows are the open windows for registers and rams
-    public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out)
-    {
-        List<List<? extends Module<?>>> moduleVectors = machine.getAllModules();
-        List<List<Microinstruction<?>>> microVectors = machine.getAllMicros();
+    public void writeMachine(Machine machine, String name, ObservableList<RegisterRAMPair> rrPairs, PrintWriter out) {
         
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println(internalDTD);
@@ -287,43 +258,29 @@ public class MachineWriter
         }
 
         //print the modules
-        for (int i = 0; i < moduleVectors.size(); i++) {
+        machine.getModuleMap().forEach((clazz, modules) -> {
             out.println();
-            out.println("\t" + moduleHeaders[i]);
-            if (moduleVectors.get(i).size() == 0)
+            out.println("\t<!--............. " + clazz.getSimpleName() + " .............-->");
+            if (modules.size() > 0) {
+                modules.stream()
+                    .map(m -> m.getXMLDescription("\t"))
+                    .forEach(out::println);
+            } else {
                 out.println("\t<!-- none -->");
-            else
-                for (Module<?> m : moduleVectors.get(i)) {
-                	out.println("\t" + m.getXMLDescription("\t\t"));
-                }
-        }
+            }
+        });
 
-        //print the micros except for End
-        for (int i = 0; i < microVectors.size(); i++) {
+        machine.getMicrosMap().forEach((clazz, micros) -> {
             out.println();
-            out.println("\t" + microHeaders[i]);
-            if (microVectors.get(i).size() == 0)
+            out.println("\t<!--............. " + clazz.getSimpleName() + " .............-->");
+            if (micros.size() > 0) {
+                micros.stream()
+                        .map(m -> m.getXMLDescription("\t"))
+                        .forEach(out::println);
+            } else {
                 out.println("\t<!-- none -->");
-            else
-            	for (Microinstruction m : microVectors.get(i)) {
-                	out.println("\t" + m.getXMLDescription("\t\t"));
-                }
-        }
-
-        //print the End micro
-        out.println();
-        out.println("\t<!--............. end ...........................-->");
-        out.println("\t<End id=\"" + machine.getEnd().getID() + "\" />");
-
-        //print the Comment micros
-        out.println();
-        out.println("\t<!--............. comment ...........................-->");
-        List<Comment> comments = machine.getCommentMicros();
-        if (comments.size() == 0)
-            out.println("\t<!-- none -->");
-        else
-            for( Comment comment : comments)
-                out.println("\t" + comment.getXMLDescription("\t\t"));
+            }
+        });
 
         //print the global EQUs
         out.println();
