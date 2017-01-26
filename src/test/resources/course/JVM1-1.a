@@ -1,0 +1,12 @@
+; This JVM1.1 program reads in integers a and b and then computes
+; (a+25)*(b-18), outputs this value, and halts.
+
+input   ;get integer a & push it on the stack. stack: a
+bipush 25 ;push 25 on the stack.  stack: (a)(25)
+iadd	;add a and 25.  stack: (a+25)
+input   ;get integer b & push it on the stack.  stack: (a+25)(b)
+bipush -18  ;push -18 on the stack.  stack: (a+25)(b)(-18)
+iadd	;add b and -18.  stack: (a+25)(b-18)
+imul	;multiply (a+25) and (b-18)
+output	; pop the value off the stack and print it
+stop	; That's all, folks!

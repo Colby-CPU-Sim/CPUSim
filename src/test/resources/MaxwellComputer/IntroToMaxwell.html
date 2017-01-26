@@ -1,0 +1,168 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=us-ascii" />
+<title>Intro Bruce1Sim</title>
+<style>
+<!--
+.Normal
+	{font-family:Palatino;}
+.MsoBodyText
+	{font-family:Times;}
+.MsoBodyText2
+	{font-family:Palatino;
+	color:red;}
+.computercode
+	{tab-stops:.5in .75in 1.0in 1.25in 1.5in 1.75in 2.0in;
+	font-family:Courier;
+	color:black;}
+.style1 {color: #FF0000}
+.red {
+	color: #F00;
+}
+-->
+</style>
+</head>
+<body lang=EN-US class="Normal" bgcolor="#FFFFFF">
+<p><b><a href="http://moodle.colby.edu/course/view.php?id=191">CS232, Spring 2013</a></b></p>
+<h2 align=center style='text-align:center;
+'><b>Introduction to <em>CPU Sim</em> and the Maxwell Computer</b></h2>
+<p><em>CPU Sim</em> is a simulator of a variety of CPUs. In particular, it can simulate the CPU (the &quot;Maxwell&quot; computer) that you are developing in Projects 6, 7, and 8. You can use<em>CPU Sim</em> to load and run machine language (binary) programs or assembly language programs for the Maxwell computer. It has many useful features for editing and debugging your programs, including the usual  features such as cut/copy/paste, as well as syntax highlighting, and stepwise debugging in both forward and backward directions.</p>
+<p align=center style='text-align:center'><b>Starting
+  up <i>Bruce1 Sim</i></b></p>
+  <p><i>CPU Sim</i> is a free application that can be downloaded from the CS232 course page. (Note: You must have Java version 1.8.0_40 or later installed on your computer for it to work properly.) After you download <em>CPU Sim</em>, unzip it, and follow the directions in the README file, you should be able to run it. When you do so, a large window should appear. 
+  This window is the main "desktop" window for <i>CPU Sim</i>. The left side of the desktop lists all the registers in the Maxwell computer. The right side shows the RAM and ROM. The center is a text editor for creating and editing assembly language programs for the Maxwell computer. Note that different parts of an assembly language program--such as the instructions, the comments, and the labels--are colored differently. The bottom part of the desktop is a console for doing input and output.  When the program needs input from you, it will prompt you in the console and the console background will change to yellow.  When the program has data to output, it outputs it to the console window.  You can also optionally change it to do input and output via dialog boxes or via text files  instead of the console if you wish.</p>
+<p>The title of the<i> </i>desktop window is "Maxwell" since that is the name of the CPU being simulated.</p>
+<p align=center style='text-align:center'><b>The Maxwell Register and RAM Windows Explained</b></p>
+<p>The pane on the bottom left of the desktop entitled &quot;R&quot; displays  eight of the 
+  registers in the Bruce1's CPU. The pane on the top left of the desktop entitled &quot;Registers&quot; displays the remaining registers in the Bruce computer. It includes three internal private registers (the _A, _B, and _Halt,  registers) used only to implement some of the machine instructions. These windows show the registers' widths (that is, the number 
+  of bits in the register) and current values. To see the registers' values displayed 
+  in other formats, such as base 2 (binary), base 16 (hexadecimal), or ASCII,  select the appropriate item from 
+  the popup menu at the top of this window. The decimal is converted to binary 
+  or hexadecimal or ASCII from a two's complement representation. The values of the registers 
+  can be edited in any of these bases by double-clicking in the appropriate cell 
+  of the table, typing in a new value, and then pressing the Enter or Return key. (Try doing 
+  some editing of these cells now to see what happens. If you type in an illegal 
+value and press enter, the cell turns red.)</p>
+<p>The window entitled &quot;RAM&quot; allows you to see the contents of the 
+  Maxwell's RAM. Similarly, the window entitled &quot;ROM&quot; allows you to see the contents of the Maxwell's ROM. As with 
+  the registers, you can display the values and addresses in different formats using the popup menus at the top of the window.   The values in these windows 
+  are all editable except for those in the address column.</p>
+<p>Note: 
+  The columns in the tables in any of these windows can be reordered by dragging 
+  the column headers left or right to a new position. The column widths 
+  can also be adjusted by dragging the line dividing the columns. Furthermore, 
+  in all windows except the RAM and ROM windows, the rows can be sorted by column by clicking 
+  in any column header.</p>
+<p align=center style='text-align:center'><b>Creating and Loading Machine Language Programs</b></p>
+<p>You can use <em>CPU Sim</em> to run machine language (binary) programs stored in mif (memory initialization file) format. We will demonstrate how to run such programs using the &quot;absProg.mif&quot; program that inputs an integer and outputs its absolute value. This program is supplied with <em>CPU Sim.</em></p>
+<p>First choose &quot;Reset everything&quot; from the <strong>Execute</strong> menu to clear to 0 all the registers, the RAM, and the ROM. Then choose 
+  "Load ROM or RAM..." from the <b>File</b> menu. (Note: If this menu item 
+  is disabled, then neither the ROM or RAM window is  the currently selected--that is, highlighted--window. In that case, click anywhere on the ROM  window  to select it and then 
+  choose "Load ROM or RAM".) Choose &quot;from mif file with binary data&quot; from the submenu, find and open the &quot;absProg.mif&quot; file.</p>
+<p>At this point, if there are any syntax errors 
+  in your mif file, <em>Bruce1 Sim</em> will flash an error message and highlight the 
+  part of your  program that it can't understand. The absProg.mif program shouldn't 
+  have any errors in it and so you should see numbers and comments appear in the 
+  first few rows of the table in the ROM window. If you display the data in the 
+ROM window in binary, the &quot;data&quot; column should display the machine language program in binary. Note that  spaces have been added after every 4 bits to make the values more readable.</p>
+<p>You can also use the <em>Bruce1 Sim's </em>built-in text editor to create or edit mif files. To do so, choose &quot;Open text...&quot; from the <strong> File</strong> menu and open the file named &quot;absProg.mif&quot;. The mif file will be displayed in a new internal window in the <I>Bruce1 Sim</I> desktop.    This window is a basic text editor window, in which you can 
+type or edit text, including the usual cut/copy/paste/undo/find/replace features. After you have edited it and saved any changes, you can reload the file by using the &quot;Load ROM or RAM...&quot; menu item from the <strong>File</strong> menu.</p>
+<p>To run the program, read the section below entitled &quot;Running Programs&quot;.</p>
+<p align=center style='text-align:center'><b>Creating and Editing Assembly Programs</b></p>
+<p>Assembly language programs are edited like mif files. To see how it works, let's open the assembly language version of the program that adds up the first 10 odd integers. To do so, choose &quot;Open text...&quot; from the <strong> File</strong> menu and open the file named &quot;sumten.a&quot; (supplied with <em>Bruce1 Sim</em>). The assembly language program will be displayed in a new internal window in the <I>Bruce1 Sim</I> desktop.    This window is a basic text editor window, in which you can 
+type or edit text, including the usual cut/copy/paste/undo/find/replace features.</p>
+<p>Here is a description of the various words and values you see in the window.</p><UL>
+  <LI>The first few lines 
+  are just comments.  In the Bruce1 assembly language, comments always begin with a pound sign (hash mark) and end at the end 
+  of the line and are displayed in the text window in italics. The remaining non-blank lines are the assembly language instructions. 
+  </LI>
+  <LI>Some of the instructions begin with the labels, such as &quot;loop:&quot; and &quot;breakout:&quot;, which are displayed in brown characters in a bold font. 
+  Labels must end with a colon. Label names can be used in the address part of 
+  some of the instructions to refer to the line starting with that label. </LI>
+  <LI>The instruction names are displayed in blue in a bold font in an assembly program. You can change the color coding scheme in the Preferences dialog box.</LI>
+  <LI>The instruction names in the assembly language program are followed by zero or more operand fields.  These fields contain either literals, labels, or register names.
+  Literal operands can be in the form of decimal,  binary, or hexadecimal integers--to use the binary or hexadecimal bases, you need to prefix your integer with &quot;0b&quot; or &quot;0x&quot;.</LI></UL>
+<p align=center style='text-align:center'><b>Assembling and Loading Programs into Memory</b></p>
+<p>Before you can run the program &quot;sumten.a&quot;, you must have <i>Bruce1 Sim</i> assemble 
+  it into machine language instructions that the Bruce1 can understand and then 
+  you must load those instructions into the Bruce1's ROM. To do so, first choose &quot;Reset everything&quot; from the <strong>Execute</strong> menu to clear to 0 all the registers, the RAM, and the ROM. Then choose 
+  "Assemble &amp; Load" from the <b>Execute</b> menu. (Note: If this menu item 
+  is disabled, then the sumten.a window is not the currently selected--that is, highlighted--window. In that case, click anywhere on the sumten.a window first to select it and then 
+  choose "Assemble &amp; Load".) At this point, if there are any syntax errors 
+  in your program, the assembler will flash an error message and highlight the 
+  part of your assembly program that it can't understand. The sumten.a program shouldn't 
+  have any errors in it and so you should see numbers and comments appear in the 
+  first few rows of the table in the ROM window. If you display the data in the 
+  ROM window in binary, the &quot;data&quot; column should display the machine language program in binary. Note that  spaces have been added after every 4 bits to make the values more readable.</p>
+<p align=center style='text-align:center'><b>Running  Programs</b></p>
+<p>Now the 
+  program in the main memory is ready to be run. To run a program in ROM, choose "Run" 
+  from the <b>Execute</b> menu. The program will begin execution with the 
+  instruction whose address is stored in the program counter PC. 
+  The machine runs by repeatedly executing machine cycles consisting of (a) the 
+  fetch sequence, which loads the instruction whose address is in the PC into the IR, increments the PC, and then decodes the instruction, followed by (b) the execute 
+  sequence, which loads any data needed by the instruction and then executes the machine instruction that was just decoded.</p>
+<p>When you run the program, you should see it print a value in the console window at the bottom of the main window. That is the sum of the first ten odd integers. This will be followed by a dialog box 
+  indicating that the program has ceased execution. Click the &quot;OK&quot; button to close the dialog box. 
+  When execution is complete, you can see the final state of the registers, ROM, and 
+  RAM in their windows.</p>
+<p>You've done it! You now successfully (a) started <i>Bruce1 Sim</i>, 
+  (b) loaded a 
+  program into the simulated computer's main memory, and (c) ran the program. 
+  This is the usual routine when using <i>Bruce1 Sim</i>.</p>
+<p align=center style='text-align:center'><b>Editing and rerunning a program</b></p>
+  <p>Let's now edit the sumten.a program so that the user inputs the number of odd integers to add together, instead of adding only the first 10 odd integers. To do so, just edit the line &quot;MOVEI 10 RD&quot; so that it reads &quot;IPORT RD&quot;. Save your changes and then choose "Clear, assemble, load, and run" from the <b>Execute</b> menu. You should see the bottom console window turn yellow and prompt you to enter an integer. If the cursor is not blinking in the bottom console window, click in the console window to select it. Then type in the value 5 and press return or enter. You should see the value 25 printed in the console window and then the program will halt.</p>
+  <p align=center style='text-align:center'><b>Using <i>Bruce1 Sim</i> to help you debug your 
+    code</b></p>
+  <p><i>Bruce1 Sim</i> has extensive features to help you debug your programs. You can 
+    step through the execution of your program one machine instruction  at a time so that 
+    you can observe, (and edit, if desired) the values in  
+    the registers, RAM, and ROM after each instruction. You can even back up as many machine instructions 
+    as you wish to restore the machine to a previous state.</p>
+  <p>Let's try it. First clear everything (by choosing &quot;Clear everything&quot; from the <strong>Execute</strong> menu), select the sumten.a window, and then choose 
+  &quot;Assemble &amp; load&quot; from the <b>Execute</b> menu. Then select "Debug 
+  mode" from the <b>Execute</b> menu. You will see a toolbar appear at the top 
+  of the display. (In the toolbar, ignore the buttons that refer to Micros and ignore the 
+  right end of the toolbar that says  &quot;Fetch sequence&quot; followed by a scroll box.)</p>
+<p>Let us now step through the execution of the sumten.a program.   If you click 
+  "Step by Instr" from the toolbar, the fetch sequence and the instruction 
+  it fetches will both be executed. Do so  now.  
+  As you can see, each click of "Step by Instr" causes a full machine 
+  cycle to be executed. Step forward a few more instructions, watching what happens to the values in 
+  the registers. Also, notice that the next instruction 
+  to be executed is always highlighted in sumten.a and in ROM. Now try backing 
+  up a few instructions. To do so, choose "Backup one Instr" from 
+  the toolbar a few times. As you are stepping through the execution, you can 
+  edit the contents of any of the registers, ROM, or RAM.</p><p>To finish, you can continue stepping forward or you can choose "Go" 
+  from the toolbar, which will execute the program without stopping. To 
+  start execution all over again from the beginning, choose "Reset all" 
+  from the toobar.</p>
+  <p>You can also set break points in your program when you are in debug mode. To do so, just check the appropriate check box in the leftmost column of the ROM window. When the program reaches that instruction, execution will halt. At that point you can inspect and optionally change the values in the registers, RAM, and ROM, step forward, step backward, or continue without stopping (by choosing &quot;Go&quot;) to the next breakpoint or the end of the program.</p>
+  <p>To exit debug mode, just select &quot;Debug Mode&quot; again from the <strong>Execute</strong> menu.</p>
+  <p align=center style='text-align:center'><b>Infinite Loops</b></p>
+<p>If your 
+  program gets into an infinite loop, the way to break out of it is to choose 
+  &quot;Stop&quot; from the <b>Execute</b> menu (or press the Ctrl and period 
+  &quot;.&quot; keys), which will cause <i>Bruce1 Sim</i> to stop running the current program.  If you get into an infinite loop when in Debug mode, <I>Bruce1 Sim</I> may crash due to out-of-memory errors.  Therefore, try testing your programs first when <I>not</I> in Debug mode. To halt the program when the IO Console is waiting for input, just press return before entering any values.</p><p align=center style='text-align:center'><b>Getting Help</b></p>
+  <p><i>Bruce1 Sim</i> contains an extensive set of features to aid you in editing, testing, 
+  and debugging your programs and machines. The best resource for learning these 
+  features is the user's manual. The most up-to-date copy of the user's manual 
+  is  online as part of the <i>Bruce1 Sim</i> package. To access the online help, 
+  just choose &quot;General Bruce1 Sim Help&quot; from <i>Bruce1 Sim</i>'s <b>Help</b> menu. 
+  Beware that the online help talks about <em>CPU Sim</em>, not <em>Bruce1 Sim</em>, and so includes a discussion of menus and menu items that do not exist in <em>Bruce1 Sim</em>. Just ignore those parts of the online help. Feel free to ask me if you have 
+  any questions, especially if you wish to learn about short cuts for performing 
+  various tasks.</p><p align=center style='text-align:center'><b><i>Bruce1 Sim</i> bugs and features</b></p>
+<p>Although the author has removed from <i>Bruce1 Sim</i> all the bugs that he is aware of, it almost 
+  surely contains other bugs that you will encounter. When that happens, 
+  please let me know and I will try to get the author fix them as quickly as he can. Ideally, 
+  give me directions on how to reproduce the bugs; otherwise it might be very 
+  hard for the author to find them and fix them.</p>
+<p>I would also like to be made aware of any missing features of <i>Bruce1 Sim</i> that 
+  you feel should be added to the package. If the feature is relatively 
+  simple, I can sometimes get the author to add it within a few days.</p>
+<p align=center style='text-align:center'><b>Quitting <i>Bruce1 Sim</i> and Logging out</b></p>
+<p>To quit <i>Bruce1 Sim</i>, just choose "Quit Bruce1 Sim" from the <b>File</b> menu or click 
+  the close box in the upper-left or right corner of the desktop window. If any of the text in the text editing windows have been changed since they were last saved, you will be asked 
+  whether you want to save the changes before quitting.</p>
+</body>
+</html>

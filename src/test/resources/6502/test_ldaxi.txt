@@ -1,0 +1,40 @@
+; test LDA (indirect,x) instructions
+LDXi 0
+LDAxi ptrdat0
+LDXi 2
+LDAxi ptrdat0
+LDXi 4
+LDAxi ptrdat0
+LDXi 6
+LDAxi ptrdat0
+LDXi 8
+LDAxi ptrdat0
+NOP
+LDXi ptrdat0
+LDAxi 0
+LDXi ptrdat1
+LDAxi 0
+LDXi ptrdat2
+LDAxi 0
+LDXi ptrdat3
+LDAxi 0
+LDXi ptrdat4
+LDAxi 0
+LDXi ptrdat0
+NOP
+LDAxi 0
+LDAxi 2
+LDAxi 4
+LDAxi 6
+LDAxi 8
+BRK
+abdata0: .data 1 [-1]
+abdata1: .data 1 [1]
+abdata2: .data 1 [127]
+abdata3: .data 1 [128]
+abdata4: .data 1 1
+ptrdat0: .data 2 abdata0
+ptrdat1: .data 2 abdata1
+ptrdat2: .data 2 abdata2
+ptrdat3: .data 2 abdata3
+ptrdat4: .data 2 abdata4

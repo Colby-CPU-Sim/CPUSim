@@ -1,0 +1,7 @@
+; test LDX immediate instructions
+LDXi 0
+LDXi 127
+LDXi 128
+LDXi 255
+LDXi -1
+BRK

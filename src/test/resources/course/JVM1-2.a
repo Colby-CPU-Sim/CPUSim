@@ -1,0 +1,25 @@
+; This JVM1 program reads in non-negative integers
+; m and n and outputs the product of m and n, without 
+; using the IMUL (multiply) machine instruction.
+
+sum EQU 0	; local var 0
+m   EQU 1	; local var 1
+n   EQU 2	; local var 2
+
+	iconst_0	; push 0 (space for m)
+	iconst_0	; push 0 (space for n)
+	input		; read m and push on stack
+	istore m	; store m
+	input		; read n and push on stack
+	istore n	; store n
+loop:	iload n		; loop: iload n
+	ifeq end	; if n=0, jump to end
+	iinc n -1	; decrement n
+	iload m		; iload m
+	iload sum	; iload sum
+	iadd		; iadd
+	istore sum	; store new sum
+	goto loop	; goto loop
+end:	iload sum	; end: iload sum
+	output		; output (m*n)
+	stop		; stop

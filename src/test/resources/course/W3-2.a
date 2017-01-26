@@ -1,0 +1,47 @@
+; This Wombat3 program reads character (ASCII) input.  If the input
+; consists of balanced parentheses followed by a '.',
+; it immediately outputs the character 'T' and halts.
+; It halts and outputs the character 'F' in all other cases.
+
+; A0 holds the new characters as they are read in.
+; A1 holds the sentinel value PERIOD
+; A2 holds the sentinel value LEFTPAREN
+; A3 holds the top of stack after popping
+
+	load A1 PERIOD  ;initialize A1 to value '.'
+	push A1		;push '.' on base of stack
+	load A2 LEFTPAREN ;initialize A2 to value '('
+	load A3 RIGHTPAREN ;initialize A3 to value ')'
+
+loop:	read A0		;loop: read the next char
+	subtract A0 A1	;subtract sentinel
+	jmpz A0 end	;jump to end if result is 0
+	add A0 A1	;add back the sentinel value
+	subtract A0 A2	;subtract LEFTPAREN
+	jmpz A0 left	;jump to left if result is 0
+	add A0 A2	;add back LEFTPAREN
+	subtract A0 A3	;subtract RIGHTPAREN
+	jmpz A0 right	;jump to right if result is 0
+	jump bad	;jump to bad
+right:	pop A0		;right: pop stack top char into A0
+	subtract A0 A1	;subtract sentinel
+	jmpz A0 bad	;jump to bad if A0 result is 0
+	jump loop	;jump back to loop
+left:	push A0		;left: push A0 (the left parenthesis)
+	jump loop	;jump back to loop
+
+end:	pop A0		;end: pop stack top into A0
+	subtract A0 A1	;subtract sentinel
+	jmpz A0 good	;jump to good if result is 0
+bad:	load A0	false	;bad: load 'F' in A0
+	write A0	;write 'F' from A0
+	stop		;stop
+good:	load A0 true	;good: load 'F' in A0
+	write A0	;write 'T' from A0
+	stop		;stop
+	
+true:	.data 2 84 	; constant 'T'
+false:	.data 2 70	; constant 'F'
+PERIOD:	.data 2 46	; constant '.'
+LEFTPAREN:  .data 2 40	; constant '('
+RIGHTPAREN: .data 2 41	; constant ')' (not used)
