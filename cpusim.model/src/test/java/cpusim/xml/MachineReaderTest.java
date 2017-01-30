@@ -50,7 +50,7 @@ public class MachineReaderTest {
 
     @Test
     public void legacy_parseWombat1() throws Exception {
-        Machine newMachine = parseMachine("/cpus/legacy/Wombat1.cpu");
+        Machine newMachine = parseMachine("/cpus/Wombat1/Wombat1.cpu");
 
         // TODO add more verifications here
         assertEquals("Wombat1", newMachine.getName());
@@ -60,7 +60,7 @@ public class MachineReaderTest {
 
     @Test @Ignore
     public void legacy_parseWombat2() throws Exception {
-        Machine newMachine = parseMachine("/cpus/legacy/Wombat2.cpu");
+        Machine newMachine = parseMachine("/cpus/Wombat2/Wombat2.cpu");
 
         // TODO add more verifications here
         assertEquals("Wombat2", newMachine.getName());
@@ -70,7 +70,7 @@ public class MachineReaderTest {
 
     @Test @Ignore
     public void legacy_parseJVM() throws Exception {
-        Machine newMachine = parseMachine("/cpus/legacy/JVM2.cpu");
+        Machine newMachine = parseMachine("/cpus/JVM2/JVM2.cpu");
         // TODO add more verifications here
         assertEquals("JVM", newMachine.getName());
         assertFalse(newMachine.getIndexFromRight());
