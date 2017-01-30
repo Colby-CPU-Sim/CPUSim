@@ -1,0 +1,8 @@
+00 : 0111000000000000; --input int into RA
+01 : 1000000110000001; --RA + ZEROS => RB to set condition bits
+02 : 0011001000000101; --branch to line 5 if RA is negative
+03 : 0110000000000000; --output RA
+04 : 0011110000000000; --exit
+05 : 1001110000000000; --ZEROS - RA => RA (negate RA)
+06 : 0110000000000000; --output RA
+07 : 0011110000000000; --exit

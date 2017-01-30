@@ -1,0 +1,124 @@
+;; This JVM3 program reads in an integer n and then reads in n more
+;; integers to store in an array.  Finally, it sorts the array
+;; using Selection sort and then outputs the values from smallest
+;; to largest.
+;;
+;; This is assignment JVM3-1EC and JVM3-2EC except that the students are required to
+;; use 2 subroutines, which I didn't use here.
+
+n 	EQU 0
+counter EQU 1
+maxIndx EQU 2
+max	EQU 3
+B	EQU 4	;; pointer to array B
+next	EQU 5  	;; next slot of partially sorted array to fill
+
+	iconst_0 ;push space for LV 0 (n)
+	iconst_0 ;push space for LV 1 (loop counter)
+	iconst_0 ;push space for LV 2 (index of max so far)
+	iconst_0 ;push space for LV 3 (max so far)
+	iconst_0 ;push space for LV 4 (ptr to B)
+	iconst_0 ;push space for LV 5 (next)
+
+	;; read in n
+	input		; input n
+	dup		; duplicate it for use by newarray
+	istore	n	; store n in LV 0
+
+	;; create the new array
+	newarray	; push ptr to B
+	istore	B	; store B ptr in B
+
+	;; read in the data B[0]..B[n-1]
+in:	iload	n	; in: push n
+	iload	counter	; push counter
+	isub		; compute n - counter
+	ifeq sort	; if n - counter == 0 jump to sort
+	iload B		; otherwise, push B
+	iload counter	; push index (counter)
+	input		; input the next array value
+	iastore		; store the input in B[counter]
+	iinc counter 1	; counter++
+	goto in		; go back to in to read more in
+
+	;; now sort the array
+
+	;; first initialize next = n-1
+sort: 	iload n		; sort:  load n
+	iconst_-1	; push -1
+	iadd		; compute n-1
+	istore next	; store n-1 in next
+
+	;; outer loop
+	;; first test next < 0
+outer:	iload	next	; outer:  push next
+	iflt	out	; if next < 0 goto out to output array
+
+	;; now initialize local vars for the loop
+	;;   maxIndx = 0, max = B[0], counter = 1
+	iconst_0	; push 0
+	istore	maxIndx	; store 0 in maxIndx
+
+	iload	B	; load B ptr
+	iconst_0 	; push 0
+	iaload		; load B[0]
+	istore	max	; store B[0] in max
+
+	iconst_1	; push 1
+	istore	counter	; store 1 in counter
+	
+	;; now find the largest
+findMx:	iload	next	; findMx:  push next
+	iload	counter	; push counter
+	isub		; compute next - counter
+	iflt	swop	; if next - counter < 0 jump to swop
+	iload	B	; otherwise push B ptr
+	iload	counter	; load counter for array indexing
+	iaload		; push B[counter]
+	iload	max	; push the current max
+	isub		; compute B[counter] - max
+	iflt continue	; if B[counter] - max < 0 skip updating max
+
+	;; update max and maxIndx
+	iload	B	; otherwise push B ptr
+	iload	counter	; push counter for array indexing
+	iaload		; push B[counter]
+	istore	max	; store B[counter] in max
+	iload	counter	; load counter
+	istore	maxIndx	; store counter in maxIndx
+continue: iinc counter 1 ; counter++
+	goto	findMx	; go back to findMx to compute the rest
+	
+	;;swap B[next] and B[maxIndx]
+swop:	iload	B	; swop: load B ptr
+	iload	maxIndx	; load maxIndx
+	iload	B	; load B ptr
+	iload	next	; load next
+	iaload		; load B[next]
+	iload	B	; load B ptr
+	iload	next	; load next
+	iload	B	; load B ptr
+	iload	maxIndx	; load maxIndx
+	iaload		; load B[maxIndx]
+	iastore		; B[next] = B[maxIndx]
+	iastore		; B[maxIndx] = B[next]
+	iinc next -1	; next--
+	goto	outer	; goto the outer loop again
+
+	;; now output sorted array
+	;; first initialize counter = 0
+out:	iconst_0	; out: push 0
+	istore	counter	; store 0 in counter
+
+nxtout:	iload	n	; nxtout: push n
+	iload	counter	; push counter
+	isub		; compute n - counter
+	ifeq	end	; if n-counter == 0 jump to the end to quit
+	iload	B	; otherwise, push B
+	iload	counter	; push index (counter)
+	iaload		; load B[counter]
+	output		; write B[counter]
+	iinc counter 1	; counter++
+	goto	nxtout	; go back tonxtout to write the next one
+
+end:	stop		; stop

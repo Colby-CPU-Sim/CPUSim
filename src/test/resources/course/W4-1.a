@@ -1,0 +1,24 @@
+; This Wombat4 program computes N mod M via a function call.
+
+main:	read A0 	   ; Read in N
+	push A0 	   ; Push it onto the stack.
+	read A0 	   ; Read in M
+	push A0 	   ; Push it onto the stack.
+	call modulo 	   ; Call the N mod M function.
+	pop A0 	   	   ; Load in the function result...
+	write A0 	   ; and output it.
+	stop 		   ; end of main program.
+
+modulo:	load_s A1 4 	   ; read M into A1
+	load_s A0 6	   ; read N into A0
+	move A0 A2 	   ; copy N into A2 as well
+	divide A2 A1   	   ; divide N by M in A2
+	multiply A2 A1     ; multiply the result by M in A2
+	subtract A0 A2     ; Subtract the result from N to get modulus.
+	load_s A3 2	   ; load the RA into A3
+	pop A2		   ; pop the stack frame
+	pop A2
+	pop A2
+	push A0 	   ; push the result
+	push A3 	   ; push the return address
+	return 		   ; return to main.

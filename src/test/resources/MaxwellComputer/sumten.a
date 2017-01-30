@@ -1,0 +1,22 @@
+# Author: Bruce Maxwell
+# Course:  CS 232 Spring 2015
+# Description: This program outputs the sum of the first 10
+# odd integers.
+
+# setup
+  movei 1 RA  # next odd integer to add to total
+  movei 0 RB  # total
+  movei 2 RC  # amount of increment
+  movei 10 RD # the number of odd integers to add
+
+# loop
+loop:
+  add RA RB RB
+  add RA RC RA
+  add ONES RD RD
+  braz breakout
+  bra loop
+
+breakout: # RB contains the sum
+  oport RB  # should output 100 if RD = 10
+  exit

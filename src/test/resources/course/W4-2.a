@@ -1,0 +1,75 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; This Wombat4 program computes fib(n) recursively.
+; The definition if fib is:
+;	fib(1) = fib(2) = 1
+;	fib(n) = fib(n-1) + fib(n-2) for n < 2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+n EQU 6
+RA EQU 4
+temp EQU 2
+
+;; the main program
+	read A0 	; read in the value for n.
+	push A0 	; Push n onto the stack as the parameter.
+	call fib 	; Call the fib procedure.
+	pop A0 		; Pop off the result fib(n).
+	write A0 	; Output it.
+	stop 		; End of main program.
+
+;; function fib
+;; parameters:  a positive integer n
+;; returns:  fib(n)
+;; It crashes if n <= 0.
+;; During execution, the registers will be used as follows:
+;;	A[0] will contain n
+;;	A[1] will be used for temporary values.
+;;	A[3] will contain the constant 1
+;; The stack frame has  n  the RA and one local var.
+
+fib:	push A0		; push space for temp local var
+	; load parameter and get other necessary data
+	load A3 one 	; fact: load constant 1 into A[3]
+	load_s A0 n	; load n into A[0]
+
+	; handle the base case
+	subtract A0 A3	; subtract 1 from n in A[0]
+	jmpz A0 base 	; if n-1=0, jump to the end (base).
+	subtract A0 A3	; subtract 1 from n-1 in A[0]
+	jmpz A0 base	; if n-2=0, jump to the end (base).
+
+	; prepare for the recursive call
+	store_s A0 temp	; store n-2 in temp during the recursion
+ 	push A0 	; push n-2 in A[0] onto the stack as the parameter
+	call fib 	; call fib(n-2) recursively
+
+	; save the value returned by the call to fib(n-2)
+	pop A1 		; pop off fib(n-2) into A[1]
+	load_s A0 temp	; load the saved n-2 into A[0]
+
+	; prepare for the second recursive call
+	load A3 one	; load constant 1 into A[3]
+	add A0 A3 	; add 1 to n-2 in A[0]
+ 	store_s A1 temp	; store fib(n-2) from A[1] into temp
+	push A0		; push n-1 from A[0] onto the stack as a parameter
+	call fib 	; call fib(n-1) recursively
+
+	; compute the result using the value returned by the call to fib(n-1)
+	pop A1 		; pop off fib(n-1) into A[1]
+	load_s A0 temp	; load fib(n-2) into A[0] from temp
+	add A0 A1 	; add fib(n-1) and fib(n-2) in A[0]
+
+	; pop the frame, push the value, and return
+	pop A1		; pop & dispose of temp
+	pop A2		; load the RA into A2
+	pop A1		; pop and dispose of n
+	push A0  	; push fib(n) from A0 to return it
+	jump done 	; jump to the end (done)
+base:	pop A1		; pop & dispose of temp
+	pop A2		; load the RA into A2
+	pop A1		; pop and dispose of n
+	push A3		; base: push result of 1
+done:	push A2		; done: push return address
+	return 		; return to the caller
+
+one:	.data 2 1 	;the constant one

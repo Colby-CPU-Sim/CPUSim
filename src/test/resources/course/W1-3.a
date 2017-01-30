@@ -1,0 +1,39 @@
+; This Wombat1 program reads in two arbitrary (positive
+; or negative)integers m and n and
+; outputs the product of m and n, without using the
+; multiply machine instruction.
+	  
+	 
+	read  		; read n -> acc
+	store n		; store n in memory
+	read		; read m -> acc
+	store m		; store m in memory
+	jmpn fixSign	; if m <0 jump to fixSign
+	jump Start	; jump to start
+fixSign: store sign	; fixSign: store m (a neg) in sign
+	subtract sign	; subtract m to get 0 in acc
+	subtract m	; get -m (= abs(m))
+	store m		; store abs(m) in memory)
+Start:	jmpz  Done  	; Start: jump to Done if m = 0.
+	load sum	; load sum
+       	add   n		; add n to the sum in the acc
+       	store sum 	; store the new sum
+	load m		; load m
+	subtract one	; subtract 1
+	store m		; store decremented m
+       	jump  Start	; go back
+Done:  	load  sign 	; Done: load the sign
+	jmpn neg	; if sign < 0 jump to neg
+	load sum	; load sum
+       	jump Out	; jump to Out
+neg:	subtract sign	; neg: subtract sign to get 0 in acc
+	subtract sum	; subtract sum
+Out:	write 		; Out: output the final sum
+       	stop  		; stop
+
+sum:   	.data 2 0 ; sum
+n:	.data 2 0 ; n
+m:	.data 2 0 ; m
+one:	.data 2 1 ; the constant 1
+sign:	.data 2 1 ; sign (stores original m if m <0)
+

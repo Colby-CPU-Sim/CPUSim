@@ -1,0 +1,17 @@
+; test LDA absolute,y instructions
+LDYi 0
+LDAay abdata0
+LDYi 1
+LDAay abdata0
+LDYi 2
+LDAay abdata0
+LDYi 3
+LDAay abdata0
+LDYi 4
+LDAay abdata0
+BRK
+abdata0: .data 1 [0]
+abdata1: .data 1 [127]
+abdata2: .data 1 [128]
+abdata3: .data 1 [255]
+abdata4: .data 1 [-1]

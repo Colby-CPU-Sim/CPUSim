@@ -1,0 +1,15 @@
+;-----------------------------------
+;  This JVM1 program reads in an integer x and
+;  outputs 1 if x >= 0 or -1 if x < 0.
+;-----------------------------------
+
+	input		; read x and push it on the stack
+	iflt less	; pop x and if x < 0, then jump to label less
+	iconst_1	; push a 1 on the stack
+	goto end	; jump to the label end
+less:	iconst_-1	; push a -1 on the stack
+end:	output	; pop the -1 and write it out
+	stop		; halt	
+
+
+

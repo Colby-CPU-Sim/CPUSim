@@ -1,0 +1,6 @@
+loadc A0 -4
+loadc A1 13
+add A0 A1
+store A0 IO
+exit
+val: .data 2 16000

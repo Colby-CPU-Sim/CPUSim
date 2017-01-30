@@ -1,0 +1,39 @@
+; This Wombat2 program uses self-modifying code in order to read in an
+; arbitrary list of positive integers until a -999 is read in
+; and then prints out the positive integers in reverse order.
+
+        load A3 nine	;loads 999 to A3; this is the sentinel
+        load A2 two	;loads 2 in to A2; this the value the store slot is incremented
+Start:  read A0		;read in the number
+        add A0 A3	;adds 999 to the number
+        jmpz A0	Print	;jumps if the value was -999
+        subtract A0 A3  ;restores the original value 
+Input:  store A0 70	;stores the value in a slot (the first is #60)
+        load A1 Input	;loads the value in store
+        add A1 A2	;increments the value in Input by 2
+        store A1 Input	;returns the new position to Input
+        jump Start	;jumps to start for next value
+
+Print:  load A1 Input	;loads the last value input
+        load A3 Store	;loads 4096
+        subtract A1 A3	;calculates the address for the number
+        load A3 Load	;loads the number corosponding to load
+        add A1 A3	;computes the command corresponding to load the last number
+        subtract A1 A2  ;decrements the value by two
+        store A1 Recall	;stores the load command
+Recall: load A0 Input	;loads the value in store, this code is not important
+                        ;as it is replaced before it is executed
+        jmpz A0 Stop	;end if back to 0
+        write A0	;writes out the value
+        subtract A1 A2	;decrements the address
+        store A1 Recall	;stores the proper comand to load the previous number
+        jump Recall	;loops back to print the next number
+
+Stop:   stop		;stop
+	
+nine:  .data 2 999	;two byte location for the number 999
+Store: .data 2 4096	;the decimal number corresponding to the store command
+Load:  .data 2 2048	;the decimal number corresponding to load
+two:   .data 2 2	;two byte location for the number 2
+zero:  .data 2 0 	;zero
+
