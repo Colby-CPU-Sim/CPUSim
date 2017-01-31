@@ -1,10 +1,11 @@
 package cpusim.gui.editmachineinstruction;
 
+import cpusim.Mediator;
+import cpusim.gui.util.DragHelper;
 import cpusim.gui.util.MicroinstructionTreeView;
-import cpusim.model.Machine;
+import cpusim.model.harness.BindMachine;
+import cpusim.model.harness.MachineInjectionRule;
 import cpusim.model.microinstruction.Comment;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,23 +14,24 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 /**
  * Test the interaction between the {@link MachineInstructionImplTableController} and a
- * {@link cpusim.gui.util.MicroinstructionTreeView}
+ * {@link MicroinstructionTreeView}
  *
  * @since 2016-12-05
  */
-public class MachineImplTableListInteractionTest extends ApplicationTest {
-
-
-    private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(new Machine("test"));
-
-    private MachineInstructionImplTableController machineInstructionImplTableController;
-
-    private MicroinstructionTreeView microinstructionTreeView;
+public class EditMachineInstructionsTest extends ApplicationTest {
+    
+    
+    @BindMachine
+    private EditMachineInstructionController underTest;
+    
+    @Rule
+    public MachineInjectionRule machineProperty = new MachineInjectionRule(this);
     
     @Override
     public void start(Stage stage) throws Exception {
@@ -38,11 +40,10 @@ public class MachineImplTableListInteractionTest extends ApplicationTest {
         HBox layout = new HBox();
         pane.getChildren().add(layout);
         ObservableList<Node> children = layout.getChildren();
-
-        machineInstructionImplTableController = new MachineInstructionImplTableController();
-        machineInstructionImplTableController.setId("implTable");
-        machineInstructionImplTableController.machineProperty().bind(machineProperty);
-        children.add(machineInstructionImplTableController);
+        
+        underTest = new EditMachineInstructionController(new Mediator(stage));
+        
+        
 
         microinstructionTreeView = new MicroinstructionTreeView();
         microinstructionTreeView.setId("instTree");

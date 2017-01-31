@@ -577,6 +577,7 @@ public class Machine extends Module<Machine> {
         }
     }
 
+    public ListProperty<MachineInstruction> instructionsProperty() { return instructions; }
     public ObservableList<MachineInstruction> getInstructions() {
         return instructions;
     }

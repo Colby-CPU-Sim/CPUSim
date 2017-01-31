@@ -8,11 +8,15 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * JUnit4 {@link org.junit.Rule} that will automatically bind anything annotated with {@link BindMachine} to an internal
@@ -26,36 +30,55 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
     
     private final List<Field> fieldsToBind;
     
+    private final Supplier<Machine> machineFactory;
+    
     /**
      * The Test class instance.
      *
      * @param instance
      */
     public MachineInjectionRule(Object instance) {
-        checkNotNull(instance);
+        this(instance, null);
+    }
     
+    /**
+     * The Test class instance.
+     *
+     * @param instance
+     */
+    public MachineInjectionRule(Object instance, @Nullable String resourceToLoad) {
+        checkNotNull(instance);
+        
         testInstance = instance;
         
         ArrayList<Field> fieldsToBind = new ArrayList<>();
-    
+        
         // collect the fields
         Class<?> iterClazz = testInstance.getClass();
         while (iterClazz != Object.class) {
             for (Field f : iterClazz.getDeclaredFields()) {
                 if (f.isAnnotationPresent(BindMachine.class) &&
                         (MachineBound.class.isAssignableFrom(f.getType())
-                         || ObjectProperty.class.isAssignableFrom(f.getType()))) {
+                                || ObjectProperty.class.isAssignableFrom(f.getType()))) {
                     f.setAccessible(true);
                     fieldsToBind.add(f);
                 }
             }
-    
+            
             iterClazz = iterClazz.getSuperclass();
         }
         
         fieldsToBind.trimToSize();
         
         this.fieldsToBind = fieldsToBind;
+        
+        if (resourceToLoad != null) {
+            try (InputStream input = getClass().getResourceAsStream(resourceToLoad)) {
+                
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException("Could not load " + resourceToLoad, ioe);
+            }
+        }
     }
     
     private Machine createMachine() {

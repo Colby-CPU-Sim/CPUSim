@@ -175,6 +175,8 @@ public class EditMachineInstructionController
 
         noFieldsLabel.visibleProperty().bind(currentInstrHasAssocFields);
 
+        this.instructionList.itemsProperty().bind(getMachine().instructionsProperty());
+        
         // Children's machines need to be bound as well.
         this.microinstTreeView.machineProperty().bind(machine);
         this.instImplTableController.machineProperty().bind(machine);

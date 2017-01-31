@@ -119,14 +119,14 @@ public class RegisterArray extends Module<RegisterArray>
      */
     private void bindRegister(Register toBind) {
         checkNotNull(toBind);
-
+    
+        this.registers.add(toBind);
+        
         if (toBind.getName().isEmpty()) {
             toBind.setName(String.format("%s[%s]", getName(), getIndexString(registers.indexOf(toBind))));
         }
 
         toBind.widthProperty().bindBidirectional(width);
-
-        this.registers.add(toBind);
     }
 
     @Override
