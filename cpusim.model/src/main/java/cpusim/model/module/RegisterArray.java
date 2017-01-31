@@ -98,6 +98,20 @@ public class RegisterArray extends Module<RegisterArray>
     }
 
     /**
+     * Copy constructor
+     * @param other
+     */
+    public RegisterArray(RegisterArray other) {
+        this(other.getName(),
+                UUID.randomUUID(),
+                other.getMachine(),
+                other.getWidth(),
+                other.getLength(),
+                other.initialValue,
+                other.initialAccess);
+    }
+
+    /**
      * Binds the name "arrayName[i]" ({@link Register#nameProperty()} &lt;- {@link #nameProperty()}) and the
      * {@link Register#widthProperty()} &lt;-&gt; {@link #widthProperty()}.
      *

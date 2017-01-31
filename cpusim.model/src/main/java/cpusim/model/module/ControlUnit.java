@@ -62,6 +62,14 @@ public class ControlUnit extends Module<ControlUnit> {
                 .buildSet(this, "dependencies");
     }
 
+    /**
+     * Copy constructor
+     * @param other
+     */
+    public ControlUnit(ControlUnit other) {
+        this(other.getName(), UUID.randomUUID(), other.getMachine());
+    }
+
     @Override
     public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
         return dependencies;
