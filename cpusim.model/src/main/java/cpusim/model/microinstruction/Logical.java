@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+
 /**
  * The logical microinstructions perform the bit operations of AND, OR, NOT, NAND,
  * NOR, or XOR on the specified registers.
@@ -21,6 +22,8 @@ public class Logical extends ArithmeticLogicOperation<Logical> {
         AND(BigInteger::and),
 
         OR(BigInteger::or),
+
+        XOR(BigInteger::xor),
 
         NAND((lhs, rhs) -> AND.apply(lhs, rhs).not()),
 
@@ -39,7 +42,6 @@ public class Logical extends ArithmeticLogicOperation<Logical> {
             return operation.apply(lhs, rhs);
         }
     }
-
 
     /**
      * Constructor

@@ -1,9 +1,11 @@
 package cpusim.model.util;
 
 import javafx.beans.property.*;
-import javafx.beans.value.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableListValue;
+import javafx.beans.value.ObservableSetValue;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.*;
-import org.fxmisc.easybind.EasyBind;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -69,6 +71,7 @@ public class ObservableCollectionBuilder<T extends IdentifiedObject> {
                             .forEach(backingMap::remove);
                 } else if (c.wasAdded()) {
                     backingMap.putAll(c.getAddedSubList().stream()
+                            .distinct()
                             .collect(Collectors.toMap(IdentifiedObject::getID, Function.identity())));
                 }
             }

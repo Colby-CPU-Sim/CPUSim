@@ -73,7 +73,7 @@
 <!ATTLIST RAMWindowInfo ram IDREF #REQUIRED cellSize CDATA "1" top CDATA "50" left CDATA "50" width CDATA "450" height CDATA "450" contentsbase (Decimal|Binary|Hexadecimal|Ascii|UnsignedDec|Unicode) "Decimal" addressbase (Decimal|Binary|Hexadecimal) "Decimal">
 ]>
 
-<Machine name="Wombat2test.cpu" >
+<Machine name="Wombat2.cpu" >
 	<!--............. Punctuation Options .............-->
 	<PunctChar char="!" use="symbol" />
 	<PunctChar char="#" use="symbol" />

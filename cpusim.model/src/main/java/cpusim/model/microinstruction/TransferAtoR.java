@@ -21,9 +21,9 @@ import java.util.UUID;
 public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR> {
 
     @DependantComponent
-    private ObjectProperty<Register> index;
-    private IntegerProperty indexStart;
-    private IntegerProperty indexNumBits;
+    private final ObjectProperty<Register> index;
+    private final IntegerProperty indexStart;
+    private final IntegerProperty indexNumBits;
 
     /**
      * Constructor

@@ -27,7 +27,6 @@ import cpusim.model.Machine;
 import cpusim.model.util.MachineComponent;
 import cpusim.model.util.Validatable;
 import cpusim.model.util.ValidationException;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -107,10 +106,9 @@ public class RegisterArray extends Module<RegisterArray>
     private void bindRegister(Register toBind) {
         checkNotNull(toBind);
 
-        toBind.nameProperty().bind(Bindings.format("%s[%s]",
-                nameProperty(),
-                Bindings.createStringBinding(() -> getIndexString(registers.indexOf(toBind)),
-                        registers)));
+        if (toBind.getName().isEmpty()) {
+            toBind.setName(String.format("%s[%s]", getName(), getIndexString(registers.indexOf(toBind))));
+        }
 
         toBind.widthProperty().bindBidirectional(width);
 

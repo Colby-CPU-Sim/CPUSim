@@ -38,6 +38,8 @@
 
 package cpusim.xml;
 
+import com.google.common.base.CharMatcher;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import cpusim.model.Field;
@@ -53,6 +55,7 @@ import cpusim.model.iochannel.StreamChannel;
 import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
 import cpusim.model.util.*;
+import cpusim.model.util.conversion.ConvertStrings;
 import javafx.collections.FXCollections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -66,6 +69,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.stream.Collectors;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
@@ -93,7 +97,7 @@ public class MachineReader {
 	// the current RegisterArray being constructed
 	private int currentRegisterArrayIndex;
 	// the index of the next register to be added to the current RegisterArray
-	private Map<String, Object> fields; // key = name, value = Field
+	private Map<String, Field> fields; // key = name, value = Field
 
 	private VersionHandler byVersion;
 	private IOChannel consoleChannel;
@@ -337,6 +341,9 @@ public class MachineReader {
 					+ "\" must be an integer, not \"" + valueString + "\".", e);
 		}
 		UUID id = byVersion.getUUID(attrs.getValue("id"));
+		if (id == null) {
+			id = UUID.randomUUID();
+		}
 		Field lastField = machine.getFields().get(machine.getFields().size() - 1);
 		lastField.getValues().add(new FieldValue(name, id, machine, value));
 	}
@@ -422,7 +429,7 @@ public class MachineReader {
 		}
 		
 		UUID id = byVersion.getUUID(attrs.getValue("id"));
-		RegisterArray r = new RegisterArray(name, id, machine, length, width, 0, Register.Access.readWrite());
+		RegisterArray r = new RegisterArray(name, id, machine, width, length, 0, Register.Access.readWrite());
 		components.put(id, r);
 		machine.getModules(RegisterArray.class).add(r);
 
@@ -1378,8 +1385,9 @@ public class MachineReader {
 					null, null);
 		} else if (currentInstructionFormat == null) {
 			// version 2: A single format for machine & assembly instructions
-			// FIXME this had a format string previously..
-			currentInstruction = new MachineInstruction(name, UUID.randomUUID(), machine, opcode, null, null);
+			List<Field> fields = ConvertStrings.formatStringToFields(currentFormat, machine);
+			currentInstruction = new MachineInstruction(name, UUID.randomUUID(), machine, opcode,
+					fields, fields);
 		} else {
 			// version 3: separate formats for machine & assembly instructions
 			
@@ -1396,30 +1404,29 @@ public class MachineReader {
 	public void endMachineInstruction() {
 		try {
 			if (currentInstruction.getInstructionFields().size() == 0) {
-				// it must be the old version where there were only
-				// FieldLengths,
-				// so now fromRootController the Fields and then set the
-				// instruction and
-				// assembly fields
-				String[] fieldNames = currentFormat.split("\\s");
-				for (String fieldName : fieldNames) {
-					if (!fields.containsKey(fieldName)) {
-						int fieldLength = Math.abs(Integer.parseInt(fieldName));
-						Field field = new Field(fieldName, UUID.randomUUID(), machine,
-								fieldLength, Field.Relativity.absolute,
-								FXCollections.observableArrayList(), 0,
-								Field.SignedType.Signed, Field.Type.required);
+				// it must be the old version where there were only FieldLengths,
+				// so, we split the current format by spaces, then convert them into new Fields
+				// as we find them, attempting to reuse as possible
+				List<Field> instFields = Splitter.on(CharMatcher.whitespace())
+						.omitEmptyStrings()
+						.splitToList(currentFormat)
+						.stream()
+						.map(fieldName ->
+							fields.computeIfAbsent(fieldName, key -> {
+								int fieldLength = Math.abs(Integer.parseInt(fieldName));
+								Field field = new Field(fieldName, UUID.randomUUID(), machine,
+										fieldLength, Field.Relativity.absolute,
+										FXCollections.observableArrayList(), 0,
+										Field.SignedType.Signed, Type.required);
 
-						machine.getFields().add(field);
-						fields.put(fieldName, field);
-					}
-				}
-				// generate the correct instruction
-				MachineInstruction newInstr = new MachineInstruction(currentInstruction.getName(), UUID.randomUUID(),
-						machine, currentInstruction.getOpcode(), null, null);
-				// copy it into currentInstruction
-				currentInstruction.setInstructionFields(newInstr.getInstructionFields());
-				currentInstruction.setAssemblyFields(newInstr.getAssemblyFields());
+								machine.getFields().add(field);
+								return field;
+							}))
+						.collect(Collectors.toList());
+
+				// put the instruction fields it into currentInstruction
+				currentInstruction.setInstructionFields(instFields);
+				currentInstruction.setAssemblyFields(instFields);
 				// FIXME colours https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109#109
 //				currentInstruction.setInstructionColors(newInstr.getInstructionColors());
 //				currentInstruction.setAssemblyColors(newInstr.getAssemblyColors());
