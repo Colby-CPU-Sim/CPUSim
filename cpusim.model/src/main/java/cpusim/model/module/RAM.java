@@ -84,6 +84,18 @@ public class RAM extends Module<RAM> {
         this.length = lengthProperty;
     }
 
+    /**
+     * Copy constructor
+     * @param other
+     */
+    public RAM(RAM other) {
+        this(other.getName(),
+                UUID.randomUUID(),
+                other.getMachine(),
+                other.getLength(),
+                other.getCellSize());
+    }
+
     //------------------------
     // utility methods
 

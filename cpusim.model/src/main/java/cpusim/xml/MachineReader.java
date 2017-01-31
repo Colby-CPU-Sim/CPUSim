@@ -358,7 +358,7 @@ public class MachineReader {
 
 		// TODO this should be a Set of elements rather than attributes
 		String readOnlyString = attrs.getValue("readOnly");
-		readOnlyString = readOnlyString == null ? "false" : "true";
+		readOnlyString = readOnlyString == null ? "false" : readOnlyString;
 		EnumSet<Register.Access> access = byVersion.getMemoryAccess(readOnlyString);
 
 		int width;

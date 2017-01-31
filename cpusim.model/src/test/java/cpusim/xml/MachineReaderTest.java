@@ -3,6 +3,7 @@ package cpusim.xml;
 import cpusim.SamplesFixture;
 import cpusim.model.Machine;
 import cpusim.model.module.ConditionBit;
+import cpusim.model.module.Register;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -173,6 +174,15 @@ public class MachineReaderTest {
             assertTrue(newMachine.getIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(11));
             assertThat(newMachine.getFields(), hasSize(4));
+
+            Register aluP = newMachine.getRegisters()
+                    .stream()
+                    .filter(r -> r.getName().equals("ALU-P"))
+                    .findFirst()
+                    .orElseThrow(AssertionError::new);
+            assertEquals("ALU-P", aluP.getName());
+            assertEquals(0, aluP.getInitialValue());
+            assertEquals(Register.Access.readWrite(), aluP.getAccess());
         }
 
         @Test
@@ -186,6 +196,15 @@ public class MachineReaderTest {
             assertThat(newMachine.getFields(), hasSize(4));
 
             assertThat(newMachine.getModules(ConditionBit.class), hasSize(9));
+
+            Register aluP = newMachine.getRegisters()
+                    .stream()
+                    .filter(r -> r.getName().equals("ALU-P"))
+                    .findFirst()
+                    .orElseThrow(AssertionError::new);
+            assertEquals("ALU-P", aluP.getName());
+            assertEquals(0, aluP.getInitialValue());
+            assertEquals(Register.Access.readWrite(), aluP.getAccess());
         }
 
         @Test
@@ -199,6 +218,15 @@ public class MachineReaderTest {
             assertThat(newMachine.getFields(), hasSize(4));
 
             assertThat(newMachine.getModules(ConditionBit.class), hasSize(9));
+
+            Register aluP = newMachine.getRegisters()
+                    .stream()
+                    .filter(r -> r.getName().equals("ALU-P"))
+                    .findFirst()
+                    .orElseThrow(AssertionError::new);
+            assertEquals("ALU-P", aluP.getName());
+            assertEquals(0, aluP.getInitialValue());
+            assertEquals(Register.Access.readWrite(), aluP.getAccess());
         }
     }
 

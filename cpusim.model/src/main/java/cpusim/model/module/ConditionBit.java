@@ -52,11 +52,24 @@ public class ConditionBit extends Module<ConditionBit> {
     public ConditionBit(String name, UUID id, Machine machine, Register register, int bit, boolean halt) {
         super(name, id, machine);
         this.register = new SimpleObjectProperty<>(this, "register", register);
-        this.bit = new SimpleIntegerProperty(bit);
-        this.halt = new SimpleBooleanProperty(halt);
+        this.bit = new SimpleIntegerProperty(this, "bit", bit);
+        this.halt = new SimpleBooleanProperty(this, "halt", halt);
 
         this.dependants = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependencies");
+    }
+
+    /**
+     * Copy constructor
+     * @param other
+     */
+    public ConditionBit(ConditionBit other) {
+        this(other.getName(),
+                UUID.randomUUID(),
+                other.getMachine(),
+                other.getRegister(),
+                other.getBit(),
+                other.getHalt());
     }
 
     @Override
