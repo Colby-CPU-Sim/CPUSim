@@ -15,7 +15,7 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.model.util.MoreBindings;
+import cpusim.util.MoreBindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;

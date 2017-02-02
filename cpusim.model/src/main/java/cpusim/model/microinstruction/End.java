@@ -4,7 +4,7 @@ import cpusim.model.Machine;
 import cpusim.model.module.ControlUnit;
 import cpusim.model.module.Module;
 import cpusim.model.util.MachineComponent;
-import cpusim.model.util.MoreBindings;
+import cpusim.util.MoreBindings;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlySetProperty;
 

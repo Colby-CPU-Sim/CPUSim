@@ -2,6 +2,7 @@ package cpusim.model.util;
 
 import cpusim.model.Machine;
 import cpusim.util.ClassCleaner;
+import cpusim.util.MoreFXCollections;
 import javafx.beans.property.*;
 
 import java.lang.annotation.*;

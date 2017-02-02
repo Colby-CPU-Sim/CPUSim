@@ -54,12 +54,10 @@ import java.util.List;
 
 import cpusim.model.Field;
 import cpusim.model.Machine;
-import cpusim.model.assembler.Assembler;
-import cpusim.model.assembler.AssemblyException;
-import cpusim.model.assembler.Token;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
+import cpusim.util.MoreStrings;
 
 /**
  * This class contains a collection of static conversion methods, mostly for converting

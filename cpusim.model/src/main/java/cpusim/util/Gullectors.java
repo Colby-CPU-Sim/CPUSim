@@ -18,10 +18,7 @@ package cpusim.util;
 
 // Taken from: https://raw.githubusercontent.com/maciejmiklas/cyclop/b90df02ab952e1aebccbb4be2595dc49e1464a99/cyclop-webapp/src/main/java/org/cyclop/common/Gullectors.java
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.*;
 
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
@@ -71,6 +68,20 @@ public abstract class Gullectors {
                 valueMapper.apply(t));
         BinaryOperator<ImmutableMap.Builder<K, V>> combiner = (l, r) -> l.putAll(r.build());
         Function<ImmutableMap.Builder<K, V>, ImmutableMap<K, V>> finisher = ImmutableMap.Builder::build;
+
+        return Collector.of(supplier, accumulator, combiner, finisher);
+    }
+
+    // kb
+    public static <T> Collector<T, ?, Multiset<T>> toMultiset() {
+
+        Supplier<LinkedHashMultiset<T>> supplier = LinkedHashMultiset::create;
+        BiConsumer<LinkedHashMultiset<T>, T> accumulator = (b, v) -> b.add(v);
+        BinaryOperator<LinkedHashMultiset<T>> combiner = (l, r) -> {
+            l.addAll(r);
+            return l;
+        };
+        Function<LinkedHashMultiset<T>, Multiset<T>> finisher = s -> s;
 
         return Collector.of(supplier, accumulator, combiner, finisher);
     }

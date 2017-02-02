@@ -1,6 +1,6 @@
 package cpusim.xml;
 
-import cpusim.SamplesFixture;
+import cpusim.model.harness.SamplesFixture;
 import cpusim.model.Machine;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;

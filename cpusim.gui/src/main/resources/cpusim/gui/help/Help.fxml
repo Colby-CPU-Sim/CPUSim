@@ -46,7 +46,7 @@ Michael Goldenberg, Ben Borchard, and Jinghui Yu modified this code on 12/6/13 i
                                             </graphic>
                                         </TreeItem>
                                         <TreeItem
-                                                value="A Tour of CPU Sim">
+                                                value="A Tour key CPU Sim">
                                             <children>
                                                 <TreeItem
                                                         value="Part 1: Running CPU Sim">

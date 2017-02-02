@@ -8,6 +8,7 @@ package cpusim.model;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import cpusim.model.util.*;
+import cpusim.util.MoreFXCollections;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
 

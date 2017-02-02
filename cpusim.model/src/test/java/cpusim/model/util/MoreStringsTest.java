@@ -5,6 +5,7 @@ package cpusim.model.util;
 
 import static org.junit.Assert.*;
 
+import cpusim.util.MoreStrings;
 import org.junit.Test;
 
 /**
@@ -15,7 +16,7 @@ import org.junit.Test;
 public class MoreStringsTest {
 
 	/**
-	 * Test method for {@link cpusim.model.util.MoreStrings#insertSpacesInString(CharSequence, int)}.
+	 * Test method for {@link MoreStrings#insertSpacesInString(CharSequence, int)}.
 	 */
 	@Test
 	public void testInsertSpacesInString() {
@@ -26,7 +27,7 @@ public class MoreStringsTest {
 	}
 
 	/**
-	 * Test method for {@link cpusim.model.util.MoreStrings#removeAllWhiteSpace(java.lang.String)}.
+	 * Test method for {@link MoreStrings#removeAllWhiteSpace(java.lang.String)}.
 	 */
 	@Test
 	public void testRemoveAllWhiteSpace() {
@@ -34,7 +35,7 @@ public class MoreStringsTest {
 	}
 
 	/**
-	 * Test method for {@link cpusim.model.util.MoreStrings#removeLeadingWhitespace(java.lang.String)}.
+	 * Test method for {@link MoreStrings#removeLeadingWhitespace(java.lang.String)}.
 	 */
 	@Test
 	public void testRemoveLeadingWhitespace() {
@@ -42,7 +43,7 @@ public class MoreStringsTest {
 	}
 
 	/**
-	 * Test method for {@link cpusim.model.util.MoreStrings#capitalizeFirstLetter(java.lang.String)}.
+	 * Test method for {@link MoreStrings#capitalizeFirstLetter(java.lang.String)}.
 	 */
 	@Test
 	public void testCapitalizeFirstLetter() {

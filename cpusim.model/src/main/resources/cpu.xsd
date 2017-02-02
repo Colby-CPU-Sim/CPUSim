@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema targetNamespace="http://www.cs.colby.edu/djskrien/CPUSim/cpu" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-  <!-- TODO change namespace to a github url? -->
+  <!-- TODO change namespace value a github url? -->
   <xs:element name="Machine" type="MachineType"/>
 
   <xs:simpleType name="uuid">
@@ -171,7 +171,7 @@
 
   <xs:complexType name="FieldsType">
     <xs:annotation>
-      <xs:documentation>Defines all of the fields in use in a CPU</xs:documentation>
+      <xs:documentation>Defines all key the fields in use in a CPU</xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element name="Field" maxOccurs="unbounded" minOccurs="0">
@@ -194,7 +194,7 @@
 
   <xs:complexType name="PunctCharsType">
     <xs:annotation>
-      <xs:documentation>Defines a set of PunctChars where every element uses &lt;PunctChar /&gt;</xs:documentation>
+      <xs:documentation>Defines a set key PunctChars where every element uses &lt;PunctChar /&gt;</xs:documentation>
     </xs:annotation>
     <xs:sequence>
       <xs:element name="PunctChar" maxOccurs="unbounded">

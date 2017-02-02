@@ -6,12 +6,10 @@ import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.*;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.conversion.ConvertStrings;
-import cpusim.model.util.units.ArchType;
-import cpusim.model.util.units.ArchValue;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.beans.property.adapter.JavaBeanLongPropertyBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -36,7 +33,13 @@ public class MachineInstruction
                 , ReadOnlyMachineBound
                 , MachineComponent
                 , Copyable<MachineInstruction> {
-    
+
+
+    public enum FieldType {
+        Assembly,
+        Instruction
+    }
+
     private final StringProperty name;				//the name of the machine instruction
     private final ReadOnlyObjectProperty<UUID> id;
 
@@ -51,6 +54,9 @@ public class MachineInstruction
 
     @DependantComponent
     private final ListProperty<Field> instructionFields;
+
+    private final IntegerProperty instructionBitWidth;
+
     @DependantComponent
     private final ListProperty<Field> assemblyFields;
 
@@ -90,6 +96,16 @@ public class MachineInstruction
         if (assemblyFields != null) {
             this.assemblyFields.addAll(assemblyFields);
         }
+
+        this.instructionBitWidth = new SimpleIntegerProperty(this, "numBits");
+        this.instructionBitWidth.bind(Bindings.createIntegerBinding(() -> {
+            int o = 0;
+            for (Field field : this.instructionFields){
+                o += field.getNumBits();
+            }
+
+            return o;
+        }, this.instructionFields));
 
         this.dependants = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependencies");
@@ -165,17 +181,29 @@ public class MachineInstruction
         return instructionFields;
     }
 
+    public ListProperty<Field> fieldsProperty(FieldType type) {
+        switch (checkNotNull(type)) {
+            case Assembly:
+                return assemblyFields;
+
+            case Instruction:
+                return instructionFields;
+        }
+
+        throw new IllegalArgumentException("Unknown FieldType: " + type);
+    }
+
+
     /**
      * returns the number of bits in the machine instruction
      * @return the number of bits in the machine instruction
      */
-    public ArchValue getNumBits(){
-        int numBits = 0;
-        for (Field field : this.instructionFields){
-            numBits += field.getNumBits();
-        }
-        
-        return ArchType.Bit.of(numBits);
+    public int getNumBits(){
+        return this.instructionBitWidth.get();
+    }
+
+    public ReadOnlyIntegerProperty numBitsProperty() {
+        return this.instructionBitWidth;
     }
 
     /**
@@ -411,4 +439,5 @@ public class MachineInstruction
         other.setInstructionFields(getInstructionFields());
         other.setAssemblyFields(getAssemblyFields());
     }
+
 } // end class MachineInstruction

@@ -35,7 +35,7 @@ subprojects {
     ext.xtextVersion = '2.10.0'
 
     dependencies {
-        compile group: 'com.google.guava', name: 'guava', version: '19.0'   
+        compile group: 'com.google.guava', name: 'guava', version: '21.0'
         
         // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
         compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'

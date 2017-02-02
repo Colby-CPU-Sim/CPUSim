@@ -31,7 +31,7 @@
                                       HBox.hgrow="ALWAYS">
                                     <children>
                                         <TextField fx:id="findTF"
-                                                   promptText="text to find"/>
+                                                   promptText="text value find"/>
                                         <TextField fx:id="replaceWithTF"
                                                    promptText="replace with"/>
                                     </children>

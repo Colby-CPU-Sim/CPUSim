@@ -92,6 +92,7 @@ import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.module.RegisterRAMPair;
 import cpusim.model.util.Convert;
+import cpusim.model.util.MachineBound;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.units.ArchType;
 import cpusim.util.BackupManager;
@@ -126,7 +127,7 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * This class is the repository of global data, such as the current machine.
  */
-public class Mediator {
+public class Mediator implements MachineBound {
     private static final String NEWLINE = System.lineSeparator();
     private static final String SPACES = "              ";
 
@@ -143,8 +144,8 @@ public class Mediator {
     public Mediator(Stage s) {
         this.stage = s;
         this.backupManager = new BackupManager();
-        this.machine = new SimpleObjectProperty<>();
-        this.machineDirty = new SimpleBooleanProperty(false);
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.machineDirty = new SimpleBooleanProperty(this, "dirty",false);
         this.machineFile = null;
         String d = machineDirty.get() ? "*" : "";
         this.machineDirtyString = new SimpleStringProperty(d);
@@ -238,15 +239,6 @@ public class Mediator {
      */
     public BackupManager getBackupManager() {
         return backupManager;
-    }
-
-    /**
-     * gets the Mediator's current Machine object.
-     *
-     * @return the Mediator's current Machine object.
-     */
-    public Machine getMachine() {
-        return machine.get();
     }
 
     /**

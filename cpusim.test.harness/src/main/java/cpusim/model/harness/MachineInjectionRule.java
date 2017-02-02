@@ -9,14 +9,15 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.testfx.util.WaitForAsyncUtils.asyncFx;
+import static org.testfx.util.WaitForAsyncUtils.waitFor;
+import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 /**
  * JUnit4 {@link org.junit.Rule} that will automatically bind anything annotated with {@link BindMachine} to an internal
@@ -46,7 +47,7 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
      *
      * @param instance
      */
-    public MachineInjectionRule(Object instance, @Nullable String resourceToLoad) {
+    public MachineInjectionRule(Object instance, @Nullable Supplier<Machine> cpuFactory) {
         checkNotNull(instance);
         
         testInstance = instance;
@@ -72,17 +73,15 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         
         this.fieldsToBind = fieldsToBind;
         
-        if (resourceToLoad != null) {
-            try (InputStream input = getClass().getResourceAsStream(resourceToLoad)) {
-                
-            } catch (IOException ioe) {
-                throw new IllegalArgumentException("Could not load " + resourceToLoad, ioe);
-            }
+        if (cpuFactory != null) {
+            this.machineFactory = cpuFactory;
+        } else {
+            this.machineFactory = () -> new Machine(testInstance.getClass().getCanonicalName());
         }
     }
     
     private Machine createMachine() {
-        return new Machine(testInstance.getClass().getCanonicalName());
+        return this.machineFactory.get();
     }
     
     @Override
@@ -92,7 +91,12 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                injectFields();
+                // We inject the fields on the JavaFX thread,
+                // not on the main thread. The waitFor waits until
+                // the Future completes
+                waitFor(asyncFx(() -> injectFields()));
+                waitForFxEvents();
+
                 base.evaluate();
             }
         };

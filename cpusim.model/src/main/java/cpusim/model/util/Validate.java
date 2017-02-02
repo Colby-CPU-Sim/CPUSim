@@ -373,7 +373,7 @@ public abstract class Validate
         if (instr.getOpcode() >= (long) Math.pow(2, instr.getInstructionFields().get(0).getNumBits())) {
             throw new ValidationException("The opcode \"" +
                     ConvertLongs.toHexString(instr.getOpcode(),
-                            instr.getNumBits()) +
+                            ArchValue.bits(instr.getNumBits())) +
                     "\" (hex) of instruction \"" + instr.getName() +
                     "\" is too big for the first field of the instruction.");
         }

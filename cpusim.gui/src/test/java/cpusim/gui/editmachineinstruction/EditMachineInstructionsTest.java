@@ -1,22 +1,24 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.DragHelper;
+import cpusim.gui.harness.FXHarness;
+import cpusim.gui.harness.FXRunner;
+import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.MicroinstructionTreeView;
+import cpusim.model.MachineInstruction;
 import cpusim.model.harness.BindMachine;
 import cpusim.model.harness.MachineInjectionRule;
-import cpusim.model.microinstruction.Comment;
-import javafx.collections.ObservableList;
-import javafx.scene.Node;
+import cpusim.model.harness.SamplesFixture;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testfx.framework.junit.ApplicationTest;
+import org.textfx.matcher.control.MoreListViewMatchers;
+
+import static org.testfx.api.FxAssert.verifyThat;
 
 /**
  * Test the interaction between the {@link MachineInstructionImplTableController} and a
@@ -24,52 +26,38 @@ import org.testfx.framework.junit.ApplicationTest;
  *
  * @since 2016-12-05
  */
-public class EditMachineInstructionsTest extends ApplicationTest {
+public class EditMachineInstructionsTest extends FXHarness {
     
     
     @BindMachine
     private EditMachineInstructionController underTest;
+
+    @BindMachine
+    private Mediator mediator;
     
     @Rule
-    public MachineInjectionRule machineProperty = new MachineInjectionRule(this);
-    
-    @Override
+    public MachineInjectionRule machineProperty = new MachineInjectionRule(this,
+            SamplesFixture.MAXWELL.factory(0));
+
+    @FXRunner.StageSetup
     public void start(Stage stage) throws Exception {
-        StackPane pane = new StackPane();
+        mediator = new Mediator(stage);
+        underTest = new EditMachineInstructionController(mediator);
 
-        HBox layout = new HBox();
-        pane.getChildren().add(layout);
-        ObservableList<Node> children = layout.getChildren();
-        
-        underTest = new EditMachineInstructionController(new Mediator(stage));
-        
-        
+        FXMLLoader loader = FXMLLoaderFactory.fromController(underTest, "EditMachineInstruction.fxml");
+        Pane root = loader.load();
 
-        microinstructionTreeView = new MicroinstructionTreeView();
-        microinstructionTreeView.setId("instTree");
-        children.add(microinstructionTreeView);
-        microinstructionTreeView.machineProperty().bind(machineProperty);
-
-        double width = machineInstructionImplTableController.getPrefWidth() + microinstructionTreeView.getPrefWidth();
-        double height = Math.max(machineInstructionImplTableController.getPrefHeight(),
-                microinstructionTreeView.getPrefHeight());
-
-        Scene scene = new Scene(pane, width, height);
+        Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();
     }
 
-    @Before
-    public void setupMock() {
-        final Comment commentMicro = machineProperty.getValue().getMicros(Comment.class).get(0);
-    }
-
     @Test
-    public void dragCommentIntoList() throws Exception {
+    public void verifyLoadedMachine() throws Exception {
+        ListView<MachineInstruction> list = lookup("#instructionList").query();
 
-        clickOn("Comment", MouseButton.PRIMARY);
-//        clickOn("Comment[2]", MouseButton.PRIMARY);
-
+        verifyThat("#instructionList",
+                   MoreListViewMatchers.hasValues(getMachine().getInstructions()));
 
     }
 }

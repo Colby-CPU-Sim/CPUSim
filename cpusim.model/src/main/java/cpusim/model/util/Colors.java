@@ -62,9 +62,9 @@ public abstract class Colors {
     public static Color generateRandomLightColor(){
         final Random rand = new Random();
 
-        return Color.color(rand.nextInt(127)+128,
-                           rand.nextInt(127)+128,
-                           rand.nextInt(127)+128);
+        return Color.color(rand.nextDouble()* 0.5 + 0.5,
+                           rand.nextDouble()* 0.5 + 0.5,
+                           rand.nextDouble()* 0.5 + 0.5);
     }
 
     /**

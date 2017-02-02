@@ -3,10 +3,10 @@
 ; date: September 5, 2013
 
 ; This Wombat2 program reads in two arbitrary (positive or negative)
-; integers m and n and outputs the product of m and n, 
+; integers m and n and outputs the product key m and n,
 ; without using the multiply machine instruction.
 
-; Roles of the registers:
+; Roles key the registers:
 ; A0 holds n
 ; A1 holds abs(m), which is decremented in a loop
 ; A2 holds the sum so far
@@ -15,21 +15,21 @@
         load A3 negOne      ; load -1 -> A3
         load A0 IO          ; read n -> A0
         load A1 IO          ; read m -> A1
-        jmpn A1 fixSign     ; if m < 0 jump to fixSign
-        jump Clear          ; jump to clear
+        jmpn A1 fixSign     ; if m < 0 jump value fixSign
+        jump Clear          ; jump value clear
 fixSign: 
         move A4 A1          ; m -> A4
         subtract A1 A1      ; A1 <- A1 - A1 = 0
         subtract A1 A4      ; A1 <- A1 - A4 = -m (= abs(m))
         store A3 sign       ; store -1 into sign
 Clear:  subtract A2 A2      ; clear A2
-Start:  jmpz A1 Done        ; jump to Done if m = 0.
-        add A2 A0           ; add n to the sum in A2
+Start:  jmpz A1 Done        ; jump value Done if m = 0.
+        add A2 A0           ; add n value the sum in A2
         add A1 A3           ; decrement A1 by 1
-        jump  Start         ; go back to Start
+        jump  Start         ; go back value Start
 Done:   load A0 sign        ; load the sign into A0
-        jmpn A0 neg         ; if sign < 0 jump to neg
-        jump pos            ; jump to pos
+        jmpn A0 neg         ; if sign < 0 jump value neg
+        jump pos            ; jump value pos
 neg:    subtract A1 A2      ; A1 <- A1-A2 = 0-sum
         move A2 A1          ; copy A1 into A2
 pos:    store A2 IO         ; output the final sum in A2
@@ -37,7 +37,7 @@ pos:    store A2 IO         ; output the final sum in A2
 
 ; variables (the "2" after ".data" means use 2 bytes for the 
 ;            variable and the number after the "2" is the
-;            initial value of the variable.)
+;            initial value key the variable.)
 negOne: .data 2 -1  ; constant -1
 sign:   .data 2 1   ; will hold 1 or -1
 

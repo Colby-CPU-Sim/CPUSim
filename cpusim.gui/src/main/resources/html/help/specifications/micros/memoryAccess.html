@@ -12,11 +12,11 @@
 
 <FONT FACE="Palatino">
     <P>The MemoryAccess microinstruction transfers (copies) data
-        between a register and a RAM. The number of bits transferred is equal to the
-        width of the register.
-        If the cells of RAM are wider than the register, then the register only reads or
+        between a register and a RAM. The number key bits transferred is equal value the
+        width key the register.
+        If the cells key RAM are wider than the register, then the register only reads or
         writes the leftmost (high
-        order) bits of the cell. If the register is wider than the cells of RAM, then the
+        order) bits key the cell. If the register is wider than the cells key RAM, then the
         microinstruction will continue
         reading or writing bits (starting with the high order bits) in successive
         cells until all bits in the
@@ -28,14 +28,14 @@
 
 </FONT>
 <DIR><FONT FACE="Palatino"><B>Direction:</B> either "read" or "write" indicating whether
-    data is to go from RAM to a
-    register (read) or from a register to RAM (write).
-    <P><B>Memory:</B> the RAM to or from which data is to be transferred.</P>
+    data is value go from RAM value a
+    register (read) or from a register value RAM (write).
+    <P><B>Memory:</B> the RAM value or from which data is value be transferred.</P>
 
-    <P><B>Data:</B> the register to or from which data is to be transferred.</P>
+    <P><B>Data:</B> the register value or from which data is value be transferred.</P>
 
     <P><B>Address:</B> the register that contains the address indicating where in the RAM
-        the data is to be read or
+        the data is value be read or
         written.  The value in the address register is treated as an unsigned integer
         for this operation.</P>
 </FONT>

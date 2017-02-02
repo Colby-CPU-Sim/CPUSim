@@ -44,7 +44,7 @@ public class EditMachineInstructionController
                     MachineModificationController,
                     ControlButtonController.InteractionHandler<MachineInstruction> {
 
-    @FXML
+    @FXML @SuppressWarnings("unused")
     private ListView<MachineInstruction> instructionList;
 
     /**
@@ -97,13 +97,13 @@ public class EditMachineInstructionController
 
     private Mediator mediator;
     private ObjectProperty<MachineInstruction> currentInstr;
-    private Field draggingField;
-    private String draggingColor;
-    private Pane originPane;
-    private boolean dropped;
-    private boolean exited;
-
-    private int draggingIndex;
+//    private Field draggingField;
+//    private String draggingColor;
+//    private Pane originPane;
+//    private boolean dropped;
+//    private boolean exited;
+//
+//    private int draggingIndex;
 
     private final ObjectProperty<Machine> machine;
 
@@ -175,8 +175,10 @@ public class EditMachineInstructionController
 
         noFieldsLabel.visibleProperty().bind(currentInstrHasAssocFields);
 
-        this.instructionList.itemsProperty().bind(getMachine().instructionsProperty());
-        
+        this.instructionList.itemsProperty()
+                .bind(Bindings.createObjectBinding(() -> getMachine().instructionsProperty(),
+                        machineProperty()));
+
         // Children's machines need to be bound as well.
         this.microinstTreeView.machineProperty().bind(machine);
         this.instImplTableController.machineProperty().bind(machine);

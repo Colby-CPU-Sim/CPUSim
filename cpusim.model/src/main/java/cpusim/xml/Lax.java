@@ -296,7 +296,7 @@ public class Lax extends org.xml.sax.helpers.DefaultHandler
      */
     public void parseDocument(boolean isValidating, DefaultHandler handler,
                               InputStream instream) throws ParserConfigurationException, SAXException, IOException {
-        checkNotNull(instream);
+        checkNotNull(instream, "Invalid input stream");
 
         SAXParser parser = createSaxParser(isValidating);
         parser.parse(instream, handler);

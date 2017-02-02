@@ -13,7 +13,7 @@
 package cpusim.model.iochannel;
 
 import cpusim.model.ExecutionException;
-import cpusim.model.util.MoreStrings;
+import cpusim.util.MoreStrings;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import cpusim.model.util.conversion.ConvertStrings;

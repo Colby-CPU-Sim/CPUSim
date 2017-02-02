@@ -18,11 +18,9 @@ import cpusim.model.assembler.EQU;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;
 import cpusim.model.util.Convert;
-import cpusim.model.util.MoreStrings;
+import cpusim.util.MoreStrings;
 
 import cpusim.model.util.conversion.ConvertLongs;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.TableCell;

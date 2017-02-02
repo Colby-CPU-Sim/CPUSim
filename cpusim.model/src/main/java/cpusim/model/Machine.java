@@ -14,6 +14,7 @@ import cpusim.model.microinstruction.*;
 import cpusim.model.module.*;
 import cpusim.model.util.*;
 import cpusim.util.Gullectors;
+import cpusim.util.MoreBindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

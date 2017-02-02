@@ -3,6 +3,7 @@ package cpusim.model.util;
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.util.MoreBindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;

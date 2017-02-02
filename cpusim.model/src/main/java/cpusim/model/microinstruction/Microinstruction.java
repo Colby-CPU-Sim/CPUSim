@@ -6,10 +6,10 @@ import com.google.common.base.Strings;
 import cpusim.model.util.*;
 import cpusim.model.Machine;
 import cpusim.model.module.Module;
+import cpusim.util.MoreFXCollections;
 import cpusim.xml.HTMLEncodable;
 import cpusim.xml.HtmlEncoder;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
 
 import java.util.UUID;
 

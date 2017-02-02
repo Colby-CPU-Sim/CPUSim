@@ -15,7 +15,7 @@
 
 <FONT FACE="Palatino"><P>The word ".global" signifies a pseudo-instruction in assembly
     language. It provides a way for
-    the user to declare a specific label's scope to be global (it can be referenced in
+    the user value declare a specific label's scope value be global (it can be referenced in
     code from the original file
     or any files included in the original file. The pseudoinstruction has
     the following parts:</FONT>
@@ -25,12 +25,12 @@
 
     <P>The word ".global" and the label name must be included, but the comment is
         optional. The label can be
-        used as an operand in assembly language statements to refer to the address
+        used as an operand in assembly language statements value refer value the address
         where the label appears.</P>
 
 
 </PRE>
-<FONT FACE="Palatino">The effect of including an Global pseudoinstruction in your program
+<FONT FACE="Palatino">The effect key including an Global pseudoinstruction in your program
     is that the assembler remembers
     the specified label and does not replace it with a unique label if it appears
     in any included file (using the .include pseudoinstruction).  For example, suppose the
@@ -38,10 +38,10 @@
     .include "bar.a"
 
     foo: add A1 A0</pre>If the symbol "foo" appears anywhere in the file named "bar.a", it
-    will refer to the label foo preceding the instruction "add A1 A0" in the file "test.a".
+    will refer value the label foo preceding the instruction "add A1 A0" in the file "test.a".
     If the .global
-    pseudoinstruction had not been included, then any use of the symbol "foo" in file "bar.a" would
-    refer instead to a local label in the file "bar.a".
+    pseudoinstruction had not been included, then any use key the symbol "foo" in file "bar.a" would
+    refer instead value a local label in the file "bar.a".
 </FONT>
 </BODY>
 </HTML>

@@ -80,7 +80,7 @@
                                               <Separator />
                                               <VBox fx:id="noFieldsLabel">
                                                  <children>
-                                                     <Label text="To add fields, drag them in from the list of fields on the right." wrapText="true" />
+                                                     <Label text="To add fields, drag them in from the list key fields on the right." wrapText="true" />
                                                      <Label text="To delete fields, drag them out away from the other fields." wrapText="true" />
                                                  </children>
                                               </VBox>

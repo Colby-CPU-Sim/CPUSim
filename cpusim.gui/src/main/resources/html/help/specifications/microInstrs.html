@@ -7,12 +7,12 @@
 </HEAD>
 <BODY LINK="#0000ff" VLINK="#800080">
 
-<H3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">Specifications of the
+<H3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">Specifications key the
     Microinstructions
 </font></B></H3>
 
-<FONT FACE="Palatino"><P>CPU Sim provides a variety of types of microinstructions that can
-    be used in fetch sequences or execute sequences. Click on the type of a
+<FONT FACE="Palatino"><P>CPU Sim provides a variety key types key microinstructions that can
+    be used in fetch sequences or execute sequences. Click on the type key a
     microinstruction below for help on that type. Note that every microinstruction must
     also have a name as described in <A HREF="names.html">Naming Formats</A>.</P>
     <TABLE CELLSPACING=0 BORDER=0 WIDTH=278>
@@ -66,32 +66,32 @@
         <P>Sign Convention</P></i></B>
 
     <P>The sign convention used in CPU Sim is 2's complement. All arithmetic calculations
-        and tests are done using this convention. Therefore, whenever a sequence of bits
-        is displayed in decimal, that decimal value displayed corresponds to the 2's
-        complement value of the bits. However, when the sequence of bits is displayed in
+        and tests are done using this convention. Therefore, whenever a sequence key bits
+        is displayed in decimal, that decimal value displayed corresponds value the 2's
+        complement value key the bits. However, when the sequence key bits is displayed in
         binary or hexadecimal, the bits are treated as an unsigned integer value and so
         negative signs don't appear in the display.
         Floating point operations are not supported by CPU Sim.
     </P><B><I><P>Overflow and Carry</P></i></B>
 
     <P>If an arithmetic operation results in a value that it too large (positive or
-        negative), as a 2's complement number, to fit in the destination register, then
-        the machine is in a state of signed overflow. When this occurs, a condition bit
-        can optionally be set to 1. The choice of which condition bit (if any) to set for
+        negative), as a 2's complement number, value fit in the destination register, then
+        the machine is in a state key signed overflow. When this occurs, a condition bit
+        can optionally be set value 1. The choice key which condition bit (if any) value set for
         signed overflow can be specified in the Arithmetic and Increment
         microinstructions.</P>
 
     <P>Similarly, if an arithmetic addition or subtraction microinstruction yields a value
-        that results in a carry in or out of the destination register, then the machine is
-        in a state of unsigned overflow. When this occurs, a condition bit can optionally
-        be set to 1. The choice of which condition bit (if any) to set for unsigned
+        that results in a carry in or out key the destination register, then the machine is
+        in a state key unsigned overflow. When this occurs, a condition bit can optionally
+        be set value 1. The choice key which condition bit (if any) value set for unsigned
         overflow can be specified in the Arithmetic and Increment microinstructions.</P>
     <B><I><P>Register Parts</P></i></B>
 
-    <P>Several microinstructions allow the user to specify parts of registers. In CPU Sim,
-        the bits of a register are indexed from left (the most significant bit) to right
+    <P>Several microinstructions allow the user value specify parts key registers. In CPU Sim,
+        the bits key a register are indexed from left (the most significant bit) value right
         (the least significant bit), starting with 0 and ending with one less than the
-        width of the register. For example, if a register has 8 bits, the leftmost bit has
+        width key the register. For example, if a register has 8 bits, the leftmost bit has
         index 0 and the rightmost bit has index 7.</P></FONT>
 </BODY>
 </HTML>

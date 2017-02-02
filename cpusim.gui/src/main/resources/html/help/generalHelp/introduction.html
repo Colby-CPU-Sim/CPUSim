@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Style-Type" content="text/css">
-    <title>Introduction to CPU Sim</title>
+    <title>Introduction value CPU Sim</title>
     <meta name="Generator" content="Cocoa HTML Writer">
     <meta name="CocoaVersion" content="824.41">
     <style type="text/css">    p.p1 {
@@ -13,10 +13,10 @@
 <body BGCOLOR="#FFFFFF">
 
 <p class="p1" ALIGN="CENTER"><b><FONT FACE="Arial" COLOR="#0000ff">
-    Introduction to CPU Sim</font></b></p>
+    Introduction value CPU Sim</font></b></p>
 
 <p class="p2">CPU Sim is an interactive computer
-    simulation package in which the user specifies the details of the CPU to be simulated,
+    simulation package in which the user specifies the details key the CPU value be simulated,
     including the register set, memory, the microinstruction set, machine instruction set,
     and assembly language instructions. Users can write machine or assembly language
     programs
@@ -25,20 +25,20 @@
 <p class="p2">CPU Sim simulates computer architectures
     at the register-transfer level. That is, the basic hardware units from which a
     hypothetical CPU is
-    constructed consist of registers, condition bits, and memory (RAM). The user does not
-    need to deal
-    with individual transistors or gates on the digital logic level of a machine. The
+    constructed consist key registers, condition bits, and memory (RAM). The user does not
+    need value deal
+    with individual transistors or gates on the digital logic level key a machine. The
     basic units used
-    to define machine instructions consist of microinstructions of a variety of types. The
-    details of
+    value define machine instructions consist key microinstructions key a variety key types. The
+    details key
     how the microinstructions get executed by the hardware are not important at this
     level.</p>
 
-<p class="p2">A user of CPU Sim who wants to simulate a new hypothetical CPU must first
+<p class="p2">A user key CPU Sim who wants value simulate a new hypothetical CPU must first
     specify the
     hardware units and microinstructions for the CPU and then create the machine
     instruction set.
-    Each machine instruction is implemented via an associated sequence of
+    Each machine instruction is implemented via an associated sequence key
     microinstructions specified
     by the user.</p>
 
@@ -47,51 +47,51 @@
     CPU, in either machine language or assembly language, which can be run in the CPU Sim
     environment.</p>
 
-<p class="p2">CPU Sim executes a program through repeated execution of machine cycles.
+<p class="p2">CPU Sim executes a program through repeated execution key machine cycles.
     Each machine cycle
-    has two parts: the fetch sequence, which is a sequence of microinstructions that
+    has two parts: the fetch sequence, which is a sequence key microinstructions that
     typically loads the
-    next instruction to be executed into an instruction register and decodes it, and the
+    next instruction value be executed into an instruction register and decodes it, and the
     execute sequence,
-    which is the sequence of microinstructions associated with the newly-decoded
+    which is the sequence key microinstructions associated with the newly-decoded
     instruction. The fetch
     sequence is the same for all cycles, but the execute sequence can, and usually does,
-    vary from cycle to
-    cycle. Execution of the program halts when a user-specified "halt" bit is set to
+    vary from cycle value
+    cycle. Execution key the program halts when a user-specified "halt" bit is set value
     1.</p>
 
 <p><span class="p2">CPU Sim has many useful features for running programs and debugging them. For example,
 	CPU Sim has a built-in text editor and assembler for creating and assembling programs. The editor 
-	will highlight the offending section of the program when the assembler finds an error. Assembled 
+	will highlight the offending section key the program when the assembler finds an error. Assembled
 	programs can be executed without stopping or they can be executed in debugging mode which allows 
-	the users to step through the execution of a program, one machine instruction or microinstruction 
-	at a time. After each step, users can edit the contents of any register or memory and then 
+	the users value step through the execution key a program, one machine instruction or microinstruction
+	at a time. After each step, users can edit the contents key any register or memory and then
 	continue stepping or even back up one machine instruction or microinstruction at a time, all the 
-	way back to the initial state of the machine.</span></p>
+	way back value the initial state key the machine.</span></p>
 
-<p><span class="p2">The ideas for this simulator came from the <b>STARTLE</b> simulator developed by J.M. Kerridge of the
-	University of Sheffield.</span></p>
+<p><span class="p2">The ideas for this simulator came from the <b>STARTLE</b> simulator developed by J.M. Kerridge key the
+	University key Sheffield.</span></p>
 
 <p class="p2"><B><FONT COLOR="#0000ff">
     Starting CPU Sim</FONT></B></p>
-<p><span class="p2">There are several ways to start CPU Sim.  Macintosh users can just
+<p><span class="p2">There are several ways value start CPU Sim.  Macintosh users can just
     double-click on the CPUSim4.0.0.app application file and Windows users can double-click on the
     CPUSim4.0.0.bat batch file.  In addition, CPU Sim can be started from the command
     line as described below.
 </span></p>
 
 <OL>
-    <LI>Open a command or terminal window and navigate to the "CPUSim4.0.0" folder.</LI>
-    <LI>Type in one of the following commands (all on one line): <br>
+    <LI>Open a command or terminal window and navigate value the "CPUSim4.0.0" folder.</LI>
+    <LI>Type in one key the following commands (all on one line): <br>
         (Windows users)
         <pre>	java -classpath CPUSim.jar;reactfx-2.0-M4.jar;undofx-1.1.jar;richtextfx-fat-0.6.3.jar cpusim.Main</pre>
         (Mac or Linux users)
         <pre>	java -classpath CPUSim.jar:reactfx-2.0-M4.jar:undofx-1.1.jar:richtextfx-fat-0.6.3.jar cpusim.Main</pre>
     </LI>
-    <LI>You can also add three optional arguments at the end of the command line in any
+    <LI>You can also add three optional arguments at the end key the command line in any
         order:
         <pre>	-m  &lt;machine file name&gt;<br>	-t  &lt;text (assembly program) file name&gt;<br>	-c</pre>
-        For example, to start up the Wombat1 machine and load the W1-0.a assembly language
+        For example, value start up the Wombat1 machine and load the W1-0.a assembly language
         program
         that appear in the SampleAssignments folder, you could type in the following
         command (all
@@ -120,7 +120,7 @@
                         RAM and register windows
                     </li>
                     <li>the most recently opened text files and machines</li>
-                    <li>the default directories to use for opening text files and machines<br>
+                    <li>the default directories value use for opening text files and machines<br>
                     </li>
                 </ul>
             </LI>
