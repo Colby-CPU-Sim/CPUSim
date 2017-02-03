@@ -3,12 +3,12 @@ package cpusim.gui.editmachineinstruction;
 import cpusim.model.Field;
 import cpusim.model.MachineInstruction;
 import cpusim.model.util.Colors;
-import cpusim.util.MoreBindings;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -19,11 +19,14 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.fxmisc.easybind.EasyBind;
-import org.fxmisc.easybind.Subscription;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -43,6 +46,8 @@ public class FieldLayoutPane extends HBox {
 
     private final MapProperty<Field, Color> fieldColorMap;
 
+    private final Logger logger = LogManager.getLogger(FieldLayoutPane.class);
+
 
     public FieldLayoutPane(@NamedArg("fieldType") MachineInstruction.FieldType fieldType) {
         this.currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", null);
@@ -52,40 +57,75 @@ public class FieldLayoutPane extends HBox {
         this.fieldColorMap = new SimpleMapProperty<>(this, "fieldColorMap", FXCollections.observableHashMap());
 
         EasyBind.subscribe(currentInstruction, this::changeInstruction);
+
+        this.fields.addListener((ListChangeListener<Field>) c -> {
+
+            // This class change listener was required because in order to map the fields property to
+            // the children, I manually had to make sure the indexes lined up. Unfortunately, using
+            // EasyBind.map() doesn't work because it counts on the mapping function returning the same value
+            // for a map when removing elements. This means some form of uniqueness. Additionally, if caching, it
+            // causes the damned thing to add duplicate labels. Thus, I had to manually put in a ListChangeListener,
+            // however, this is probably much more efficient anyway.
+
+            ObservableList<Node> nChildren = getChildren();
+            List<FieldLabel> children = nChildren.stream()
+                    .map(v -> (FieldLabel)v)
+                    .collect(Collectors.toList());
+
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        nChildren.set(c.getPermutation(i), children.get(i));
+                    }
+                } else if (c.wasUpdated() || c.wasReplaced()) {
+                    //update or replace item, either way, need to change the Label
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        nChildren.set(i, new FieldLabel(fields.get(i)));
+                    }
+                } else if (c.wasRemoved()) {
+                    // https://docs.oracle.com/javase/8/javafx/api/javafx/collections/ListChangeListener.Change.html#getFrom--
+                    // If removing, then it returns the same index and the number to remove.
+                    for (int i = c.getFrom() + c.getRemovedSize() - 1; i >= c.getFrom() ; --i) {
+                        nChildren.remove(i);
+                    }
+                } else if (c.wasAdded()) {
+                    // add them all at once, lets the underlying list do better..
+
+                    List<FieldLabel> toAdd = new ArrayList<>(c.getTo() - c.getFrom());
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        toAdd.add(new FieldLabel(fields.get(i)));
+                    }
+
+                    nChildren.addAll(c.getFrom(), toAdd);
+                }
+            }
+        });
     }
 
 
     private NumberBinding widthPerBit;
-    private Subscription childBinding;
 
-    // This class solves a nasty bug: So, EasyBind.map() calls it's mapping function
-    // against the value using mapper.apply(element) which, when using `FieldLabel::new` as
-    // the mapping function, it creates a new Label and thus can't actually delete the previous one
-    // which means that when the removal events were happening, it was trying to remove a NEW label
-    // instead of the one that should have been removed. Using a small cache solves this by trying to
-    // get a value from the cache instead of just spontaneously creating them.
-    // I feel like EasyBind.map() should use the same mechanism by default.. it leads to some odd behaviours
-    // and I can not fathom a reason to not have it
+
 
 
     private void changeInstruction(@Nullable MachineInstruction instruction) {
-        ObservableList<Node> children = getChildren();
-        if (childBinding != null) {
-            childBinding.unsubscribe();
-        }
-
         fields.unbind();
-        fields.clear();
-        children.clear();
 
         if (instruction != null) {
             widthPerBit = Bindings.divide(widthProperty(),
-                    Bindings.createDoubleBinding(() -> instruction.numBitsProperty().doubleValue(), instruction.numBitsProperty()));
+                    Bindings.createDoubleBinding(() -> {
+                        double width = 0.0;
+                        for (Field f: this.fields) {
+                            width += f.getNumBits();
+                        }
+
+                        return width;
+                    }, this.fields));
 
             // bind fields first, that way the children get bound properly
-            childBinding = EasyBind.listBind(children, MoreBindings.orderedMap(fields, FieldLabel::new));
-
             fields.bind(instruction.fieldsProperty(this.fieldType.get()));
+
+//            children.addAll(fields.stream().map(FieldLabel::new).collect(Collectors.toList()));
        } else {
             // make sure to unbind if the instruction isn't valid
 
@@ -145,21 +185,6 @@ public class FieldLayoutPane extends HBox {
 
         public Field getField() {
             return field;
-        }
-
-        // Due to using the Field as the "discriminant" within the labels, we use it
-        // as the equals and hashcode operations.
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null || !(obj instanceof FieldLabel)) return false;
-
-            return super.equals(obj) && ((FieldLabel) obj).getField().equals(field);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(super.hashCode(), this.field.hashCode());
         }
     }
 }

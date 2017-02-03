@@ -1,7 +1,5 @@
 package cpusim.gui.editmachineinstruction;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import cpusim.gui.harness.FXHarness;
 import cpusim.gui.harness.FXRunner;
 import cpusim.model.Field;
@@ -22,10 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.core.Is.is;
@@ -108,7 +103,11 @@ public class FieldLayoutPaneTest extends FXHarness {
             List<Node> children = underTest.getChildren();
             assertEquals(instructionFields.size(), children.size());
 
-            final double bitWidth = instruction.get().getNumBits();
+            double bitWidth = 0;
+            for (Field f : instructionFields) {
+                bitWidth += f.getNumBits();
+            }
+
             final double widthPerBit = WIDTH / bitWidth;
             MoreIteratables.zip(instructionFields, children, (field, node) -> {
                 assertThat(node, instanceOf(FieldLayoutPane.FieldLabel.class));
@@ -130,9 +129,8 @@ public class FieldLayoutPaneTest extends FXHarness {
 
         @Test
         public void changeInstruction() {
-            Set<Field> usedFields = new HashSet<>(instructionFields);
             Field toAdd = getMachine().getFields().stream()
-                    .filter(f -> !usedFields.contains(f))
+                    .filter(f -> !instructionFields.contains(f))
                     .findFirst().orElseThrow(NullPointerException::new);
 
             interact(() -> instructionFields.add(toAdd));
@@ -142,6 +140,30 @@ public class FieldLayoutPaneTest extends FXHarness {
             interact(() -> instruction.set(byName("ret")));
 
             verifyFieldsShowing();
+        }
+
+        @Test
+        public void permutateFields() {
+            Field toAdd = getMachine().getFields().stream()
+                    .filter(f -> !instructionFields.contains(f))
+                    .findFirst().orElseThrow(NullPointerException::new);
+
+            interact(() -> instructionFields.add(toAdd));
+
+            verifyFieldsShowing();
+
+            Field toAdd2 = getMachine().getFields().stream()
+                    .filter(f -> !instructionFields.contains(f))
+                    .findFirst().orElseThrow(NullPointerException::new);
+
+            interact(() -> instructionFields.add(instructionFields.size() - 2, toAdd2));
+
+            verifyFieldsShowing();
+
+            interact(() -> instructionFields.remove(toAdd));
+
+            verifyFieldsShowing();
+
         }
 
         /**
@@ -155,16 +177,6 @@ public class FieldLayoutPaneTest extends FXHarness {
             interact(() -> instructionFields.add(toAdd));
 
             verifyFieldsShowing();
-        }
-
-        @Test
-        public void wat() {
-            ListMultimap<String, Integer> mm = ArrayListMultimap.create(4, 1);
-            mm.put("A", 1);
-            mm.put("B", 1);
-            mm.put("A", 2);
-
-            Collection<?> entries = mm.entries();
         }
 
     }
