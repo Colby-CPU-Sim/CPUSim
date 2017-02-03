@@ -113,7 +113,7 @@ public class EditFieldsController
      * Initializes the controller class.
      */
     @FXML
-    public void initialize() {
+    protected void initialize() {
 
         fieldsList.machineProperty().bind(machine);
 
@@ -269,6 +269,7 @@ public class EditFieldsController
         valuesButtons.setInteractionHandler(valuesHandler);
 
         dialogButtons.setInteractionHandler(this);
+        dialogButtons.setCurrentHelpable(this);
     }
 
     @Override

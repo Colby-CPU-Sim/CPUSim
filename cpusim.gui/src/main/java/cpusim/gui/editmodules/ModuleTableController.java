@@ -137,12 +137,12 @@ public abstract class ModuleTableController<T extends Module<T>>
     // -- Implementations for ControlButtonController.InteractionHandler
 
     final void bindSelectedItemIsNullBinding(BooleanProperty toBind) {
-        ControlButtonController.bindSelectedItemIsNull(toBind, selectionModelProperty());
+        ControlButtonController.bindSelectedItemIsNull(toBind, getSelectionModel().selectedItemProperty());
     }
 
     @Override
     public void bindNewButtonDisabled(@Nonnull BooleanProperty toBind) {
-        toBind.bind(new ReadOnlyBooleanWrapper(true));
+        toBind.bind(new ReadOnlyBooleanWrapper(false));
     }
 
     @Override

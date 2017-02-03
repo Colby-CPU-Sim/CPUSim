@@ -10,7 +10,6 @@ import cpusim.model.module.RegisterArray;
 import cpusim.model.util.Validate;
 import cpusim.util.Dialogs;
 import cpusim.util.ValidateControllers;
-import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,7 +25,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The controller for editing the Register arrays in the EditModules dialog.
@@ -158,11 +156,6 @@ public class RegisterArrayTableController extends ModuleTableController<Register
                 return shouldDelete;
             }
         };
-    }
-    
-    @Override
-    public void bindPropertiesButtonDisabled(@Nonnull BooleanProperty toBind) {
-        bindSelectedItemIsNullBinding(toBind);
     }
     
     /**

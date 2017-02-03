@@ -83,12 +83,13 @@ public class FieldLayoutPane extends HBox {
                         nChildren.set(i, new FieldLabel(fields.get(i)));
                     }
                 } else if (c.wasReplaced()) {
-                    //update or replace item, either way, need to change the Label
+                    //update items that were replaced
                     int i = c.getFrom();
                     for ( ; i < c.getTo() && i < nChildren.size(); ++i) {
                         nChildren.set(i, new FieldLabel(fields.get(i)));
                     }
                     
+                    // There's extra items, so fix them
                     for ( ; i < c.getTo(); ++i) {
                         nChildren.add(i, new FieldLabel(fields.get(i)));
                     }

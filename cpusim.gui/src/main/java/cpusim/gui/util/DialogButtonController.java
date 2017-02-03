@@ -5,7 +5,6 @@ import cpusim.model.Machine;
 import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.util.ValidationException;
 import cpusim.util.Dialogs;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -19,9 +18,13 @@ import javafx.stage.Stage;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Implements the controller for the buttons at the bottom of the dialogs (e.g. OK, Cancel and ?).
@@ -85,7 +88,7 @@ public final class DialogButtonController extends VBox implements ReadOnlyMachin
 
     @FXML @SuppressWarnings("unused")
     private void initialize() {
-        helpButton.disableProperty().bind(currentHelpable.isNotNull());
+        helpButton.disableProperty().bind(currentHelpable.isNull());
     }
 
     @Override

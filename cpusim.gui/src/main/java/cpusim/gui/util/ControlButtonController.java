@@ -26,8 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Controller for a "New", "Duplicate", and "Remove" button.
@@ -270,9 +269,9 @@ public class ControlButtonController<T extends NamedObject & Copyable<T>> extend
     }
 
     public static <T> void bindSelectedItemIsNull(BooleanProperty toBind,
-                                                  ObjectProperty<? extends SelectionModel<T>> property) {
+                                                  ReadOnlyProperty<? extends T> property) {
         toBind.bind(Bindings.createBooleanBinding(() ->
-                property.get() == null || property.get().isEmpty(), property));
+                property.getValue() == null, property));
     }
 
     /**
