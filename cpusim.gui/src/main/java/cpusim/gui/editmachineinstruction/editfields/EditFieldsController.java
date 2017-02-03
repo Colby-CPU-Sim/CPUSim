@@ -102,56 +102,6 @@ public class EditFieldsController
         this.machine = new SimpleObjectProperty<>(this, "machine", null);
         this.selectedField = new SimpleObjectProperty<>(this, "selectedField", null);
 
-        // clone all the fields to fill up allFields
-        // FIXME KB
-//        for (Field field : editMachineInstructionController.getFields()){
-//            List<FieldValue> realFieldValues = field.getValues();
-//            ObservableList<FieldValue> fieldValues = FXCollections.observableArrayList();
-//            for (FieldValue fieldValue : realFieldValues){
-//                fieldValues.add(new FieldValue(fieldValue.getName(), UUID.randomUUID(),
-//                        getMachine(), fieldValue.getValue()));
-//            }
-//            allFields.add(new Field(field.getName(), UUID.randomUUID(), getMachine(),
-//                    field.getNumBits(), field.getRelativity(),
-//                    fieldValues, field.getDefaultValue(),
-//                    field.getSigned(), field.getType()
-//            ));
-//        }
-
-        // clone the machine instructions using the cloned fields
-//        for (MachineInstruction instr : editMachineInstructionController.getInstructions()){
-//
-//            final List<Field> oldInstrFields = instr.getInstructionFields();
-//            final List<Field> newInstrFields = new ArrayList<>();
-//            for (Field field : oldInstrFields){
-//                for (Field aField : allFields) {
-//                    if (field.getName().equals(aField.getName())) {
-//                        newInstrFields.add(aField);
-//                    }
-//                }
-//            }
-//
-//            List<Field> oldAssemblyFields = instr.getAssemblyFields();
-//            List<Field> newAssemblyFields = new ArrayList<>();
-//            for (Field field : oldAssemblyFields){
-//                for (Field aField : allFields) {
-//                    if (field.getName().equals(aField.getName())) {
-//                        newAssemblyFields.add(aField);
-//                    }
-//                }
-//            }
-//
-//            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
-//                    UUID.randomUUID(),
-//                    getMachine(),
-//                    instr.getOpcode(),
-//                    newInstrFields, newAssemblyFields);
-//
-//            instrToAdd.setMicros(instr.getMicros());
-//
-//            instructions.add(instrToAdd);
-//        }
-
         try {
             FXMLLoaderFactory.fromRootController(this, FXML_FILE).load();
         } catch (IOException ioe) {
@@ -341,7 +291,7 @@ public class EditFieldsController
 
     @Override
     public void onMachineUpdated() {
-        //editMachineInstructionController.setFields(allFields);
+        
     }
 
     @Override
@@ -356,7 +306,7 @@ public class EditFieldsController
 
     @Override
     public boolean onCancelButtonClick() {
-        return false;
+        return true;
     }
 
     @Override

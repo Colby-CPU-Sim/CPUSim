@@ -52,22 +52,17 @@ public class EditMachineInstructionController
      */
     @FXML @SuppressWarnings("unused")
     private BorderPane formatTabPane;
-
-    @FXML
-    private FieldLayoutPane instructionLayout;
-
-    @FXML
+    
+    
+    @FXML @SuppressWarnings("unused")
     private TextField opcodeTextField;
 
-    @FXML
-    private FieldLayoutPane assemblyLayout;
-
-    /**
-     * The {@link VBox} containing fields to drag to create a format for laying out assembly
-     */
     @FXML @SuppressWarnings("unused")
-    private VBox fieldsFormatVBox;
-
+    private FieldLayoutPane instructionLayout;
+    
+    @FXML @SuppressWarnings("unused")
+    private FieldLayoutPane assemblyLayout;
+    
     @FXML
     private FieldListControl fieldList;
 
@@ -182,20 +177,16 @@ public class EditMachineInstructionController
         // Children's machines need to be bound as well.
         this.microinstTreeView.machineProperty().bind(machine);
         this.instImplTableController.machineProperty().bind(machine);
+        this.fieldList.machineProperty().bind(machine);
 
         this.instButtonController.setInteractionHandler(this);
 
         this.dialogButtonController.setRequired(machine, this, this);
         this.dialogButtonController.setCurrentHelpable(this);
-
-//        microInstrTreeView.setOnMousePressed(t -> {
-//            if (commentEditor != null) {
-//                commitCommentEdit();
-//            }
-//        });
-
+        
         this.instructionLayout.currentInstructionProperty().bind(currentInstr);
         this.assemblyLayout.currentInstructionProperty().bind(currentInstr);
+        
 
         // set up listeners for the panes for drag & drop
         initializeInstructionFormatPane();

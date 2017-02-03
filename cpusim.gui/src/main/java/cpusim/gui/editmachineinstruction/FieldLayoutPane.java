@@ -77,10 +77,20 @@ public class FieldLayoutPane extends HBox {
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
                         nChildren.set(c.getPermutation(i), children.get(i));
                     }
-                } else if (c.wasUpdated() || c.wasReplaced()) {
+                } else if (c.wasUpdated()) {
                     //update or replace item, either way, need to change the Label
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
                         nChildren.set(i, new FieldLabel(fields.get(i)));
+                    }
+                } else if (c.wasReplaced()) {
+                    //update or replace item, either way, need to change the Label
+                    int i = c.getFrom();
+                    for ( ; i < c.getTo() && i < nChildren.size(); ++i) {
+                        nChildren.set(i, new FieldLabel(fields.get(i)));
+                    }
+                    
+                    for ( ; i < c.getTo(); ++i) {
+                        nChildren.add(i, new FieldLabel(fields.get(i)));
                     }
                 } else if (c.wasRemoved()) {
                     // https://docs.oracle.com/javase/8/javafx/api/javafx/collections/ListChangeListener.Change.html#getFrom--
