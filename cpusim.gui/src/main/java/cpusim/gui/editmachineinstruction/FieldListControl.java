@@ -129,7 +129,7 @@ public class FieldListControl
 
                     event.setDragDetect(true);
                     event.consume();
-                    logger.trace("row.setOnDragDetected() started MOVE, field = \"{}\"@{}",
+                    logger.trace("row.setOnDragDetected() started COPY, field = \"{}\"@{}",
                             field.getName(), field.getID());
                 }
             });

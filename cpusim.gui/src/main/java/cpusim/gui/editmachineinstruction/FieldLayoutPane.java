@@ -1,10 +1,14 @@
 package cpusim.gui.editmachineinstruction;
 
+import cpusim.gui.util.DragHelper;
 import cpusim.model.Field;
+import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.util.Colors;
+import cpusim.model.util.MachineBound;
 import javafx.beans.NamedArg;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -14,18 +18,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fxmisc.easybind.EasyBind;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,27 +37,50 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2016-12-06
  */
-public class FieldLayoutPane extends HBox {
+public class FieldLayoutPane extends HBox implements MachineBound {
+
+    private final Logger logger = LogManager.getLogger(FieldLayoutPane.class);
 
     private final ListProperty<Field> fields;
+
+    private DoubleProperty fieldBits;
+    private DoubleBinding widthPerBit;
 
     private final ObjectProperty<MachineInstruction.FieldType> fieldType;
 
     private final ObjectProperty<MachineInstruction> currentInstruction;
 
-    private final MapProperty<Field, Color> fieldColorMap;
+    private Map<Field, Color> fieldColorMap;
 
-    private final Logger logger = LogManager.getLogger(FieldLayoutPane.class);
+    private final boolean showWidth;
 
+    private final ObjectProperty<Machine> machine;
+
+    // Drag and Drop fields
+    private int dndIndex = -1;
 
     public FieldLayoutPane(@NamedArg("fieldType") MachineInstruction.FieldType fieldType) {
+        this.machine = new SimpleObjectProperty<>(this, "machine", null);
+
         this.currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", null);
         this.fields = new SimpleListProperty<>(this, "fields", FXCollections.observableArrayList());
         this.fieldType = new SimpleObjectProperty<>(this, "fieldType", fieldType);
+        this.showWidth = fieldType == MachineInstruction.FieldType.Instruction;
 
-        this.fieldColorMap = new SimpleMapProperty<>(this, "fieldColorMap", FXCollections.observableHashMap());
+        this.fieldColorMap = new HashMap<>();
 
-        EasyBind.subscribe(currentInstruction, this::changeInstruction);
+        // Fields based properties
+
+        this.fields.bind(EasyBind.select(currentInstruction)
+                .selectObject(ins -> ins.fieldsProperty(fieldType)));
+
+        this.fieldBits = new SimpleDoubleProperty(1);
+        this.widthPerBit = widthProperty().divide(this.fieldBits);
+        this.fields.addListener((ListChangeListener<Field>) c -> {
+            this.fieldBits.set(c.getList().stream()
+                    .mapToInt(Field::getNumBits)
+                    .sum());
+        });
 
         this.fields.addListener((ListChangeListener<Field>) c -> {
 
@@ -80,18 +104,18 @@ public class FieldLayoutPane extends HBox {
                 } else if (c.wasUpdated()) {
                     //update or replace item, either way, need to change the Label
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                        nChildren.set(i, new FieldLabel(fields.get(i)));
+                        nChildren.set(i, new FieldLabel(fields.get(i), showWidth));
                     }
                 } else if (c.wasReplaced()) {
                     //update items that were replaced
                     int i = c.getFrom();
                     for ( ; i < c.getTo() && i < nChildren.size(); ++i) {
-                        nChildren.set(i, new FieldLabel(fields.get(i)));
+                        nChildren.set(i, new FieldLabel(fields.get(i), showWidth));
                     }
                     
                     // There's extra items, so fix them
                     for ( ; i < c.getTo(); ++i) {
-                        nChildren.add(i, new FieldLabel(fields.get(i)));
+                        nChildren.add(i, new FieldLabel(fields.get(i), showWidth));
                     }
                 } else if (c.wasRemoved()) {
                     // https://docs.oracle.com/javase/8/javafx/api/javafx/collections/ListChangeListener.Change.html#getFrom--
@@ -104,43 +128,68 @@ public class FieldLayoutPane extends HBox {
 
                     List<FieldLabel> toAdd = new ArrayList<>(c.getTo() - c.getFrom());
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                        toAdd.add(new FieldLabel(fields.get(i)));
+                        toAdd.add(new FieldLabel(fields.get(i), showWidth));
                     }
 
                     nChildren.addAll(c.getFrom(), toAdd);
                 }
             }
         });
+
+        // Add support for drag-and-drop
+        this.setOnDragEntered(ev -> {
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragField(Field field) {
+                    ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                    logger.trace("FieldLayoutPane#onDragEntered(): ev.transferMode={}, field={}", ev.getTransferMode(), field);
+                }
+            });
+        });
+
+//        this.setOnDragExited(ev -> {
+//            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+//            helper.visit(new DragHelper.HandleDragBehaviour() {
+//                @Override
+//                public void onDragField(Field field) {
+//                    ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+//
+//                    if (dndIndex != -1) {
+//                        //fields.remove(dndIndex);
+//                        //dndIndex = -1;
+//
+//
+//                        ev.consume();
+//                    }
+//                }
+//            });
+//        });
+
+        this.setOnDragDropped(ev -> {
+            if (dndIndex == -1) {
+                throw new IllegalStateException("Attempted to drop Field, but was not properly initialized");
+            }
+
+            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+            helper.visit(new DragHelper.HandleDragBehaviour() {
+                @Override
+                public void onDragField(Field field) {
+                    ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+
+                    dndIndex = -1;
+                    ev.setDropCompleted(true);
+                    ev.consume();
+                }
+            });
+        });
     }
 
 
-    private NumberBinding widthPerBit;
-
-
-
-
-    private void changeInstruction(@Nullable MachineInstruction instruction) {
-        fields.unbind();
-
-        if (instruction != null) {
-            widthPerBit = Bindings.divide(widthProperty(),
-                    Bindings.createDoubleBinding(() -> {
-                        double width = 0.0;
-                        for (Field f: this.fields) {
-                            width += f.getNumBits();
-                        }
-
-                        return width;
-                    }, this.fields));
-
-            // bind fields first, that way the children get bound properly
-            fields.bind(instruction.fieldsProperty(this.fieldType.get()));
-
-//            children.addAll(fields.stream().map(FieldLabel::new).collect(Collectors.toList()));
-       } else {
-            // make sure to unbind if the instruction isn't valid
-
-        }
+    @Override
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     public ListProperty<Field> fieldsProperty() {
@@ -159,43 +208,220 @@ public class FieldLayoutPane extends HBox {
         return currentInstruction.get();
     }
 
-    public ObjectProperty<MachineInstruction> currentInstructionProperty() {
+    ObjectProperty<MachineInstruction> currentInstructionProperty() {
         return currentInstruction;
+    }
+
+    Map<Field, Color> getFieldColorMap() {
+        return fieldColorMap;
+    }
+
+    void setFieldColorMap(Map<Field, Color> fieldColorMap) {
+        this.fieldColorMap = checkNotNull(fieldColorMap);
     }
 
     /**
      * Used internally for representing a marker in the view
      */
-    class FieldLabel extends Label {
-        private final Field field;
+    class FieldLabel extends VBox {
 
-        FieldLabel(Field field) {
-            this.field = checkNotNull(field);
+        private static final double DEFAULT_MAX_LABEL_HEIGHT = 50.;
+
+        private final ObjectProperty<Field> field;
+
+        private final Label name;
+        private final Label width;
+
+        FieldLabel(Field field, boolean showWidth) {
+            this.field = new SimpleObjectProperty<>(this, "field", checkNotNull(field));
 
             Color color = fieldColorMap.computeIfAbsent(field, ignore -> Colors.generateRandomLightColor());
-            this.setBackground(new Background(new BackgroundFill(color, null, null)));
-            this.setTextFill(color.darker().darker());
+            Color textColor = color.darker().darker();
 
-            NumberBinding width = widthPerBit.multiply(field.numBitsProperty());
-            this.prefWidthProperty().bind(width);
-            this.maxWidthProperty().bind(width);
+            // Create a tooltip with the name and width of a field
+            Tooltip tooltip = new Tooltip();
+            tooltip.textProperty().bind(Bindings.format("%s\nWidth: %d bits",
+                    EasyBind.select(this.field).selectObject(Field::nameProperty),
+                    EasyBind.select(this.field).selectObject(Field::numBitsProperty)));
+
+            DoubleBinding halfHeight = this.maxHeightProperty().divide(2);
+
+            name = new Label();
+            this.setBackground(new Background(new BackgroundFill(color, null, null)));
+
+            name.setTextFill(textColor);
+            name.textProperty().bind(field.nameProperty());
+            name.setAlignment(Pos.BOTTOM_CENTER);
+            name.prefHeightProperty().bind(halfHeight);
+            name.minHeightProperty().bind(halfHeight);
+
+            VBox.setVgrow(name, Priority.ALWAYS);
+            name.setTooltip(tooltip);
+
+            getChildren().add(name);
+
+            if (showWidth) {
+                width = new Label();
+                width.setTextFill(textColor);
+                width.textProperty().bind(Bindings.convert(field.numBitsProperty()));
+                width.setAlignment(Pos.TOP_CENTER);
+                width.prefHeightProperty().bind(halfHeight);
+                width.minHeightProperty().bind(halfHeight);
+
+                VBox.setVgrow(width, Priority.ALWAYS);
+                width.setTooltip(tooltip);
+
+                getChildren().add(width);
+            } else {
+                width = null;
+                name.prefHeightProperty().bind(this.maxHeightProperty());
+                name.minHeightProperty().bind(this.maxHeightProperty());
+                name.setAlignment(Pos.CENTER);
+            }
+
+            NumberBinding widthBinding = widthPerBit.multiply(field.numBitsProperty());
+
+            Consumer<Region> bindWidth = node -> {
+              if (node != null) {
+                  node.minWidthProperty().bind(widthBinding);
+                  node.prefWidthProperty().bind(widthBinding);
+                  node.maxWidthProperty().bind(widthBinding);
+              }
+            };
+
+            bindWidth.accept(this);
+            bindWidth.accept(this.name);
+            bindWidth.accept(this.width);
+
+            this.setMinHeight(50);
+            this.setMaxHeight(DEFAULT_MAX_LABEL_HEIGHT);
 
             HBox.setHgrow(this, Priority.ALWAYS);
-
-            this.textProperty().bind(field.nameProperty());
-            this.tooltipProperty().bind(Bindings.createObjectBinding(() -> {
-                Tooltip tip = new Tooltip();
-                tip.textProperty()
-                        .bind(Bindings.format("%s\nWidth: %d", field.nameProperty(), field.numBitsProperty()));
-
-                return tip;
-            }));
+            VBox.setVgrow(this, Priority.ALWAYS);
 
             this.setAlignment(Pos.CENTER);
+
+            this.initializeDragAndDrop();
         }
 
-        public Field getField() {
+        private void initializeDragAndDrop() {
+
+            this.setOnDragOver(ev -> {
+                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+
+                helper.visit(new DragHelper.HandleDragBehaviour() {
+                    @Override
+                    public void onDragField(Field field) {
+                        ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                        ev.consume();
+                    }
+                });
+            });
+
+            this.setOnDragEntered(ev -> {
+                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+
+                helper.visit(new DragHelper.HandleDragBehaviour() {
+                    @Override
+                    public void onDragField(Field field) {
+                        ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                        int idx = FieldLayoutPane.this.getChildren().indexOf(FieldLabel.this);
+
+                        if (ev.getTransferMode() == TransferMode.COPY) {
+                            // moving from FieldList -> location
+                            if (idx != dndIndex) {
+                                if (dndIndex == -1) {
+                                    fields.add(idx, field);
+
+                                    logger.trace("FieldLabel#onDragEntered() found COPY, thus adding new Field");
+                                } else {
+                                    // already inserted, so swap them
+                                    Field current = fields.get(dndIndex); // index is dragging
+                                    fields.set(dndIndex, fields.get(idx));
+                                    fields.set(idx, current);
+
+                                    logger.trace("FieldLabel#onDragEntered() found COPY, swapping fields " + idx + " <-> " + dndIndex);
+                                }
+
+                                dndIndex = idx;
+                            }
+
+                            ev.consume();
+                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
+                            // rearranging
+                        }
+                    }
+                });
+            });
+
+//            this.setOnDragExited(ev -> {
+//                Dragboard db = ev.getDragboard();
+//                DragHelper helper = new DragHelper(machineProperty(), db);
+//
+//                if (dndIndex == -1) {
+//                    return;
+//                }
+//
+//                helper.visit(new DragHelper.HandleDragBehaviour() {
+//                    @Override
+//                    public void onDragField(Field field) {
+//                        ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+//
+//                        if (ev.getTransferMode() == TransferMode.COPY) {
+//                            // moving from FieldList -> location
+////                            fields.remove(dndIndex);
+////                            dndIndex = -1;
+//
+//                            logger.trace("FieldLabel#onDragExited() found COPY, thus removed Field");
+//
+//                            //ev.consume();
+//                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
+//                            // rearranging
+//                        }
+//                    }
+//                });
+//            });
+//
+//            this.setOnDragDropped(ev -> {
+//                Dragboard db = ev.getDragboard();
+//                DragHelper helper = new DragHelper(machineProperty(), db);
+//
+//                helper.visit(new DragHelper.HandleDragBehaviour() {
+//                    @Override
+//                    public void onDragField(Field field) {
+//                        ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
+//
+//                        if (ev.getTransferMode() == TransferMode.COPY) {
+//                            // moving from FieldList -> location
+//                            dndIndex = -1;
+//
+//                            logger.trace("FieldLabel#onDragDropped() found COPY, dropping Field");
+//
+//                            ev.consume();
+//                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
+//                            // rearranging
+//                        }
+//                    }
+//                });
+//            });
+        }
+
+        Field getField() {
+            return field.get();
+        }
+
+        ObjectProperty<Field> fieldProperty() {
             return field;
+        }
+
+        Label getNameLabel() {
+            return name;
+        }
+
+        Optional<Label> getWidthLabel() {
+            return Optional.ofNullable(width);
         }
     }
 }

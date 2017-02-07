@@ -4,6 +4,7 @@ import cpusim.gui.harness.FXHarness;
 import cpusim.gui.harness.FXRunner;
 import cpusim.model.Field;
 import cpusim.model.MachineInstruction;
+import cpusim.model.harness.BindMachine;
 import cpusim.model.harness.MachineInjectionRule;
 import cpusim.model.harness.SamplesFixture;
 import cpusim.util.MoreIteratables;
@@ -12,6 +13,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import org.fxmisc.easybind.EasyBind;
 import org.junit.Before;
@@ -20,12 +26,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.instanceOf;
+import static com.github.npathai.hamcrestopt.OptionalMatchers.*;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static org.testfx.api.FxAssert.verifyThat;
+import static org.testfx.matcher.control.LabeledMatchers.hasText;
 
 /**
  * Created by kevin on 31/01/2017.
@@ -39,10 +49,16 @@ public class FieldLayoutPaneTest extends FXHarness {
 
     private static final double WIDTH = 100;
 
-    public static class BaseSuite extends FXHarness {
+    // TODO Tooltip tests?
+
+    public static abstract class BaseSuite extends FXHarness {
 
 
+        @BindMachine
         protected FieldLayoutPane underTest;
+
+        @BindMachine
+        protected FieldListControl fieldList;
 
         protected ObjectProperty<MachineInstruction> instruction;
 
@@ -68,9 +84,14 @@ public class FieldLayoutPaneTest extends FXHarness {
 
         @FXRunner.StageSetup
         public void start(Stage stage) throws Exception {
-            underTest = new FieldLayoutPane(fieldType);
 
-            Scene scene = new Scene(underTest, WIDTH, 40);
+            fieldList = new FieldListControl(true, false);
+            underTest = new FieldLayoutPane(fieldType);
+            HBox hbox = new HBox(fieldList, underTest);
+
+            HBox.setHgrow(underTest, Priority.ALWAYS);
+
+            Scene scene = new Scene(hbox, 400, 100);
             stage.setScene(scene);
             stage.show();
         }
@@ -99,28 +120,40 @@ public class FieldLayoutPaneTest extends FXHarness {
             });
         }
 
-        protected void verifyFieldsShowing() {
-            List<Node> children = underTest.getChildren();
-            assertEquals(instructionFields.size(), children.size());
-
+        protected final double calcWidthPerBit() {
             double bitWidth = 0;
             for (Field f : instructionFields) {
                 bitWidth += f.getNumBits();
             }
 
-            final double widthPerBit = WIDTH / bitWidth;
-            MoreIteratables.zip(instructionFields, children, (field, node) -> {
-                assertThat(node, instanceOf(FieldLayoutPane.FieldLabel.class));
+            return underTest.getWidth() / bitWidth;
+        }
 
-                FieldLayoutPane.FieldLabel label = (FieldLayoutPane.FieldLabel)node;
-                assertEquals(field, label.getField());
+        protected void verifyFieldsShowing() {
+            List<Node> children = underTest.getChildren();
+            assertEquals(instructionFields.size(), children.size());
 
-                assertEquals(Math.round(widthPerBit * field.getNumBits()), label.getWidth(), 1.0);
+            List<FieldLayoutPane.FieldLabel> asFL = children.stream()
+                    .map(node -> (FieldLayoutPane.FieldLabel)node)
+                    .collect(Collectors.toList());
+
+            final double widthPerBit = calcWidthPerBit();
+            MoreIteratables.zip(instructionFields, asFL, (field, node) -> {
+                assertEquals(field, node.getField());
+                assertEquals("Width does not match",
+                        Math.round(widthPerBit * field.getNumBits()), node.getWidth(), 1.0);
+
+                Label nameLabel = node.getNameLabel();
+                assertNotNull(nameLabel);
 
                 // check the values now:
-                assertThat(label.getText(), is(field.getName()));
+                assertThat(nameLabel.getText(), is(field.getName()));
+
+                additionalFieldChecks(field, node);
             });
         }
+
+        protected abstract void additionalFieldChecks(Field field, FieldLayoutPane.FieldLabel node);
 
         @Test
         public void base() {
@@ -129,12 +162,6 @@ public class FieldLayoutPaneTest extends FXHarness {
 
         @Test
         public void changeInstruction() {
-            Field toAdd = getMachine().getFields().stream()
-                    .filter(f -> !instructionFields.contains(f))
-                    .findFirst().orElseThrow(NullPointerException::new);
-
-            interact(() -> instructionFields.add(toAdd));
-
             verifyFieldsShowing();
 
             interact(() -> instruction.set(byName("ret")));
@@ -179,6 +206,39 @@ public class FieldLayoutPaneTest extends FXHarness {
             verifyFieldsShowing();
         }
 
+        /**
+         * Add field to the assembly
+         */
+        @Test
+        public void dragAddField() {
+            List<ListCell<Field>> list = new ArrayList<>(lookup(".list-cell")
+                    .<ListCell<Field>>match(c -> c != null && !c.isEmpty())
+                    .queryAll());
+
+            int size = instructionFields.size();
+
+            assertEquals(size, underTest.getChildren().size());
+
+            interact(() -> {
+                drag(list.get(0), MouseButton.PRIMARY)
+                        .moveTo(underTest.localToScreen(10, 20))
+                        .drop();
+            });
+
+            assertEquals(size + 1, underTest.getChildren().size());
+
+            verifyFieldsShowing();
+
+            interact(() -> {
+                drag(list.get(1), MouseButton.PRIMARY)
+                        .moveTo(underTest.getChildren().get(1).localToScreen(10, 10))
+                        .drop();
+            });
+
+            assertEquals(size + 2, underTest.getChildren().size());
+
+            verifyFieldsShowing();
+        }
     }
 
     public static class AssemblyFields extends BaseSuite {
@@ -186,12 +246,26 @@ public class FieldLayoutPaneTest extends FXHarness {
         public AssemblyFields() {
             super(MachineInstruction.FieldType.Assembly);
         }
+
+        @Override
+        protected void additionalFieldChecks(Field field, FieldLayoutPane.FieldLabel node) {
+            Optional<Label> widthLabel = node.getWidthLabel();
+            assertThat(widthLabel, isEmpty());
+        }
     }
 
     public static class InstructionFields extends BaseSuite {
 
         public InstructionFields() {
             super(MachineInstruction.FieldType.Instruction);
+        }
+
+        @Override
+        protected void additionalFieldChecks(Field field, FieldLayoutPane.FieldLabel node) {
+            Optional<Label> widthLabel = node.getWidthLabel();
+            assertThat(widthLabel, isPresent());
+
+            verifyThat(widthLabel, hasValue(hasText(Integer.toString(field.getNumBits()))));
         }
     }
 

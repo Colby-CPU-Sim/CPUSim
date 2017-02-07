@@ -24,15 +24,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.fxmisc.easybind.EasyBind;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -183,10 +182,18 @@ public class EditMachineInstructionController
 
         this.dialogButtonController.setRequired(machine, this, this);
         this.dialogButtonController.setCurrentHelpable(this);
-        
+
+        this.instructionLayout.machineProperty().bind(machineProperty());
+        this.assemblyLayout.machineProperty().bind(machineProperty());
+
+        // Must set the color map first, before the instructions are bound
+        // TODO Make this behave as a property, so when the map changes, the FieldLabels update their colours
+        Map<Field, Color> fieldColors = new HashMap<>();
+        this.instructionLayout.setFieldColorMap(fieldColors);
+        this.assemblyLayout.setFieldColorMap(fieldColors);
+
         this.instructionLayout.currentInstructionProperty().bind(currentInstr);
         this.assemblyLayout.currentInstructionProperty().bind(currentInstr);
-        
 
         // set up listeners for the panes for drag & drop
         initializeInstructionFormatPane();
