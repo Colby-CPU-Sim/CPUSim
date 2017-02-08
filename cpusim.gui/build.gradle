@@ -24,6 +24,15 @@ dependencies {
     testCompile project(':cpusim.test.harness')
 }
 
+task runMaxwell(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = 'cpusim.Main'
+
+    // arguments to pass to the application
+    args = ['-m', '../cpusim.test.harness/src/main/resources/cpus/MaxwellComputer/Maxwell.cpu']
+}
+
 jar {
     manifest {
         attributes  'Implementation-Title': 'CPU Sim',

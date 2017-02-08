@@ -23,7 +23,7 @@
 
     <left>
         <VBox>
-            <FieldListControl fx:id="fieldsList" allowDrag="false" allowEditing="true" prefHeight="473.0" prefWidth="59.0" VBox.vgrow="ALWAYS" />
+            <FieldListControl fx:id="fieldsList" allowDrag="false" allowEditing="true" VBox.vgrow="ALWAYS" />
         </VBox>
     </left>
     <bottom>

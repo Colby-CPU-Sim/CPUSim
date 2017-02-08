@@ -63,7 +63,7 @@ public abstract class MoreListViewMatchers {
     @Factory
     @Unstable(reason = "is missing apidocs")
     public static Matcher<Node> hasValues(Collection<?> values) {
-        String descriptionText = "has call values of " + values;
+        String descriptionText = "has cell values of " + values;
         return typeSafeMatcher(ListView.class, descriptionText,
                 node -> hasListValuesInOrder(node, values));
     }

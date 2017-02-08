@@ -39,6 +39,13 @@ public abstract class MoreTableViewMatchers {
 
     @Factory
     @Unstable(reason = "is missing apidocs")
+    public static Matcher<Node> isEmpty() {
+        String descriptionText = "is empty (has no items)";
+        return typeSafeMatcher(TableView.class, descriptionText, MoreTableViewMatchers::isTableEmpty);
+    }
+
+    @Factory
+    @Unstable(reason = "is missing apidocs")
     public static Matcher<Node> hasRowWith(Object value) {
         String descriptionText = "has TableRow with \"" + value + "\"";
         return typeSafeMatcher(TableView.class, descriptionText,
@@ -79,5 +86,9 @@ public abstract class MoreTableViewMatchers {
     private static boolean cellItem(TableCell<?, ?> cell,
                                     Matcher<?> matcher) {
         return matcher.matches(cell.getItem());
+    }
+
+    private static boolean isTableEmpty(TableView view) {
+        return view.getItems().isEmpty();
     }
 }

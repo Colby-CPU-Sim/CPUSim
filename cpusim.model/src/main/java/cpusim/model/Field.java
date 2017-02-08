@@ -360,13 +360,8 @@ public class Field
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(Field.class)
-                .addValue(getID())
                 .add("name", getName())
-                .add("type", getType())
-                .add("signed", getSigned())
-                .add("width", getNumBits())
-                .add("default", getDefaultValue())
-                .add("relativity", getRelativity())
+                .addValue(getID())
                 .toString();
     }
 

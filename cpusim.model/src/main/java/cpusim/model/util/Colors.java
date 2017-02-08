@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Color utility functions
  * 
@@ -85,5 +87,13 @@ public abstract class Colors {
      */
     public static List<String> xmlToColorsList(CharSequence xmlString){
         return Splitter.on(' ').splitToList(xmlString);
+    }
+
+    public static String toWeb(Color color) {
+        checkNotNull(color);
+
+        return String.format("rgb(%d,%d,%d)", (int)(color.getRed() * 255),
+                (int)(color.getGreen() * 255),
+                (int)(color.getBlue() * 255));
     }
 }

@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -211,8 +211,8 @@ public class FieldLayoutPaneTest extends FXHarness {
          */
         @Test
         public void dragAddField() {
-            List<ListCell<Field>> list = new ArrayList<>(lookup(".list-cell")
-                    .<ListCell<Field>>match(c -> c != null && !c.isEmpty())
+            List<TableRow<Field>> list = new ArrayList<>(lookup(".table-row-cell")
+                    .<TableRow<Field>>match(c -> c != null && !c.isEmpty())
                     .queryAll());
 
             int size = instructionFields.size();

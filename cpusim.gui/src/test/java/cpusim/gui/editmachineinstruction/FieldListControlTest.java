@@ -9,8 +9,8 @@ import cpusim.model.harness.BindMachine;
 import cpusim.model.harness.MachineInjectionRule;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
@@ -20,7 +20,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testfx.matcher.control.ListViewMatchers;
+import org.textfx.matcher.control.MoreTableViewMatchers;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -98,10 +98,10 @@ public class FieldListControlTest extends FXHarness {
 
     @Test
     public void elementsPresent() {
-        ListView<Field> list = lookup("#fieldListView").query();
+        TableView<Field> table = lookup("#fieldTableView").query();
 
         for (Field f : getMachine().getFields()) {
-            verifyThat(list, ListViewMatchers.hasListCell(f));
+            verifyThat(table, MoreTableViewMatchers.hasRowWith(f));
         }
     }
 
@@ -110,20 +110,20 @@ public class FieldListControlTest extends FXHarness {
      */
     @Test
     public void dragTest() {
-        Set<ListCell<Field>> cells = lookup(".list-cell")
-                .<ListCell<Field>>match(c -> c != null && !c.isEmpty())
+        Set<TableRow<Field>> cells = lookup(".table-row-cell")
+                .<TableRow<Field>>match(c -> c != null && !c.isEmpty())
                 .queryAll();
 
         Label end = lookup("#end").query();
 
-        for (ListCell<Field> cell : cells) {
+        for (TableRow<Field> cell : cells) {
             drag(cell, MouseButton.PRIMARY).dropTo(end);
 
             verify(handler).onDragField(cell.getItem());
         }
 
-        ListCell<Field> emptyCell = lookup(".list-cell")
-                .<ListCell<Field>>match(c -> c != null && c.isEmpty())
+        TableRow<Field> emptyCell = lookup(".table-row-cell")
+                .<TableRow<Field>>match(c -> c != null && c.isEmpty())
                 .query();
 
         drag(emptyCell, MouseButton.PRIMARY).dropTo(end);

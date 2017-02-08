@@ -1,7 +1,6 @@
 package cpusim.gui.editmachineinstruction;
 
 import cpusim.gui.util.*;
-import cpusim.gui.util.list.StringPropertyListCell;
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
@@ -15,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
@@ -55,7 +55,14 @@ public class FieldListControl
     private Button showEditFieldsButton;
 
     @FXML @SuppressWarnings("unused")
-    private ListView<Field> fieldListView;
+    private TableView<Field> fieldTableView;
+
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Field, String> nameColumn;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Field, Integer> widthColumn;
 
     @FXML @SuppressWarnings("unused")
     private DefaultControlButtonController<Field> controlButtons;
@@ -110,19 +117,20 @@ public class FieldListControl
 
         this.showEditFieldsButton.onActionProperty().bind(onShowEditAction);
 
-        selectedField.bind(fieldListView.getSelectionModel().selectedItemProperty());
+        selectedField.bind(fieldTableView.getSelectionModel().selectedItemProperty());
 
-        fieldListView.setCellFactory(param -> {
-            ListCell<Field> cell = new StringPropertyListCell<Field>(Field::nameProperty);
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        widthColumn.setCellValueFactory(new PropertyValueFactory<>("numBits"));
 
-            cell.setEditable(allowEditing);
+        fieldTableView.setRowFactory(param -> {
+            TableRow<Field> row = new TableRow<>();
 
             // Starting a drag
-            cell.setOnDragDetected(event -> {
-                if (allowDrag && !cell.isEmpty()) {
-                    Field field = cell.getItem();
-                    Dragboard db = cell.startDragAndDrop(TransferMode.COPY);
-                    db.setDragView(cell.snapshot(null, null));
+            row.setOnDragDetected(event -> {
+                if (allowDrag && !row.isEmpty()) {
+                    Field field = row.getItem();
+                    Dragboard db = row.startDragAndDrop(TransferMode.COPY);
+                    db.setDragView(row.snapshot(null, null));
 
                     DragHelper helper = new DragHelper(machineProperty(), db);
                     helper.setFieldContent(field);
@@ -135,28 +143,28 @@ public class FieldListControl
             });
 
             // A drag entered the row
-//            cell.setOnDragEntered(ev -> {});
+//            row.setOnDragEntered(ev -> {});
 
             // Drag moved over, must set Transfer if used
-//            cell.setOnDragOver(ev -> {});
+//            row.setOnDragOver(ev -> {});
 
             // Drag left the row
 //            row.setOnDragExited(ev -> {});
 
             // This row started a drag, and is now done
-            cell.setOnDragDone(ev -> {
+            row.setOnDragDone(ev -> {
                 if (ev.getTransferMode() == TransferMode.COPY) {
-                    logger.trace("Row Drag successfully completed: row.getItem() = {}", cell.getItem());
+                    logger.trace("Row Drag successfully completed: row.getItem() = {}", row.getItem());
                     ev.consume();
                 }
             });
 
-           return cell;
+            return row;
         });
 
         EasyBind.subscribe(machine, newMachine -> {
             if (newMachine != null) {
-                fieldListView.itemsProperty().bindBidirectional(newMachine.fieldsProperty());
+                fieldTableView.itemsProperty().bindBidirectional(newMachine.fieldsProperty());
             }
         });
 
@@ -200,12 +208,12 @@ public class FieldListControl
 
     @Override
     public void bindItems(@Nonnull Property<ObservableList<Field>> toBind) {
-        toBind.bind(fieldListView.itemsProperty());
+        toBind.bind(fieldTableView.itemsProperty());
     }
 
     @Override
     public void selectionModelBinding(@Nonnull ObjectProperty<SelectionModel<Field>> toBind) {
-        toBind.bind(fieldListView.selectionModelProperty());
+        toBind.bind(fieldTableView.selectionModelProperty());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package cpusim.gui.editmachineinstruction;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import cpusim.gui.util.DragHelper;
 import cpusim.model.Field;
 import cpusim.model.Machine;
@@ -18,14 +20,18 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.PropertyBinding;
 
+import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -38,6 +44,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @since 2016-12-06
  */
 public class FieldLayoutPane extends HBox implements MachineBound {
+
+    /**
+     * Defines how much time between allowing a swap of two fields when
+     * dragging and dropping.
+     */
+    private static final Duration DND_SWAP_REFUSAL_TIME = Duration.ofMillis(400);
 
     private final Logger logger = LogManager.getLogger(FieldLayoutPane.class);
 
@@ -58,6 +70,8 @@ public class FieldLayoutPane extends HBox implements MachineBound {
 
     // Drag and Drop fields
     private int dndIndex = -1;
+    private AtomicReference<ImmutableSet<Integer>> dndPrevSwap = new AtomicReference<>();
+    private Timer dndTimer = new Timer(this.toString() + "#dndTimer", true);
 
     public FieldLayoutPane(@NamedArg("fieldType") MachineInstruction.FieldType fieldType) {
         this.machine = new SimpleObjectProperty<>(this, "machine", null);
@@ -75,7 +89,8 @@ public class FieldLayoutPane extends HBox implements MachineBound {
                 .selectObject(ins -> ins.fieldsProperty(fieldType)));
 
         this.fieldBits = new SimpleDoubleProperty(1);
-        this.widthPerBit = widthProperty().divide(this.fieldBits);
+        this.widthPerBit = Bindings.createDoubleBinding(() ->
+            getWidth() / fieldBits.get(), widthProperty(), fieldBits);
         this.fields.addListener((ListChangeListener<Field>) c -> {
             this.fieldBits.set(c.getList().stream()
                     .mapToInt(Field::getNumBits)
@@ -137,50 +152,24 @@ public class FieldLayoutPane extends HBox implements MachineBound {
         });
 
         // Add support for drag-and-drop
-        this.setOnDragEntered(ev -> {
+
+        this.setOnDragExited(ev -> {
             DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
             helper.visit(new DragHelper.HandleDragBehaviour() {
                 @Override
                 public void onDragField(Field field) {
                     ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 
-                    logger.trace("FieldLayoutPane#onDragEntered(): ev.transferMode={}, field={}", ev.getTransferMode(), field);
-                }
-            });
-        });
+                    if (dndIndex != -1) {
+                        fields.remove(dndIndex);
+                        dndIndex = -1;
 
-//        this.setOnDragExited(ev -> {
-//            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
-//            helper.visit(new DragHelper.HandleDragBehaviour() {
-//                @Override
-//                public void onDragField(Field field) {
-//                    ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
-//
-//                    if (dndIndex != -1) {
-//                        //fields.remove(dndIndex);
-//                        //dndIndex = -1;
-//
-//
-//                        ev.consume();
-//                    }
-//                }
-//            });
-//        });
+                        logger.trace("FieldLayoutPane#onDragExited(): ev.transferMode={}, field={}", ev.getTransferMode(), field);
 
-        this.setOnDragDropped(ev -> {
-            if (dndIndex == -1) {
-                throw new IllegalStateException("Attempted to drop Field, but was not properly initialized");
-            }
+                        dndTimer.cancel();
 
-            DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
-            helper.visit(new DragHelper.HandleDragBehaviour() {
-                @Override
-                public void onDragField(Field field) {
-                    ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
-
-                    dndIndex = -1;
-                    ev.setDropCompleted(true);
-                    ev.consume();
+                        ev.consume();
+                    }
                 }
             });
         });
@@ -226,6 +215,8 @@ public class FieldLayoutPane extends HBox implements MachineBound {
     class FieldLabel extends VBox {
 
         private static final double DEFAULT_MAX_LABEL_HEIGHT = 50.;
+        private static final String STYLE_TEMPLATE = "-fx-border-color: %s;" +
+                "-fx-background-color: %s;";
 
         private final ObjectProperty<Field> field;
 
@@ -236,7 +227,8 @@ public class FieldLayoutPane extends HBox implements MachineBound {
             this.field = new SimpleObjectProperty<>(this, "field", checkNotNull(field));
 
             Color color = fieldColorMap.computeIfAbsent(field, ignore -> Colors.generateRandomLightColor());
-            Color textColor = color.darker().darker();
+            Color borderColor = color.darker();
+            Color textColor = borderColor.darker();
 
             // Create a tooltip with the name and width of a field
             Tooltip tooltip = new Tooltip();
@@ -244,10 +236,12 @@ public class FieldLayoutPane extends HBox implements MachineBound {
                     EasyBind.select(this.field).selectObject(Field::nameProperty),
                     EasyBind.select(this.field).selectObject(Field::numBitsProperty)));
 
+            this.setStyle(String.format(STYLE_TEMPLATE, Colors.toWeb(borderColor), Colors.toWeb(color)));
+
             DoubleBinding halfHeight = this.maxHeightProperty().divide(2);
 
             name = new Label();
-            this.setBackground(new Background(new BackgroundFill(color, null, null)));
+            //this.setBackground(new Background(new BackgroundFill(color, null, null)));
 
             name.setTextFill(textColor);
             name.textProperty().bind(field.nameProperty());
@@ -260,10 +254,12 @@ public class FieldLayoutPane extends HBox implements MachineBound {
 
             getChildren().add(name);
 
+            PropertyBinding<Number> numBitsProperty = EasyBind.selectProperty(this.field, Field::numBitsProperty);
+
             if (showWidth) {
                 width = new Label();
-                width.setTextFill(textColor);
-                width.textProperty().bind(Bindings.convert(field.numBitsProperty()));
+                //width.setTextFill(textColor);
+                width.textProperty().bind(Bindings.convert(numBitsProperty));
                 width.setAlignment(Pos.TOP_CENTER);
                 width.prefHeightProperty().bind(halfHeight);
                 width.minHeightProperty().bind(halfHeight);
@@ -279,13 +275,15 @@ public class FieldLayoutPane extends HBox implements MachineBound {
                 name.setAlignment(Pos.CENTER);
             }
 
-            NumberBinding widthBinding = widthPerBit.multiply(field.numBitsProperty());
+            NumberBinding widthBinding = Bindings.createDoubleBinding(() ->
+                    Math.floor(widthPerBit.get() * numBitsProperty.getValue().doubleValue()),
+                    widthPerBit, numBitsProperty);
 
             Consumer<Region> bindWidth = node -> {
               if (node != null) {
-                  node.minWidthProperty().bind(widthBinding);
+//                  node.minWidthProperty().bind(widthBinding);
                   node.prefWidthProperty().bind(widthBinding);
-                  node.maxWidthProperty().bind(widthBinding);
+//                  node.maxWidthProperty().bind(widthBinding);
               }
             };
 
@@ -304,20 +302,11 @@ public class FieldLayoutPane extends HBox implements MachineBound {
             this.initializeDragAndDrop();
         }
 
+        private int getIndexInParent() {
+            return FieldLayoutPane.this.getChildren().indexOf(this);
+        }
+
         private void initializeDragAndDrop() {
-
-            this.setOnDragOver(ev -> {
-                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
-
-                helper.visit(new DragHelper.HandleDragBehaviour() {
-                    @Override
-                    public void onDragField(Field field) {
-                        ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
-
-                        ev.consume();
-                    }
-                });
-            });
 
             this.setOnDragEntered(ev -> {
                 DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
@@ -326,31 +315,74 @@ public class FieldLayoutPane extends HBox implements MachineBound {
                     @Override
                     public void onDragField(Field field) {
                         ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                        logger.trace("FieldLabel#onDragEntered() " +
+                                "ENTERED - {}", field);
+                        ev.consume();
+                    }
+                });
+            });
 
-                        int idx = FieldLayoutPane.this.getChildren().indexOf(FieldLabel.this);
+            this.setOnDragOver(ev -> {
+                final int idx = getIndexInParent();
 
-                        if (ev.getTransferMode() == TransferMode.COPY) {
+                if (dndIndex != -1 && idx == dndIndex) {
+                    ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+                    logger.trace("FieldLabel#onDragOver() ignored due to dndIndex == idx ({})", idx);
+                    return;
+                }
+
+                DragHelper helper = new DragHelper(machineProperty(), ev.getDragboard());
+
+                helper.visit(new DragHelper.HandleDragBehaviour() {
+                    @Override
+                    public void onDragField(Field field) {
+                        ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                        if (ev.getTransferMode() == TransferMode.COPY || ev.getTransferMode() == TransferMode.MOVE) {
                             // moving from FieldList -> location
                             if (idx != dndIndex) {
-                                if (dndIndex == -1) {
-                                    fields.add(idx, field);
+                                int cidx = idx;
 
-                                    logger.trace("FieldLabel#onDragEntered() found COPY, thus adding new Field");
-                                } else {
-                                    // already inserted, so swap them
-                                    Field current = fields.get(dndIndex); // index is dragging
-                                    fields.set(dndIndex, fields.get(idx));
-                                    fields.set(idx, current);
-
-                                    logger.trace("FieldLabel#onDragEntered() found COPY, swapping fields " + idx + " <-> " + dndIndex);
+                                List<Node> children = FieldLayoutPane.this.getChildren();
+                                if (cidx == children.size() - 1) {
+                                    cidx = children.size();
                                 }
 
-                                dndIndex = idx;
+                                if (dndIndex == -1) {
+                                    fields.add(cidx, field);
+                                    dndIndex = cidx;
+
+                                    logger.trace("FieldLabel#onDragOver() COPY - added {} {}", cidx, field);
+                                } else {
+                                    // already inserted, so swap them
+
+                                    final ImmutableSet<Integer> toSwap = ImmutableSortedSet.of(dndIndex, cidx);
+                                    if (!toSwap.equals(dndPrevSwap.get())) {
+                                        logger.trace("FieldLabel#onDragOver() " +
+                                                "COPY - swapping fields f:{} <-> t:{}", dndIndex, cidx);
+
+                                        Field current = fields.get(dndIndex); // index is dragging
+                                        fields.remove(dndIndex);
+                                        dndIndex = Math.min(cidx, fields.size());
+                                        fields.add(dndIndex, current);
+
+                                        // Set the timer to not let a swap happen for awhile
+                                        dndPrevSwap.set(toSwap);
+                                        dndTimer.schedule(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                dndPrevSwap.lazySet(null);
+                                            }
+                                        }, DND_SWAP_REFUSAL_TIME.toMillis());
+                                    } else {
+                                        logger.trace("FieldLabel#onDragOver() " +
+                                                "COPY - NOT swapping due to previous swap", cidx, dndIndex);
+                                    }
+                                }
+
                             }
 
                             ev.consume();
-                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
-                            // rearranging
                         }
                     }
                 });
@@ -374,7 +406,7 @@ public class FieldLayoutPane extends HBox implements MachineBound {
 ////                            fields.remove(dndIndex);
 ////                            dndIndex = -1;
 //
-//                            logger.trace("FieldLabel#onDragExited() found COPY, thus removed Field");
+//                            logger.trace("FieldLabel#onDragExited() found COPY, thus removed {}", field);
 //
 //                            //ev.consume();
 //                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
@@ -383,29 +415,28 @@ public class FieldLayoutPane extends HBox implements MachineBound {
 //                    }
 //                });
 //            });
-//
-//            this.setOnDragDropped(ev -> {
-//                Dragboard db = ev.getDragboard();
-//                DragHelper helper = new DragHelper(machineProperty(), db);
-//
-//                helper.visit(new DragHelper.HandleDragBehaviour() {
-//                    @Override
-//                    public void onDragField(Field field) {
-//                        ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
-//
-//                        if (ev.getTransferMode() == TransferMode.COPY) {
-//                            // moving from FieldList -> location
-//                            dndIndex = -1;
-//
-//                            logger.trace("FieldLabel#onDragDropped() found COPY, dropping Field");
-//
-//                            ev.consume();
-//                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
-//                            // rearranging
-//                        }
-//                    }
-//                });
-//            });
+
+            this.setOnDragDropped(ev -> {
+                Dragboard db = ev.getDragboard();
+                DragHelper helper = new DragHelper(machineProperty(), db);
+
+                helper.visit(new DragHelper.HandleDragBehaviour() {
+                    @Override
+                    public void onDragField(Field field) {
+                        ev.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+
+                        if (ev.getTransferMode() == TransferMode.COPY
+                                || ev.getTransferMode() == TransferMode.MOVE) {
+                            // moving from FieldList -> location
+                            dndIndex = -1;
+
+                            logger.trace("FieldLabel#onDragDropped() COPY - dropped {}", field);
+
+                            ev.consume();
+                        }
+                    }
+                });
+            });
         }
 
         Field getField() {

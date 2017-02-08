@@ -22,7 +22,6 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.testfx.matcher.control.ListViewMatchers;
 import org.testfx.matcher.control.TableViewMatchers;
 import org.testfx.matcher.control.TextInputControlMatchers;
 import org.textfx.matcher.control.CheckBoxMatchers;
@@ -90,7 +89,7 @@ public class EditFieldsControllerTest extends FXHarness {
         
         verifyThat(fieldList, hasChildren(3, ".button"));
         
-        verifyThat(from(fieldList).lookup(".list-view"), ListViewMatchers.isEmpty());
+        verifyThat(from(fieldList).lookup(".table-view"), MoreTableViewMatchers.isEmpty());
         
         BorderPane rootPane = lookup("#rootPane").<BorderPane>tryQuery().get();
         verifyThat(rootPane.getCenter(), isDisabled());
@@ -128,9 +127,9 @@ public class EditFieldsControllerTest extends FXHarness {
 
         FieldListControl parent = lookup("#fieldsList").query();
         for (Field f : fields) {
-            clickOn(from(parent).lookup(".list-cell")
+            clickOn(from(parent).lookup(".table-row-cell")
                     .match(FXMatchers.forItem(is(f)))
-                    .<ListCell<Field>>query());
+                    .<TableRow<Field>>query());
             verifyFieldShown(f);
         }
     }
@@ -141,7 +140,7 @@ public class EditFieldsControllerTest extends FXHarness {
         interact(() -> fields.add(f));
 
         FieldListControl parent = lookup("#fieldsList").query();
-        ListCell<Field> cell = from(parent).lookup(".list-cell")
+        TableRow<Field> cell = from(parent).lookup(".table-row-cell")
                 .match(FXMatchers.forItem(is(f)))
                 .query();
         interact(() -> clickOn(cell));
