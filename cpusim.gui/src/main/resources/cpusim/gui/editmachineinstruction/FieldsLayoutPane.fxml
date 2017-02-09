@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox fx:controller="cpusim.gui.editmachineinstruction.FieldLayoutPane" alignment="CENTER" maxHeight="-Infinity"
+      maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="300.0" prefHeight="100.0" prefWidth="400.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <HBox minHeight="50.0" prefHeight="50.0" prefWidth="200.0" VBox.vgrow="SOMETIMES"/>
+   <Label fx:id="deleteLabel" alignment="CENTER" maxHeight="-Infinity" minHeight="50.0" prefHeight="50.0"
+          prefWidth="50.0" text="Delete" textAlignment="CENTER" textFill="RED" HBox.hgrow="ALWAYS"
+          VBox.vgrow="SOMETIMES"/>
+</VBox>

@@ -76,7 +76,7 @@
                                                      </HBox>
                                                  </children>
                                               </VBox>
-                                              <FieldLayoutPane fx:id="instructionLayout" fieldType="Instruction" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                              <FieldLayoutPane fx:id="instructionLayout" fieldType="Instruction" VBox.vgrow="ALWAYS" />
                                               <Separator />
                                               <VBox fx:id="noFieldsLabel">
                                                  <children>
@@ -86,7 +86,7 @@
                                               </VBox>
                                               <Separator />
                                               <Label text="Assembly" VBox.vgrow="NEVER" />
-                                              <FieldLayoutPane fx:id="assemblyLayout" fieldType="Assembly" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+                                              <FieldLayoutPane fx:id="assemblyLayout" fieldType="Assembly" VBox.vgrow="ALWAYS" />
                                           </children>
                                        </VBox>
                                    </center>
