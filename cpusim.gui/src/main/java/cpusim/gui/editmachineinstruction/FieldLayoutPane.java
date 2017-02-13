@@ -130,14 +130,14 @@ public class FieldLayoutPane extends VBox implements MachineBound {
         });
     
         try {
-            FXMLLoaderFactory.fromRootController(this, FXML_FILE).load();
+            FXMLLoaderFactory.fromController(this, FXML_FILE).load();
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
     }
     
     @FXML
-    private void initialize() {
+    void initialize() {
         this.fields.addListener((ListChangeListener<Field>) c -> {
         
             // This class change listener was required because in order to map the fields property to
