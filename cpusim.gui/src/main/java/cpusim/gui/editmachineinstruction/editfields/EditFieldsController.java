@@ -18,9 +18,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.fxmisc.easybind.EasyBind;
@@ -107,6 +113,30 @@ public class EditFieldsController
         } catch (IOException ioe) {
             throw new IllegalStateException(ioe);
         }
+    }
+
+    public static EditFieldsController showDialog(Mediator mediator, Window owner) {
+        final Stage fieldStage = new Stage();
+
+        final EditFieldsController controller = new EditFieldsController(mediator);
+        controller.machineProperty().bind(mediator.machineProperty());
+
+        Scene dialogScene = new Scene(controller);
+        fieldStage.setScene(dialogScene);
+        fieldStage.initOwner(owner);
+        fieldStage.initModality(Modality.WINDOW_MODAL);
+        fieldStage.setTitle("Edit Fields");
+        dialogScene.addEventFilter(
+                KeyEvent.KEY_RELEASED, event -> {
+                    if (event.getCode().equals(KeyCode.ESCAPE)) {
+                        if (fieldStage.isFocused()) {
+                            fieldStage.close();
+                        }
+                    }
+                });
+        fieldStage.show();
+
+        return controller;
     }
 
     /**

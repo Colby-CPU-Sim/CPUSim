@@ -227,12 +227,9 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import cpusim.Mediator;
 import cpusim.gui.about.AboutController;
-import cpusim.gui.desktop.editorpane.CodePaneController;
-import cpusim.gui.desktop.editorpane.CodePaneTab;
-import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
-import cpusim.gui.desktop.editorpane.LineNumPrintingFactory;
-import cpusim.gui.desktop.editorpane.StyleInfo;
+import cpusim.gui.desktop.editorpane.*;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
+import cpusim.gui.editmachineinstruction.editfields.EditFieldsController;
 import cpusim.gui.editmicroinstruction.EditMicroinstructionsController;
 import cpusim.gui.editmodules.EditModulesController;
 import cpusim.gui.equs.EQUsController;
@@ -249,15 +246,10 @@ import cpusim.model.module.ConditionBit;
 import cpusim.model.module.RAM;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
-import cpusim.util.ConsoleManager;
-import cpusim.util.Dialogs;
-import cpusim.util.GUIChannels;
-import cpusim.util.HighlightManager;
-import cpusim.util.MIFReaderException;
-import cpusim.util.SourceLine;
-import cpusim.util.UpdateDisplayManager;
+import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -275,12 +267,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -292,21 +279,10 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.fxmisc.flowless.VirtualFlow;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.InlineStyleTextArea;
-import org.fxmisc.richtext.Paragraph;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyledTextArea;
+import org.fxmisc.richtext.*;
 import org.fxmisc.wellbehaved.event.EventHandlerHelper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.prefs.Preferences;
@@ -343,6 +319,7 @@ public class DesktopController implements Initializable
             {"Find...", SHORTCUT + "-F"},
             {"Preferences...", SHORTCUT + "-Comma"},
             {"Machine instructions...", SHORTCUT + "-M"},
+            {"Fields...", SHORTCUT + "-Y"},
             {"Microinstructions...", SHORTCUT + "-Shift-M"},
             {"Hardware Modules...", SHORTCUT + "-K"},
             {"EQUs...", SHORTCUT + "-E"},
@@ -434,16 +411,16 @@ public class DesktopController implements Initializable
     private HighlightManager highlightManager;
     private UpdateDisplayManager updateDisplayManager;
     private ConsoleManager consoleManager;
-    private SimpleBooleanProperty inDebugMode;
-    private SimpleBooleanProperty inRunningMode;
-    private SimpleBooleanProperty inDebugOrRunningMode;
-    private SimpleBooleanProperty noTabSelected;
-    private SimpleBooleanProperty anchorEqualsCarret;
-    private SimpleBooleanProperty codeStoreIsNull;
+    private BooleanProperty inDebugMode;
+    private BooleanProperty inRunningMode;
+    private BooleanProperty inDebugOrRunningMode;
+    private BooleanProperty noTabSelected;
+    private BooleanProperty anchorEqualsCarret;
+    private BooleanProperty codeStoreIsNull;
     private HelpController helpController;
     private FindReplaceController findReplaceController;
-    private SimpleBooleanProperty canUndoProperty;
-    private SimpleBooleanProperty canRedoProperty;
+    private BooleanProperty canUndoProperty;
+    private BooleanProperty canRedoProperty;
 
     /**
      * constructor method that takes in a mediator and a stage
@@ -991,8 +968,8 @@ public class DesktopController implements Initializable
      */
     public void addMenuKeyboardShortcuts(InlineStyleTextArea<StyleInfo> codeArea) {
         codeArea.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.Y) && event.isShortcutDown())
-            // ctrl-Y opens Fetch sequence dialog
+            if (event.getCode().equals(KeyCode.T) && event.isShortcutDown())
+            // ctrl-T opens Fetch sequence dialog
             {
                 DesktopController.this.handleFetchSequence(null);
             }
@@ -1261,6 +1238,11 @@ public class DesktopController implements Initializable
     }
 
     //============== handlers for MODIFY menu ==================================
+
+    @FXML @SuppressWarnings("unused")
+    protected void handleFields(ActionEvent event) {
+        EditFieldsController.showDialog(mediator, this.stage.getScene().getWindow());
+    }
 
     /**
      * Opens the machine instructions dialog.
@@ -1963,7 +1945,7 @@ public class DesktopController implements Initializable
      * @return The SimpleBooleanProperty describing
      * whether or not we are in debug mode.
      */
-    public SimpleBooleanProperty inDebugModeProperty() {
+    public BooleanProperty inDebugModeProperty() {
         return inDebugMode;
     }
 
@@ -1987,7 +1969,7 @@ public class DesktopController implements Initializable
      * Returns the SimpleBooleanProperty describing whether
      * or not we are currently in running mode.
      */
-    public SimpleBooleanProperty inRunningModeProperty() {
+    public BooleanProperty inRunningModeProperty() {
         return inRunningMode;
     }
 
@@ -1996,7 +1978,7 @@ public class DesktopController implements Initializable
      * or not we are currently in running mode or currently
      * in debugging mode.
      */
-    public SimpleBooleanProperty inDebugOrRunningModeProperty() {
+    public BooleanProperty inDebugOrRunningModeProperty() {
         return inDebugOrRunningMode;
     }
 

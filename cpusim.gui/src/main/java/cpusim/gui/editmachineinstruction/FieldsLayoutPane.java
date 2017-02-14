@@ -432,9 +432,7 @@ public class FieldsLayoutPane extends VBox implements MachineBound {
 
             Consumer<Region> bindWidth = node -> {
               if (node != null) {
-//                  node.minWidthProperty().bind(widthBinding);
                   node.prefWidthProperty().bind(widthBinding);
-//                  node.maxWidthProperty().bind(widthBinding);
               }
             };
 
@@ -572,34 +570,6 @@ public class FieldsLayoutPane extends VBox implements MachineBound {
 
                 logger.traceExit("{}", ev);
             });
-
-//            this.setOnDragExited(ev -> {
-//                Dragboard db = ev.getDragboard();
-//                DragHelper helper = new DragHelper(machineProperty(), db);
-//
-//                if (dndIndex == -1) {
-//                    return;
-//                }
-//
-//                helper.visit(new DragHelper.HandleDragBehaviour() {
-//                    @Override
-//                    public void onDragField(Field field) {
-//                        ev.acceptTransferModes(TransferMode.COPY, TransferMode.MOVE);
-//
-//                        if (ev.getTransferMode() == TransferMode.COPY) {
-//                            // moving from FieldList -> location
-////                            fields.remove(dndIndex);
-////                            dndIndex = -1;
-//
-//                            logger.trace("FieldLabel#onDragExited() found COPY, thus removed {}", field);
-//
-//                            //ev.consume();
-//                        } else if (ev.getTransferMode() == TransferMode.MOVE) {
-//                            // rearranging
-//                        }
-//                    }
-//                });
-//            });
 
             this.setOnDragDropped(ev -> {
                 Dragboard db = ev.getDragboard();

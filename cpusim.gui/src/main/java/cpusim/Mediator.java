@@ -102,10 +102,7 @@ import cpusim.util.MIFReaderException;
 import cpusim.util.SourceLine;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -305,7 +302,7 @@ public class Mediator implements MachineBound {
      * @return the simple string property that is "*"
      * if machine is dirty, "" if not.
      */
-    public SimpleStringProperty getMachineDirtyProperty() {
+    public ReadOnlyStringProperty getMachineDirtyProperty() {
         return this.machineDirtyString;
     }
 

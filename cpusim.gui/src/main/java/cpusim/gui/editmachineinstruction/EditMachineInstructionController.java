@@ -16,21 +16,13 @@ import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
 import org.fxmisc.easybind.EasyBind;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -107,8 +99,6 @@ public class EditMachineInstructionController
 
         this.machine = new SimpleObjectProperty<>(this, "machine", null);
         this.machine.bind(mediator.machineProperty());
-
-        this.machine.addListener((observable, oldValue, newValue) -> updateViewsFromMachine());
     }
 
     /**
@@ -194,10 +184,6 @@ public class EditMachineInstructionController
 
         this.instructionLayout.currentInstructionProperty().bind(currentInstr);
         this.assemblyLayout.currentInstructionProperty().bind(currentInstr);
-
-        // set up listeners for the panes for drag & drop
-        initializeInstructionFormatPane();
-        initializeAssemblyFormatPane();
     }
 
     private void initializeOpcodeTextField() {
@@ -227,239 +213,6 @@ public class EditMachineInstructionController
                 opcodeTextField.setTooltip(new Tooltip(ex.getMessage()));
             }
         });
-    }
-
-
-    /**
-     * Initializes drag events for the instructionFormatPane.
-     */
-    private void initializeInstructionFormatPane() {
-//        implementationFormatPane.setOnMousePressed(t -> {
-//            if (commentEditor != null) {
-//                commitCommentEdit();
-//            }
-//        });
-
-//        instructionFormatPane.setOnDragOver(event -> {
-//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-//                    draggingField.getNumBits() != 0) {
-//                event.acceptTransferModes(TransferMode.COPY);
-//
-//                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
-//                        (), event.getSceneY()).getX();
-//
-//                if (!currentInstr.getValue().getInstructionFields().isEmpty()) {
-//                    int index = getInstrFieldIndex(localX);
-//                    insertInstrField(draggingField, index);
-//                }
-//                dropped = false;
-//
-//
-//                event.consume();
-//            }
-//        });
-//        instructionFormatPane.setOnDragDropped(event -> {
-//            /* data dropped */
-//            /* if there is a string data on drag board, read it and use it */
-//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-//                    draggingField.getNumBits() != 0) {
-//
-//                final MachineInstruction inst = currentInstr.getValue();
-//
-//                double localX = instructionFormatPane.sceneToLocal(event.getSceneX
-//                        (), event.getSceneY()).getX();
-//                int index = getInstrFieldIndex(localX);
-//                inst.getInstructionFields().add(index, draggingField);
-//                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-////                inst.getInstructionColors().add(index, draggingColor);
-//
-//                if (draggingField.getType() != Type.ignored) {
-//                    inst.getAssemblyFields().add(draggingIndex, draggingField);
-//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-////                    inst.getAssemblyColors().add(draggingIndex, draggingColor);
-//                }
-//
-//                /* let the source know whether the string was successfully
-//                 * transferred and used */
-//                event.setDropCompleted(true);
-//                dropped = true;
-//
-//                event.consume();
-//            }
-//        });
-//        instructionFormatPane.setOnDragExited(event -> {
-//            if (currentInstr.getValue() != null && !originPane.equals(assemblyFormatPane) &&
-//                    draggingField.getNumBits() != 0) {
-//                updateInstructionDisplay();
-//                updateAssemblyDisplay();
-//                event.consume();
-//            }
-//        });
-    }
-
-    /**
-     * Initializes drag events for the assemblyFormatPane.
-     */
-    private void initializeAssemblyFormatPane() {
-//        assemblyFormatPane.setOnDragOver(event -> {
-//            if (currentInstr.getValue() != null) {
-//                if (originPane.equals(assemblyFormatPane) || draggingField
-//                        .getNumBits() == 0) {
-//                    event.acceptTransferModes(TransferMode.COPY);
-//                    double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
-//                            (), event.getSceneY()).getX();
-//                    int index = getAssemblyFieldIndex(localX);
-//                    insertAssemblyField(draggingField, index);
-//                    event.consume();
-//                    dropped = false;
-//                }
-//
-//            }
-//        });
-//        assemblyFormatPane.setOnDragDropped(event -> {
-//            /* data dropped */
-//            /* if there is a string data on dragboard, read it and use it */
-//            MachineInstruction inst = currentInstr.getValue();
-//            if (originPane.equals(assemblyFormatPane) || draggingField
-//                    .getNumBits() == 0) {
-//                double localX = assemblyFormatPane.sceneToLocal(event.getSceneX
-//                        (), event.getSceneY()).getX();
-//                int index = getAssemblyFieldIndex(localX);
-//
-//                inst.getAssemblyFields().add(index, draggingField);
-//                // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-////                inst.getAssemblyColors().add(index, draggingColor);
-//
-//                /* let the source know whether the string was successfully
-//                 * transferred and used */
-//                event.setDropCompleted(true);
-//                dropped = true;
-//                exited = true;
-//
-//                event.consume();
-//            }
-//        });
-//        assemblyFormatPane.setOnDragExited(event -> {
-//            MachineInstruction inst = currentInstr.getValue();
-//            if (originPane.equals(assemblyFormatPane) || draggingField.getNumBits() == 0) {
-//                if (!dropped && draggingField.getNumBits() != 0) {
-//                    inst.getAssemblyFields().add(draggingIndex, draggingField);
-//
-//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-////                    inst.getAssemblyColors().add(draggingIndex,
-////                            draggingColor);
-//                    exited = true;
-//                }
-//
-//                updateAssemblyDisplay();
-//                event.consume();
-//            }
-//        });
-//        assemblyFormatPane.setOnDragEntered(event -> {
-//            MachineInstruction inst = currentInstr.getValue();
-//            if (originPane.equals(assemblyFormatPane) || draggingField
-//                    .getNumBits() == 0) {
-//                //so there aren't duplicate fields added whenever the user drags
-//                //out of the field and back in again
-//                if (!dropped && draggingField.getNumBits() != 0 && exited &&
-//                        !inst.getAssemblyFields().isEmpty() &&
-//                        !inst.getInstructionFields().isEmpty()) {
-//                    inst.getAssemblyFields().remove(draggingIndex);
-//
-//                    // FIXME https://github.com/Colby-CPU-Sim/CPUSimFX2015/issues/109
-////                    inst.getAssemblyColors().remove(draggingIndex);
-//                    exited = false;
-//                }
-//                updateAssemblyDisplay();
-//                event.consume();
-//            }
-//        });
-//
-//        // set the preferred width of the instr and assm panes in case
-//        // the width of the dialog changed
-//        DoubleBinding formatPaneSizeBinding = mainPane.widthProperty()
-//                .subtract(instructionList.widthProperty())
-//                .subtract(fieldsList.widthProperty())
-//                .subtract(Bindings.createDoubleBinding(() ->
-//                                //sum of padding of instr list & format tab pane & field's VBox
-//                                instructionList.getPadding().getLeft() +
-//                                    formatTabPane.getPadding().getLeft() +
-//                                    fieldsFormatVBox.getPadding().getLeft(),
-//                        instructionList.paddingProperty(), formatTabPane.paddingProperty(), fieldsFormatVBox.paddingProperty()));
-//        assemblyFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
-//        instructionFormatPane.prefWidthProperty().bind(formatPaneSizeBinding);
-    }
-
-    /**
-     * Takes the real fields and instructions and makes copies of them that will be
-     * manipulated in this dialog.  These copies will be made real if the okay button
-     * is hit, if cancel is hit, they will be garbage collected without being saved to
-     * the machine.
-     */
-    private void updateViewsFromMachine() {
-//        List<Field> realAllFields = machine.getValue().getFields();
-//        ObservableList<Field> listFields = fieldsList.getItems();
-//
-//        listFields.clear();
-//        List<Field> cloned = realAllFields.stream()
-//                .map(Field::new)
-//                .collect(Collectors.toList());
-//        listFields.addAll(cloned); // do addAll to ease the change listener calls
-//
-//        ObservableList<MachineInstruction> insViewItems = instructionList.getItems();
-//        insViewItems.clear();
-//        List<MachineInstruction> clonedInst = machine.getValue().getInstructions().stream()
-//                .map(Copyable::cloneOf)
-//                .collect(Collectors.toList());
-//        insViewItems.addAll(clonedInst);
-
-
-
-        // FIXME Isn't this just cloning the array?
-//        for (MachineInstruction instr : instructions) {
-//
-//            List<Field> oldInstrFields = instr.getInstructionFields();
-//            List<Field> newInstrFields = new ArrayList<>();
-//            for (Field oldField : oldInstrFields) {
-//                for (Field newField : allFields) {
-//                    if (oldField.getName().equals(newField.getName())) {
-//                        newInstrFields.add(newField);
-//                    }
-//                }
-//            }
-//
-//            List<Field> oldAssemblyFields = instr.getAssemblyFields();
-//            List<Field> newAssemblyFields = new ArrayList<>();
-//            for (Field oldField : oldAssemblyFields) {
-//                for (Field newField : allFields) {
-//                    if (oldField.getName().equals(newField.getName())) {
-//                        newAssemblyFields.add(newField);
-//                    }
-//                }
-//            }
-//
-//            List<String> oldInstrColors = instr.getInstructionColors();
-//            List<String> newInstrColors = new ArrayList<>();
-//            for (String colors : oldInstrColors) {
-//                newInstrColors.add(colors);
-//            }
-//
-//            List<String> oldAssemblyColors = instr.getAssemblyColors();
-//            List<String> newAssemblyColors = new ArrayList<>();
-//            for (String colors : oldAssemblyColors) {
-//                newAssemblyColors.add(colors);
-//            }
-//
-//            MachineInstruction instrToAdd = new MachineInstruction(instr.getName(),
-//                    IdentifiedObject.generateRandomID(), mediator.getMachine(), newAssemblyFields, newInstrColors, newAssemblyColors, instr.getOpcode(), newInstrFields
-//            );
-//
-//            ObservableList<Microinstruction<?>> newMicros = FXCollections.observableArrayList(new ArrayList<>());
-//            newMicros.setAll(instr.getMicros());
-//            instrToAdd.setMicros(newMicros);
-//
-//            instructions.add(instrToAdd);
-//        }
     }
 
     @Override
@@ -610,38 +363,7 @@ public class EditMachineInstructionController
      */
     @FXML
     protected void handleEditFields(ActionEvent ae) {
-        final Stage fieldStage = new Stage();
-
-        final EditFieldsController controller = new EditFieldsController(mediator);
-        controller.machineProperty().bind(machineProperty());
-
-        final FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(controller, "EditFields.fxml");
-
-        Pane dialogRoot = null;
-
-        fxmlLoader.setController(controller);
-
-        try {
-            dialogRoot = fxmlLoader.load();
-        } catch (IOException e) {
-            // should never happen
-            assert false : "Unable to load file: " +
-                    "gui/editmachineinstruction/editFields/EditFields.fxml";
-        }
-        Scene dialogScene = new Scene(dialogRoot);
-        fieldStage.setScene(dialogScene);
-        fieldStage.initOwner(lengthLabel.getScene().getWindow());
-        fieldStage.initModality(Modality.WINDOW_MODAL);
-        fieldStage.setTitle("Edit Fields");
-        dialogScene.addEventFilter(
-                KeyEvent.KEY_RELEASED, event -> {
-                    if (event.getCode().equals(KeyCode.ESCAPE)) {
-                        if (fieldStage.isFocused()) {
-                            fieldStage.close();
-                        }
-                    }
-                });
-        fieldStage.show();
+        EditFieldsController.showDialog(mediator, lengthLabel.getScene().getWindow());
     }
 
     /**
