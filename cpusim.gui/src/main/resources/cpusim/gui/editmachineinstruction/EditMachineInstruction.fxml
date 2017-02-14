@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import cpusim.gui.editmachineinstruction.FieldLayoutPane?>
+<?import cpusim.gui.editmachineinstruction.FieldsLayoutPane?>
 <?import cpusim.gui.editmachineinstruction.FieldListControl?>
 <?import cpusim.gui.util.DefaultControlButtonController?>
 <?import cpusim.gui.editmachineinstruction.MachineInstructionImplTableController?>
@@ -76,7 +76,7 @@
                                                      </HBox>
                                                  </children>
                                               </VBox>
-                                              <FieldLayoutPane fx:id="instructionLayout" fieldType="Instruction" VBox.vgrow="ALWAYS" />
+                                              <FieldsLayoutPane fx:id="instructionLayout" fieldType="Instruction" VBox.vgrow="ALWAYS" />
                                               <Separator />
                                               <VBox fx:id="noFieldsLabel">
                                                  <children>
@@ -86,7 +86,7 @@
                                               </VBox>
                                               <Separator />
                                               <Label text="Assembly" VBox.vgrow="NEVER" />
-                                              <FieldLayoutPane fx:id="assemblyLayout" fieldType="Assembly" VBox.vgrow="ALWAYS" />
+                                              <FieldsLayoutPane fx:id="assemblyLayout" fieldType="Assembly" VBox.vgrow="ALWAYS" />
                                           </children>
                                        </VBox>
                                    </center>

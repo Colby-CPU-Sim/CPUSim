@@ -57,10 +57,10 @@ public class EditMachineInstructionController
     private TextField opcodeTextField;
 
     @FXML @SuppressWarnings("unused")
-    private FieldLayoutPane instructionLayout;
+    private FieldsLayoutPane instructionLayout;
     
     @FXML @SuppressWarnings("unused")
-    private FieldLayoutPane assemblyLayout;
+    private FieldsLayoutPane assemblyLayout;
     
     @FXML
     private FieldListControl fieldList;
