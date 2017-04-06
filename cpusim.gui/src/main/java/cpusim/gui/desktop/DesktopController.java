@@ -3413,6 +3413,7 @@ public class DesktopController implements Initializable
             menuItems.add(menuItem);
         }
 
+
         //bind the key proper keycode to the every menu item
         for (MenuItem menuItem : menuItems) {
             if (keyBindings.containsKey(menuItem.getText())) {

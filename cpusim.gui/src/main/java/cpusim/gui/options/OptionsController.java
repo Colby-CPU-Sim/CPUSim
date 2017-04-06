@@ -27,7 +27,7 @@
 package cpusim.gui.options;
 
 import cpusim.Mediator;
-import cpusim.gui.util.table.EditingStrCell;
+import cpusim.gui.util.table.EditingCharCell;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.BufferedChannel;
 import cpusim.model.iochannel.FileChannel;
@@ -62,6 +62,7 @@ import javafx.util.Callback;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class OptionsController {
@@ -130,13 +131,13 @@ public class OptionsController {
     @FXML
     private TableView<PunctChar> leftPunctuationTable;
     @FXML
-    private TableColumn<PunctChar, String> leftASCIIColumn;
+    private TableColumn<PunctChar, Character> leftASCIIColumn;
     @FXML
     private TableColumn<PunctChar, PunctChar.Use> leftTypeColumn;
     @FXML
     private TableView<PunctChar> rightPunctuationTable;
     @FXML
-    private TableColumn<PunctChar, String> rightASCIIColumn;
+    private TableColumn<PunctChar, Character> rightASCIIColumn;
     @FXML
     private TableColumn<PunctChar, PunctChar.Use> rightTypeColumn;
 
@@ -617,9 +618,9 @@ public class OptionsController {
         rightPunctuationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // Callbacks
-        Callback<TableColumn<PunctChar, String>, TableCell<PunctChar, String>>
-                cellStrFactory = setStringTableColumn -> {
-            EditingStrCell<PunctChar> esc = new EditingStrCell<>();
+        Callback<TableColumn<PunctChar, Character>, TableCell<PunctChar, Character>>
+                cellCharFactory = setStringTableColumn -> {
+            EditingCharCell<PunctChar> esc = new EditingCharCell<>();
             esc.setAlignment(Pos.CENTER);
             esc.setFont(new Font("Courier", 18));
             return esc;
@@ -639,8 +640,8 @@ public class OptionsController {
         rightTypeColumn.setCellValueFactory(new PropertyValueFactory<>("Use"));
 
         // Set cell factory and onEditCommit
-        leftASCIIColumn.setCellFactory(cellStrFactory);
-        rightASCIIColumn.setCellFactory(cellStrFactory);
+        leftASCIIColumn.setCellFactory(cellCharFactory);
+        rightASCIIColumn.setCellFactory(cellCharFactory);
         // no on edit necessary
 
         leftTypeColumn.setCellFactory(cellComboFactory1);
@@ -855,7 +856,7 @@ public class OptionsController {
             ObservableList<Register> registers =
                                   FXCollections.observableArrayList(this.registers);
             programCounterChoice.setItems(registers);
-            programCounterChoice.setValue(mediator.getMachine().getProgramCounter().get());
+            mediator.getMachine().getProgramCounter().ifPresent(programCounterChoice::setValue);
         }
     }
 
@@ -871,16 +872,15 @@ public class OptionsController {
 
     //=========== inner class for IO Options tab ============
 
-    class IOComboBoxTableCell<S, T> extends ComboBoxTableCell<S, T> {
+    class IOComboBoxTableCell<S, T extends IOChannel> extends ComboBoxTableCell<S, T> {
 
         public IOComboBoxTableCell(ObservableList<T> items) {
             super(items);
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public void updateItem(T item, boolean empty) {
-            if (!item.equals(GUIChannels.FILE) ||
+            if (!Objects.equals(item, GUIChannels.FILE) ||
                     IOOptionsSelectedSet == null) {
                 super.updateItem(item, empty);
                 if (item instanceof FileChannel) {

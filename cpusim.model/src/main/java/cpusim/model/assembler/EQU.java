@@ -1,6 +1,5 @@
 package cpusim.model.assembler;
 
-//import java.beans.*;
 import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
@@ -10,17 +9,23 @@ import javafx.beans.property.SimpleStringProperty;
 
 import java.io.Serializable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 //for Serializable and StreamTokenizer
 
 public class EQU implements Serializable, NamedObject, Copyable<EQU>, LegacyXMLSupported {
 	private static final long serialVersionUID = 1L;
 	// instance variables
-    private SimpleStringProperty name;
-    private SimpleLongProperty value;
+    private final SimpleStringProperty name;
+    private final SimpleLongProperty value;
 
     public EQU(String name, long value) {
-        this.name = new SimpleStringProperty(name);
-        this.value = new SimpleLongProperty(value);
+        this.name = new SimpleStringProperty(this, "name", name);
+        this.value = new SimpleLongProperty(this, "value", value);
+    }
+
+    public EQU(EQU other) {
+        this(checkNotNull(other, "other == null").name.get(), other.value.get());
     }
     
     //////////////////// Setters and Getters ////////////////////

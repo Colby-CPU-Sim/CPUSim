@@ -232,7 +232,7 @@ public class FieldsLayoutPaneTest extends FXHarness {
                         .sleep(100);
             });
 
-            assertEquals("Failed to add field to control", size+1, getFieldLabels().size());
+            assertEquals("Failed to add field to control after dragging", size+1, getFieldLabels().size());
 
             verifyFieldsShowing();
 
