@@ -57,7 +57,7 @@ public class EditingStrCell<T> extends TableCell<T, String> {
      * @param empty used for the parent method
      */
     @Override
-    public void updateItem(String item, boolean empty) {
+    protected void updateItem(String item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty || item == null) {

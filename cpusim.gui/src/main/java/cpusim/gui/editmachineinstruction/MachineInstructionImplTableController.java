@@ -1,29 +1,38 @@
 package cpusim.gui.editmachineinstruction;
 
+import com.google.common.collect.ImmutableMap;
 import cpusim.gui.util.DragHelper;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
+import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.util.MachineBound;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Consumer;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Implements a {@link TableView} that supports drag and drop between it's own elements and a view of
@@ -31,6 +40,7 @@ import java.util.Optional;
  *
  * @since 2016-12-01
  */
+@ParametersAreNonnullByDefault
 public class MachineInstructionImplTableController extends TitledPane implements MachineBound {
     
     private static final String FXML_FILE = "MachineInstructionImplTable.fxml";
@@ -41,7 +51,10 @@ public class MachineInstructionImplTableController extends TitledPane implements
     private TableView<Microinstruction<?>> executeSequenceTable;
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<Microinstruction<?>, String> nameColumn;
+    private TableColumn<Microinstruction<?>, String> typeColumn;
+
+    @FXML @SuppressWarnings("unused")
+    private TableColumn<Microinstruction<?>, String> descColumn;
 
     @FXML @SuppressWarnings("unused")
     private TableColumn<Microinstruction<?>, Integer> cycleColumn;
@@ -79,9 +92,21 @@ public class MachineInstructionImplTableController extends TitledPane implements
     @FXML @SuppressWarnings("unused")
     private void initialize() {
 
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        typeColumn.setCellValueFactory(param -> Bindings.createObjectBinding(() -> {
+            Microinstruction<?> ins = param.getValue();
+            if (ins != null) {
+                return ins.getClass().getSimpleName();
+            } else {
+                return "";
+            }
+        }));
+        descColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         cycleColumn.setCellValueFactory(new PropertyValueFactory<>("cycleCount"));
-    
+
+        typeColumn.setCellFactory((TableColumn<Microinstruction<?>, String> column) -> new MicroStyledCell<>());
+        descColumn.setCellFactory((TableColumn<Microinstruction<?>, String> column) -> new MicroDescTableCell());
+        cycleColumn.setCellFactory((TableColumn<Microinstruction<?>, Integer> column) -> new MicroStyledCell<>());
+
         class WrappedInteger {
             int index = -1;
         }
@@ -190,6 +215,14 @@ public class MachineInstructionImplTableController extends TitledPane implements
                     if (empty || item == null) {
                         setText(null);
                         setGraphic(null);
+                    } else {
+                        if (Comment.class.isAssignableFrom(item.getClass())) {
+                            // Make the comments look different
+                            this.getChildren().forEach(n -> {
+
+                            });
+
+                        }
                     }
                 }
             };
@@ -289,6 +322,85 @@ public class MachineInstructionImplTableController extends TitledPane implements
                 tableItems.addAll(newValue.getMicros());
             }
         });
+    }
+
+    private static final Consumer<TableCell<Microinstruction<?>, ?>> DEFAULT_STYLE_HANDLER = cell -> {
+
+        TableRow<?> row = cell.getTableRow();
+
+//        cell.setTextFill(row.getTextFill());
+//        Font rowFont = row.getFont();
+//        cell.setFont(Font.font(rowFont.getFamily(), rowFont.getSize()));
+    };
+
+    // Add any special formatting in here
+    private static final ImmutableMap<Class<? extends Microinstruction<?>>, Consumer<? super TableCell<Microinstruction<?>, ?>>> STYLE_HANDLERS =
+            ImmutableMap.<Class<? extends Microinstruction<?>>, Consumer<? super TableCell<Microinstruction<?>, ?>>>builder()
+            .put(Comment.class, cell -> {
+                cell.setTextFill(Color.LIGHTGREEN);
+                Font thisFont = cell.getFont();
+                cell.setFont(Font.font(thisFont.getFamily(), FontPosture.ITALIC, thisFont.getSize()));
+            })
+            .build();
+
+    private static void styleCellForMicro(TableCell<Microinstruction<?>, ?> cell) {
+        checkNotNull(cell, "cell == null");
+
+        @SuppressWarnings("unchecked") // this is safe, can't have an improper row in the table
+        TableRow<Microinstruction<?>> row = (TableRow<Microinstruction<?>>)cell.getTableRow();
+        checkState(row != null, "Calling set style before inserted into a row");
+
+        Microinstruction<?> rowValue = row.getItem();
+
+        final Consumer<? super TableCell<Microinstruction<?>, ?>> styler;
+        if (rowValue == null) {
+            styler = DEFAULT_STYLE_HANDLER;
+        } else {
+            styler = STYLE_HANDLERS.getOrDefault(rowValue.getClass(), DEFAULT_STYLE_HANDLER);
+        }
+
+        styler.accept(cell);
+    }
+
+    /**
+     * Wrapper class that just updates the style based on the MicroInstruction type
+     * @param <T>
+     */
+    private static class MicroStyledCell<T> extends TableCell<Microinstruction<?>, T> {
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            styleCellForMicro(this);
+        }
+    }
+
+    /**
+     * Simple extension of {@link EditingStrCell} that only allows for editing if the Micro is a
+     * {@link Comment}.
+     */
+    private static class MicroDescTableCell extends EditingStrCell<Microinstruction<?>> {
+
+        @Override
+        public void startEdit() {
+            @SuppressWarnings("unchecked") // this is safe, can't have an improper row in the table
+            TableRow<Microinstruction<?>> row = (TableRow<Microinstruction<?>>)getTableRow();
+            if (!row.isEmpty()) {
+                Microinstruction<?> value = row.getItem();
+
+                if (Comment.class.isAssignableFrom(value.getClass())) {
+                    // we have a comment
+                    super.startEdit();
+                }
+            }
+        }
+
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+
+            styleCellForMicro(this);
+        }
     }
     
 }
