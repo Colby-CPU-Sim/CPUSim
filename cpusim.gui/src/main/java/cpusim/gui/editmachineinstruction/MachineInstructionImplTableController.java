@@ -15,7 +15,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TitledPane;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -25,14 +29,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.fxmisc.easybind.EasyBind;
+import org.fxmisc.easybind.monadic.MonadicBinding;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Implements a {@link TableView} that supports drag and drop between it's own elements and a view of
@@ -195,10 +200,12 @@ public class MachineInstructionImplTableController extends TitledPane implements
                         items.remove(index);
                     }
                     
-                    items.add(Math.min(currentIndex.index, items.size()), micro.cloneOf());
+                    Microinstruction<?> toInsert = micro.cloneOf();
+                    items.add(Math.min(currentIndex.index, items.size()), toInsert);
 
                     ev.setDropCompleted(true);
-                    logger.debug("executeSequenceTable#setOnDragDropped({}): micro -> {}", micro, index);
+                    logger.debug("executeSequenceTable#setOnDragDropped({}): index: {}, currentIndex: {}",
+                            toInsert, index, currentIndex.index);
                 }
             });
 
@@ -216,13 +223,7 @@ public class MachineInstructionImplTableController extends TitledPane implements
                         setText(null);
                         setGraphic(null);
                     } else {
-                        if (Comment.class.isAssignableFrom(item.getClass())) {
-                            // Make the comments look different
-                            this.getChildren().forEach(n -> {
-
-                            });
-
-                        }
+                        setItem(item);
                     }
                 }
             };
@@ -328,16 +329,16 @@ public class MachineInstructionImplTableController extends TitledPane implements
 
         TableRow<?> row = cell.getTableRow();
 
-//        cell.setTextFill(row.getTextFill());
-//        Font rowFont = row.getFont();
-//        cell.setFont(Font.font(rowFont.getFamily(), rowFont.getSize()));
+        cell.setTextFill(row.getTextFill());
+        Font rowFont = row.getFont();
+        cell.setFont(Font.font(rowFont.getFamily(), rowFont.getSize()));
     };
 
     // Add any special formatting in here
     private static final ImmutableMap<Class<? extends Microinstruction<?>>, Consumer<? super TableCell<Microinstruction<?>, ?>>> STYLE_HANDLERS =
             ImmutableMap.<Class<? extends Microinstruction<?>>, Consumer<? super TableCell<Microinstruction<?>, ?>>>builder()
             .put(Comment.class, cell -> {
-                cell.setTextFill(Color.LIGHTGREEN);
+                cell.setTextFill(Color.DARKCYAN);
                 Font thisFont = cell.getFont();
                 cell.setFont(Font.font(thisFont.getFamily(), FontPosture.ITALIC, thisFont.getSize()));
             })
@@ -372,6 +373,12 @@ public class MachineInstructionImplTableController extends TitledPane implements
             super.updateItem(item, empty);
 
             styleCellForMicro(this);
+    
+            if (empty || item == null) {
+                setText(null);
+            } else {
+                setText(item.toString());
+            }
         }
     }
 
@@ -380,7 +387,27 @@ public class MachineInstructionImplTableController extends TitledPane implements
      * {@link Comment}.
      */
     private static class MicroDescTableCell extends EditingStrCell<Microinstruction<?>> {
-
+        
+        private static final Logger logger = LogManager.getLogger(MicroDescTableCell.class);
+        
+        public MicroDescTableCell() {
+    
+            MonadicBinding<Microinstruction<?>> binding = EasyBind.select(tableRowProperty())
+                    .selectObject(TableRow::itemProperty);
+                    
+            editableProperty().bind(Bindings.createBooleanBinding(() -> {
+                    TableRow<?> row = getTableRow();
+                    if (row != null) {
+                        boolean result = row.getItem() != null &&
+                                Comment.class.isAssignableFrom(row.getItem().getClass());
+                        logger.debug("row-item: {}, result: {}", row.getItem(), result);
+                        return result;
+                    } else {
+                        return false;
+                    }
+                }, tableRowProperty(), binding));
+        }
+    
         @Override
         public void startEdit() {
             @SuppressWarnings("unchecked") // this is safe, can't have an improper row in the table
