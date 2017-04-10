@@ -20,10 +20,9 @@ package cpusim.model.assembler;
 // the packages we need to import
 
 import cpusim.model.Machine;
-import cpusim.model.assembler.AssemblyException.InvalidOperandError;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the Assembler class

@@ -164,9 +164,10 @@ public class Normalizer
     //loaded into memory starting at the given address
 
     private void processLabels(List<InstructionCall> instructions,
-                               int startingAddress) throws AssemblyException.NameSpaceError, AssemblyException.InvalidOperandError
+                               int startingAddress)
+            throws AssemblyException.NameSpaceError, AssemblyException.InvalidOperandError
     {
-        checkState(machine.getCodeStore().isPresent());
+        checkState(machine.getCodeStore().isPresent(), "No code store set in Machine");
         labelHash.clear();
         int cellSize = machine.getCodeStore().get().getCellSize();
         int currAddressInBits = startingAddress*cellSize;

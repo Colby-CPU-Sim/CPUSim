@@ -494,6 +494,14 @@ public class Mediator implements MachineBound {
      */
     //CHANGE: returns boolean value
     public boolean Assemble(String programFileName) {
+        checkState(getMachine() != null, "No machine is loaded.");
+
+        if (!getMachine().getCodeStore().isPresent()) {
+            Dialogs.createErrorDialog(stage, "Machine error",
+                    "No code-store has been set, must create a register for a code-store.").showAndWait();
+            return false;
+        }
+
         try {
             assembler.assemble(programFileName,
                     (machine.get()).getStartingAddressForLoading());
