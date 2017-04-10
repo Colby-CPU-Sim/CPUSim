@@ -341,10 +341,7 @@ public class EditMachineInstructionController
 
     @Override
     public void updateMachine() {
-        // FIXME KB
-//            if (commentEditor != null) {
-////                commitCommentEdit();
-//            }
+        instImplTableController.updateMachine();
         mediator.getMachine().setInstructions(instructionList.getItems());
         mediator.setMachineDirty(true);
     }
@@ -354,6 +351,8 @@ public class EditMachineInstructionController
         Validatable.all(instructionList.getItems());
 
         Validate.machineInstructions(instructionList.getItems(), machineProperty().getValue());
+
+        instImplTableController.checkValidity();
     }
 
     /**

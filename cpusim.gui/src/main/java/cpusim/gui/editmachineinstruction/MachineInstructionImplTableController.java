@@ -1,25 +1,25 @@
 package cpusim.gui.editmachineinstruction;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import cpusim.gui.util.DragHelper;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.gui.util.MachineModificationController;
 import cpusim.gui.util.table.EditingStrCell;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.microinstruction.Comment;
-import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.microinstruction.*;
 import cpusim.model.util.MachineBound;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.MapProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -34,10 +34,13 @@ import org.fxmisc.easybind.monadic.MonadicBinding;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * Implements a {@link TableView} that supports drag and drop between it's own elements and a view of
@@ -46,7 +49,9 @@ import static com.google.common.base.Preconditions.*;
  * @since 2016-12-01
  */
 @ParametersAreNonnullByDefault
-public class MachineInstructionImplTableController extends TitledPane implements MachineBound {
+public class MachineInstructionImplTableController extends TitledPane
+        implements MachineBound,
+                    MachineModificationController {
     
     private static final String FXML_FILE = "MachineInstructionImplTable.fxml";
 
@@ -64,6 +69,36 @@ public class MachineInstructionImplTableController extends TitledPane implements
     @FXML @SuppressWarnings("unused")
     private TableColumn<Microinstruction<?>, Integer> cycleColumn;
 
+    private final MapProperty<Class<? extends Microinstruction<?>>, String> microShorthands;
+
+    private static final ImmutableMap<Class<? extends Microinstruction<?>>, String> DEFAULT_MICRO_SHORTHANDS =
+            ImmutableMap.<Class<? extends Microinstruction<?>>, String>builder()
+                .put(Comment.class, "//")
+                .put(Arithmetic.class, "arith")
+                .put(Branch.class, "br")
+                .put(Decode.class, "dec")
+                .put(End.class, "end")
+                .put(Increment.class, "inc")
+                .put(IO.class, "io")
+                .put(Logical.class, "logic")
+                .put(MemoryAccess.class, "mem")
+                .put(SetBits.class, "set")
+                .put(SetCondBit.class, "cndbit")
+                .put(Shift.class, "shift")
+                .put(Test.class, "test")
+                .put(TransferAtoR.class, "a->r")
+                .put(TransferRtoA.class, "r->a")
+                .put(TransferRtoR.class, "r->r")
+                .build();
+
+    /**
+     * The default short-hands in for micros
+     * @return
+     */
+    public static Map<Class<? extends Microinstruction<?>>, String> defaultMicroShorthands() {
+        return Maps.newHashMap(DEFAULT_MICRO_SHORTHANDS);
+    }
+
     private ObjectProperty<MachineInstruction> currentInstruction;
     
     private final ObjectProperty<Machine> machine;
@@ -71,6 +106,9 @@ public class MachineInstructionImplTableController extends TitledPane implements
     public MachineInstructionImplTableController() {
         this.currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", null);
         this.machine = new SimpleObjectProperty<>(this, "machine", null);
+        this.microShorthands = new SimpleMapProperty<>(this, "microShorthands",
+                FXCollections.observableMap(defaultMicroShorthands()));
+
 
         // If the machine changes, make sure we don't have anything showing because it doesn't make sense anymore :)
 
@@ -100,11 +138,11 @@ public class MachineInstructionImplTableController extends TitledPane implements
         typeColumn.setCellValueFactory(param -> Bindings.createObjectBinding(() -> {
             Microinstruction<?> ins = param.getValue();
             if (ins != null) {
-                return ins.getClass().getSimpleName();
+                return microShorthands.getOrDefault(ins.getClass(), ins.getClass().getSimpleName());
             } else {
                 return "";
             }
-        }));
+        }, microShorthands));
         descColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         cycleColumn.setCellValueFactory(new PropertyValueFactory<>("cycleCount"));
 
@@ -325,6 +363,20 @@ public class MachineInstructionImplTableController extends TitledPane implements
         });
     }
 
+    @Override
+    public void updateMachine() {
+        if (currentInstruction.get() != null) {
+            List<Microinstruction<?>> micros = currentInstruction.get().getMicros();
+            micros.clear();
+            micros.addAll(executeSequenceTable.getItems());
+        }
+    }
+
+    @Override
+    public void checkValidity() {
+
+    }
+
     private static final Consumer<TableCell<Microinstruction<?>, ?>> DEFAULT_STYLE_HANDLER = cell -> {
 
         TableRow<?> row = cell.getTableRow();
@@ -390,7 +442,7 @@ public class MachineInstructionImplTableController extends TitledPane implements
         
         private static final Logger logger = LogManager.getLogger(MicroDescTableCell.class);
         
-        public MicroDescTableCell() {
+        MicroDescTableCell() {
     
             MonadicBinding<Microinstruction<?>> binding = EasyBind.select(tableRowProperty())
                     .selectObject(TableRow::itemProperty);
@@ -405,7 +457,7 @@ public class MachineInstructionImplTableController extends TitledPane implements
                     } else {
                         return false;
                     }
-                }, tableRowProperty(), binding));
+                }, binding));
         }
     
         @Override

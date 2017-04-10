@@ -663,10 +663,12 @@ public class Machine extends Module<Machine> {
      * @param newInstructions
      */
     public void setInstructions(List<? extends MachineInstruction> newInstructions) {
-        checkNotNull(newInstructions);
+        checkNotNull(newInstructions, "newInstructions == null");
 
-        instructions.clear();
-        instructions.addAll(newInstructions);
+        if (!Objects.equals(newInstructions, instructions)) {
+            instructions.clear();
+            instructions.addAll(newInstructions);
+        }
     }
 
     //-------------------------------
