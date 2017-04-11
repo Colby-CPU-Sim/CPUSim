@@ -13,17 +13,9 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-jdk:
-  - oraclejdk8
-  - oraclejdk9
-
 os:
   - linux
   - osx
-
-matrix:
-  allow_failures:
-  - jdk: oraclejdk9
 
 script:
   - ./gradlew -Pheadless=true check

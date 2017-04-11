@@ -213,7 +213,7 @@ public class FieldsLayoutPaneTest extends FXHarness {
         /**
          * Add field to the assembly
          */
-        @Test
+        @Test // TODO turn off if running on headless mode :/
         public void dragAddField() {
             List<TableRow<Field>> list = lookup(".table-view")
                     .match(Objects::nonNull)
