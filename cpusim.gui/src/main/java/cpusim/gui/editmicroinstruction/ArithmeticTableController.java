@@ -2,17 +2,16 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EnumCellFactory;
+import cpusim.gui.util.table.MachineObjectCellFactories;
+import cpusim.gui.util.table.NamedObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -68,8 +67,8 @@ class ArithmeticTableController extends ALUOpTableController<Arithmetic> {
         overflowBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
         carryBit.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
-        Callback<TableColumn<Arithmetic, ConditionBit>,TableCell<Arithmetic, ConditionBit>> cellCondFactory =
-                _ignore -> new ComboBoxTableCell<>(getMachine().getModules(ConditionBit.class));
+        NamedObjectCellFactories.ComboBox<Arithmetic, ConditionBit> cellCondFactory =
+                MachineObjectCellFactories.modulesProperty(machineProperty(), ConditionBit.class);
 
         //Add for EdiCell of each field, in String or in Integer
 

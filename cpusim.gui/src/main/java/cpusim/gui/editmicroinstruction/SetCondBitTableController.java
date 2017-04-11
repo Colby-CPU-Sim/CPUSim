@@ -1,6 +1,7 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
@@ -11,9 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -34,7 +33,7 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
     final static String FX_ID = "setCondBitTab";
 
     @FXML @SuppressWarnings("unused")
-    private TableColumn<SetCondBit,ConditionBit> bit;
+    private TableColumn<SetCondBit, ConditionBit> bit;
     
     @FXML @SuppressWarnings("unused")
     private TableColumn<SetCondBit, Boolean> value;
@@ -55,14 +54,11 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
         bit.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
         value.prefWidthProperty().bind(prefWidthProperty().divide(100/33.0));
 
-        Callback<TableColumn<SetCondBit,ConditionBit>,TableCell<SetCondBit,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getModules(ConditionBit.class));
-
         bit.setCellValueFactory(new PropertyValueFactory<>("bit"));
         value.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         //Add for Editable Cell of each field, in String or in Integer
-        bit.setCellFactory(cellCondFactory);
+        bit.setCellFactory(MachineObjectCellFactories.modulesProperty(machineProperty(), ConditionBit.class));
         bit.setOnEditCommit(text -> text.getRowValue().setBit(text.getNewValue()));
 
         value.setCellFactory(param ->

@@ -2,6 +2,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EnumCellFactory;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.IODirection;
 import cpusim.model.microinstruction.MemoryAccess;
@@ -13,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -72,11 +72,9 @@ class MemoryAccessTableController
         address.prefWidthProperty().bind(prefWidthProperty().divide(FACTOR));
 
         Callback<TableColumn<MemoryAccess,Register>,TableCell<MemoryAccess,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getRegisters());
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
         Callback<TableColumn<MemoryAccess,RAM>,TableCell<MemoryAccess,RAM>> cellRAMFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getModules(RAM.class));
+                MachineObjectCellFactories.modulesProperty(machineProperty(), RAM.class);
 
         direction.setCellValueFactory(new PropertyValueFactory<>("direction"));
         memory.setCellValueFactory(new PropertyValueFactory<>("memory"));

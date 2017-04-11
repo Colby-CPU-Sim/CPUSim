@@ -3,6 +3,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingLongCell;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetBits;
 import cpusim.model.module.Register;
@@ -11,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -71,8 +71,7 @@ class SetTableController extends MicroinstructionTableController<SetBits> {
         Callback<TableColumn<SetBits,Long>,TableCell<SetBits,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<SetBits,Register>,TableCell<SetBits,Register>> cellComboFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getRegisters());
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
 
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         start.setCellValueFactory(new PropertyValueFactory<>("start"));

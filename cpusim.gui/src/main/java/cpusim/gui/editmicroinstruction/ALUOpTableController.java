@@ -1,19 +1,14 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.gui.util.table.EnumCellFactory;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.microinstruction.Arithmetic;
 import cpusim.model.microinstruction.ArithmeticLogicOperation;
-import cpusim.model.microinstruction.Microinstruction;
-import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -42,7 +37,7 @@ abstract class ALUOpTableController<T extends ArithmeticLogicOperation<T>> exten
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         Callback<TableColumn<Arithmetic,Register>,TableCell<Arithmetic,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
 
         //Add for EdiCell of each field, in String or in Integer
 

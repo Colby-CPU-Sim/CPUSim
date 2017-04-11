@@ -3,6 +3,7 @@ package cpusim.gui.editmicroinstruction;
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.gui.util.table.EnumCellFactory;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.microinstruction.Shift;
 import cpusim.model.module.Register;
 import javafx.beans.property.BooleanProperty;
@@ -10,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -71,7 +71,7 @@ class ShiftTableController extends MicroinstructionTableController<Shift> {
         Callback<TableColumn<Shift,Integer>,TableCell<Shift,Integer>> cellIntFactory =
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<Shift,Register>,TableCell<Shift,Register>> cellComboFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         destination.setCellValueFactory(new PropertyValueFactory<>("destination"));

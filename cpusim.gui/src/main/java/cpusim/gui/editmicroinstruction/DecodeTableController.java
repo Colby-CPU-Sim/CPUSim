@@ -1,17 +1,15 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Decode;
 import cpusim.model.module.Register;
 import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.util.Callback;
 
 import javax.annotation.Nonnull;
 import java.util.UUID;
@@ -50,13 +48,11 @@ class DecodeTableController extends MicroinstructionTableController<Decode> {
         name.prefWidthProperty().bind(prefWidthProperty().divide(100/50.0));
         ir.prefWidthProperty().bind(prefWidthProperty().divide(100/50.0));
 
-        Callback<TableColumn<Decode,Register>,TableCell<Decode,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
-
         ir.setCellValueFactory(new PropertyValueFactory<>("ir"));
 
         //Add for EdiCell of each field, in String or in Integer
-        ir.setCellFactory(cellRegFactory);
+        ir.setCellFactory(
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class));
         ir.setOnEditCommit(
                 text -> text.getRowValue().setIr(text.getNewValue())
         );

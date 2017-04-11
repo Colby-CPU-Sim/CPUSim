@@ -2,18 +2,16 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingLongCell;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.Increment;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import javafx.beans.property.BooleanProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -69,13 +67,9 @@ class IncrementTableController
         Callback<TableColumn<Increment,Long>,TableCell<Increment,Long>> cellLongFactory =
                 setIntegerTableColumn -> new EditingLongCell<>();
         Callback<TableColumn<Increment,Register>,TableCell<Increment,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(machine.get().getRegisters());
-
-        final ObservableList<ConditionBit> condBit = FXCollections.observableArrayList((ConditionBit) null);
-        condBit.addAll(machine.get().getModules(ConditionBit.class));
-        
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
         Callback<TableColumn<Increment,ConditionBit>,TableCell<Increment,ConditionBit>> cellCondFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(condBit);
+                MachineObjectCellFactories.modulesProperty(machineProperty(), ConditionBit.class);
 
         register.setCellValueFactory(new PropertyValueFactory<>("register"));
         overflowBit.setCellValueFactory(new PropertyValueFactory<>("overflowBit"));

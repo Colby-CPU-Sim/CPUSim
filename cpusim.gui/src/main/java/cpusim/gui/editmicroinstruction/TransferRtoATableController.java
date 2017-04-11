@@ -13,6 +13,7 @@ package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
 import cpusim.gui.util.table.EditingNonNegativeIntCell;
+import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.Register;
@@ -24,7 +25,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
@@ -100,12 +100,10 @@ class TransferRtoATableController extends MicroinstructionTableController<Transf
                 setIntegerTableColumn -> new EditingNonNegativeIntCell<>();
         Callback<TableColumn<TransferRtoA,Register>,
                 TableCell<TransferRtoA,Register>> cellRegFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getRegisters());
+                MachineObjectCellFactories.modulesProperty(machineProperty(), Register.class);
         Callback<TableColumn<TransferRtoA,RegisterArray>,
                 TableCell<TransferRtoA,RegisterArray>> cellRegAFactory =
-                setStringTableColumn -> new ComboBoxTableCell<>(
-                        machine.get().getModules(RegisterArray.class));
+                MachineObjectCellFactories.modulesProperty(machineProperty(), RegisterArray.class);
 
         source.setCellValueFactory(new PropertyValueFactory<>("source"));
         srcStartBit.setCellValueFactory(new PropertyValueFactory<>("srcStartBit"));

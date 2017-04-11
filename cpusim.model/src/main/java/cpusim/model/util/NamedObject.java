@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
+import javafx.util.StringConverter;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -191,5 +192,21 @@ public interface NamedObject extends Validatable, Comparable<NamedObject> {
     static void validateUniqueAndNonempty(List<? extends NamedObject> objects) {
         validateNamesUnique(objects);
         objects.stream().map(NamedObject::getName).forEach(NamedObject::validateName);
+    }
+
+    static class NameStringConverter<T extends NamedObject> extends StringConverter<T> {
+        @Override
+        public String toString(T object) {
+            if (object == null) {
+                return null;
+            }
+
+            return object.getName();
+        }
+
+        @Override
+        public T fromString(String string) {
+            throw new UnsupportedOperationException("Can not convert from a String");
+        }
     }
 }
