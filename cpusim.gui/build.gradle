@@ -22,6 +22,9 @@ dependencies {
     compile project(':cpusim.model')
 
     testCompile project(':cpusim.test.harness')
+
+    // For CI
+    testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
 }
 
 task runMaxwell(type: JavaExec) {
@@ -39,5 +42,15 @@ jar {
                     'Implementation-Version': version,
                     'Main-Class': 'cpusim.Main',
                     'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
+    }
+}
+
+/*
+ * Allows you to run the UI tests in headless mode by calling gradle with the -Pheadless=true argument
+ */
+if (project.hasProperty('headless') ? project.headless : false) {
+    println "Running UI Tests Headless"
+    test {
+        jvmArgs = ['-Djava.awt.headless=true', '-Dtestfx.robot=glass', '-Dtestfx.headless=true', '-Dprism.order=sw', '-Dprism.text=t2k']
     }
 }

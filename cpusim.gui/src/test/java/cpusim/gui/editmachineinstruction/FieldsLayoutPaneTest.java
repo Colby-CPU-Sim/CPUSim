@@ -25,8 +25,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -88,12 +88,12 @@ public class FieldsLayoutPaneTest extends FXHarness {
 
             HBox.setHgrow(underTest, Priority.ALWAYS);
 
-            Scene scene = new Scene(hbox, 400, 100);
+            Scene scene = new Scene(hbox, 400, 200);
             stage.setScene(scene);
             stage.show();
         }
 
-        protected List<FieldsLayoutPane.FieldLabel> getFieldLabels() {
+        List<FieldsLayoutPane.FieldLabel> getFieldLabels() {
             return lookup("#fieldsBox")
                     .<HBox>query().getChildren()
                     .stream().map(n -> (FieldsLayoutPane.FieldLabel)n)
@@ -118,10 +118,9 @@ public class FieldsLayoutPaneTest extends FXHarness {
         public void setup() {
             instruction.set(byName("exit"));
 
-            interact(() -> {
+            interact(() ->
                 underTest.currentInstructionProperty()
-                        .bind(instruction);
-            });
+                        .bind(instruction));
         }
 
         protected final double calcWidthPerBit() {
@@ -216,33 +215,32 @@ public class FieldsLayoutPaneTest extends FXHarness {
          */
         @Test
         public void dragAddField() {
-            List<TableRow<Field>> list = new ArrayList<>(lookup(".table-row-cell")
-                    .<TableRow<Field>>match(c -> c != null && !c.isEmpty())
-                    .queryAll());
+            List<TableRow<Field>> list = lookup(".table-view")
+                    .match(Objects::nonNull)
+                    .lookup(".table-row-cell")
+                    .<TableRow<Field>>queryAll()
+                        .stream().filter(r -> !r.isEmpty())
+                                .collect(Collectors.toList());
 
             int size = instructionFields.size();
 
             assertEquals("Base case before dragging fields", size, getFieldLabels().size());
 
-            interact(() -> {
-                drag(list.get(0), MouseButton.PRIMARY)
+            interact(() ->
+                    drag(list.get(0), MouseButton.PRIMARY)
                         .moveTo(underTest.localToScreen(10, 20))
-                        .sleep(100)
                         .drop()
-                        .sleep(100);
-            });
+            );
 
             assertEquals("Failed to add field to control after dragging", size+1, getFieldLabels().size());
 
             verifyFieldsShowing();
 
-            interact(() -> {
+            interact(() ->
                 drag(list.get(1), MouseButton.PRIMARY)
                         .moveTo(getFieldLabels().get(1).localToScreen(10, 10))
-                        .sleep(100)
                         .drop()
-                        .sleep(100);
-            });
+            );
 
             assertEquals("Failed to add field to control", size+2, getFieldLabels().size());
 
