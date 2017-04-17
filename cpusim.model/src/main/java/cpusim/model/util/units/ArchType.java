@@ -83,8 +83,11 @@ public enum ArchType {
 	 * @param width Width of the mask 
 	 * @return long mask
 	 */
-	public long getMask(final int width) {
-		checkArgument(width >= 0 && width <= 64, "Invalid width specified, must be between 0 and 64 (width = " + width + ")");
+	public long getMask(final long width) {
+		final long bvalue = convertTo(Bit, width);
+		checkArgument(bvalue >= 0 && bvalue <= Long.BYTES * 8,
+				"Invalid width specified, must be between 0 and 64 bits (width = %s %s)",
+					width, this);
 	
 		return (1l << asBits(width)) - 1l;
 	}

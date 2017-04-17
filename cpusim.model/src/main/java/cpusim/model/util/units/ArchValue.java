@@ -148,14 +148,18 @@ public class ArchValue implements Comparable<ArchValue> {
 	
 	/**
 	 * Create a mask of <code>this</code> units wide. 
-	 * 
-	 * @return bit mask. 
+	 *
+	 * @return bit mask.
+     * @throws IllegalStateException if the width is too large
+	 *
+     * @see ArchType#getMask(long)
 	 */
 	public long mask() {
-		checkArgument(value >= 0 && value <= 64, 
-				"Can not create mask from ArchValue with content: " + value + ", must be between 0 <= value <= 64.");
-		
-		return type.getMask((int)value);
+		try {
+			return type.getMask(value);
+		} catch (IllegalArgumentException iae) {
+			throw new IllegalStateException(iae);
+		}
 	}
 
 	/**

@@ -1,18 +1,17 @@
 package cpusim.model.util.units;
 
-import static org.junit.Assert.assertEquals;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class ArchValueTest {
@@ -103,5 +102,10 @@ public class ArchValueTest {
         	assertEquals(ArchType.Bit.of(2), mapper.readValue(strOut, ArchValue.class));
     	}
     }
-    
+
+    @Test(expected = IllegalStateException.class)
+    public void mask_tooLarge() {
+        final ArchValue bytes_8 = ArchType.Byte.of(9);
+        bytes_8.mask();
+    }
 }
