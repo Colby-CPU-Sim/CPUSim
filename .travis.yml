@@ -20,9 +20,6 @@ matrix:
       language: java
       env: JDK_VERSION=oraclejdk8
 
-  allow_failures:
-    - os: osx
-
 before_install:
   - chmod a+x ./install-deps.sh ; ./install-deps.sh
 

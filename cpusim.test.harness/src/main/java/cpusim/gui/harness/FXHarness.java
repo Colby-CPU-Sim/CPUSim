@@ -66,7 +66,11 @@ public abstract class FXHarness extends FxRobot implements MachineBound {
     }
 
     private static void ciSkip(boolean shouldSkip) {
-        assumeThat(Boolean.parseBoolean(System.getProperty("CI", "false")), Is.is(!shouldSkip));
+        String ciVar = System.getenv("CI");
+        if (ciVar == null) {
+            ciVar = "false";
+        }
+        assumeThat(Boolean.parseBoolean(ciVar), Is.is(!shouldSkip));
     }
 
     public static void skipOnCI() {
