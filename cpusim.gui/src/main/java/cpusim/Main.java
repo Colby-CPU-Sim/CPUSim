@@ -36,7 +36,7 @@ import org.xml.sax.SAXParseException;
 import java.io.File;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 public class Main {
     
@@ -153,8 +153,11 @@ public class Main {
         ObservableList<IO> ioMicros = machine.getMicros(IO.class);
         BufferedChannel commandLineChannel = new BufferedChannel(new StreamChannel());
         for(final IO io : ioMicros) {
-            if(!(io.getConnection() instanceof FileChannel))
-                io.setConnection(commandLineChannel);
+            io.getConnection().ifPresent(connection -> {
+                if(!(connection instanceof FileChannel))
+                    io.setConnection(commandLineChannel);
+            });
+            
         }
 
         //run the program

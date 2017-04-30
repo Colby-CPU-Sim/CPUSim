@@ -29,7 +29,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
                 LegacyXMLSupported,
                 HTMLEncodable,
                 Validatable,
-                ReadOnlyMachineBound,
+                MachineBound,
                 MachineComponent,
                 Copyable<T>
 {
@@ -44,7 +44,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
 
     private final ReadOnlyObjectProperty<UUID> uuid;
     
-    private final Machine machine;
+    private final ObjectProperty<Machine> machine;
     
 
     //------------------------------
@@ -55,8 +55,10 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
         
         this.name = new SimpleStringProperty(this, "name", name);
         this.cycles = new SimpleIntegerProperty(this, "cycleCount", 1);
-        this.machine = checkNotNull(machine);
-        this.uuid = new ReadOnlyObjectWrapper<>(this, "id", checkNotNull(id));
+        this.machine = new SimpleObjectProperty<>(this, "machine",
+                checkNotNull(machine, "machine == null"));
+        this.uuid = new ReadOnlyObjectWrapper<>(this, "id",
+                checkNotNull(id, "id == null"));
     }
     
     /**
@@ -66,7 +68,7 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
 	 * @throws NullPointerException if <code>other</code> is <code>null</code>.
 	 */
 	public Microinstruction(final Microinstruction<T> other) {
-		this(checkNotNull(other).getName(), IdentifiedObject.generateRandomID(), other.machine);
+		this(checkNotNull(other).getName(), IdentifiedObject.generateRandomID(), other.machine.get());
 	}
 
     @Override
@@ -80,8 +82,8 @@ public abstract class Microinstruction<T extends Microinstruction<T>>
     }
 
     @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
-        return new ReadOnlyObjectWrapper<>(this, "machine", machine);
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     @Override

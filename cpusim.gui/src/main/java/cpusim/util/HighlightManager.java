@@ -19,6 +19,7 @@ import cpusim.gui.desktop.DesktopController;
 import cpusim.gui.desktop.RamTableController;
 import cpusim.gui.desktop.editorpane.LineNumAndBreakpointFactory;
 import cpusim.model.Machine;
+import cpusim.model.assembler.SourceLine;
 import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import cpusim.model.module.Register;

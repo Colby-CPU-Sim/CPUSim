@@ -1333,7 +1333,8 @@ public class MachineReader {
 
 	@SuppressWarnings("unused")
 	public void startFetchSequence(Attributes attrs) {
-		currentInstruction = machine.getFetchSequence();
+		currentInstruction = machine.getFetchSequence()
+				.orElseThrow(() -> new MachineReaderException("No Fetch Sequence set"));
 	}
 
 	@SuppressWarnings("unused")

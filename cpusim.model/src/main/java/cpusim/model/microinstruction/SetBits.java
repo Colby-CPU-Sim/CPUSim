@@ -8,6 +8,7 @@ import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +67,8 @@ public class SetBits extends Microinstruction<SetBits> {
      * @throws NullPointerException if <code>other</code> is <code>null</code>
      */
     public SetBits(final SetBits other) {
-    	this(checkNotNull(other).getName(), UUID.randomUUID(), other.getMachine(), other.getRegister(),
+    	this(checkNotNull(other).getName(), UUID.randomUUID(), other.getMachine(),
+                other.getRegister().orElse(null),
     			other.getStart(), other.getNumBits(), other.getValue());
     }
 
@@ -74,8 +76,8 @@ public class SetBits extends Microinstruction<SetBits> {
     /**
      * @return the Register in the set microinstruction.
      */
-    public Register getRegister(){
-        return register.get();
+    public Optional<Register> getRegister(){
+        return Optional.ofNullable(register.get());
     }
 
     /**
@@ -170,7 +172,7 @@ public class SetBits extends Microinstruction<SetBits> {
         int numBits = this.numBits.get();
         int startBits = this.start.get();
         
-        if (!getMachine().getIndexFromRight()){
+        if (!getMachine().isIndexFromRight()){
             rightOffsetShift = 64 - startBits; 
             leftOffsetShift = startBits + numBits;
             valueRightShift = startBits;
@@ -207,7 +209,7 @@ public class SetBits extends Microinstruction<SetBits> {
         checkNotNull(oldToNew);
 
         return new SetBits(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                oldToNew.get(getRegister()), getStart(), getNumBits(), getValue());
+                oldToNew.get(getRegister().orElse(null)), getStart(), getNumBits(), getValue());
     }
 
     @Override
@@ -215,7 +217,7 @@ public class SetBits extends Microinstruction<SetBits> {
         checkNotNull(other);
 
         other.setName(getName());
-        other.setRegister(getRegister());
+        other.setRegister(getRegister().orElse(null));
         other.setStart(getStart());
         other.setNumBits(getNumBits());
         other.setValue(getValue());
@@ -226,9 +228,10 @@ public class SetBits extends Microinstruction<SetBits> {
      * @return the XML description
      */
     @Override
-    public String getXMLDescription(String indent){
+    public String getXMLDescription(String indent) {
+        // FIXME PROPERTY-BASED-XML
         return "<Set name=\"" + getHTMLName() +
-                "\" register=\"" + getRegister().getID() +
+//                "\" register=\"" + getRegister().getID() +
                 "\" start=\"" + getStart() +
                 "\" numBits=\"" + getNumBits() +
                 "\" value=\"" + getValue() +
@@ -241,8 +244,11 @@ public class SetBits extends Microinstruction<SetBits> {
      */
 	@Override
 	public String getHTMLDescription(String indent) {
-		return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
-	        "</TD><TD>" + getStart() + "</TD><TD>" + getNumBits() +
+
+        // FIXME PROPERTY-BASED-XML
+		return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>"
+                //+ getRegister().getHTMLName() +
+	         + "</TD><TD>" + getStart() + "</TD><TD>" + getNumBits() +
 	        "</TD><TD>" + getValue() + "</TD></TR>";
 	}
 
@@ -265,9 +271,12 @@ public class SetBits extends Microinstruction<SetBits> {
         
         final int start = getStart();
         final int numBits = getNumBits();
-//            final long value = getValue();
-    
-        Register register = getRegister();
+
+        if (!getRegister().isPresent()) {
+            throw new ValidationException("No register specified for instruction " + getName());
+        }
+
+        Register register = getRegister().get();
     
         if (start < 0) {
             throw new ValidationException("You cannot specify a negative value for the " +

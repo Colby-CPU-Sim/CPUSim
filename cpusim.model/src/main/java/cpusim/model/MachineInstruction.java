@@ -30,7 +30,7 @@ public class MachineInstruction
                 , NamedObject
                 , LegacyXMLSupported
                 , HTMLEncodable
-                , ReadOnlyMachineBound
+                , MachineBound
                 , MachineComponent
                 , Copyable<MachineInstruction> {
 
@@ -50,7 +50,7 @@ public class MachineInstruction
      * the opcode of the instruction
      */
     private final LongProperty opcode;
-    private final Machine machine;
+    private final ObjectProperty<Machine> machine;
 
     @DependantComponent
     private final ListProperty<Field> instructionFields;
@@ -78,7 +78,7 @@ public class MachineInstruction
                               @Nullable List<Field> assemblyFields) {
         this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
         this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
-        this.machine = machine;
+        this.machine = new SimpleObjectProperty<>(this, "machine", machine);
         
         this.opcode = new SimpleLongProperty(this, "opcode", opcode);
         
@@ -135,8 +135,8 @@ public class MachineInstruction
     }
 
     @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
-        return new ReadOnlyObjectWrapper<>(machine);
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     @Override

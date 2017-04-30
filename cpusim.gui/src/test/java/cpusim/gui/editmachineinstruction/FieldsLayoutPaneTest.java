@@ -198,7 +198,7 @@ public class FieldsLayoutPaneTest {
         }
 
         /**
-         * Adding duplicate fields into an assembly used to cause this to blow-up because the control
+         * Adding duplicate instructionFields into an assembly used to cause this to blow-up because the control
          * would create duplicate labels, this should NOT be a problem.
          */
         @Test
@@ -227,7 +227,7 @@ public class FieldsLayoutPaneTest {
 
             int size = instructionFields.size();
 
-            assertEquals("Base case before dragging fields", size, getFieldLabels().size());
+            assertEquals("Base case before dragging instructionFields", size, getFieldLabels().size());
 
             interact(() ->
                     drag(list.get(0), MouseButton.PRIMARY)

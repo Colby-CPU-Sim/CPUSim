@@ -16,9 +16,12 @@ import javafx.beans.property.SimpleObjectProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static cpusim.model.util.Validate.getOptionalProperty;
 
 /**
  * Reads/writes to an {@link IOChannel}.
@@ -37,11 +40,11 @@ public class IO extends Microinstruction<IO> {
     @DependantComponent
     private final ObjectProperty<Register> buffer;
 
-    private IOChannel connection;
+    private final ObjectProperty<IOChannel> connection;
 
     private final ReadOnlySetProperty<MachineComponent> dependencies;
 
-    private final Logger logger = LogManager.getLogger(IO.class);
+    private static final Logger logger = LogManager.getLogger(IO.class);
 
     /**
      * Constructor
@@ -57,14 +60,14 @@ public class IO extends Microinstruction<IO> {
               UUID id,
               Machine machine,
               Type type,
-              Register buffer,
+              @Nullable Register buffer,
               IODirection direction,
               IOChannel connection){
         super(name, id, machine);
         this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
         this.buffer = new SimpleObjectProperty<>(this, "buffer", buffer);
         this.direction = new SimpleObjectProperty<>(this, "direction", checkNotNull(direction));
-        this.connection = connection;
+        this.connection = new SimpleObjectProperty<>(this, "connection", connection);
 
         this.dependencies = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependantComponents");
@@ -79,9 +82,9 @@ public class IO extends Microinstruction<IO> {
                 UUID.randomUUID(),
                 other.getMachine(),
                 other.getType(),
-                other.getBuffer(),
+                other.getBuffer().orElse(null),
                 other.getDirection(),
-                other.getConnection());
+                other.getConnection().orElse(null));
     }
 
     @Override
@@ -93,8 +96,8 @@ public class IO extends Microinstruction<IO> {
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public Register getBuffer(){
-        return buffer.get();
+    public Optional<Register> getBuffer(){
+        return Optional.ofNullable(buffer.get());
     }
 
     /**
@@ -153,8 +156,8 @@ public class IO extends Microinstruction<IO> {
      * getter for the IOChannel
      * @return the IOChannel
      */
-    public IOChannel getConnection(){
-        return this.connection;
+    public Optional<IOChannel> getConnection(){
+        return Optional.ofNullable(this.connection.getValue());
     }
 
     /**
@@ -162,16 +165,22 @@ public class IO extends Microinstruction<IO> {
      * @param newConnection new Channel to be set
      */
     public void setConnection(IOChannel newConnection){
-        this.connection = newConnection;
+        this.connection.setValue(newConnection);
     }
-
+    
+    public ObjectProperty<IOChannel> connectionProperty() {
+        return connection;
+    }
+    
     @Override
     public IO cloneFor(IdentifierMap oldToNew) {
         checkNotNull(oldToNew);
 
         return new IO(getName(), UUID.randomUUID(), getMachine(),
-                getType(), oldToNew.get(getBuffer()),
-                getDirection(), getConnection());
+                getType(),
+                oldToNew.get(getBuffer().orElse(null)),
+                getDirection(),
+                getConnection().orElse(null));
     }
 
     @Override
@@ -181,8 +190,8 @@ public class IO extends Microinstruction<IO> {
         newIO.setName(getName());
         newIO.setDirection(getDirection());
         newIO.setType(getType());
-        newIO.setBuffer(getBuffer());
-        newIO.setConnection(getConnection());
+        newIO.setBuffer(getBuffer().orElse(null));
+        newIO.setConnection(getConnection().orElse(null));
     }
 
     /**
@@ -194,6 +203,8 @@ public class IO extends Microinstruction<IO> {
 
         IODirection dir = getDirection();
         Type type = getType();
+        
+        IOChannel connection = this.connection.getValue();
 
         switch (dir) {
             case Read: {
@@ -249,7 +260,8 @@ public class IO extends Microinstruction<IO> {
     /**
      * undo the execution of the micro instruction from machine
      */
-    public void undoExecute(){
+    public void undoExecute() {
+        IOChannel connection = this.connection.get();
         if (connection instanceof FileChannel){
             FileChannel connect = (FileChannel) connection;
 
@@ -314,7 +326,7 @@ public class IO extends Microinstruction<IO> {
 		return indent + "<IO name=\"" + getHTMLName() +
                 "\" direction=\"" + getDirection() +
                 "\" type=\"" + getType() +
-                "\" buffer=\"" + getBuffer().getID() +
+//                "\" buffer=\"" + getBuffer().getID() +
                 "\" connection=\"" + getConnection() +
                 "\" id=\"" + getID() + "\" />";
 	}
@@ -324,7 +336,7 @@ public class IO extends Microinstruction<IO> {
 		return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getDirection() +
                 "</TD><TD>" + getType() +
-                "</TD><TD>" + getBuffer().getHTMLName() +
+//                "</TD><TD>" + getBuffer().getHTMLName() +
                 "</TD><TD>" + HtmlEncoder.sEncode(getConnection().toString()) +
                 "</TD></TR>";
 	}
@@ -357,7 +369,9 @@ public class IO extends Microinstruction<IO> {
 
         }
 
-        if (getBuffer().getWidth() < width.as(ArchType.Byte)) {
+        Register buffer = getOptionalProperty(this, IO::bufferProperty);
+        
+        if (buffer.getWidth() < width.as(ArchType.Byte)) {
             throw new ValidationException("IO \"" + this + "\" is of type " + getType()+ " and so needs a\n" +
                     "buffer register at least " + width.as(ArchType.Bit) + " bits wide.");
         }

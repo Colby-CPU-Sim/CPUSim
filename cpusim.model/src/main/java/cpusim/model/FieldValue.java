@@ -19,7 +19,11 @@ import java.util.UUID;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class FieldValue implements NamedObject, LegacyXMLSupported, MachineComponent, Copyable<FieldValue> {
+public class FieldValue implements
+		NamedObject,
+		LegacyXMLSupported,
+		MachineComponent,
+		Copyable<FieldValue> {
 
 	private ReadOnlyObjectProperty<UUID> id;
 	private StringProperty name;

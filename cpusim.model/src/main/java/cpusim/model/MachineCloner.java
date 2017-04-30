@@ -11,10 +11,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2016-12-07
  */
-public class MachineCloner {
+public abstract class MachineCloner {
 
 
-    public MachineCloner() {
+    private MachineCloner() {
+        // no init
     }
 
     /**
@@ -22,7 +23,7 @@ public class MachineCloner {
      *
      * @return Clone of original {@link Machine}
      */
-    public Machine cloneMachine(Machine originalMachine) {
+    public static Machine cloneMachine(Machine originalMachine) {
         checkNotNull(originalMachine);
 
         MachineComponent.IdentifierMap oldToNewMapping = new MachineComponent.IdentifierMap();

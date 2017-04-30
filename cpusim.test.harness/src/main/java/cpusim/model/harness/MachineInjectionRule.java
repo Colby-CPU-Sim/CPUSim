@@ -54,7 +54,7 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         
         ArrayList<Field> fieldsToBind = new ArrayList<>();
         
-        // collect the fields
+        // collect the instructionFields
         Class<?> iterClazz = testInstance.getClass();
         while (iterClazz != Object.class) {
             for (Field f : iterClazz.getDeclaredFields()) {
@@ -91,7 +91,7 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                // We inject the fields on the JavaFX thread,
+                // We inject the instructionFields on the JavaFX thread,
                 // not on the main thread. The waitFor waits until
                 // the Future completes
                 waitFor(asyncFx(() -> injectFields()));
@@ -112,7 +112,7 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
                     MachineBound bound = (MachineBound) instance;
                     bound.machineProperty().bind(this);
                 } else {
-                    @SuppressWarnings("unchecked") // this is safe because of how the fields are collected
+                    @SuppressWarnings("unchecked") // this is safe because of how the instructionFields are collected
                     ObjectProperty<Machine> property = (ObjectProperty<Machine>) instance;
                     property.bind(this);
                 }

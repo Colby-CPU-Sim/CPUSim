@@ -5,13 +5,15 @@ import cpusim.model.module.ControlUnit;
 import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import cpusim.util.MoreBindings;
 import cpusim.model.util.ValidationException;
+import cpusim.util.MoreBindings;
 import javafx.beans.property.*;
+import org.fxmisc.easybind.EasyBind;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The Test microinstruction allows the computer to jump to other microinstructions
@@ -89,7 +91,10 @@ public class Test extends Microinstruction<Test> {
         this.value = new SimpleLongProperty(this, "value", value);
         this.omission = new SimpleIntegerProperty(this, "omission", omission);
 
-        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(
+                this, "controlUnit",
+                EasyBind.select(machineProperty())
+                        .selectObject(Machine::controlUnitProperty));
 
         this.dependencies = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependencies");
@@ -103,7 +108,7 @@ public class Test extends Microinstruction<Test> {
      */
     public Test(Test other) {
         this(other.getName(), UUID.randomUUID(), other.getMachine(),
-                other.getRegister(), other.getStart(),
+                other.getRegister().orElse(null), other.getStart(),
                 other.getNumBits(), other.getComparison(),
                 other.getValue(), other.getOmission());
     }
@@ -112,8 +117,8 @@ public class Test extends Microinstruction<Test> {
      * returns the name of the set microinstruction as a string.
      * @return the name of the set microinstruction.
      */
-    public Register getRegister(){
-        return register.get();
+    public Optional<Register> getRegister(){
+        return Optional.ofNullable(register.get());
     }
 
     /**
@@ -122,6 +127,10 @@ public class Test extends Microinstruction<Test> {
      */
     public void setRegister(Register newRegister){
         register.set(newRegister);
+    }
+
+    public ObjectProperty<Register> registerProperty() {
+        return register;
     }
 
     /**
@@ -140,6 +149,12 @@ public class Test extends Microinstruction<Test> {
         start.set(newStart);
     }
 
+
+    public IntegerProperty startProperty() {
+        return start;
+    }
+
+
     /**
      * returns the number of bits of the value.
      * @return the integer value of the number of bits.
@@ -156,6 +171,11 @@ public class Test extends Microinstruction<Test> {
         numBits.set(newNumbits);
     }
 
+    public IntegerProperty numBitsProperty() {
+        return numBits;
+    }
+
+
     /**
      * returns the type of comparison of the test instruction.
      * @return the type of comparison of the test instruction as string.
@@ -170,6 +190,10 @@ public class Test extends Microinstruction<Test> {
      */
     public void setComparison(Operation newComparison){
         comparison.set(newComparison);
+    }
+
+    public ObjectProperty<Operation> comparisonProperty() {
+        return comparison;
     }
 
     /**
@@ -188,6 +212,11 @@ public class Test extends Microinstruction<Test> {
         value.set(newValue);
     }
 
+
+    public LongProperty valueProperty() {
+        return value;
+    }
+
     /**
      * returns the number of bits to jump.
      * @return the integer value of omission.
@@ -202,6 +231,18 @@ public class Test extends Microinstruction<Test> {
      */
     public void setOmission(int newOmission){
         omission.set(newOmission);
+    }
+
+    public IntegerProperty omissionProperty() {
+        return omission;
+    }
+
+    public Optional<ControlUnit> getControlUnit() {
+        return Optional.ofNullable(controlUnit.get());
+    }
+
+    public ReadOnlyObjectProperty<ControlUnit> controlUnitProperty() {
+        return controlUnit;
     }
     
     /**
@@ -221,7 +262,7 @@ public class Test extends Microinstruction<Test> {
         
         //set leftShift differently depending on whether we are indexing from the
         //right or the left
-        if (!getMachine().getIndexFromRight()){
+        if (!getMachine().isIndexFromRight()){
             leftShift = bits64 - width + start;
         }
         else{
@@ -249,19 +290,25 @@ public class Test extends Microinstruction<Test> {
 
         final int start = getStart();
         final int numBits = getNumBits();
-    
+
+        if (!getRegister().isPresent()) {
+            throw new ValidationException("No Register is set for microinstruction " + getName());
+        }
+
+        Register register = getRegister().get();
+
         if (start < 0 || numBits < 0) {
             throw new ValidationException("You cannot specify a negative value for the " +
                     "start bits,\nor the bitwise width of the test range\n" +
                     "in the microinstruction " + getName() + ".");
         }
-        else if (start >= getRegister().getWidth()) {
+        else if (start >= register.getWidth()) {
             throw new ValidationException("The start bit in the microinstruction "
                     + getName() + " is out of range.\n" +
                     "It must be non-negative, and less than the " +
                     "register's length.");
         }
-        else if ((start + numBits) > getRegister().getWidth()) {
+        else if ((start + numBits) > register.getWidth()) {
             throw new ValidationException("The bits specified in the Test " +
                     "microinstruction " + getName() +
                     " are too large to fit in the register.");
@@ -271,7 +318,7 @@ public class Test extends Microinstruction<Test> {
     @Override
     public Test cloneFor(IdentifierMap oldToNew) {
         return new Test(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                oldToNew.get(getRegister()), getStart(), getNumBits(),
+                oldToNew.get(getRegister().orElse(null)), getStart(), getNumBits(),
                 getComparison(), getValue(), getOmission());
     }
 
@@ -280,7 +327,7 @@ public class Test extends Microinstruction<Test> {
         checkNotNull(newTest);
 
         newTest.setName(getName());
-        newTest.setRegister(getRegister());
+        newTest.setRegister(getRegister().orElse(null));
         newTest.setStart(getStart());
         newTest.setNumBits(getNumBits());
         newTest.setComparison(getComparison());
@@ -295,21 +342,68 @@ public class Test extends Microinstruction<Test> {
 
 	@Override
 	public String getXMLDescription(String indent) {
-		return indent + "<Test name=\"" + getHTMLName() +
-                "\" register=\"" + getRegister().getID() +
-                "\" start=\"" + getStart() +
-                "\" numBits=\"" + getNumBits() +
-                "\" comparison=\"" + getComparison() +
-                "\" value=\"" + getValue() +
-                "\" omission=\"" + getOmission() +
-                "\" id=\"" + getID() + "\" />";
+
+        // FIXME PROPERTY-BASED-XML
+
+		StringBuilder bld = new StringBuilder();
+		bld.append(indent).append("<Test ");
+		bld.append("name=\"")
+                .append(getHTMLName())
+                .append("\"");
+
+        bld.append(" id=\"")
+                .append(getID())
+                .append("\"");
+
+		bld.append(" register=\"");
+		getRegister().ifPresent(register -> bld.append(register.getID()));
+		bld.append("\"");
+
+		bld.append(" start=\"")
+                .append(getStart())
+                .append("\"");
+
+		bld.append(" numBits=\"")
+                .append(getNumBits())
+                .append("\"");
+
+		bld.append(" comparison=\"")
+                .append(getComparison())
+                .append("\"");
+
+		bld.append(" value=\"")
+                .append(getValue())
+                .append("\"");
+
+		bld.append(" omission=\"")
+                .append(getOmission())
+                .append("\"");
+
+		return bld.append(" />").toString();
 	}
 
 	@Override
 	public String getHTMLDescription(String indent) {
-		return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getRegister().getHTMLName() +
-                "</TD><TD>" + getStart() + "</TD><TD>" + getNumBits() +
-                "</TD><TD>" + getComparison() + "</TD><TD>" + getValue() +
-                "</TD><TD>" + getOmission() + "</TD></TR>";
+        StringBuilder bld = new StringBuilder();
+		bld.append(indent)
+                .append("<TR><TD>")
+                .append(getHTMLName())
+                .append("</TD><TD>");
+
+		getRegister().ifPresent(register -> bld.append(register.getHTMLName()));
+
+		bld.append("</TD><TD>")
+                .append(getStart())
+                .append("</TD><TD>")
+                .append(getNumBits())
+                .append("</TD><TD>")
+                .append(getComparison())
+                .append("</TD><TD>")
+                .append(getValue())
+                .append("</TD><TD>")
+                .append(getOmission())
+                .append("</TD></TR>");
+
+		return bld.toString();
 	}
 }

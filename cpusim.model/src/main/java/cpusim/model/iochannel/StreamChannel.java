@@ -235,7 +235,7 @@ public class StreamChannel implements IOChannel, AutoCloseable {
 	@Override
 	public void reset() {
 		try {
-			if (in != null) {
+			if (in != null && in.markSupported()) {
 				in.reset();
 			}
 		} catch (IOException ioe) {

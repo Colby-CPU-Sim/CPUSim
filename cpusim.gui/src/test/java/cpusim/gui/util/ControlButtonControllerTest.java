@@ -29,11 +29,12 @@ import org.testfx.matcher.base.ParentMatchers;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.*;
 import static cpusim.gui.harness.FXMatchers.forItem;
-import static cpusim.model.harness.CPUSimMatchers.isNamed;
+import static cpusim.model.harness.matchers.NamedObjectMatchers.named;
 import static org.junit.Assert.*;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.base.NodeMatchers.isDisabled;
@@ -208,7 +209,7 @@ public class ControlButtonControllerTest extends FXHarness {
         buttonController.setInteractionHandler(listHandler(supplied));
 
         ListCell<Data> testCell = lookup(".list-cell")
-                .<ListCell<Data>>match(forItem(isNamed("Test")))
+                .<ListCell<Data>>match(forItem(named("Test")))
                 .query();
         clickOn(testCell);
         verifyThat("#deleteButton", isEnabled());
@@ -228,7 +229,7 @@ public class ControlButtonControllerTest extends FXHarness {
         buttonController.setInteractionHandler(listHandler(supplied));
 
         ListCell<Data> testCell = lookup(".list-cell")
-                .<ListCell<Data>>match(forItem(isNamed("Test")))
+                .<ListCell<Data>>match(forItem(named("Test")))
                 .query();
         clickOn(testCell);
         verifyThat("#duplicateButton", isEnabled());
@@ -252,6 +253,7 @@ public class ControlButtonControllerTest extends FXHarness {
             this.name = new SimpleStringProperty(this, "name", name);
         }
 
+        @SuppressWarnings("unused")
         Data(Data other) {
             this(other.getName());
         }
@@ -275,7 +277,7 @@ public class ControlButtonControllerTest extends FXHarness {
 
             Data data = (Data) o;
 
-            return getName().equals(data.getName());
+            return Objects.equals(getName(), data.getName());
         }
 
         @Override

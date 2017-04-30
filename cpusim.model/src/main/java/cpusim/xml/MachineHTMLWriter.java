@@ -214,7 +214,7 @@ public class MachineHTMLWriter
                 " CELLPADDING=\"0\" CELLSPACING=\"3\" WIDTH=\"100%\">");
         out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Indexing Order of Bits in Registers"
                 + HEADER_SUFFIX);
-        out.println("<TR><TD>From " + (machine.getIndexFromRight() ? " right to left" :
+        out.println("<TR><TD>From " + (machine.isIndexFromRight() ? " right to left" :
                 " left to right") + "</TD></TR>");
         out.println("</TABLE><P></P>");
 
@@ -268,11 +268,12 @@ public class MachineHTMLWriter
         out.println(HEADER_PREFIX + "1" + HEADER_MIDDLE + "Fetch Sequence"
                 + HEADER_SUFFIX);
         out.println("<TR><TD><B>Microinstructions</B></TD></TR>");
-        MachineInstruction fetchSequence = machine.getFetchSequence();
         out.println("<TR><TD>");
-        for (int i = 0; i < fetchSequence.getMicros().size(); i++) {
-            out.println(fetchSequence.getMicros().get(i).getHTMLName() +"<BR>");
-        }
+        machine.getFetchSequence().ifPresent(fs -> {
+            for (int i = 0; i < fs.getMicros().size(); i++) {
+                out.println(fs.getMicros().get(i).getHTMLName() +"<BR>");
+            }
+        });
         out.println("</TD></TR>");
         out.println("</TABLE><P></P>");
 

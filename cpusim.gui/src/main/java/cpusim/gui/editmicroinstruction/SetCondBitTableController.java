@@ -6,6 +6,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.SetCondBit;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import cpusim.model.util.Validate;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
@@ -97,7 +98,10 @@ class SetCondBitTableController extends MicroinstructionTableController<SetCondB
         super.checkValidity();
         
         for (SetCondBit micro: getItems()) {
-            Register.validateIsNotReadOnly(micro.getBit().getRegister(), micro.getName());
+            ConditionBit bit = Validate.getOptionalProperty(micro, SetCondBit::bitProperty);
+            Register register = Validate.getOptionalProperty(bit, ConditionBit::registerProperty);
+            
+            Register.validateIsNotReadOnly(register, micro.getName());
         }
     }
 

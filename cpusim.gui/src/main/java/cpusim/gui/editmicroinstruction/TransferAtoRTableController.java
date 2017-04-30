@@ -24,6 +24,7 @@ import cpusim.model.Machine;
 import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
+import cpusim.model.util.Validate;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableList;
@@ -171,7 +172,9 @@ class TransferAtoRTableController
         
         // convert the array to an array of TransferAtoRs
         for (TransferAtoR check: getItems()) {
-            Register.validateIsNotReadOnly(check.getDest(), check.getName());
+            Register register = Validate.getOptionalProperty(check, TransferAtoR::destProperty);
+            
+            Register.validateIsNotReadOnly(register, check.getName());
         }
     }
 

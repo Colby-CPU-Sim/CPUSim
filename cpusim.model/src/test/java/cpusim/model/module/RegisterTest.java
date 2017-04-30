@@ -1,14 +1,19 @@
 package cpusim.model.module;
 
 import cpusim.model.Machine;
-import cpusim.model.util.ValidationException;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.crypto.Mac;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static cpusim.model.harness.matchers.MachineBoundMatchers.boundTo;
+import static cpusim.model.harness.matchers.NamedObjectMatchers.named;
+import static cpusim.model.harness.matchers.module.RegisterMatchers.access;
+import static cpusim.model.harness.matchers.module.RegisterMatchers.value;
+import static cpusim.model.harness.matchers.module.SizedMatchers.width;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -18,11 +23,12 @@ import static org.mockito.Mockito.mock;
  */
 public class RegisterTest {
 
+    private Machine machine;
     private Register r;
 
     @Before
     public void setup() {
-        Machine machine = mock(Machine.class);
+        machine = mock(Machine.class);
 
         r = new Register("r", UUID.randomUUID(), machine,
                 4, 0, Register.Access.readWrite());
@@ -30,9 +36,11 @@ public class RegisterTest {
 
     @Test
     public void creation() {
-        assertEquals(0, r.getValue());
-        assertEquals(4, r.getWidth());
-        assertEquals(Register.Access.readWrite(), r.getAccess());
+        assertThat(r, boundTo(sameInstance(machine)));
+        assertThat(r, named("r"));
+        assertThat(r, value(0));
+        assertThat(r, width(r.getWidth()));
+        assertThat(r, access(Register.Access.readWrite()));
     }
 
     @Test

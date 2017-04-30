@@ -9,7 +9,7 @@
 
 package cpusim.model.module;
 
-import cpusim.util.SourceLine;
+import cpusim.model.assembler.SourceLine;
 import javafx.beans.property.*;
 
 /**
@@ -35,11 +35,11 @@ public class RAMLocation {
      */
     public RAMLocation(int addr, long val, RAM ram, boolean breakPoint, String comment,
             SourceLine sourceLine){
-        this.address = new SimpleLongProperty(addr);
+        this.address = new SimpleLongProperty(this, "address", addr);
         this.ram = ram;
-        this.value = new SimpleLongProperty(val);
-        this.breakPoint = new SimpleBooleanProperty(breakPoint);
-        this.comment = new SimpleStringProperty(comment);
+        this.value = new SimpleLongProperty(this, "value", val);
+        this.breakPoint = new SimpleBooleanProperty(this, "isBreakPoint", breakPoint);
+        this.comment = new SimpleStringProperty(this, "comment", comment);
         this.sourceLine = sourceLine;
     }
     

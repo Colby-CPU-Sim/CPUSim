@@ -30,7 +30,9 @@ public enum SamplesFixture {
 
     MAXWELL("MaxwellComputer", "Maxwell.cpu", 1),
 
-    WOMBAT("Wombat%VERSION%", "Wombat%VERSION%.cpu", 2)
+    WOMBAT("Wombat%VERSION%", "Wombat%VERSION%.cpu", 2),
+    
+    URISC("urisc", "urisc.cpu", 1)
     ;
 
     private final String folderUri;

@@ -3,7 +3,6 @@ package cpusim.model.microinstruction;
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import cpusim.model.util.ValidationException;
 
 import java.util.UUID;
 
@@ -52,8 +51,8 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
     @Override
     public TransferRtoR cloneFor(IdentifierMap oldToNew) {
         return new TransferRtoR(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                oldToNew.get(getSource()), getSrcStartBit(),
-                oldToNew.get(getDest()), getDestStartBit(), getNumBits());
+                oldToNew.get(getSource().orElse(null)), getSrcStartBit(),
+                oldToNew.get(getDest().orElse(null)), getDestStartBit(), getNumBits());
     }
 
     /**
@@ -72,7 +71,7 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
         int destLeftShift;
         int srcRightShift;
         int srcLeftShift;
-        if (getMachine().getIndexFromRight()) {
+        if (getMachine().isIndexFromRight()) {
             destRightShift = destFullShift + destStartBit.get() + numBits.get();
             destLeftShift = dest.get().getWidth() - destStartBit.get();
             srcLeftShift = source.get().getWidth() - srcStartBit.get() - numBits.get();
@@ -115,14 +114,16 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
      * @return the XML description
      */
     @Override
-    public String getXMLDescription(String indent){
-        return indent + "<TransferRtoR name=\"" + getHTMLName() +
-                "\" source=\"" + getSource().getID() +
-                "\" srcStartBit=\"" + getSrcStartBit() +
-                "\" dest=\"" + getDest().getID() +
-                "\" destStartBit=\"" + getDestStartBit() +
-                "\" numBits=\"" + getNumBits() +
-                "\" id=\"" + getID() + "\" />";
+    public String getXMLDescription(String indent) {
+        final StringBuilder bld = new StringBuilder();
+        bld.append(indent)
+                .append("<TransferRtoA ");
+
+        getXMLDescriptionBase(bld);
+
+        bld.append("/>");
+
+        return bld.toString();
     }
 
     /**
@@ -131,47 +132,11 @@ public class TransferRtoR extends Transfer<Register, Register, TransferRtoR> {
      */
     @Override
     public String getHTMLDescription(String indent){
-        return indent + "<TR><TD>" + getHTMLName() +
-                "</TD><TD>" + getSource().getHTMLName() +
-                "</TD><TD>" + getSrcStartBit() +
-                "</TD><TD>" + getDest().getHTMLName() +
-                "</TD><TD>" + getDestStartBit() +
-                "</TD><TD>" + getNumBits() +
-                "</TD></TR>";
-    }
-    
-    @Override
-    public void validate() {
-        super.validate();
+        StringBuilder builder = new StringBuilder();
 
-        int srcStartBit = getSrcStartBit();
-        int destStartBit = getDestStartBit();
-        int numBits = getNumBits();
-        if (srcStartBit < 0 || destStartBit < 0 || numBits < 0) {
-            throw new ValidationException("You cannot specify a negative value for the " +
-                    "start and end bits, \nor the bitwise width of the TransferRtoR range.\n" +
-                    "Please fix this in the microinstruction \"" + getName() + ".\"");
-        }
-    
-    
-        String boundPhrase = null;
-        if (srcStartBit > getSource().getWidth()) {
-            boundPhrase = "srcStartBit";
-        }
-        else if (destStartBit > getDest().getWidth()) {
-            boundPhrase = "destStartBit";
-        }
-    
-        if (boundPhrase != null) {
-            throw new ValidationException(boundPhrase + " has an invalid index for the " +
-                    "specified register in instruction " + getName() +
-                    ".\nIt must be non-negative, and less than the register's length.");
-        }
-        else if (srcStartBit + numBits > getSource().getWidth() ||
-                destStartBit + numBits > getDest().getWidth()) {
-            throw new ValidationException("In the microinstruction \"" + getName() +
-                    "\",\nthe bitwise width of the transfer area is too large " +
-                    "to fit in \neither the source or the destination registers.");
-        }
+        builder.append(indent);
+        getHTMLDescriptionBase(builder, null);
+
+        return builder.toString();
     }
 }

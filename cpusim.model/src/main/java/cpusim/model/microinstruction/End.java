@@ -1,6 +1,8 @@
 package cpusim.model.microinstruction;
 
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
 import cpusim.model.module.ControlUnit;
 import cpusim.model.module.Module;
 import cpusim.model.util.MachineComponent;
@@ -81,7 +83,9 @@ public class End extends Microinstruction<End> {
     @Override
     public void execute() {
         controlUnit.getValue().setMicroIndex(0);
-        controlUnit.getValue().setCurrentInstruction(getMachine().getFetchSequence());
+        MachineInstruction fetchSequence = getMachine().getFetchSequence()
+                .orElseThrow(() -> new ExecutionException("Can not execute without Fetch Sequence"));
+        controlUnit.getValue().setCurrentInstruction(fetchSequence);
     } // end execute()
 
     /**

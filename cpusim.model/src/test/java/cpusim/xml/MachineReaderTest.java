@@ -1,13 +1,17 @@
 package cpusim.xml;
 
-import cpusim.model.harness.SamplesFixture;
+import com.google.common.collect.ImmutableMap;
 import cpusim.model.Machine;
+import cpusim.model.harness.SamplesFixture;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+
+import java.util.UUID;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isPresent;
 import static org.hamcrest.Matchers.hasSize;
@@ -46,7 +50,7 @@ public class MachineReaderTest {
 //
 //        // TODO add more verifications here
 //        assertEquals("empty", newMachine.getName());
-//        assertTrue(newMachine.getIndexFromRight());
+//        assertTrue(newMachine.isIndexFromRight());
 //        assertThat(newMachine.getRegisters(), hasSize(0));
 //    }
 
@@ -61,7 +65,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat1", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(6));
         }
 
@@ -71,7 +75,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat2", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(7));
         }
 
@@ -84,7 +88,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("JVM1", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(11));
         }
 
@@ -94,7 +98,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("JVM2", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(12));
         }
 
@@ -105,7 +109,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("JVM3", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(12));
         }
     }
@@ -118,7 +122,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat1", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(6));
         }
 
@@ -128,7 +132,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat2", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(7));
         }
 
@@ -138,7 +142,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat3", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(8));
         }
 
@@ -148,7 +152,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat4", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(8));
         }
 
@@ -158,7 +162,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Wombat5", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(8));
         }
 
@@ -171,7 +175,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("sim6502", newMachine.getName());
-            assertTrue(newMachine.getIndexFromRight());
+            assertTrue(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(11));
             assertThat(newMachine.getFields(), hasSize(4));
 
@@ -191,7 +195,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("sim6502", newMachine.getName());
-            assertTrue(newMachine.getIndexFromRight());
+            assertTrue(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(11));
             assertThat(newMachine.getFields(), hasSize(4));
 
@@ -213,7 +217,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("sim6502", newMachine.getName());
-            assertTrue(newMachine.getIndexFromRight());
+            assertTrue(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(11));
             assertThat(newMachine.getFields(), hasSize(4));
 
@@ -238,7 +242,7 @@ public class MachineReaderTest {
 
             // TODO add more verifications here
             assertEquals("Maxwell", newMachine.getName());
-            assertFalse(newMachine.getIndexFromRight());
+            assertFalse(newMachine.isIndexFromRight());
             assertThat(newMachine.getRegisters(), hasSize(8));
             assertThat(newMachine.getFields(), hasSize(17));
 
@@ -247,5 +251,33 @@ public class MachineReaderTest {
         }
     }
 
+    
+    public static class URISC {
+    
+        Machine underTest;
+        
+        ImmutableMap<String, Register> expectedRegisters;
+        
+        
+        
+        @Before
+        public void setup() throws Exception {
+            underTest = SamplesFixture.URISC.load(0).orElseThrow(NullPointerException::new);
+            
+            expectedRegisters = ImmutableMap.<String, Register>builder()
+                    .put("A", new Register("A", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+                    .put("B", new Register("B", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+                    .put("CCR", new Register("CCR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+                    .put("MR", new Register("MR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+                    .put("IR", new Register("IR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+                    .build();
+        }
+        
+    
+        public void verifyContent() {
+        
+        }
+    
+    }
 
 }

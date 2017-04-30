@@ -684,10 +684,12 @@ public class OptionsController {
 
         ObservableList<IO> ios = mediator.getMachine().getMicros(IO.class);
         for (IO io : ios) {
-            IOChannel channel = io.getConnection();
-            if (channel instanceof FileChannel) {
-                allChannels.add(channel);
-            }
+            io.getConnection().ifPresent(channel -> {
+                if (channel instanceof FileChannel) {
+                    allChannels.add(channel);
+                }
+            });
+            
         }
 
         // Accounts for width changes.
@@ -727,7 +729,7 @@ public class OptionsController {
         ObservableList<IOOptionsData> data = IOOptionsTable.getItems();
         for (int i = 0; i < ios.size(); i++) {
             IO channel = ios.get(i);
-            data.add(new IOOptionsData(channel, channel.getConnection()));
+            data.add(new IOOptionsData(channel, channel.getConnection().orElse(null)));
         }
         IOOptionsTable.setItems(data);
 
@@ -841,7 +843,7 @@ public class OptionsController {
             }
         };
 
-        indexChoice.setValue(mediator.getMachine().getIndexFromRight() ? "right" : "left");
+        indexChoice.setValue(mediator.getMachine().isIndexFromRight() ? "right" : "left");
         indexChoice.getSelectionModel().selectedIndexProperty().addListener(indexChangeListener);
     }
 

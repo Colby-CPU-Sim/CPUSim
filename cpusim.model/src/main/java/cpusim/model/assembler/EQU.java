@@ -4,12 +4,13 @@ import cpusim.model.util.Copyable;
 import cpusim.model.util.LegacyXMLSupported;
 import cpusim.model.util.NamedObject;
 import cpusim.xml.HtmlEncoder;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 import java.io.Serializable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 //for Serializable and StreamTokenizer
 
@@ -49,7 +50,7 @@ public class EQU implements Serializable, NamedObject, Copyable<EQU>, LegacyXMLS
         return value.get();
     }
     
-    public SimpleLongProperty valueProperty() {
+    public LongProperty valueProperty() {
         return value;
     }
 

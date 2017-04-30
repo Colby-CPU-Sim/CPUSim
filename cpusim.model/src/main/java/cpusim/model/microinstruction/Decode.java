@@ -7,14 +7,17 @@ import cpusim.model.module.ControlUnit;
 import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import cpusim.util.MoreBindings;
 import cpusim.model.util.ValidationException;
+import cpusim.util.MoreBindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlySetProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import org.fxmisc.easybind.EasyBind;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,11 +48,14 @@ public class Decode extends Microinstruction<Decode> {
     public Decode(String name,
                   UUID id,
                   Machine machine,
-                  Register ir){
+                  @Nullable Register ir){
         super(name, id, machine);
         this.ir = new SimpleObjectProperty<>(this, "ir", ir);
 
-        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(machine.controlUnitProperty());
+        this.controlUnit = MoreBindings.createReadOnlyBoundProperty(
+                this, "controlUnit",
+                EasyBind.select(machineProperty())
+                    .selectObject(Machine::controlUnitProperty));
 
         this.dependants = MachineComponent.collectDependancies(this)
                 .buildSet(this, "dependantComponents");
@@ -60,7 +66,8 @@ public class Decode extends Microinstruction<Decode> {
      * @param other Instance to copy from
      */
     public Decode(Decode other) {
-        this(other.getName(), UUID.randomUUID(), other.getMachine(), other.getIr());
+        this(other.getName(), UUID.randomUUID(), other.getMachine(),
+                other.getIr().orElse(null));
     }
 
     @Override
@@ -73,8 +80,8 @@ public class Decode extends Microinstruction<Decode> {
      *
      * @return the integer value of the field.
      */
-    public Register getIr(){
-        return ir.get();
+    public Optional<Register> getIr(){
+        return Optional.ofNullable(ir.get());
     }
 
     public ObjectProperty<Register> irProperty() {
@@ -89,7 +96,15 @@ public class Decode extends Microinstruction<Decode> {
     public void setIr(Register newIr){
         ir.set(newIr);
     }
-    
+
+    public Optional<ControlUnit> getControlUnit() {
+        return Optional.ofNullable(controlUnit.get());
+    }
+
+    public ReadOnlyObjectProperty<ControlUnit> controlUnitProperty() {
+        return controlUnit;
+    }
+
     /**
      * execute the micro instruction from machine
      */
@@ -127,7 +142,8 @@ public class Decode extends Microinstruction<Decode> {
 
     @Override
     public Decode cloneFor(IdentifierMap oldToNew) {
-        return new Decode(getName(), UUID.randomUUID(), getMachine(), oldToNew.get(getIr()));
+        return new Decode(getName(), UUID.randomUUID(), getMachine(),
+                oldToNew.get(getIr().orElse(null)));
     }
 
     @Override
@@ -135,20 +151,20 @@ public class Decode extends Microinstruction<Decode> {
         checkNotNull(other);
 
         other.setName(getName());
-        other.setIr(getIr());
+        other.setIr(getIr().orElse(null));
     }
 
     @Override
     public String getXMLDescription(String indent) {
         return indent + "<Decode name=\"" + getHTMLName() +
-                "\" ir=\"" + getIr().getID() +
+//                "\" ir=\"" + getIr().getID() +
                 "\" id=\"" + getID() + "\" />";
     }
     
     @Override
     public String getHTMLDescription(String indent) {
         return indent + "<TR><TD>" + getHTMLName() +
-                "</TD><TD>" + getIr().getHTMLName() +
+//                "</TD><TD>" + getIr().getHTMLName() +
                 "</TD></TR>";
     }
 

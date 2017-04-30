@@ -72,8 +72,11 @@ public class Logical extends ArithmeticLogicOperation<Logical> {
 
     @Override
     public Logical cloneFor(IdentifierMap oldToNew) {
-       return new Logical(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), (Type) getOperation(),
-               oldToNew.get(getDestination()), oldToNew.get(getLhs()), oldToNew.get(getRhs()),
+       return new Logical(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
+               (Type) getOperation(),
+               oldToNew.get(getDestination().orElse(null)),
+               oldToNew.get(getLhs().orElse(null)),
+               oldToNew.get(getRhs().orElse(null)),
                oldToNew.copyOrNull(getZeroBit()));
     }
 

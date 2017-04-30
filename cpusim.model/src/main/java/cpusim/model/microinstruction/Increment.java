@@ -32,9 +32,11 @@ public class Increment extends Microinstruction<Increment> {
 
     @DependantComponent
     private final ObjectProperty<ConditionBit> zeroBit;
+
     private final LongProperty delta;
 
     private final ReadOnlySetProperty<MachineComponent> dependencies;
+
     /**
      * Constructor
      * creates a new Increment object with input values.

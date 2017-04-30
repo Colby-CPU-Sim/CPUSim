@@ -92,24 +92,23 @@ import cpusim.model.Field;
 import cpusim.model.Field.Type;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.model.module.Module;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.microinstruction.*;
+import cpusim.model.module.ConditionBit;
+import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import cpusim.model.util.conversion.ConvertLongs;
 import cpusim.model.util.conversion.ConvertStrings;
 import cpusim.model.util.units.ArchValue;
+import javafx.beans.property.ReadOnlyProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -514,6 +513,52 @@ public abstract class Validate
             }
         }
     }
+
+    /**
+     * Gets an optional property from an object, throwing a {@link ValidationException} if the
+     * property is not present.
+     *
+     * @param object Object to read from
+     * @param getter Property accessor
+     * @param propertyName Name of the property (used in the message)
+     * @param <O> Type of object
+     * @param <T> Type of the Property value
+     * @return Non-{@code null} instance from the property
+     */
+    public static <O extends NamedObject, T> T getOptionalProperty(O object, Function<O, Optional<T>> getter, String propertyName) {
+        Optional<T> opt = getter.apply(object);
+        if (!opt.isPresent()) {
+            throw new ValidationException(
+                    String.format("No %s set for %s %s", propertyName, object.getClass().getSimpleName(), object.getName()));
+        }
+
+        return opt.get();
+    }
+
+    /**
+     * Gets an optional property from an object, throwing a {@link ValidationException} if the
+     * property is not present.
+     *
+     * @param object Object to read from
+     * @param getter Property accessor
+     * @param <O> Type of object
+     * @param <T> Type of the Property value
+     * @return Non-{@code null} instance from the property
+     */
+    public static <O extends NamedObject, T> T getOptionalProperty(O object, Function<O, ? extends ReadOnlyProperty<T>> getter) {
+        ReadOnlyProperty<T> property = getter.apply(object);
+        T out = property.getValue();
+
+        if (out == null) {
+            throw new ValidationException(
+                    String.format("No %s set for %s %s",
+                            property.getName(),
+                            object.getClass().getSimpleName(),
+                            object.getName()));
+        }
+
+        return out;
+    }
     
     /**
      * check if all registers have appropriate width for micro instructions.
@@ -546,14 +591,16 @@ public abstract class Validate
         //by them must be the same widths.
         ObservableList<Shift> shifts = machine.getMicros(Shift.class);
         for (Shift shift : shifts) {
-            Register source = shift.getSource();
+            Register source = getOptionalProperty(shift, Shift::getSource, "Source");
+            Register dest = getOptionalProperty(shift, Shift::getDest, "Destination");
+
             int sourceWidth = newWidths.get(source);
-            int destWidth = newWidths.get(shift.getDest());
+            int destWidth = newWidths.get(dest);
             if (sourceWidth != destWidth) {
                 throw new ValidationException("The new width " + sourceWidth +
-                        " of register " + shift.getSource() + "\nand new width " +
-                        destWidth + " of register " + shift.getDest() +
-                        "\ncause microinstruction " + shift + " to be invalid.");
+                        " of register " + source + "\nand new width " +
+                        destWidth + " of register " + dest +
+                        "\ncause microinstruction " + shift.getName() + " to be invalid.");
             }
         }
         
@@ -574,10 +621,12 @@ public abstract class Validate
         
         ObservableList<SetBits> sets = machine.getMicros(SetBits.class);
         for (SetBits set : sets) {
-            int newWidth = newWidths.get(set.getRegister());
+            Register register = getOptionalProperty(set, SetBits::getRegister, "register");
+
+            int newWidth = newWidths.get(register);
             if (newWidth < set.getStart() + set.getNumBits()) {
                 throw new ValidationException("The new width " + newWidth +
-                        " of register " + set.getRegister() +
+                        " of register " + register +
                         "\ncauses microinstruction " + set + " to be invalid.");
             }
         }
@@ -759,24 +808,28 @@ public abstract class Validate
 
         if (readOnlyRegisters.size() > 0) {
             for (TransferAtoR t: transferAtoRs){
-                if (readOnlyRegisters.contains(t.getDest())) {
-                    throw new ValidationException("The register " + t.getDest().getName() + " is used as the " +
+                Register dest = getOptionalProperty(t, TransferAtoR::destProperty);
+                if (readOnlyRegisters.contains(dest)) {
+                    throw new ValidationException("The register " + dest.getName() + " is used as the " +
                             "destination register in the microinstruction transferAtoR " + t.getName() + ". " +
                             "You should change the microinstruction before setting the register to read-only.");
                 }
             }
 
             for (TransferRtoR o: transferRtoRs) {
-                if (readOnlyRegisters.contains(o.getDest())) {
-                    throw new ValidationException("The register " + o.getDest().getName() + " is used as the " +
+                Register dest = getOptionalProperty(o, TransferRtoR::destProperty);
+                if (readOnlyRegisters.contains(dest)) {
+                    throw new ValidationException("The register " + dest.getName() + " is used as the " +
                             "destination register in the microinstruction transferRtoR " + o.getName() + ". " +
                             "You should change the microinstruction before setting the register to read-only.");
                 }
             }
 
             for (SetCondBit o: setCondBits){
-                if (readOnlyRegisters.contains(o.getBit().getRegister()))
-                    throw new ValidationException("The register " + o.getBit().getRegister() + " is used as the " +
+                ConditionBit cb = getOptionalProperty(o, SetCondBit::bitProperty);
+                Register register = getOptionalProperty(cb, ConditionBit::registerProperty);
+                if (readOnlyRegisters.contains(register))
+                    throw new ValidationException("The register " + register + " is used as the " +
                             "condition flag reigster in the microinstruction setCondBit " + o.getName() + ". " +
                             "You should change the microinstruction before setting the register to read-only.");
             }

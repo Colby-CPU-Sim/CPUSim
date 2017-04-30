@@ -28,13 +28,13 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2013-08-01
  */
-public class Field
-        implements
+public class Field implements
                 NamedObject
                 , IdentifiedObject
                 , LegacyXMLSupported
                 , HTMLEncodable
                 , MachineComponent
+                , MachineBound
                 , Copyable<Field> {
 
 	public enum Relativity {
@@ -67,7 +67,7 @@ public class Field
     	}
     }
 
-    private final Machine machine;
+    private final ObjectProperty<Machine> machine;
 
     private final ReadOnlyObjectProperty<UUID> id;
     
@@ -134,7 +134,7 @@ public class Field
      */
     public Field(final Field other) {
         this(other.getName(), UUID.randomUUID(),
-                other.machine,
+                other.machine.get(),
                 other.getNumBits(), other.getRelativity(),
                 other.getValues(), other.getDefaultValue(),
                 other.getSigned(), other.getType());
@@ -166,7 +166,7 @@ public class Field
                  @JsonProperty("type") Type type) {
         this.id = new SimpleObjectProperty<>(this, "id", checkNotNull(id));
         this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
-        this.machine = checkNotNull(machine);
+        this.machine = new SimpleObjectProperty<>(this, "machine", checkNotNull(machine, "machine == null"));
         this.type = new SimpleObjectProperty<>(this, "type", checkNotNull(type));
         this.numBits = new SimpleIntegerProperty(this, "numBits", numBits);
         this.relativity = new SimpleObjectProperty<>(this, "relativity", checkNotNull(relativity));
@@ -194,8 +194,8 @@ public class Field
     }
 
     @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
-        return new ReadOnlyObjectWrapper<>(this, "machine", machine);
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     @JsonProperty
@@ -322,7 +322,7 @@ public class Field
 
     @Override
     public Field cloneFor(MachineComponent.IdentifierMap oldToNew) {
-        Field newInst = new Field(getName(), UUID.randomUUID(), machine,
+        Field newInst = new Field(getName(), UUID.randomUUID(), getMachine(),
                 getNumBits(),getRelativity(), FXCollections.observableArrayList(),
                 getDefaultValue(), getSigned(), getType());
 

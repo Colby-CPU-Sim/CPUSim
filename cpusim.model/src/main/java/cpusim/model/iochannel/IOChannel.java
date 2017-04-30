@@ -34,7 +34,7 @@ public interface IOChannel extends IdentifiedObject {
      * @return the long value that was input
      * @throws ExecutionException if it cannot read a long.
      */
-    public long readLong(int numBits);
+    long readLong(int numBits);
 
     /**
      * returns the next ASCII char from input.
@@ -42,7 +42,7 @@ public interface IOChannel extends IdentifiedObject {
      * @return the ASCII character read
      * @throws ExecutionException if it cannot read an ASCII char.
      */
-    public char readAscii();
+    char readAscii();
 
     /**
      * returns the next Unicode char from input.
@@ -50,14 +50,14 @@ public interface IOChannel extends IdentifiedObject {
      * @return the Unicode character read
      * @throws ExecutionException if it cannot read an Unicode char.
      */
-    public int readUnicode();
+    int readUnicode();
 
     /**
      * writes the given long value to the output
      *
      * @param value the long value to be output
      */
-    public void writeLong(long value);
+    void writeLong(long value);
 
     /**
      * writes the given long value to the output as an ASCII value
@@ -65,7 +65,7 @@ public interface IOChannel extends IdentifiedObject {
      * @param longValue the long value to be output
      * @throws ExecutionException if the long is not an ASCII char
      */
-    public void writeAscii(char longValue);
+    void writeAscii(char longValue);
 
     /**
      * writes the given long value to the output as a Unicode value
@@ -73,13 +73,13 @@ public interface IOChannel extends IdentifiedObject {
      * @param unicodeChar the long value to be output
      * @throws ExecutionException if the long is not an Unicode char
      */
-    public void writeUnicode(int unicodeChar);
+    void writeUnicode(int unicodeChar);
     
 	/**
 	 * displays an output to the user
 	 * @param s - the output displayed to the user
 	 */
-	public void writeString(String s);
+	void writeString(String s);
 
 	/**
 	 * reads and returns the String input of the user
@@ -87,7 +87,7 @@ public interface IOChannel extends IdentifiedObject {
 	 * @param prompt - the prompt to the user for input
 	 * @return the String input by the user
 	 */
-	public String readString(String prompt);
+	String readString(String prompt);
 
     
     /**
@@ -102,11 +102,11 @@ public interface IOChannel extends IdentifiedObject {
 	 * 
 	 * @since 2013-12-01
      */
-    public void flush(boolean saveInputBuffers);
+    void flush(boolean saveInputBuffers);
 
     /** 
      * reset the input and output 
      */
-    public void reset();
+    void reset();
 
 }

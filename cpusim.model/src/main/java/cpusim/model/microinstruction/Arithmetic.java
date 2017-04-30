@@ -4,14 +4,16 @@ import cpusim.model.Machine;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
-import javafx.beans.property.ListProperty;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * The arithmetic microinstruction use three registers and optionally two condition
@@ -19,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @since 2013-06-06
  */
+@ParametersAreNonnullByDefault
 public class Arithmetic extends ArithmeticLogicOperation<Arithmetic> {
 
     public enum Type implements ALUOperator {
@@ -56,12 +59,12 @@ public class Arithmetic extends ArithmeticLogicOperation<Arithmetic> {
                       UUID id,
                       Machine machine,
                       Type type,
-                      Register destination,
-                      Register lhs,
-                      Register rhs,
-                      ConditionBit carryBit,
-                      ConditionBit overflowBit,
-                      ConditionBit zeroBit) {
+                      @Nullable Register destination,
+                      @Nullable Register lhs,
+                      @Nullable Register rhs,
+                      @Nullable ConditionBit carryBit,
+                      @Nullable ConditionBit overflowBit,
+                      @Nullable ConditionBit zeroBit) {
         super(name, id, machine, type, destination, lhs, rhs, carryBit, null, overflowBit, zeroBit);
     }
     
@@ -75,9 +78,9 @@ public class Arithmetic extends ArithmeticLogicOperation<Arithmetic> {
                 UUID.randomUUID(),
                 other.getMachine(),
                 (Type) other.getOperation(),
-                other.getDestination(),
-                other.getLhs(),
-                other.getRhs(),
+                other.getDestination().orElse(null),
+                other.getLhs().orElse(null),
+                other.getRhs().orElse(null),
                 other.getCarryBit().orElse(null),
                 other.getOverflowBit().orElse(null),
                 other.getZeroBit().orElse(null));
@@ -97,16 +100,17 @@ public class Arithmetic extends ArithmeticLogicOperation<Arithmetic> {
 
         getCarryBit().ifPresent(carryBit -> {
 
-            long lhs = getLhs().getValue();
-            long rhs = getRhs().getValue();
+            long lhs = this.lhsProperty().get().getValue();
+            long rhs = this.rhsProperty().get().getValue();
 
             carryBit.set(0);
 
             //set the carry bit if necessary
-            if (getOperation().equals(Type.ADD) &&
-                    ((lhs < 0 && rhs < 0) ||
-                            (lhs < 0 && rhs >= -lhs) ||
-                            (lhs < 0 && rhs >= -lhs))) {
+            if ((Objects.equals(getOperation(), Type.ADD)
+                    || Objects.equals(getOperation(), Type.SUBTRACT)) &&
+                    ((lhs < 0 && rhs < 0)
+                            || (lhs < 0 && rhs >= -lhs)
+                            || (lhs < 0 && rhs >= -lhs))) {
                 carryBit.set(1);
             }
         });
@@ -117,8 +121,10 @@ public class Arithmetic extends ArithmeticLogicOperation<Arithmetic> {
         checkNotNull(oldToNew);
 
         return new Arithmetic(this.getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                (Type)getOperation(), oldToNew.get(getDestination()),
-                oldToNew.get(getLhs()), oldToNew.get(getRhs()),
+                (Type)getOperation(),
+                oldToNew.get(getDestination().orElse(null)),
+                oldToNew.get(getLhs().orElse(null)),
+                oldToNew.get(getRhs().orElse(null)),
                 oldToNew.copyOrNull(getCarryBit()), oldToNew.copyOrNull(getOverflowBit()),
                 oldToNew.copyOrNull(getZeroBit()));
     }

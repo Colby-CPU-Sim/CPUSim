@@ -1,8 +1,9 @@
 package cpusim.util;
 
-import cpusim.model.Machine;
 import cpusim.Mediator;
 import cpusim.gui.desktop.DesktopController;
+import cpusim.model.Machine;
+import cpusim.model.module.ControlUnit;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -77,7 +78,7 @@ public class UpdateDisplayManager implements ChangeListener<Machine.StateWrapper
             desktop.getDebugToolBarController().updateDisplay(false, outlineChanges);
         }
         else {
-            mediator.getMachine().getControlUnit().reset();
+            mediator.getMachine().getControlUnit().ifPresent(ControlUnit::reset);
             mediator.getMachine().resetAllChannelsButConsole();
         }
     }

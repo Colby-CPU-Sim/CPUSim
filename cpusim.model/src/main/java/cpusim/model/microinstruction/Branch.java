@@ -1,13 +1,17 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.module.Module;
 import cpusim.model.module.ControlUnit;
+import cpusim.model.module.Module;
 import cpusim.model.util.MachineComponent;
-import cpusim.util.MoreBindings;
 import cpusim.model.util.ValidationException;
-import javafx.beans.property.*;
+import cpusim.util.MoreBindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ReadOnlySetProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -69,6 +73,14 @@ public class Branch extends Microinstruction<Branch>
     @Override
     public ReadOnlySetProperty<MachineComponent> getDependantComponents() {
         return dependants;
+    }
+
+    public Optional<ControlUnit> getControlUnit() {
+        return Optional.ofNullable(controlUnit.get());
+    }
+
+    public ReadOnlyObjectProperty<ControlUnit> controlUnitProperty() {
+        return controlUnit;
     }
 
     /**
@@ -137,8 +149,7 @@ public class Branch extends Microinstruction<Branch>
      * @return the XML description
      */
     @Override
-    public String getXMLDescription(String indent)
-    {
+    public String getXMLDescription(String indent) {
         return indent + "<Branch name=\"" + getHTMLName() +
                 "\" amount=\"" + getAmount() +
                 "\" id=\"" + getID() + "\" />";
@@ -149,8 +160,7 @@ public class Branch extends Microinstruction<Branch>
      * @return the HTML description
      */
     @Override
-    public String getHTMLDescription(String indent)
-    {
+    public String getHTMLDescription(String indent) {
         return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" +
                 getAmount() + "</TD></TR>";
     }

@@ -9,7 +9,7 @@ import cpusim.model.Field;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.harness.BindMachine;
-import cpusim.model.harness.CPUSimMatchers;
+import cpusim.model.harness.matchers.CPUSimMatchers;
 import cpusim.model.harness.MachineInjectionRule;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
