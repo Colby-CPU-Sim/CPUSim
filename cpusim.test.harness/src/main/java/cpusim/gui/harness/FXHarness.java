@@ -7,6 +7,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
+import org.hamcrest.core.Is;
 import org.junit.runner.RunWith;
 import org.testfx.api.FxRobot;
 import org.testfx.service.query.NodeQuery;
@@ -17,6 +18,7 @@ import java.util.function.Consumer;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeThat;
 
 /**
  * @since 2016-12-12
@@ -61,5 +63,21 @@ public abstract class FXHarness extends FxRobot implements MachineBound {
                 .<Node>query());
 
         return comboBox;
+    }
+
+    private static void ciSkip(boolean shouldSkip) {
+        String ciVar = System.getenv("CI");
+        if (ciVar == null) {
+            ciVar = "false";
+        }
+        assumeThat(Boolean.parseBoolean(ciVar), Is.is(!shouldSkip));
+    }
+
+    public static void skipOnCI() {
+        ciSkip(true);
+    }
+
+    public static void skipOnDev() {
+        ciSkip(false);
     }
 }
