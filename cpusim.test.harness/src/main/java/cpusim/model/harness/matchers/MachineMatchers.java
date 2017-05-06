@@ -343,6 +343,8 @@ public abstract class MachineMatchers {
     public static <T extends Microinstruction<T>> Matcher<Machine> micros(
             Class<? extends Microinstruction<?>> clazz,
             Collection<? extends Microinstruction<?>> values) {
+        // This method makes me super sad. I could not think of any way to do this while maintaining any kind of
+        // *real* type-safety. This does keep it, but is clunky and brittle.
         
         if (Arithmetic.class.isAssignableFrom(clazz)) {
             return microMatcher(Arithmetic.class,
