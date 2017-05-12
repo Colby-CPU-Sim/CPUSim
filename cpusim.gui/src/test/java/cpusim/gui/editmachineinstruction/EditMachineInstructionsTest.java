@@ -6,7 +6,7 @@ import cpusim.gui.harness.FXRunner;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.MicroinstructionTreeView;
 import cpusim.model.harness.BindMachine;
-import cpusim.model.harness.MachineInjectionRule;
+import cpusim.model.harness.FXMachineInjectionRule;
 import cpusim.model.harness.SamplesFixture;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -35,7 +35,7 @@ public class EditMachineInstructionsTest extends FXHarness {
     private Mediator mediator;
     
     @Rule
-    public MachineInjectionRule machineProperty = new MachineInjectionRule(this,
+    public FXMachineInjectionRule machineProperty = new FXMachineInjectionRule(this,
             SamplesFixture.MAXWELL.factory(0));
 
     @FXRunner.StageSetup

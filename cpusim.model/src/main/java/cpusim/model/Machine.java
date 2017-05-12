@@ -1716,6 +1716,10 @@ public class Machine extends Module<Machine> {
             private boolean value = false;
         }
 
+        visitor.visitName(getName());
+        visitor.visitStartingAddressForLoading(getStartingAddressForLoading());
+        visitor.visitIndexFromRight(isIndexFromRight());
+
         WrappedBool shouldExit = new WrappedBool();
 
         visitor.getModuleVisitor().ifPresent(mv -> {
@@ -1764,6 +1768,33 @@ public class Machine extends Module<Machine> {
                     } break;
                 }
             });
+        }
+
+        switch (visitor.startFields(getFields())) {
+            case SkipSiblings:
+            case Stop:
+                return;
+
+            case SkipChildren:
+                break;
+
+            case Continue: {
+                fieldLoop: for (Field f: fields) {
+                    switch (visitor.visitField(f)) {
+                        case SkipSiblings:
+                        case Stop:
+                            return;
+
+                        case SkipChildren:
+                            break fieldLoop; // break the loop
+
+                        case Continue:
+                            break;
+                    }
+                }
+
+                visitor.endFields(fields);
+            } break;
         }
     }
 

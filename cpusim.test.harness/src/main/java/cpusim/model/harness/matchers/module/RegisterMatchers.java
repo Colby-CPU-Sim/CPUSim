@@ -6,7 +6,7 @@ import cpusim.model.harness.matchers.NamedObjectMatchers;
 import cpusim.model.module.Register;
 import org.hamcrest.Matcher;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
@@ -47,7 +47,7 @@ public abstract class RegisterMatchers {
                 equalTo(value));
     }
 
-    public static Matcher<Register> access(EnumSet<Register.Access> access) {
+    public static Matcher<Register> access(Set<Register.Access> access) {
         return hasFeature("access",
                 Register::getAccess,
                 equalTo(access));

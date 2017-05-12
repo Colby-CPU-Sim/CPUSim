@@ -15,45 +15,28 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.testfx.util.WaitForAsyncUtils.asyncFx;
-import static org.testfx.util.WaitForAsyncUtils.waitFor;
-import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * JUnit4 {@link org.junit.Rule} that will automatically bind anything annotated with {@link BindMachine} to an internal
  * {@link Machine} instance build with the name of the Test class.
  *
- * @since 2016-12-13.
+ * @see FXMachineInjectionRule for working with JavaFX applications -- it requires special considerations for threads
  */
 public class MachineInjectionRule extends SimpleObjectProperty<Machine> implements TestRule {
-
     private final Object testInstance;
-    
     private final List<Field> fieldsToBind;
-    
     private final Supplier<Machine> machineFactory;
-    
-    /**
-     * The Test class instance.
-     *
-     * @param instance
-     */
+
     public MachineInjectionRule(Object instance) {
         this(instance, null);
     }
-    
-    /**
-     * The Test class instance.
-     *
-     * @param instance
-     */
+
     public MachineInjectionRule(Object instance, @Nullable Supplier<Machine> cpuFactory) {
-        checkNotNull(instance);
-        
-        testInstance = instance;
-        
+        testInstance = checkNotNull(instance, "instance == null");
+
         ArrayList<Field> fieldsToBind = new ArrayList<>();
-        
+
         // collect the instructionFields
         Class<?> iterClazz = testInstance.getClass();
         while (iterClazz != Object.class) {
@@ -65,44 +48,45 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
                     fieldsToBind.add(f);
                 }
             }
-            
+
             iterClazz = iterClazz.getSuperclass();
         }
-        
+
         fieldsToBind.trimToSize();
-        
+
         this.fieldsToBind = fieldsToBind;
-        
+
         if (cpuFactory != null) {
             this.machineFactory = cpuFactory;
         } else {
             this.machineFactory = () -> new Machine(testInstance.getClass().getCanonicalName());
         }
     }
-    
+
     private Machine createMachine() {
         return this.machineFactory.get();
     }
-    
+
     @Override
-    public Statement apply(final Statement base, final Description description) {
-        MachineInjectionRule.this.set(createMachine());
+    public final Statement apply(final Statement base, final Description description) {
+        this.set(createMachine());
 
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                // We inject the instructionFields on the JavaFX thread,
-                // not on the main thread. The waitFor waits until
-                // the Future completes
-                waitFor(asyncFx(() -> injectFields()));
-                waitForFxEvents();
+                onEvaluateStatement(base, description);
 
                 base.evaluate();
             }
         };
     }
-    
-    private void injectFields() {
+
+    protected void onEvaluateStatement(Statement base, final Description description) {
+        // Simply inject the fields, all injection, no waiting. :)
+        injectFields();
+    }
+
+    protected void injectFields() {
         // find them all, we need to reverse the List after to call super classes first
         fieldsToBind.forEach(f -> {
             try {
@@ -110,6 +94,10 @@ public class MachineInjectionRule extends SimpleObjectProperty<Machine> implemen
                 Object instance = f.get(testInstance);
                 if (MachineBound.class.isAssignableFrom(f.getType())) {
                     MachineBound bound = (MachineBound) instance;
+                    checkState(bound != null,
+                            "Found field %s that is null, did you initialize it in an @Before method? " +
+                                    "To use the @BindMachine annotation, must initialize during construction or declaration.",
+                            f);
                     bound.machineProperty().bind(this);
                 } else {
                     @SuppressWarnings("unchecked") // this is safe because of how the instructionFields are collected

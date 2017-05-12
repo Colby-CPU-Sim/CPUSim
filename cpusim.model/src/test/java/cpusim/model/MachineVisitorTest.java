@@ -1,11 +1,10 @@
 package cpusim.model;
 
 import cpusim.model.harness.MachineInjectionRule;
+import cpusim.model.util.structure.AbstractMachineVisitor;
 import cpusim.model.util.structure.MachineVisitor;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.Optional;
 
 import static org.mockito.Mockito.*;
 
@@ -21,10 +20,7 @@ public class MachineVisitorTest {
     public void emptyValues() throws Exception {
         Machine m = machineInjectionRule.get();
 
-        MachineVisitor empty = mock(MachineVisitor.class);
-
-        when(empty.getMicrosVisitor()).thenReturn(Optional.empty());
-        when(empty.getModuleVisitor()).thenReturn(Optional.empty());
+        MachineVisitor empty = spy(new AbstractMachineVisitor() {});
 
         m.acceptVisitor(empty);
 
@@ -32,14 +28,13 @@ public class MachineVisitorTest {
         verify(empty).visitIndexFromRight(m.isIndexFromRight());
         verify(empty).visitStartingAddressForLoading(m.getStartingAddressForLoading());
 
-        verify(empty, atLeastOnce()).startMicros();
         verify(empty, atLeastOnce()).getMicrosVisitor();
-        verify(empty, atLeastOnce()).endMicros();
+        verify(empty, never()).startMicros();
+        verify(empty, never()).endMicros();
 
-
-        verify(empty, atLeastOnce()).startModules();
         verify(empty, atLeastOnce()).getModuleVisitor();
-        verify(empty, atLeastOnce()).endModules();
+        verify(empty, never()).startModules();
+        verify(empty, never()).endModules();
 
         verify(empty, atLeastOnce()).startFields(m.getFields());
         verify(empty, never()).visitField(null);
