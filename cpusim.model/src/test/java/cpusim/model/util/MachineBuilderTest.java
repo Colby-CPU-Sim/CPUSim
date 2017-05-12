@@ -84,7 +84,7 @@ public class MachineBuilderTest {
                 errorCollector.checkThat(modules.get(mclazz), empty());
             }
 
-            ImmutableMap<Class<? extends Microinstruction<?>>, List<Microinstruction<?>>> micros =
+            ImmutableMap<Class<? extends Microinstruction<?>>, List<? extends Microinstruction<?>>> micros =
                     base.getMicrosMap();
             for (Class<? extends Microinstruction<?>> mclazz : micros.keySet()) {
                 if (mclazz == End.class || mclazz == Comment.class) {
