@@ -1,0 +1,28 @@
+
+apply plugin: 'java'
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+}
+
+dependencies {
+    compile project(':cpusim.model')
+
+    // https://mvnrepository.com/artifact/org.hamcrest/hamcrest-all
+    compile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+
+    // https://mvnrepository.com/artifact/org.hobsoft.hamcrest/hamcrest-compose
+    compile group: 'org.hobsoft.hamcrest', name: 'hamcrest-compose', version: '0.3.0'
+
+    // http://search.maven.org#artifactdetails|com.github.npathai|hamcrest-optional|1.0|
+    compile 'com.github.npathai:hamcrest-optional:1.0'
+
+    compile 'junit:junit:4.12'
+
+    compile "org.testfx:testfx-core:4.0.+"
+    compile "org.testfx:testfx-junit:4.0.+"
+}

@@ -1,0 +1,592 @@
+///////////////////////////////////////////////////////////////////////////////
+// File:    	RAM.java
+// Type:    	java application file
+// Author:		Dale Skrien
+// Project: 	CPU Sim
+// Date:    	June, 1999
+//
+// Last Modified: 6/4/13
+//
+// Description:
+//   This file contains the code for the RAM module.
+//
+// Things to do:
+//   1.  Why doesn't the ModuleDialog let you specify a negative length for a RAM
+//		 but does let you specify a negative value for a Register?
+//
+///////////////////////////////////////////////////////////////////////////////
+// the package in which our project resides
+
+package cpusim.model.module;
+
+import cpusim.model.ExecutionException;
+import cpusim.model.Machine;
+import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.assembler.SourceLine;
+import cpusim.model.util.ValidationException;
+import cpusim.util.LoadException;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+/**
+ * This class models RAM.  All addressable units ("cells") have the same
+ * number of bits, but that number can be any value from 1 to 64.
+ */
+public class RAM extends Module<RAM> implements Sized<RAM> {
+
+    /** the data stored in the ram cells */
+    private final ObservableList<RAMLocation> data;
+    /** data value that is changed in debug mode and used for backupManager only */
+    private final ListProperty<RAMLocation> changedData;
+    /** number of bits per cell.  The first 64-cellSize bits of each data value
+     * will be all 0's. That is, the value is not stored in 64-bit 2's complement. */
+    private final IntegerProperty cellSize;
+    /** the number of cells in ram */
+    private final ReadOnlyIntegerProperty length;
+
+    /** set to true when CPU Sim is running in debug mode */
+    private final BooleanProperty haltAtBreaks;
+    /** all 0s except the rightmost cellSize bits, which are 1s. */
+    private final ReadOnlyLongProperty cellMask;
+
+    /**
+     * Constructor
+     * @param name name of the ram
+     * @param length a positive integer that specifies the number
+     *               of cells in the RAM.
+     * @param cellSize the number of bits per cell. This must be a positive
+     *                 integer up to 64.
+     */
+    public RAM(String name, UUID id, Machine machine, int length, int cellSize) {
+        super(name, id, machine);
+        this.cellSize = new SimpleIntegerProperty(cellSize);
+
+        this.data = FXCollections.observableArrayList();
+        this.changedData = new SimpleListProperty<>(this,"RAM data",null);
+        for (int i=0; i<length; i++){
+            this.data.add(new RAMLocation(i, 0, this, false, "", null));
+        }
+
+        //can only set in root controller RAM when not in debug mode
+        this.haltAtBreaks = new SimpleBooleanProperty(this, "haltAtBreaks", false);
+
+        LongProperty cellMaskProp = new SimpleLongProperty(this, "cellMask", 0);
+        cellMaskProp.bind(Bindings.createLongBinding(() -> {
+            long cellMask = 0;
+            for (int i = 0; i < cellSize; i++) {
+                cellMask = (cellMask << 1) + 1;
+            }
+            return cellMask;
+        }, cellSizeProperty()));
+        cellMask = cellMaskProp;
+
+        IntegerProperty lengthProperty = new SimpleIntegerProperty(this, "length", length);
+        lengthProperty.bind(Bindings.size(this.data));
+        this.length = lengthProperty;
+    }
+
+    /**
+     * Copy constructor
+     * @param other
+     */
+    public RAM(RAM other) {
+        this(other.getName(),
+                UUID.randomUUID(),
+                other.getMachine(),
+                other.getLength(),
+                other.getCellSize());
+    }
+
+    //------------------------
+    // utility methods
+
+    /**
+     * returns the data field
+     * @return the data in the RAM
+     */
+    public ObservableList<RAMLocation> data(){
+        return data;
+    }
+
+    /**
+     * returns the value at address addr.
+     * the value is returned as a 64-bit 2's complement integer.
+     * Used by getValueAt in RAMTableModel, so should not signal a break
+     * even if there is a break on that row of the table
+     * @param addr address of the data
+     * @return the data as a long object
+     */
+    public long getData(int addr) {
+        if (addr < 0 || addr >= data.size())
+            throw new ExecutionException("Attempted to access RAM " +
+                    getName() + " at address " + addr +
+                    " which is out of range");
+        return (data.get(addr).getValue() << (64 - cellSize.get())) >> (64 - cellSize.get());
+    }
+
+    /**
+     * returns the long value consisting of the given number of bits
+     * starting at address addr, as a 2's complement number.  It
+     * gets the high order bits from the first cell first and, if necessary,
+     * continues getting bits from successive cells.
+     * @param addr address of the data
+     * @param numBits number of bits for the value
+     * @return data as a lone object
+     */
+    public long getData(int addr, int numBits) {
+        int numCells = (numBits + cellSize.get() - 1) / cellSize.get(); //ceil(numBits/cellSize)
+        if (addr < 0 || addr + numCells > data.size())
+            throw new ExecutionException("Attempted to access RAM " +
+                    getName() + " at addresses " + addr + " to " +
+                    (addr + numCells - 1) + " which is out of range");
+        
+        checkArgument(numBits > 0 && numBits <= 64 ,
+                "RAM.getData() was called with numBits = %s", numBits);
+       
+        long value = 0;
+        for (int i = addr; i < addr + numCells - 1; i++) {
+            // Is the "& cellMask" in the next line necessary?
+            value = (value << cellSize.get()) + (data.get(i).getValue() & getCellMask());
+        }
+        
+        // now add the bits from the last cell
+        int numBitsLeft = numBits % cellSize.get() == 0 ? cellSize.get() : numBits % cellSize.get();
+        long tempMask = (1L << numBitsLeft) - 1;
+        value = (value << numBitsLeft) + (data.get(addr + numCells - 1).getValue() & tempMask);
+        
+        // now add sign extension
+        value = value << (64 - numBits) >> (64 - numBits);
+        return value;
+    }
+
+    /**
+     * Gets an iteration between [start, end)
+     * @param start first address read
+     * @param end one past the last address read
+     * @return Iterator of data through the range
+     */
+    public Iterator<RAMLocation> getDataIterator(long start, long end) {
+        checkArgument(end > start && start >= 0,
+                "Address start %s must be < end %s",
+                start, end);
+
+        return new Iterator<RAMLocation>() {
+            long address = start;
+
+            @Override
+            public boolean hasNext() {
+                return address < end;
+            }
+
+            @Override
+            public RAMLocation next() {
+                RAMLocation out = data.get((int)address);
+                address++;
+                return out;
+            }
+        };
+    }
+
+    /**
+     * Gets an iteration between [start, {@link #getLength()})
+     * @param start first address read
+     * @return Iterator of data through the range
+     *
+     * @see #getDataIterator(long, long)
+     */
+    public Iterator<RAMLocation> getDataIterator(int start) {
+        return getDataIterator(start, getLength());
+    }
+
+    /**
+     * sets the given number of bits starting at address addr
+     * with the given long value.  If there are too many bits for the
+     * cell at the given address, the bits are stored in consecutive cells.
+     * The value is stored big-endian
+     * and is right justified within the given number of bits.
+     * This means that if there are more bits than needed, the
+     * first few bits will just contain 0's if value >= 0 and
+     * 1's if value < 0.
+     * @param addr address in the RAM of the data
+     * @param value value of the data in long
+     * @param numBits number of bits of the data
+     */
+    public void setData(final int addr, long value, final int numBits) {
+        int numCells = (numBits + cellSize.get() - 1) / cellSize.get(); //ceil(numBits/cellSize)
+        if (addr < 0 || addr + numCells > data.size()) {
+            throw new ExecutionException("Attempt to access data in RAM " +
+                    getName() + " at addresses " + addr + " to " +
+                    (addr + numCells - 1) + " which are out of range");
+        }
+        
+        checkArgument(numBits > 0,
+                "RAM.setData() was called with numBits = %s", numBits);
+
+        //save old values of data for the purpose of backing up
+        final ObservableList<RAMLocation> savedData = FXCollections.observableArrayList();
+        for (int j = 0; j < numCells; j++)
+            savedData.add(data.get(addr + j));
+        changedData.set(savedData);
+
+        //set the new values of data starting with the low-order bits.
+        if (numBits % numCells != 0) {
+            long tempMask = (1L << (numBits % numCells)) - 1;
+            long tempValue = value & tempMask;
+            int tempIndex = addr + numCells - 1;
+            data.get(tempIndex).setValue(data.get(tempIndex).getValue() &
+                    (-1 - (tempMask << (cellSize.get() - numBits % numCells))));
+            data.get(tempIndex).setValue(data.get(tempIndex).getValue() |
+                    (tempValue << (cellSize.get() - numBits % numCells)));
+            value >>= numBits % numCells;
+            for (int j = numCells - 2; j >= 0; j--) {
+                data.get(addr + j).setValue(value & getCellMask());
+                value >>= cellSize.get();
+            }
+        } else {
+            for (int j = numCells - 1; j >= 0; j--) {
+                data.get(addr + j).setValue(value & getCellMask());
+                value >>= cellSize.get();
+            }
+        }
+    }
+
+    /**
+     * set the value of the data at address addr
+     * If the value doesn't fit, only the low-order cellSize bits
+     * are saved.
+     * @param addr address in the RAM of the data
+     * @param value value of the data in long
+     */
+    public void setData(final int addr, long value) {
+        data.get(addr).setValue(value & getCellMask());
+    }
+
+    /**
+     * getter for the data simple list property object
+     * @return the data simple list property object
+     */
+    public ListProperty<RAMLocation> dataProperty(){
+        return changedData;
+    }
+
+    /**
+     * getter for the assembly language comment in the data
+     * @param index index of the comment line
+     * @return a string of comment
+     */
+    public String getComment(int index) {
+        return data.get(index).getComment();
+    }
+
+    /**
+     * setter for the assembly language comment in the data
+     * @param i index of the comment line
+     * @param value value of the comment as a string
+     */
+    public void setComment(int i, String value) {
+        //change all tabs to spaces for compactness
+        data.get(i).setComment(value.replace('\t', ' '));
+    }
+
+    /**
+     * get the source line from the assembled instructions
+     * @param index index of the source line in the instructions
+     * @return the source line at the given index
+     */
+    public SourceLine getSourceLine(int index) {
+        if (0 <= index && index < data.size())
+            return data.get(index).getSourceLine();
+        else
+            return null;
+    }
+
+    /**
+     * setter of the source line
+     * @param index index of the source line in the instructions
+     * @param sourceLine the new source line to be set
+     */
+    public void setSourceLine(int index, SourceLine sourceLine) {
+        assert 0 <= index && index < data.size() : "index out of range" +
+                "in RAM.setsourceLine";
+        this.data.get(index).setSourceLine(sourceLine);
+    }
+
+    /**
+     * getter for the break line
+     * @param index index of the break line
+     * @return boolean if the line is break
+     */
+    public boolean getBreak(int index) {
+        return data.get(index).getBreak();
+    }
+
+    /**
+     * break the ram at the given address
+     * @param addr address of the line to break
+     * @return boolean value telling if it's break
+     */
+    public boolean breakAtAddress(int addr) {
+        return haltAtBreaks.get() // break turned on
+                && (addr >= 0 && addr < data.size()) // in range
+                && data.get(addr).getBreak(); // is asked to be breaking
+    }
+
+    /**
+     * set the break at the given index
+     * @param i index in the RAM
+     * @param value boolean value to tell if break
+     */
+    public void setBreak(int i, boolean value) {
+        data.get(i).setBreak(value);
+    }
+
+    /**
+     * getter for the cell size
+     * @return the cell size
+     */
+    public int getCellSize() {
+        return cellSize.get();
+    }
+
+    /**
+     * change the size (the number of bits) of the cells to the new value.
+     * effect: if we reduce the cell size, some high order bits are lost.
+     * if we increase the cell size, the new high order bits are zeros.
+     *
+     * @param newSize the new number of bits per cell
+     */
+    public void setCellSize(int newSize) {
+        cellSize.set(newSize);
+        
+        // now update all the values in the data array
+        for (int i = 0; i < data.size(); i++) {
+            data.get(i).setValue(data.get(i).getValue() & getCellMask());
+        }
+    }
+
+    public ReadOnlyIntegerProperty cellSizeProperty() {
+        return cellSize;
+    }
+    
+    @Override
+    public int getWidth() {
+        return getCellSize();
+    }
+
+    @Override
+    public ReadOnlyIntegerProperty widthProperty() {
+        return cellSizeProperty();
+    }
+
+    public int getLength() {
+        return length.get();
+    }
+
+
+    public long getCellMask() {
+        return cellMask.get();
+    }
+
+    public ReadOnlyLongProperty cellMaskProperty() {
+        return cellMask;
+    }
+
+    /**
+     * set the length of the data in ram
+     * @param newLength new length of the data
+     */
+    public void setLength(int newLength) {
+        int oldLength = data.size();
+        if (newLength == oldLength)
+            return;  //no changes need to be made
+
+        //update the data
+        if (newLength > oldLength) //add new empty RAMLocations
+            for (int i = oldLength; i < newLength; i++) {
+                data.add(new RAMLocation(i,0,this,false,"",null));
+            }
+        else { //new length is shorter so remove extra RAMLocations
+            data.remove(newLength, oldLength);
+        }
+    }
+
+    public ReadOnlyIntegerProperty lengthProperty() {
+        return length;
+    }
+
+    /**
+     * loads the given vector of assembled instructions into the
+     * given RAM starting at the given starting address.
+     * returns true if the loading was successful.
+     * It concatenates the bits in all the instrs to form one long list
+     * of bits and then inserts them in the RAM starting at the given
+     * address.
+     * If the memory is too small, it displays an error message.
+     * @param instrs lists of the assembled instruction
+     * @param address address to be loaded to
+     */
+    public void loadAssembledInstructions(
+            List<AssembledInstructionCall> instrs, int address) {
+        int totalNumBits = 0;
+        int nextAddr = address;
+        int cellIndex = 0;
+        long cellValue = 0;
+
+        for (AssembledInstructionCall nextInstr : instrs) {
+            int instrIndex = 0;
+            int instrLength = nextInstr.length();
+            long instrValue = nextInstr.getValue();
+            //remove any sign bits
+            instrValue = (instrValue << (64 - instrLength)) >>> (64 - instrLength);
+
+            totalNumBits += instrLength;
+            if ((totalNumBits + cellSize.get() - 1) / cellSize.get() + address
+                    > getLength()) {
+                throw new LoadException("There is not enough " +
+                        "room in RAM " + getName() + " to load the instructions " +
+                        "starting at address " + address, this, instrs);
+            }
+
+            //save comments & SourceLines
+            String c = getComment(nextAddr); //get current comment on that line
+            setComment(nextAddr, (c.length() == 0 ? "" : c + " | ") +
+                    nextInstr.getComment().trim());
+            if (getSourceLine(nextAddr) == null)
+                // if the line doesn't already have a SourceLine, add one
+                setSourceLine(nextAddr, nextInstr.getSourceLine());
+
+            // fill up as many cells as you can
+            while (instrLength - instrIndex >= cellSize.get() - cellIndex) {
+                // add instr bits to successive cells
+                long value = instrValue << instrIndex;
+                value >>>= instrLength - (cellSize.get() - cellIndex);
+                cellValue |= (value & getCellMask());
+                setData(nextAddr, ~cellValue); // to invoke an ChangeListener
+                setData(nextAddr, cellValue);
+                instrIndex += cellSize.get() - cellIndex;
+                nextAddr++;
+                cellIndex = 0;
+                cellValue = 0;
+            }
+            if (instrLength - instrIndex > 0) {
+                // there are a few more bits to store and
+                // those bits fit in the current cell
+                long value = instrValue << (64 - (instrLength - instrIndex));
+                value >>>= (64 - (instrLength - instrIndex));
+                value <<= (cellSize.get() - cellIndex) - (instrLength - instrIndex);
+                cellValue |= (value & getCellMask());
+                cellIndex += instrLength - instrIndex;
+            }
+        }
+    }
+
+    @Override
+    public RAM cloneFor(IdentifierMap oldToNew) {
+        return new RAM(getName(), UUID.randomUUID(), oldToNew.getNewMachine(), getLength(), getCellSize());
+    }
+
+    @Override
+    public void copyTo(RAM newRAM) {
+        checkNotNull(newRAM);
+
+        newRAM.setName(getName());
+        newRAM.setLength(getLength());
+        newRAM.setCellSize(getCellSize());
+
+        // FIXME Data copy?
+    }
+
+    /**
+     * returns the XML description
+     * @return the XML description
+     */
+    @Override
+    public String getXMLDescription(String indent) {
+        return indent + "<RAM name=\"" + getHTMLName() + "\" length=\"" + getLength()
+                + "\" cellSize=\"" + getCellSize() + "\" id=\"" + getID()
+                + "\" />";
+    }
+
+    /**
+     * returns the HTML description
+     * @return the HTML description
+     */
+    @Override
+    public String getHTMLDescription(String indent) {
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getLength() +
+                "</TD><TD>" + getCellSize() + "</TD></TR>";
+    }
+
+    /**
+     * clear erases the data, comments, and breakpoints of this ram
+     */
+    public void clear() {
+        for (int i = 0; i < getLength(); i++) {
+            setData(i, 0);
+            setComment(i, "");
+            setSourceLine(i, null);
+        }
+    }
+
+    /**
+     * setter for the halt at breaks
+     * @param b if true then halt at breaks
+     */
+    public void setHaltAtBreaks(boolean b) {
+        haltAtBreaks.set(b);
+    }
+
+
+    public boolean haltAtBreaks() {
+        return haltAtBreaks.get();
+    }
+
+    public BooleanProperty haltAtBreaksProperty() {
+        return haltAtBreaks;
+    }
+
+    /**
+     * getter for the length of address bits
+     * @return the length of address bits
+     */
+    public int getNumAddrBits() {
+        return 31-Integer.numberOfLeadingZeros(data.size());
+    }
+
+    /**
+     * clear all the breakpoints for ram locations.
+     */
+    public void clearAllBreakpoints() {
+        for (RAMLocation rLoc : this.data()) {
+            rLoc.setBreak(false);
+        }
+    }
+    
+    @Override
+    public void validate() {
+        super.validate();
+
+        int size = getCellSize();
+        if (size <= 0 || size > 64) {
+            throw new ValidationException("The RAM module \"" + getName() +
+                    "\" has cell size " + getCellSize() +
+                    ".\nThe cell size must be an integer from 1 to 64.");
+        }
+    
+        // checks whether it has a positive length
+        if (getLength() <= 0) {
+            throw new ValidationException("The RAM module \"" + getName() +
+                    "\" has length " + getLength() +
+                    ".\nThe length must be a positive integer.");
+        }
+    }
+}

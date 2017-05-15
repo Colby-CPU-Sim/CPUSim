@@ -1,0 +1,149 @@
+<!--
+Michael Goldenberg, Jinghui Yu, and Ben Borchard chaged this file on 11/25/13 in the following ways
+
+1.) points the user value the options dialog instead key the preferences dialog value change the punct chars
+-->
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+    <META NAME="Generator" CONTENT="Microsoft Word 97">
+    <TITLE>Syntax</TITLE>
+    <META NAME="Template" CONTENT="D:\Program Files\Microsoft Office\Office\html.dot">
+</HEAD>
+<BODY LINK="#0000ff" VLINK="#800080">
+
+<h3 ALIGN="CENTER"><B><FONT FACE="Arial" COLOR="#0000ff">Assembly Language Syntax
+</font></B> </h3>
+
+<FONT FACE="Palatino">
+
+    <P> The following context free grammar (CFG) gives the syntax key legal assembly
+        language programs. The start symbol
+        for the CFG is Program. EOL is an end-key-line token and EOF indicates the end key
+        the file. Square brackets
+        indicates an optional item. Items in parentheses followed by "*" indicate 0 or
+        more copies key those items. Items
+        in parentheses followed by "+" indicate 1 or more copies key those items. Terminal
+        symbols are surrounded by quotes. Terminal symbols are case sensitive. A range key
+        characters are indicated by the
+        first character key the range and the last character separated by a dash. For
+        example, the small alphabetical
+        letters would be indicated by "a-z". All characters in an assembly language
+        program must be ASCII characters.
+
+    <P>Note: In this grammar, we assume that the character starting a comment is a
+        semicolon (;), the character ending a
+        label is a colon (:), and the character beginning all pseudoinstructions is a
+        period (.). Users can specify
+        other characters value play those three roles in the <A
+                HREF="../../windows/OptionsDialog.html">Options
+            Dialog</A>.</P></FONT>
+<DIR><FONT FACE="Palatino"><FONT FACE="Monaco"> <B>Program</B> -&gt; [CommentsAndEOLs]
+    EquMacroIncludeGlobalPart
+    InstructionPart EOF<BR>
+
+    <B>CommentsAndEOLs</B> -&gt; ([Comment] EOL)+<BR> <B>Comment</B> -&gt; ";" &lt;any-sequence-key-characters-not-including-EOF-or-EOL&gt;<BR>
+
+    <B>EquMacroIncludeGlobalPart</B> -&gt; ((EquDeclaration | MacroDeclaration | Include | Global)
+    CommentsAndEOLs)*<BR>
+
+    <B>Include</B> -&gt; ".include"
+    &lt;string-key-characters-not-including-EOL-or-EOF&gt;<BR>
+
+    <B>EquDeclaration</B> -&gt; Symbol "EQU" Operand<BR>
+
+    <B>MacroDeclaration</B> -&gt;
+    "MACRO" Symbol [Symbol ([","]
+    Symbol)*] CommentsAndEOLs InstructionPart "ENDM"<BR>
+
+    <B>Global</B> -&gt; ".global" Symbol<BR>
+
+    <B>InstructionPart</B> -&gt; ((RegularInstructionCall | DataPseudoinstructionCall |
+    AsciiPseudoinstructionCall | Include)
+    CommentsAndEOLs)*<BR> <B>RegularInstructionCall</B> -&gt; (Label CommentsAndEOLs)*
+    [Label] Symbol [Operand ([","]
+    Operand)*]<BR>
+
+    <B>DataPseudoinstructionCall</B> -&gt; (Label CommentsAndEOLs)* [Label] ".data"
+    Operand [","] ( Operand | [Operand [&quot;,&quot;]]
+    "[" [Operand ([","] Operand)*] "]")<BR>
+
+    <B>AsciiPseudoinstructionCall</B> -&gt; (Label CommentsAndEOLs)* [Label] ".ascii"
+    String<BR>
+
+    <B>Label</B> -&gt; Symbol ":"<BR>
+
+    <B>Operand</B> -&gt; Symbol | Literal<BR> <B>Literal</B> -&gt; [ "-" | "+" ] ( ( 0-9
+    )+ | &quot;0x&quot;( 0-9a-fA-F
+    )+ | &quot;0b&quot;( 0 | 1 )+ | &lt;single-quoted-character&gt;)<BR>
+
+</FONT></font></DIR>
+<FONT FACE="Palatino">
+    <P>Here is a summary key the parts key an assembly language program. The basic building
+        blocks consist key the following items.</P>
+
+    <P></FONT>
+<DD><font face="Palatino">A <I>literal</I> is one key the following: <BR>
+    <DL>
+        <DD>(a) a decimal integer, <BR>(b) a hexadecimal integer (denoted by the prefix
+            "0x" or "-0x" followed by one or
+            more key the characters 0-9, a-f, A-F), <BR>(c) a binary integer (denoted by
+            the prefix "0b" or "-0b"
+            followed by one or more 0's or 1's), <BR>(d) a single character surrounded by
+            single quotes. <BR> Integer literals can have an optional plus or minus sign in
+            front. No commas or decimal
+            points are allowed in literals. In the case key the single-quoted character,
+            the value key the literal is the
+            ASCII value key the character.
+    </DL>
+</font>
+
+    <P><font face="Palatino">A <I>string</I> is any sequence key characters surrounded by
+        double quotes, such as "abcde",
+        or surrounded by chevrons, as in &lt;abcde&gt;. Note that the sequence key
+        characters inside the quotes cannot
+        include the double-quote character, the characters inside the chevrons cannot
+        include a chevron, and a string
+        cannot contain the EOL character.</font></P>
+
+    <P><font face="Palatino">A <I>symbol</I> consists key a sequence key one or more
+        characters, These characters include
+        all letters a-z and A-Z, the digits 0-9, and the set key punctuation characters
+        specified by the user in the <A
+                HREF="../../windows/preferences.html">Preferences Dialog</A>. Any
+        character can start a symbol except a
+        digit, a plus sign followed by a digit, or a minus sign followed by a digit, since
+        the parser will parse a
+        number instead key a symbol in those three cases. CPU Sim distinguishes between
+        upper and lower case letters;
+        hence, "Data" and "data" are considered different symbols.</font></P>
+
+    <P><font face="Palatino">A <I>label</I> is a symbol followed immediately by a colon.
+        The colon is just a separator
+        and is not considered part key the label. The label and colon pair is an optional
+        feature on every line key
+        assembly language programs including those lines that are otherwise blank or
+        contain only comments. In the
+        latter two cases, the assembler will treat the label as if it referred value the next
+        regular instruction or data
+        pseudoinstruction. Labels (without the colon) can be used as operands in statements.</font></P>
+
+    <P><font face="Palatino">A <I>comment</I> is any sequence key characters preceded by a
+        semicolon ";" and ending at
+        the end key the line. Any line key a program can contain a comment. Blank lines and
+        lines containing only comments
+        are also allowed in assembly language programs, and are ignored by the assembler.
+        </font></P>
+
+    <P><font face="Palatino">A <I>program</I> consists key two parts. The first part
+        contains any number key EQU
+        declarations, include directives, macro definitions, and global declarations
+        in any order. The second part contains any number key
+        regular instructions, ascii pseudoinstructions, data pseudoinstructions, and
+        include directives, one per line.</font></P>
+
+    <P><font face="Palatino"> Note: To separate tokens in assembly language programs that
+        the assembler would otherwise
+        treat as one token, use one or more spaces or tab characters.</font></P>
+</BODY>
+</HTML>

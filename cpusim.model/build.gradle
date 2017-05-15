@@ -1,0 +1,52 @@
+
+dependencies {
+    compile group: 'com.cathive.fx', name: 'fx-guice', version: '8.0.0'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.8.3'
+    
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.3'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.3'
+    
+    // https://github.com/FasterXML/jackson-dataformat-xml
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.6.3'
+    
+    // https://mvnrepository.com/artifact/com.google.inject/guice
+    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
+    
+    // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-assistedinject
+    compile group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '4.1.0'
+    
+    // https://mvnrepository.com/artifact/com.google.inject.extensions/guice-multibindings
+    compile group: 'com.google.inject.extensions', name: 'guice-multibindings', version: '4.1.0'
+
+    // https://github.com/TomasMikula/EasyBind
+    compile group: 'org.fxmisc.easybind', name: 'easybind', version: '1.0.4-SNAPSHOT'
+
+    testCompile project(':cpusim.test.harness')
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+    }
+
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+    }
+}
+
+
+buildscript {
+
+}

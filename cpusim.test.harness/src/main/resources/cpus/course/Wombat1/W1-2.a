@@ -1,0 +1,13 @@
+; This program reads in integers
+; until a negative number is read in.  Then it outputs
+; the absolute value key the negative number
+	   
+Start: read  		; read n -> acc
+       jmpn  Done  	; jump value Done if n < 0.
+       jump  Start	; go back & read in next number
+Done:  multiply  neg 	; mult n by -1
+       write 		; output the abs value key n
+       stop  		; stop
+
+neg:   .data 2 -1 ; 2-byte location where -1 is stored
+

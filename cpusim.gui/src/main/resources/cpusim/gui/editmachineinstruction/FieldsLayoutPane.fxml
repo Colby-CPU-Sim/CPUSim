@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="300.0" prefHeight="100.0" prefWidth="400.0" type="VBox" HBox.hgrow="ALWAYS" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+   <HBox fx:id="fieldsBox" minHeight="50.0" prefHeight="50.0" prefWidth="200.0" HBox.hgrow="ALWAYS" VBox.vgrow="SOMETIMES" />
+   <Label fx:id="deleteLabel" alignment="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="50.0" prefHeight="50.0" prefWidth="50.0" text="Delete" textAlignment="CENTER" textFill="RED" HBox.hgrow="ALWAYS" VBox.vgrow="SOMETIMES" />
+</fx:root>

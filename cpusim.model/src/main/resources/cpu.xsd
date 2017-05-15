@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.cs.colby.edu/djskrien/CPUSim/cpu" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- TODO change namespace value a github url? -->
+  <xs:element name="Machine" type="MachineType"/>
+
+  <xs:simpleType name="uuid">
+    <xs:restriction base="xs:string">
+      <xs:length value="36" fixed="true" />
+      <xs:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[8-9a-bA-B][0-9a-fA-F]{3}-[0-9a-fA-F]{12}" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="HighlightingInfoType">
+    <xs:sequence>
+      <xs:element type="RegisterRAMPairType" name="RegisterRAMPair"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="IncrementType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="register"/>
+        <xs:attribute type="xs:string" name="overflowBit"/>
+        <xs:attribute type="xs:string" name="delta"/>
+        <xs:attribute type="uuid" name="id"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ProgramCounterInfoType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="programCounter"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="MachineType">
+    <xs:sequence>
+      <xs:element type="PunctCharsType" name="PunctChars" />
+      <xs:element type="FieldsType" name="Fields" />
+
+      <xs:choice maxOccurs="unbounded">
+        <xs:element type="RegisterType" name="Register" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. FileChannels ................. none ............. registers .....................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="ConditionBitType" name="ConditionBit">
+          <xs:annotation>
+            <xs:documentation>............. register arrays ............... none ............. condition bits ................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="RAMType" name="RAM">
+          <xs:annotation>
+            <xs:documentation>............. rams ..........................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="TestType" name="Test" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. set ........................... none ............. test ..........................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="IncrementType" name="Increment">
+          <xs:annotation>
+            <xs:documentation>............. increment .....................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="ArithmeticType" name="Arithmetic" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. shift ......................... none ............. logical ....................... none ............. arithmetic ....................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="TransferRtoRType" name="TransferRtoR" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. branch ........................ none ............. transferRtoR ..................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="DecodeType" name="Decode">
+          <xs:annotation>
+            <xs:documentation>............. transferRtoA .................. none ............. transferAtoR .................. none ............. decode ........................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="SetCondBitType" name="SetCondBit">
+          <xs:annotation>
+            <xs:documentation>............. set condition bit .............</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="IOType" name="IO" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. io ............................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="MemoryAccessType" name="MemoryAccess" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. memory access .................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="EndType" name="End">
+          <xs:annotation>
+            <xs:documentation>............. end ...........................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="FetchSequenceType" name="FetchSequence">
+          <xs:annotation>
+            <xs:documentation>............. comment ........................... none ............. global equs .................. none ............. fetch sequence ................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="MachineInstructionType" name="MachineInstruction" maxOccurs="unbounded" minOccurs="0">
+          <xs:annotation>
+            <xs:documentation>............. machine instructions ..........</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="HighlightingInfoType" name="HighlightingInfo">
+          <xs:annotation>
+            <xs:documentation>............. highlighting info .............</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="LoadingInfoType" name="LoadingInfo">
+          <xs:annotation>
+            <xs:documentation>............. loading info ..................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="IndexingInfoType" name="IndexingInfo">
+          <xs:annotation>
+            <xs:documentation>............. indexing info ............</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element type="ProgramCounterInfoType" name="ProgramCounterInfo">
+          <xs:annotation>
+            <xs:documentation>............. program counter info ..................</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+      </xs:choice>
+    </xs:sequence>
+
+    <xs:attribute type="xs:string" name="name"/>
+  </xs:complexType>
+  <xs:complexType name="MachineInstructionType">
+    <xs:sequence>
+      <xs:element type="MicroinstructionType" name="Microinstruction" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="name" use="required"/>
+    <xs:attribute type="xs:string" name="opcode" use="required"/>
+    <xs:attribute type="xs:string" name="instructionFormat" use="required"/>
+    <xs:attribute type="xs:string" name="assemblyFormat" use="required"/>
+    <xs:attribute type="xs:string" name="instructionColors" use="required"/>
+    <xs:attribute type="xs:string" name="assemblyColors" use="required"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="IndexingInfoType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="indexFromRight"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="DecodeType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="ir"/>
+        <xs:attribute type="xs:string" name="id"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="FetchSequenceType">
+    <xs:sequence>
+      <xs:element type="MicroinstructionType" name="Microinstruction" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="FieldsType">
+    <xs:annotation>
+      <xs:documentation>Defines all key the fields in use in a CPU</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Field" maxOccurs="unbounded" minOccurs="0">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="xs:string">
+              <xs:attribute type="xs:string" name="name" use="required"/>
+              <xs:attribute type="xs:string" name="type" use="required"/>
+              <xs:attribute type="xs:string" name="numBits" use="required"/>
+              <xs:attribute type="xs:string" name="relativity" use="required"/>
+              <xs:attribute type="xs:string" name="signed" use="required"/>
+              <xs:attribute type="xs:string" name="defaultValue" use="required"/>
+              <xs:attribute type="xs:string" name="id" use="required"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PunctCharsType">
+    <xs:annotation>
+      <xs:documentation>Defines a set key PunctChars where every element uses &lt;PunctChar /&gt;</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="PunctChar" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:restriction base="xs:string">
+              <xs:attribute type="xs:string" name="char" use="required"/>
+              <xs:attribute type="xs:string" name="use" use="required"/>
+            </xs:restriction>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Modules! -->
+  <xs:complexType name="ConditionBitType">
+    <xs:complexContent>
+      <xs:restriction base="xs:string">
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="bit"/>
+        <xs:attribute type="xs:string" name="register"/>
+        <xs:attribute type="xs:string" name="halt"/>
+        <xs:attribute type="xs:string" name="id"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="RegisterType">
+    <xs:complexContent>
+      <xs:restriction base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="width" use="required"/>
+        <xs:attribute type="xs:string" name="initialValue" use="required"/>
+        <xs:attribute type="xs:string" name="readOnly" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="RegisterArrayType">
+    <xs:complexContent>
+      <xs:restriction base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="width" use="required"/>
+        <xs:attribute type="xs:string" name="initialValue" use="required"/>
+        <xs:attribute type="xs:string" name="readOnly" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="RAMType">
+    <xs:complexContent>
+      <xs:restriction base="xs:string">
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="length"/>
+        <xs:attribute type="xs:string" name="cellSize"/>
+        <xs:attribute type="xs:string" name="id"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ModulesType">
+
+  </xs:complexType>
+
+  <!-- MicroInstructions -->
+  <xs:complexType name="TestType">
+    <xs:complexContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="uuid" name="id" use="required"/>
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="uuid" name="register" use="required"/>
+        <xs:attribute type="xs:unsignedInt" name="start" use="required"/>
+        <xs:attribute type="xs:unsignedInt" name="numBits" use="required"/>
+        <xs:attribute name="comparison" use="required">
+          <xs:restriction base="xs:string">
+            <xs:enumeration value="EQ"/>
+            <xs:enumeration value="NE"/>
+            <xs:enumeration value="LT"/>
+            <xs:enumeration value="GT"/>
+            <xs:enumeration value="LE"/>
+            <xs:enumeration value="GE"/>
+          </xs:restriction>
+        </xs:attribute>
+        <xs:attribute type="xs:long" name="value" use="required"/>
+        <xs:attribute type="xs:integer" name="omission" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="RegisterRAMPairType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="register"/>
+        <xs:attribute type="xs:string" name="ram"/>
+        <xs:attribute type="xs:string" name="dynamic"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="IOType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="direction" use="required"/>
+        <xs:attribute type="xs:string" name="type" use="required"/>
+        <xs:attribute type="xs:string" name="buffer" use="required"/>
+        <xs:attribute type="xs:string" name="connection" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ArithmeticType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="type" use="required"/>
+        <xs:attribute type="xs:string" name="source1" use="required"/>
+        <xs:attribute type="xs:string" name="source2" use="required"/>
+        <xs:attribute type="xs:string" name="destination" use="required"/>
+        <xs:attribute type="xs:string" name="overflowBit" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="LoadingInfoType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="ram"/>
+        <xs:attribute type="xs:string" name="startingAddress"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="SetCondBitType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="bit"/>
+        <xs:attribute type="xs:string" name="value"/>
+        <xs:attribute type="xs:string" name="id"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="EndType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="id"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TransferRtoRType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="source" use="required"/>
+        <xs:attribute type="xs:string" name="srcStartBit" use="required"/>
+        <xs:attribute type="xs:string" name="dest" use="required"/>
+        <xs:attribute type="xs:string" name="destStartBit" use="required"/>
+        <xs:attribute type="xs:string" name="numBits" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="MemoryAccessType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="required"/>
+        <xs:attribute type="xs:string" name="direction" use="required"/>
+        <xs:attribute type="xs:string" name="memory" use="required"/>
+        <xs:attribute type="xs:string" name="data" use="required"/>
+        <xs:attribute type="xs:string" name="address" use="required"/>
+        <xs:attribute type="xs:string" name="id" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="MicroinstructionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="microRef" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+</xs:schema>

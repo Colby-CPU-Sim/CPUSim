@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+
+<fx:root type="javafx.scene.control.TableView" id="arithmeticTable"
+         fx:id="table" editable="true" xmlns:fx="http://javafx.com/fxml">
+    <columns>
+        <TableColumn text="name" fx:id="name"/>
+        <TableColumn text="type" fx:id="type"/>
+        <TableColumn text="lhs" fx:id="lhs"/>
+        <TableColumn text="rhs" fx:id="rhs"/>
+        <TableColumn text="destination" fx:id="destination"/>
+        <TableColumn text="overflowBit" fx:id="overflowBit"/>
+        <TableColumn text="carryBit" fx:id="carryBit"/>
+    </columns>
+</fx:root>

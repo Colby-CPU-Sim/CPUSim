@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import cpusim.gui.util.DialogButtonController?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="600.0" prefWidth="600.0" styleClass="root" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+      <TabPane fx:id="modulePane" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+            <Tab fx:id="conditionBitsTab" text="Condition Bits">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </Tab>
+            <Tab fx:id="ramTab" text="RAM">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+              </content>
+            </Tab>
+          <Tab fx:id="registersTab" text="Registers">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="447.0" prefWidth="548.0" />
+            </content>
+          </Tab>
+          <Tab fx:id="registerArraysTab" text="Register Arrays">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="447.0" prefWidth="576.0" />
+            </content>
+          </Tab>
+        </tabs>
+         <BorderPane.margin>
+            <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+         </BorderPane.margin>
+      </TabPane>
+    </center>
+
+    <bottom>
+        <DialogButtonController fx:id="dialogButtonController" />
+    </bottom>
+    <stylesheets>
+        <URL value="@../css/Dialogs.css" />
+    </stylesheets>
+
+</BorderPane>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import java.net.URL?>
+
+<?import cpusim.gui.util.DialogButtonController?>
+<?import cpusim.gui.editmodules.RegistersTableController?>
+
+
+<fx:root type="BorderPane" prefHeight="500.0" prefWidth="440.0" styleClass="root"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml">
+    <top>
+        <HBox id="HBox" fx:id="hBox" alignment="CENTER" spacing="5.0">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Label text="Register Array:"/>
+            <ComboBox fx:id="arrayCombo" />
+        </HBox>
+    </top>
+    <center>
+        <RegistersTableController />
+    </center>
+    <bottom>
+        <DialogButtonController />
+    </bottom>
+    <stylesheets>
+        <URL value="@../../css/Dialogs.css"/>
+    </stylesheets>
+</fx:root>

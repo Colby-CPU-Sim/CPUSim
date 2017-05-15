@@ -1,0 +1,56 @@
+plugins {
+    id "edu.sc.seis.macAppBundle" version "2.1.6"
+}
+
+apply plugin: 'java'
+
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/0.4.0/javafx.plugin"
+
+dependencies {
+    compile 'org.reactfx:reactfx:2.0-M4'
+    compile 'org.fxmisc.undo:undofx:1.1.1'
+    compile 'org.fxmisc.richtext:richtextfx:0.6.9'
+
+    // http://search.maven.org/#artifactdetails%7Corg.controlsfx%7Ccontrolsfx%7C8.40.12%7C
+    compile 'org.controlsfx:controlsfx:8.40.12'
+
+    // http://aalmiray.github.io/ikonli/#_download
+    compile 'org.kordamp.ikonli:ikonli-javafx:1.8.0'
+    // http://aalmiray.github.io/ikonli/#_fontawesome
+    compile 'org.kordamp.ikonli:ikonli-fontawesome-pack:1.8.0'
+    
+    compile project(':cpusim.model')
+
+    testCompile project(':cpusim.test.harness')
+
+    // For CI
+    testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
+}
+
+task runMaxwell(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+
+    main = 'cpusim.Main'
+
+    // arguments to pass to the application
+    args = ['-m', '../cpusim.test.harness/src/main/resources/cpus/MaxwellComputer/Maxwell.cpu']
+}
+
+jar {
+    manifest {
+        attributes  'Implementation-Title': 'CPU Sim',
+                    'Implementation-Version': version,
+                    'Main-Class': 'cpusim.Main',
+                    'Class-Path': configurations.runtime.collect { it.getName() }.join(' ')
+    }
+}
+
+/*
+ * Allows you to run the UI tests in headless mode by calling gradle with the -Pheadless=true argument
+ */
+if (project.hasProperty('headless') ? project.headless : false) {
+    println "Running UI Tests Headless"
+    test {
+        jvmArgs = ['-Djava.awt.headless=true', '-Dtestfx.robot=glass', '-Dtestfx.headless=true', '-Dprism.order=sw', '-Dprism.text=t2k']
+    }
+}
