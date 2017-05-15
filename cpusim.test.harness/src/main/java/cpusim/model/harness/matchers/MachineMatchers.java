@@ -7,28 +7,15 @@ import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
 import cpusim.model.assembler.EQU;
 import cpusim.model.harness.matchers.microinstruction.*;
-import cpusim.model.harness.matchers.module.ConditionBitMatchers;
-import cpusim.model.harness.matchers.module.ControlUnitMatchers;
-import cpusim.model.harness.matchers.module.RAMMatchers;
-import cpusim.model.harness.matchers.module.RegisterArrayMatchers;
-import cpusim.model.harness.matchers.module.RegisterMatchers;
+import cpusim.model.harness.matchers.module.*;
 import cpusim.model.microinstruction.*;
-import cpusim.model.module.ConditionBit;
-import cpusim.model.module.ControlUnit;
-import cpusim.model.module.Module;
-import cpusim.model.module.RAM;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
+import cpusim.model.module.*;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,15 +29,23 @@ import static org.junit.Assert.fail;
 /**
  * Matchers for {@link cpusim.model.Machine} values
  */
+@SuppressWarnings({"WeakerAccess", "OptionalUsedAsFieldOrParameterType"})
 public abstract class MachineMatchers {
     
     private MachineMatchers() {
         // no instantiate
     }
-    
+
+    /**
+     * Creates a {@link Matcher} for all components of a {@link Machine}.
+     *
+     * @return Matcher
+     * @see Machine
+     */
     public static Matcher<Machine> machine(Machine expected) {
         return compose("Machine",
-                compose(indexedFromRight(expected.isIndexFromRight()))
+                compose(NamedObjectMatchers.<Machine>named(expected.getName()))
+                        .and(indexedFromRight(expected.isIndexFromRight()))
                     .and(startingAddressForLoading(expected.getStartingAddressForLoading()))
                     .and(controlUnit(expected.getControlUnit()))
                     .and(programCounter(expected.getProgramCounter()))
@@ -95,10 +90,11 @@ public abstract class MachineMatchers {
                                                     Function<Machine, Optional<T>> accessor,
                                                     BiFunction<Machine, T, Matcher<T>> matcher,
                                                     Optional<T> check) {
-        return new TypedMatcher<Machine>(Machine.class) {
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(final Machine item) {
+            public boolean matchesSafely(final Machine item) {
                 final Matcher<Machine> m;
+                //noinspection OptionalIsPresent
                 if (check.isPresent()) {
                     m = hasFeature(textDesc, accessor, OptionalMatchers.hasValue(matcher.apply(item, check.get())));
                 } else {
@@ -164,9 +160,9 @@ public abstract class MachineMatchers {
     
     /** @see Machine#equsProperty() */
     public static Matcher<Machine> equs(Collection<? extends EQU> values) {
-        return new TypedMatcher<Machine>(Machine.class) {
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(Machine item) {
+            public boolean matchesSafely(Machine item) {
                 return Matchers.containsInAnyOrder(values.stream()
                                 .map(EQUMatchers::equ)
                                 .collect(Collectors.toList()))
@@ -193,9 +189,9 @@ public abstract class MachineMatchers {
     
     /** @see Machine#fieldsProperty() */
     public static Matcher<Machine> fields(Collection<? extends Field> values) {
-        return new TypedMatcher<Machine>(Machine.class) {
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(Machine item) {
+            public boolean matchesSafely(Machine item) {
                 return Matchers.containsInAnyOrder(values.stream()
                         .map(FieldMatchers::field)
                         .collect(Collectors.toList()))
@@ -237,9 +233,9 @@ public abstract class MachineMatchers {
     private static <T extends Module<T>> Matcher<Machine> moduleMatcher(Class<T> clazz,
                                                                         BiFunction<Machine, T, Matcher<T>> matcher,
                                                                         Collection<? extends T> values) {
-        return new TypedMatcher<Machine>(Machine.class) {
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(Machine item) {
+            public boolean matchesSafely(Machine item) {
                 return Matchers.containsInAnyOrder(values.stream()
                         .map(r -> matcher.apply(item, r))
                         .collect(Collectors.toList()))
@@ -290,10 +286,10 @@ public abstract class MachineMatchers {
         Iterable<Matcher<? super Machine>> matchers = modulesMap.entrySet().stream()
                 .map(e -> modules(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
-        
-        return new TypedMatcher<Machine>(Machine.class) {
+
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(final Machine item) {
+            public boolean matchesSafely(final Machine item) {
                 return allOf(matchers).matches(item);
             }
             
@@ -309,9 +305,9 @@ public abstract class MachineMatchers {
     Matcher<Machine> microMatcher(Class<T> clazz,
                                   BiFunction<Machine, T, Matcher<T>> matcher,
                                   Collection<? extends T> values) {
-        return new TypedMatcher<Machine>(Machine.class) {
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(Machine item) {
+            public boolean matchesSafely(Machine item) {
                 return Matchers.containsInAnyOrder(values.stream()
                         .map(r -> matcher.apply(item, r))
                         .collect(Collectors.toList()))
@@ -340,7 +336,7 @@ public abstract class MachineMatchers {
     
     /** @see Machine#microsProperty() ()  */
     @SuppressWarnings("unchecked")
-    public static <T extends Microinstruction<T>> Matcher<Machine> micros(
+    public static Matcher<Machine> micros(
             Class<? extends Microinstruction<?>> clazz,
             Collection<? extends Microinstruction<?>> values) {
         // This method makes me super sad. I could not think of any way to do this while maintaining any kind of
@@ -446,10 +442,10 @@ public abstract class MachineMatchers {
         Iterable<Matcher<? super Machine>> matchers = microsMap.entrySet().stream()
                 .map(e -> micros(e.getKey(), e.getValue()))
                 .collect(Collectors.toList());
-        
-        return new TypedMatcher<Machine>(Machine.class) {
+
+        return new TypeSafeMatcher<Machine>(Machine.class) {
             @Override
-            public boolean typedMatches(final Machine item) {
+            public boolean matchesSafely(final Machine item) {
                 return allOf(matchers).matches(item);
             }
     

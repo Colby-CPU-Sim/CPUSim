@@ -25,7 +25,7 @@ public abstract class RegisterMatchers {
         return compose("Register",
                 compose(named(expected.getName()))
                     .and(ModuleMatchers.module(machine, expected))
-                    .and(SizedMatchers.properties(expected))
+                        .and(SizedMatchers.sized(expected))
                     .and(initialValue(expected.getInitialValue()))
                     .and(value(expected.getValue()))
                     .and(access(expected.getAccess())));

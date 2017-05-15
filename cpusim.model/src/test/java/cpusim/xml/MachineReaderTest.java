@@ -1,17 +1,13 @@
 package cpusim.xml;
 
-import com.google.common.collect.ImmutableMap;
 import cpusim.model.Machine;
 import cpusim.model.harness.SamplesFixture;
 import cpusim.model.module.ConditionBit;
 import cpusim.model.module.Register;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-
-import java.util.UUID;
 
 import static com.github.npathai.hamcrestopt.OptionalMatchers.isPresent;
 import static org.hamcrest.Matchers.hasSize;
@@ -251,33 +247,34 @@ public class MachineReaderTest {
         }
     }
 
-    
-    public static class URISC {
-    
-        Machine underTest;
-        
-        ImmutableMap<String, Register> expectedRegisters;
-        
-        
-        
-        @Before
-        public void setup() throws Exception {
-            underTest = SamplesFixture.URISC.load(0).orElseThrow(NullPointerException::new);
-            
-            expectedRegisters = ImmutableMap.<String, Register>builder()
-                    .put("A", new Register("A", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
-                    .put("B", new Register("B", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
-                    .put("CCR", new Register("CCR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
-                    .put("MR", new Register("MR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
-                    .put("IR", new Register("IR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
-                    .build();
-        }
-        
-    
-        public void verifyContent() {
-        
-        }
-    
-    }
+//    TODO Implement this once a URISC machine is properly built.
+//    public static class URISC {
+//
+//        Machine underTest;
+//
+//        ImmutableMap<String, Register> expectedRegisters;
+//
+//
+//
+//        @Before
+//        public void setup() throws Exception {
+//            underTest = SamplesFixture.URISC.load(0).orElseThrow(NullPointerException::new);
+//
+//            expectedRegisters = ImmutableMap.<String, Register>builder()
+//                    .put("A", new Register("A", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+//                    .put("B", new Register("B", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+//                    .put("CCR", new Register("CCR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+//                    .put("MR", new Register("MR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+//                    .put("IR", new Register("IR", UUID.randomUUID(), underTest, 8, 0, Register.Access.readWrite()))
+//                    .build();
+//        }
+//
+//
+//        @Test
+//        public void verifyContent() {
+//
+//        }
+//
+//    }
 
 }

@@ -8,6 +8,7 @@ import cpusim.model.util.units.ArchValue;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,9 +75,9 @@ public abstract class MachineInstructionMatchers {
     
     /** @see MachineInstruction#instructionFieldsProperty() */
     public static Matcher<MachineInstruction> instructionFields(Collection<? extends Field> values) {
-        return new TypedMatcher<MachineInstruction>(MachineInstruction.class) {
+        return new TypeSafeMatcher<MachineInstruction>(MachineInstruction.class) {
             @Override
-            public boolean typedMatches(MachineInstruction item) {
+            public boolean matchesSafely(MachineInstruction item) {
                 return Matchers.containsInAnyOrder(values.stream()
                         .map(FieldMatchers::field)
                         .collect(Collectors.toList()))
@@ -103,9 +104,9 @@ public abstract class MachineInstructionMatchers {
     
     /** @see MachineInstruction#assemblyFieldsProperty() */
     public static Matcher<MachineInstruction> assemblyFields(Collection<? extends Field> values) {
-        return new TypedMatcher<MachineInstruction>(MachineInstruction.class) {
+        return new TypeSafeMatcher<MachineInstruction>(MachineInstruction.class) {
             @Override
-            public boolean typedMatches(MachineInstruction item) {
+            public boolean matchesSafely(MachineInstruction item) {
                 return Matchers.containsInAnyOrder(values.stream()
                         .map(FieldMatchers::field)
                         .collect(Collectors.toList()))

@@ -18,7 +18,11 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
  * @since 2016-12-12
  */
 public abstract class CPUSimMatchers {
-    
+
+    private CPUSimMatchers() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Returns a {@link Matcher} implementation for a {@link IdentifiedObject}, checking the
      * {@link IdentifiedObject#getID()} value.

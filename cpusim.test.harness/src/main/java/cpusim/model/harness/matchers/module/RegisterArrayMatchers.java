@@ -3,12 +3,12 @@ package cpusim.model.harness.matchers.module;
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.harness.matchers.NamedObjectMatchers;
-import cpusim.model.harness.matchers.TypedMatcher;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,7 +32,7 @@ public abstract class RegisterArrayMatchers {
         return compose("RegisterArray",
                 compose(named(expected.getName()))
                     .and(ModuleMatchers.module(machine, expected))
-                    .and(SizedMatchers.properties(expected))
+                        .and(SizedMatchers.sized(expected))
                     .and(initialAccess(expected.getInitialAccess()))
                     .and(initialValue(expected.getInitialValue()))
                     .and(registers(machine, expected.getRegisters())));
@@ -66,9 +66,9 @@ public abstract class RegisterArrayMatchers {
     }
 
     public static Matcher<RegisterArray> registers(Machine machine, Collection<? extends Register> values) {
-        return new TypedMatcher<RegisterArray>(RegisterArray.class) {
+        return new TypeSafeMatcher<RegisterArray>(RegisterArray.class) {
             @Override
-            public boolean typedMatches(RegisterArray item) {
+            public boolean matchesSafely(RegisterArray item) {
                 return values.size() == item.getRegisters().size() &&
                         Matchers.containsInAnyOrder(values.stream()
                                 .map(r -> RegisterMatchers.register(machine, r))

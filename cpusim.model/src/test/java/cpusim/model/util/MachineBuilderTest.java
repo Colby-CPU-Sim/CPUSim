@@ -70,6 +70,9 @@ public class MachineBuilderTest {
         underTest = newBuilder;
     }
 
+    /**
+     * Test that with no changes, the "base" machine is built correctly
+     */
     @Test
     public void base() {
         underTest.verify(base -> {

@@ -10,10 +10,10 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  * Hamcrest matchers for {@link Field}
  */
-public abstract class NamedObjectMatchers extends TypedMatcher<NamedObject> {
+public abstract class NamedObjectMatchers {
 
     private NamedObjectMatchers() {
-        super(NamedObject.class);
+        throw new UnsupportedOperationException();
     }
 
     public static <T extends NamedObject> Matcher<T> named(String name) {

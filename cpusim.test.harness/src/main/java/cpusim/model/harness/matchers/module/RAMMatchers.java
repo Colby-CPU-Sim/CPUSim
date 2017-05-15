@@ -4,12 +4,12 @@ import com.google.common.collect.Lists;
 import cpusim.model.Field;
 import cpusim.model.Machine;
 import cpusim.model.harness.matchers.NamedObjectMatchers;
-import cpusim.model.harness.matchers.TypedMatcher;
 import cpusim.model.module.RAM;
 import cpusim.model.module.RAMLocation;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public abstract class RAMMatchers {
         return compose("RAM",
                 compose(named(expected.getName()))
                     .and(ModuleMatchers.module(machine, expected))
-                    .and(SizedMatchers.properties(expected))
+                        .and(SizedMatchers.sized(expected))
                     .and(cellMask(expected.getCellMask()))
                     .and(cellSize(expected.getCellSize()))
                     .and(data(expected.getDataIterator(0)))
@@ -60,9 +60,9 @@ public abstract class RAMMatchers {
     }
 
     public static Matcher<RAM> data(Collection<? extends RAMLocation> values) {
-        return new TypedMatcher<RAM>(RAM.class) {
+        return new TypeSafeMatcher<RAM>(RAM.class) {
             @Override
-            public boolean typedMatches(RAM item) {
+            public boolean matchesSafely(RAM item) {
                 return values.size() == item.getLength() &&
                         Matchers.contains(values.stream()
                                 .map(rl -> RAMLocationMatchers.properties(item, rl))

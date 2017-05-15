@@ -1,6 +1,5 @@
 package cpusim.model.harness.matchers;
 
-import cpusim.model.Field;
 import cpusim.model.FieldValue;
 import org.hamcrest.Matcher;
 
@@ -9,24 +8,27 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 
 /**
- * Hamcrest matchers for {@link Field}
+ * Hamcrest matchers for {@link FieldValue FieldValues}
  */
-public abstract class FieldValueMatchers extends TypedMatcher<FieldValue> {
+public abstract class FieldValueMatchers {
 
     private FieldValueMatchers() {
-        super(FieldValue.class);
+        throw new UnsupportedOperationException();
     }
 
+    /**
+     * Creates a {@link Matcher} for {@link FieldValue} parts.
+     *
+     * @return Matcher
+     * @see FieldValue
+     */
     public static Matcher<FieldValue> properties(FieldValue expected) {
         return compose("FieldValue",
-                compose(named(expected.getName()))
+                compose(NamedObjectMatchers.<FieldValue>named(expected.getName()))
                         .and(value(expected.getValue())));
     }
 
-    public static Matcher<FieldValue> named(String name) {
-        return NamedObjectMatchers.named(name);
-    }
-
+    /** @see FieldValue#valueProperty() */
     public static Matcher<FieldValue> value(long value) {
         return hasFeature("value", FieldValue::getValue, equalTo(value));
     }

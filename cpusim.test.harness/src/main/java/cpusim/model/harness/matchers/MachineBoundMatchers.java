@@ -23,6 +23,7 @@ public abstract class MachineBoundMatchers {
         // no instantiate
     }
 
+
     public static <T extends ReadOnlyMachineBound> Matcher<T> properties(T expected) {
         return compose("MachineBound",
                 compose(boundTo(sameInstance(expected.getMachine()))));

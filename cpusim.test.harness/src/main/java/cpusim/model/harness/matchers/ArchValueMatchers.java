@@ -4,6 +4,7 @@ import cpusim.model.util.units.ArchType;
 import cpusim.model.util.units.ArchValue;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 /**
  * {@link Matcher Matchers} for {@link ArchValue}
@@ -11,9 +12,9 @@ import org.hamcrest.Matcher;
 public class ArchValueMatchers {
 
     public static Matcher<ArchValue> equalTo(ArchValue value) {
-        return new TypedMatcher<ArchValue>(ArchValue.class) {
+        return new TypeSafeMatcher<ArchValue>(ArchValue.class) {
             @Override
-            public boolean typedMatches(ArchValue item) {
+            public boolean matchesSafely(ArchValue item) {
                 return value.as(ArchType.Bit) == item.as(ArchType.Bit);
             }
 

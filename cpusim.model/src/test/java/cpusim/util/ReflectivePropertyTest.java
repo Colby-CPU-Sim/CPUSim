@@ -1,6 +1,5 @@
 package cpusim.util;
 
-import cpusim.util.ReflectiveProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -11,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Created by kevin on 27/04/2017.
  */
+// TODO Replace with jfxproperties
 public class ReflectivePropertyTest {
 
     ReflectiveProperty<Foo, String> readOnly = new ReflectiveProperty<>(Foo.class, "readOnly");
