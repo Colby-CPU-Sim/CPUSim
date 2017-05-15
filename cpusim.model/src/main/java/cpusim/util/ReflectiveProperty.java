@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Reflectively finds a property by a name on a class. This is useful for different
  * property-based tasks. For example, utilization in JFX tables.
  */
+// TODO replace with jfxproperties later
 @ParametersAreNonnullByDefault
 public final class ReflectiveProperty<T, P>  {
 

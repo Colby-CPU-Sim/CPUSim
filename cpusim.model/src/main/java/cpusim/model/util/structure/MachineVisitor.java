@@ -22,7 +22,7 @@ import java.util.Optional;
  *     <li>
  *         The indexing property
  *     </li>
- * </ul></il></li>
+ * </ul>
  *
  * @see <a href="https://en.wikipedia.org/wiki/Visitor_pattern">Visitor Pattern</a>
  */
@@ -40,7 +40,7 @@ public interface MachineVisitor {
      * {@link Optional#isPresent() present}, then the traversal will not visit the children ({@link #startMicros()} is
      * still called.
      *
-     * @return
+     * @return Present value in the
      */
     Optional<MicroinstructionVisitor> getMicrosVisitor();
 
@@ -62,9 +62,10 @@ public interface MachineVisitor {
     VisitResult visitIndexFromRight(boolean indexFromRight);
 
     /**
+     * Visit the {@link Machine#startingAddressForLoadingProperty()}.
      *
-     * @param loadingAddress
-     * @return
+     * @param loadingAddress Address the {@link Machine#programCounterProperty()} loads from initially.
+     * @return State of traversal
      */
     VisitResult visitStartingAddressForLoading(int loadingAddress);
 
