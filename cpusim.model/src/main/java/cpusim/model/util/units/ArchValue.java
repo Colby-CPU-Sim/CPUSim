@@ -12,10 +12,9 @@ import javax.annotation.Generated;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.math.BigInteger;
+import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 /**
  * Consists of a wrapped integer that has width information that allows it to store and perform math related to 
@@ -83,6 +82,18 @@ public class ArchValue implements Comparable<ArchValue> {
      */
     public static ArchValue bits(final int bitValue) {
         return ArchType.Bit.of(bitValue);
+    }
+
+    /**
+     * Wraps a method that returns a value in bits to return the value as {@link ArchType#Bit}.
+     *
+     * @param getBitValue Function that returns a bit value
+     * @return Non-<code>null</code> {@link Function}
+     *
+     * @see ArchValue#bits(int)
+     */
+    public static <T> Function<T, ArchValue> wrapAsBits(final Function<T, Integer> getBitValue) {
+        return getBitValue.andThen(ArchValue::bits);
     }
     
     /**

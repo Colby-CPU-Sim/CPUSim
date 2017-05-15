@@ -3,6 +3,7 @@ package cpusim.model.microinstruction;
 import cpusim.model.Machine;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
+import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 
@@ -72,8 +73,8 @@ public class Shift extends Transfer<Register, Register, Shift> {
      */
     public Shift(Shift other){
         this(other.getName(), UUID.randomUUID(), other.getMachine(),
-                other.getSource(), other.getDest(), other.getType(),
-                other.getDirection(), other.getDistance());
+                other.getSource().orElse(null), other.getDest().orElse(null),
+                other.getType(), other.getDirection(), other.getDistance());
     }
 
     /**
@@ -139,9 +140,12 @@ public class Shift extends Transfer<Register, Register, Shift> {
     @Override
     public void validate() {
         super.validate();
+
+        Register source = Validate.getOptionalProperty(this, Shift::sourceProperty);
+        Register dest = Validate.getOptionalProperty(this, Shift::destProperty);
     
         // checks if the two registers specified in the shift microinstructions have the same width
-        if (getSource().getWidth() != getDest().getWidth()) {
+        if (source.getWidth() != dest.getWidth()) {
             throw new ValidationException("The microinstruction " + getName() +
                     " has different-sized registers designated " +
                     "for source and destination.\nBoth registers " +
@@ -229,7 +233,8 @@ public class Shift extends Transfer<Register, Register, Shift> {
     @Override
     public Shift cloneFor(IdentifierMap oldToNew) {
         return new Shift(getName(), UUID.randomUUID(), getMachine(),
-                oldToNew.get(getSource()), oldToNew.get(getDest()),
+                oldToNew.get(getSource().orElse(null)),
+                oldToNew.get(getDest().orElse(null)),
                 getType(), getDirection(), getDistance());
     }
 
@@ -250,8 +255,8 @@ public class Shift extends Transfer<Register, Register, Shift> {
     public String getXMLDescription(String indent){
         return indent + "<Shift name=\"" + getHTMLName() +
                 "\" type=\"" + getType() +
-                "\" source=\"" + getSource().getID() +
-                "\" destination=\"" + getDest().getID() +
+//                "\" source=\"" + getSource().getID() +
+//                "\" destination=\"" + getDest().getID() +
                 "\" direction=\"" + getDirection() +
                 "\" distance=\"" + getDistance() +
                 "\" id=\"" + getID() + "\" />";
@@ -263,8 +268,10 @@ public class Shift extends Transfer<Register, Register, Shift> {
      */
     @Override
     public String getHTMLDescription(String indent){
-        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" + getSource().getHTMLName() +
-                "</TD><TD>" + getDest().getHTMLName() + "</TD><TD>" + getType() +
+        return indent + "<TR><TD>" + getHTMLName() + "</TD><TD>" +
+                // getSource().getHTMLName() +
+                //"</TD><TD>" + getDest().getHTMLName() +
+                "</TD><TD>" + getType() +
                 "</TD><TD>" + getDirection() +
                 "</TD><TD>" + getDistance() + "</TD></TR>";
     }

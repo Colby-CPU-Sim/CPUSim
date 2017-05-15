@@ -20,6 +20,7 @@ import cpusim.model.util.MachineComponent;
 import javafx.beans.property.*;
 import org.fxmisc.easybind.EasyBind;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.*;
@@ -53,7 +54,8 @@ public class ControlUnit extends Module<ControlUnit> {
     public ControlUnit(String name, UUID id, Machine machine) {
         super(name, id, machine);
         microIndex = new SimpleIntegerProperty(0);
-        currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction", machine.getFetchSequence());
+        currentInstruction = new SimpleObjectProperty<>(this, "currentInstruction");
+        machine.getFetchSequence().ifPresent(currentInstruction::setValue);
 
         // When the current instruction changes, we reset the value to 0
         EasyBind.subscribe(currentInstruction, newValue -> setMicroIndex(0));
@@ -132,7 +134,8 @@ public class ControlUnit extends Module<ControlUnit> {
     public void reset()
     {
         microIndex.set(0);
-        currentInstruction.set(getMachine().getFetchSequence());
+        currentInstruction.set(getMachine().getFetchSequence()
+                .orElseThrow(() -> new IllegalStateException("Can not reset ControlUnit with no Machine#fetchSequence set.")));
     }
 
     @Override
@@ -216,6 +219,20 @@ public class ControlUnit extends Module<ControlUnit> {
         public int getIndex() { return microIndex; }
 
         public MachineInstruction getInstr() { return instr; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            State state = (State) o;
+            return microIndex == state.microIndex &&
+                    Objects.equals(getInstr(), state.getInstr());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getInstr(), microIndex);
+        }
     }
 
 }

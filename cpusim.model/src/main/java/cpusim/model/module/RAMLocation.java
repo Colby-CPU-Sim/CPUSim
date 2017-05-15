@@ -9,7 +9,7 @@
 
 package cpusim.model.module;
 
-import cpusim.util.SourceLine;
+import cpusim.model.assembler.SourceLine;
 import javafx.beans.property.*;
 
 /**
@@ -17,12 +17,12 @@ import javafx.beans.property.*;
  */
 public class RAMLocation {
 
-    private LongProperty address;
-    private LongProperty value;
-    private RAM ram;
-    private BooleanProperty breakPoint;
-    private StringProperty comment;
-    private SourceLine sourceLine;
+    private final LongProperty address;
+    private final LongProperty value;
+    private final RAM ram;
+    private final BooleanProperty breakPoint;
+    private final StringProperty comment;
+    private final ObjectProperty<SourceLine> sourceLine;
 
     /**
      * Constructor
@@ -35,12 +35,12 @@ public class RAMLocation {
      */
     public RAMLocation(int addr, long val, RAM ram, boolean breakPoint, String comment,
             SourceLine sourceLine){
-        this.address = new SimpleLongProperty(addr);
+        this.address = new SimpleLongProperty(this, "address", addr);
         this.ram = ram;
-        this.value = new SimpleLongProperty(val);
-        this.breakPoint = new SimpleBooleanProperty(breakPoint);
-        this.comment = new SimpleStringProperty(comment);
-        this.sourceLine = sourceLine;
+        this.value = new SimpleLongProperty(this, "value", val);
+        this.breakPoint = new SimpleBooleanProperty(this, "isBreakPoint", breakPoint);
+        this.comment = new SimpleStringProperty(this, "comment", comment);
+        this.sourceLine = new SimpleObjectProperty<>(this, "sourceLine", sourceLine);
     }
     
     /**
@@ -133,6 +133,10 @@ public class RAMLocation {
      * @return the source line
      */
     public SourceLine getSourceLine(){
+        return sourceLine.get();
+    }
+
+    public Property<SourceLine> sourceLineProperty() {
         return sourceLine;
     }
 
@@ -141,7 +145,7 @@ public class RAMLocation {
      * @param sourceLine the new sourceline to replace
      */
     public void setSourceLine(SourceLine sourceLine){
-        this.sourceLine = sourceLine;
+        this.sourceLine.set(sourceLine);
     }
 
     /**

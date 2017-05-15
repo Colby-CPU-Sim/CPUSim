@@ -14,12 +14,11 @@
 // the package in which our project resides
 package cpusim.model.assembler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cpusim.model.MachineInstruction;
 import cpusim.model.util.conversion.ConvertStrings;
-import cpusim.util.SourceLine;
+
+import java.util.ArrayList;
+import java.util.List;
 
 ///////////////////////////////////////////////////////////////////////////////
 // the InstructionCall class

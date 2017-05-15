@@ -68,8 +68,9 @@ public class RegisterArray extends Module<RegisterArray>
                          int initialValue, EnumSet<Register.Access> initialAccess) {
         super(name, id, machine);
 
-        this.width = new SimpleIntegerProperty(this, "width", width);  //used in setLength
-        this.initialAccess = checkNotNull(initialAccess);
+        //used in setLength
+        this.width = new SimpleIntegerProperty(this, Sized.PROPERTY_NAME_WIDTH, width);
+        this.initialAccess = checkNotNull(initialAccess, "initialAccess == null");
         this.initialValue = Math.max(0, initialValue);
 
         this.registers = new SimpleListProperty<>(this, "registers", FXCollections.observableArrayList());
@@ -144,10 +145,19 @@ public class RegisterArray extends Module<RegisterArray>
         return width.get();
     }
 
+    public int getInitialValue() {
+        return initialValue;
+    }
+
+    public EnumSet<Register.Access> getInitialAccess() {
+        return initialAccess;
+    }
+
     /**
      * Read-only property for the width.
      * @return Read-only, non-{@code null} width property.
      */
+    @Override
     public IntegerProperty widthProperty() {
         return width;
     }

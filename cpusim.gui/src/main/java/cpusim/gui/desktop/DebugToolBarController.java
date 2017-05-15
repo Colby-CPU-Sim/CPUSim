@@ -5,12 +5,13 @@
 
 package cpusim.gui.desktop;
 
-import cpusim.model.Machine;
-import cpusim.model.MachineInstruction;
 import cpusim.Mediator;
-import cpusim.model.microinstruction.Microinstruction;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.gui.util.list.StyledListCell;
+import cpusim.model.Machine;
+import cpusim.model.MachineInstruction;
+import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.module.ControlUnit;
 import cpusim.util.BackupManager;
 import cpusim.util.OutlineChangesManager;
 import javafx.application.Platform;
@@ -171,7 +172,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
     public void onBackupMachineInstrClick(ActionEvent e) {
         // Can't back up the IO GUIChannels--this is mentioned in user manual.
         backupManager.backupOneMachineInstruction();
-        machine.getControlUnit().reset();
+        machine.getControlUnit().ifPresent(ControlUnit::reset);
         machine.setState(Machine.State.EXECUTION_HALTED, false);
         updateDisplay();
         enableForwardButtons();
@@ -200,7 +201,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
     @FXML
     public void onStartOverClick(ActionEvent e) {
         backupManager.backupAllTheWay();
-        machine.getControlUnit().reset();
+        machine.getControlUnit().ifPresent(ControlUnit::reset);
         machine.resetAllChannels();
         updateDisplay();
         enableForwardButtons();
@@ -248,18 +249,20 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
      * @param outlineChanges true if the outlines of changed register and ram cells should be displayed
      */
     public void updateDisplay(boolean newToolbar, boolean outlineChanges) {
-        MachineInstruction currentInstruction = machine.getControlUnit()
-                .getCurrentInstruction();
+        ControlUnit controlUnit = machine.getControlUnit()
+                .orElseThrow(() -> new IllegalStateException("No Control Unit set"));
+
+        MachineInstruction currentInstruction = controlUnit.getCurrentInstruction();
         currentMicrosList.setItems(currentInstruction.getMicros());
         currentInstrLabel.setText(currentInstruction.getName() + ": ");
 
 
-        int index = machine.getControlUnit().getMicroIndex();
+        int index = controlUnit.getMicroIndex();
         if (index == currentMicrosList.getItems().size() - 1) {
             currentMicrosList.scrollTo(index + 1);
         }
         else if (index == 0) {
-            if (newToolbar == false) {
+            if (!newToolbar) {
                 currentMicrosList.scrollTo(-1);
             }
         }
@@ -283,7 +286,7 @@ public class DebugToolBarController extends ToolBar implements Initializable, Ch
         }
         // Can this next if stmt be commented out because the start of cycle values are already saved
         // whenever the machine state is START_OF_MACHINE_CYCLE in HighlightManager.changed()?
-        if (index == 0 && machine.getFetchSequence() == currentInstruction) {
+        if (index == 0 && machine.getFetchSequence().get() == currentInstruction) {
             desktop.getHighlightManager().saveStartOfCycleValues();
         }
         desktop.getHighlightManager().highlightCellsAndText();

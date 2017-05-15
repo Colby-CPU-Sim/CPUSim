@@ -5,7 +5,7 @@ import cpusim.gui.harness.FXRunner;
 import cpusim.model.Field;
 import cpusim.model.MachineInstruction;
 import cpusim.model.harness.BindMachine;
-import cpusim.model.harness.MachineInjectionRule;
+import cpusim.model.harness.FXMachineInjectionRule;
 import cpusim.model.harness.SamplesFixture;
 import cpusim.util.MoreIteratables;
 import javafx.beans.property.ObjectProperty;
@@ -62,7 +62,7 @@ public class FieldsLayoutPaneTest {
         protected ObservableList<Field> instructionFields;
 
         @Rule
-        public MachineInjectionRule machineProperty = new MachineInjectionRule(this,
+        public FXMachineInjectionRule machineProperty = new FXMachineInjectionRule(this,
                 SamplesFixture.MAXWELL.factory(0));
 
 
@@ -198,7 +198,7 @@ public class FieldsLayoutPaneTest {
         }
 
         /**
-         * Adding duplicate fields into an assembly used to cause this to blow-up because the control
+         * Adding duplicate instructionFields into an assembly used to cause this to blow-up because the control
          * would create duplicate labels, this should NOT be a problem.
          */
         @Test
@@ -227,7 +227,7 @@ public class FieldsLayoutPaneTest {
 
             int size = instructionFields.size();
 
-            assertEquals("Base case before dragging fields", size, getFieldLabels().size());
+            assertEquals("Base case before dragging instructionFields", size, getFieldLabels().size());
 
             interact(() ->
                     drag(list.get(0), MouseButton.PRIMARY)

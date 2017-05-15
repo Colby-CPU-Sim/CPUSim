@@ -43,20 +43,23 @@ public abstract class Module<T extends Module<T>>
                 HTMLEncodable,
                 Validatable,
                 MachineComponent,
+                MachineBound,
                 Copyable<T>
 {
     private StringProperty name;	//name of the module
     private ReadOnlyObjectProperty<UUID> id; //unique ID used when saving in XML
-    private final Machine machine; //machine that holds the module
+    private final ObjectProperty<Machine> machine; //machine that holds the module
 
     //------------------------------
     // constructor
     
     protected Module(String name, UUID id, Machine machine) {
-        this.name = new SimpleStringProperty(this, "name", checkNotNull(name));
-        this.id = new ReadOnlyObjectWrapper<>(this, "id", checkNotNull(id));
+        this.name = new SimpleStringProperty(this, "name",
+                checkNotNull(name, "name == null"));
+        this.id = new ReadOnlyObjectWrapper<>(this, "id",
+                checkNotNull(id, "id == null"));
 
-        this.machine = machine;
+        this.machine = new SimpleObjectProperty<>(this, "machine", machine);
     }
 
     @Override
@@ -70,8 +73,8 @@ public abstract class Module<T extends Module<T>>
     }
 
     @Override
-    public ReadOnlyObjectProperty<Machine> machineProperty() {
-        return new ReadOnlyObjectWrapper<>(this, "machine", checkNotNull(machine));
+    public ObjectProperty<Machine> machineProperty() {
+        return machine;
     }
 
     public String getHTMLName()

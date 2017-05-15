@@ -17,8 +17,8 @@ package cpusim.gui.util;
 import cpusim.Mediator;
 import cpusim.gui.editmachineinstruction.EditMachineInstructionController;
 import cpusim.gui.fetchsequence.EditFetchSequenceController;
-import cpusim.model.Machine;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.microinstruction.Microinstructions;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -170,7 +170,7 @@ public class DragTreeCell extends TreeCell<String> {
         treeItem = this.getTreeItem();
 
         if (treeItem != null) {
-            for (Class<? extends Microinstruction> microClass : Machine.getMicroClasses()) {
+            for (Class<? extends Microinstruction> microClass : Microinstructions.getMicroClasses()) {
                 if ((treeItem.getValue().equals(microClass.getSimpleName()) &&
                         treeItem.getParent().getValue().equals("MicroInstructions"))
                         || (treeItem.getValue().equals("MicroInstructions") &&

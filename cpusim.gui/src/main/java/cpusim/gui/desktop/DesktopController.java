@@ -240,12 +240,10 @@ import cpusim.gui.options.OptionsController;
 import cpusim.gui.preferences.PreferencesController;
 import cpusim.gui.util.FXMLLoaderFactory;
 import cpusim.model.Machine;
+import cpusim.model.assembler.SourceLine;
 import cpusim.model.assembler.Token;
 import cpusim.model.microinstruction.IO;
-import cpusim.model.module.ConditionBit;
-import cpusim.model.module.RAM;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
+import cpusim.model.module.*;
 import cpusim.util.*;
 import cpusim.xml.MachineHTMLWriter;
 import javafx.application.Platform;
@@ -1910,9 +1908,11 @@ public class DesktopController implements Initializable
      */
     private void setInDebugMode(boolean inDebug) {
         inDebugMode.set(inDebug);
+        Machine m = mediator.getMachine();
+
         if (inDebug) {
-            mediator.getMachine().getControlUnit().reset();
-            mediator.getMachine().resetAllChannels();
+            m.getControlUnit().ifPresent(ControlUnit::reset);
+            m.resetAllChannels();
 
             debugToolBarController.updateDisplay(true, false, mediator);
             //debugToolBarController = new DebugToolBarController(mediator, this);
@@ -1925,14 +1925,15 @@ public class DesktopController implements Initializable
             mainPane.getChildren().remove(1);
             debugToolBarController.clearAllOutlines();
             mediator.getBackupManager().flushBackups();
-            mediator.getMachine().getControlUnit().setMicroIndex(0);
-            mediator.getMachine().setState(Machine.State.EXECUTION_HALTED,false);
+
+            m.getControlUnit().ifPresent(cu -> cu.setMicroIndex(0));
+            m.setState(Machine.State.EXECUTION_HALTED,false);
+
             debugToolBarController.updateDisplay();
         }
         
-        mediator.getMachine().getCodeStore().ifPresent(codeStore -> {
-            codeStore.setHaltAtBreaks(inDebug);
-        });
+        m.getCodeStore().ifPresent(codeStore ->
+            codeStore.setHaltAtBreaks(inDebug));
         mediator.getBackupManager().setListening(inDebug);
         ((CheckMenuItem) (executeMenu.getItems().get(0))).setSelected(inDebug);
     }

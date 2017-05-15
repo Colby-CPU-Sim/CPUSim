@@ -31,6 +31,8 @@ import static org.mockito.Mockito.*;
 public class DragHelperTest extends ApplicationTest {
 
     private ObjectProperty<Machine> machineProperty = new SimpleObjectProperty<>(new Machine("test"));
+    private ObjectProperty<Machine> mockedMachineProperty = new SimpleObjectProperty<>(new Machine("test"));
+
     private Branch branchMicro;
     private DragHelper.HandleDragBehaviour handler;
     private Field field;
@@ -135,10 +137,12 @@ public class DragHelperTest extends ApplicationTest {
     @Before
     public void setupMock() {
         branchMicro = mock(Branch.class);
+        when(branchMicro.machineProperty()).thenReturn(mockedMachineProperty);
         when(branchMicro.getID()).thenReturn(testUUID);
         machineProperty.getValue().getMicros(Branch.class).add(branchMicro);
 
         field = mock(Field.class);
+        when(field.machineProperty()).thenReturn(mockedMachineProperty);
         when(field.getID()).thenReturn(testUUID);
 
         machineProperty.getValue().getFields().add(field);

@@ -32,11 +32,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ConditionBit extends Module<ConditionBit> {
 
+    /**
+     * the register containing the bit
+     */
     @DependantComponent
-    private final ObjectProperty<Register> register;  //the register containing the bit
-    private final IntegerProperty bit;    //the index of the bit in the register, bit = 0
-    //means the left-most or rightmost bit depending on the indexFromRight field in the machine.
-    private final BooleanProperty halt;  //should machine halt when this bit is set to 1?
+    private final ObjectProperty<Register> register;
+
+    /**
+     * the index of the bit in the register, bit = 0, means the left-most or rightmost bit depending on the
+     * indexFromRight field in the machine.
+     */
+    private final IntegerProperty bit;
+
+    /**
+     * should machine halt when this bit is set to 1?
+     */
+    private final BooleanProperty halt;
 
     private final ReadOnlySetProperty<MachineComponent> dependants;
 
@@ -213,7 +224,7 @@ public class ConditionBit extends Module<ConditionBit> {
         }
 
         int leftShift;
-        if (machineProperty().getValue().getIndexFromRight()) {
+        if (machineProperty().getValue().isIndexFromRight()) {
             leftShift = bit.get();
         }
         else {
@@ -247,7 +258,7 @@ public class ConditionBit extends Module<ConditionBit> {
         long registerValue = register.get().getValue();
 
         int leftShift;
-        if (machineProperty().getValue().getIndexFromRight()) {
+        if (machineProperty().getValue().isIndexFromRight()) {
             leftShift = 64 - bit.get() - 1;
         }
         else {

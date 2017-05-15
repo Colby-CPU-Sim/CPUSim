@@ -273,7 +273,7 @@ public class StreamChannelTest {
 		sc = new StreamChannel(inStream, outStream);
 		
 		sc.reset();
-		verify(inStream).reset();
+		verify(inStream).markSupported();
 	}
 
 }

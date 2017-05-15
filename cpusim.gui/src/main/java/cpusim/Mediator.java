@@ -81,16 +81,13 @@ package cpusim;
 
 import cpusim.gui.desktop.DesktopController;
 import cpusim.mif.MIFScanner;
+import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
-import cpusim.model.module.Module;
 import cpusim.model.assembler.AssembledInstructionCall;
 import cpusim.model.assembler.Assembler;
 import cpusim.model.assembler.AssemblyException;
-import cpusim.model.module.RAM;
-import cpusim.model.module.RAMLocation;
-import cpusim.model.module.Register;
-import cpusim.model.module.RegisterArray;
-import cpusim.model.module.RegisterRAMPair;
+import cpusim.model.assembler.SourceLine;
+import cpusim.model.module.*;
 import cpusim.model.util.Convert;
 import cpusim.model.util.MachineBound;
 import cpusim.model.util.conversion.ConvertLongs;
@@ -99,7 +96,6 @@ import cpusim.util.BackupManager;
 import cpusim.util.Dialogs;
 import cpusim.util.LoadException;
 import cpusim.util.MIFReaderException;
-import cpusim.util.SourceLine;
 import cpusim.xml.MachineReader;
 import cpusim.xml.MachineWriter;
 import javafx.beans.property.*;
@@ -599,15 +595,19 @@ public class Mediator implements MachineBound {
     //CHANGE: run() code replaced body
     public void Run() {
         // Try running
-        machine.get().getControlUnit().reset();
+        Machine m = getMachine();
+
+        m.getControlUnit()
+                .orElseThrow(() -> new ExecutionException("Control Unit not set"))
+                .reset();
 
         if (desktopController.getOtherSettings().clearConsoleOnRun) {
-            machine.get().resetAllChannels();
+            m.resetAllChannels();
         } else {
-            machine.get().resetAllChannelsButConsole();
+            m.resetAllChannelsButConsole();
         }
 
-        machine.get().execute(Machine.RunModes.RUN);
+        m.execute(Machine.RunModes.RUN);
     }
 
     /**

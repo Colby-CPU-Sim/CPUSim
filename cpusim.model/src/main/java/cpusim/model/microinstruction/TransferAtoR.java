@@ -12,6 +12,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -46,7 +48,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
                         Register dest,
                         int destStartBit,
                         int numBits,
-                        Register index,
+                        @Nullable Register index,
                         int indexStart,
                         int indexNumBits){
         super(name, id, machine, source, srcStartBit, dest, destStartBit, numBits);
@@ -64,19 +66,31 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
      */
     public TransferAtoR(TransferAtoR other) {
         this(other.getName(), UUID.randomUUID(), other.getMachine(),
-                other.getSource(), other.getSrcStartBit(),
-                other.getDest(), other.getDestStartBit(),
-                other.getNumBits(), other.getIndex(),
+                other.getSource().orElse(null), other.getSrcStartBit(),
+                other.getDest().orElse(null), other.getDestStartBit(),
+                other.getNumBits(), other.getIndex().orElse(null),
                 other.getIndexStart(), other.getIndexNumBits());
     }
 
     /**
-     * returns the name of the set microinstruction as a string.
+     * returns the index {@link Register}
      *
-     * @return the name of the set microinstruction.
+     * @return index {@link Register}, {@link Optional#empty()} if unset
      */
-    public Register getIndex(){
-        return index.get();
+    public Optional<Register> getIndex(){
+        return Optional.ofNullable(index.get());
+    }
+
+    public ObjectProperty<Register> indexProperty() {
+        return index;
+    }
+
+    public IntegerProperty indexStartProperty() {
+        return indexStart;
+    }
+
+    public IntegerProperty indexNumBitsProperty() {
+        return indexNumBits;
     }
 
     /**
@@ -128,16 +142,16 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
     @Override
     public TransferAtoR cloneFor(IdentifierMap oldToNew) {
         return new TransferAtoR(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                oldToNew.get(getSource()), getSrcStartBit(),
-                oldToNew.get(getDest()), getDestStartBit(),
+                oldToNew.get(getSource().orElse(null)), getSrcStartBit(),
+                oldToNew.get(getDest().orElse(null)), getDestStartBit(),
                 getNumBits(),
-                oldToNew.get(getIndex()), getIndexStart(), getIndexNumBits());
+                oldToNew.get(getIndex().orElse(null)), getIndexStart(), getIndexNumBits());
     }
 
     @Override
     public <U extends TransferAtoR> void copyTo(U newTransferAtoR) {
         super.copyTo(newTransferAtoR);
-        newTransferAtoR.setIndex(getIndex());
+        newTransferAtoR.setIndex(getIndex().orElse(null));
         newTransferAtoR.setIndexStart(getIndexStart());
         newTransferAtoR.setIndexNumBits(getIndexNumBits());
     }
@@ -148,7 +162,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
         //manipulate variables depending on the indexing scheme
         int indexLeftShift;
         int indexRightShift = 64 - indexNumBits.get();
-        if (!getMachine().getIndexFromRight()){
+        if (!getMachine().isIndexFromRight()){
             indexLeftShift = 64 - index.get().getWidth() + indexStart.get();            
         }
         else{
@@ -181,7 +195,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
         int srcRightShift;
         int srcLeftShift;
         int srcOffsetShift = 64 - numBits.get();
-        if(!getMachine().getIndexFromRight()){
+        if(!getMachine().isIndexFromRight()){
             destRightShift = 64 - destStartBit.get();
             destLeftShift = destStartBit.get() + numBits.get();
             srcLeftShift = srcStartBit.get();
@@ -225,16 +239,27 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
      */
     @Override
     public String getXMLDescription(String indent) {
-        return indent + "<TransferAtoR name=\"" + getHTMLName() +
-                "\" source=\"" + getSource().getID() +
-                "\" srcStartBit=\"" + getSrcStartBit() +
-                "\" dest=\"" + getDest().getID() +
-                "\" destStartBit=\"" + getDestStartBit() +
-                "\" numBits=\"" + getNumBits() +
-                "\" index=\"" + getIndex().getID() +
-                "\" indexStart=\"" + getIndexStart() +
-                "\" indexNumBits=\"" + getIndexNumBits() +
-                "\" id=\"" + getID() + "\" />";
+        final StringBuilder bld = new StringBuilder();
+        bld.append(indent)
+                .append("<TransferAtoR ");
+
+        getXMLDescriptionBase(bld);
+
+        bld.append(" index=\"");
+        getIndex().ifPresent(index -> bld.append(index.getID()));
+        bld.append("\"");
+
+        bld.append(" indexStart=\"")
+                .append(getIndexStart())
+                .append("\"");
+
+        bld.append(" indexNumBits=\"")
+                .append(getIndexNumBits())
+                .append("\"");
+
+        bld.append("/>");
+
+        return bld.toString();
     }
 
     /**
@@ -242,17 +267,14 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
      * @return the HTML description
      */
     @Override
-    public String getHTMLDescription(String indent){
-        return indent + "<TR><TD>" + getHTMLName() +
-                "</TD><TD>" + getSource().getHTMLName() +
-                "</TD><TD>" + getSrcStartBit() +
-                "</TD><TD>" + getDest().getHTMLName() +
-                "</TD><TD>" + getDestStartBit() +
-                "</TD><TD>" + getNumBits() +
-                "</TD><TD>" + getIndex().getHTMLName() +
-                "</TD><TD>" + getIndexStart() +
-                "</TD><TD>" + getIndexNumBits() +
-                "</TD></TR>";
+    public String getHTMLDescription(String indent) {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(indent);
+        getHTMLDescriptionBase(builder,
+                getHTMLIndexRegister(this::getIndex, this::getIndexStart, this::getIndexNumBits));
+
+        return builder.toString();
     }
 
     /**
@@ -278,8 +300,14 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
                     "start bits or the number of bits\nin the " +
                     "microinstruction \"" + getName() + "\".");
         }
-    
-        if (indexStart > getIndex().getWidth()) {
+
+        if (!getIndex().isPresent()) {
+            throw new ValidationException("No Index Register is set for " + getName());
+        }
+
+        Register index = getIndex().get();
+
+        if (indexStart > index.getWidth()) {
             throw new ValidationException("indexStart has an invalid value for the " +
                     "specified register in instruction " + getName() +
                     ".\nIt must be non-negative, and less than the " +
@@ -290,7 +318,7 @@ public class TransferAtoR extends Transfer<RegisterArray, Register, TransferAtoR
             throw new ValidationException("A positive number of bits must be specified " +
                     "for the index register.");
         }
-        else if (indexStart + indexNumBits > getIndex().getWidth()) {
+        else if (indexStart + indexNumBits > index.getWidth()) {
             throw new ValidationException("The number of bits specified in the index " +
                     "register is " +
                     "too large to fit in the index register.\n" +

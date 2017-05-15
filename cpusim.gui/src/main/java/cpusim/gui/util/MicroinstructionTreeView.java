@@ -2,11 +2,11 @@ package cpusim.gui.util;
 
 import com.google.common.base.Strings;
 import cpusim.model.Machine;
-import cpusim.model.util.MachineBound;
-import cpusim.model.util.ReadOnlyMachineBound;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.util.MachineBound;
+import cpusim.model.util.structure.MicroinstructionVisitor;
+import cpusim.model.util.structure.VisitResult;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,10 +18,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 /**
  * This is a UI element to display a {@link Microinstruction} tree organized by
@@ -29,6 +31,7 @@ import static com.google.common.base.Preconditions.*;
  *
  * @since 2016-12-01
  */
+@ParametersAreNonnullByDefault
 public final class MicroinstructionTreeView extends TitledPane implements MachineBound {
 
     private static final String FXML_FILE = "MicroinstructionTreeView.fxml";
@@ -143,7 +146,7 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
         final MicroinstructionTreeItem root = MicroinstructionTreeItem.forCategory("Microinstructions");
         root.setExpanded(true);
         
-        machine.getValue().visitMicros(new Machine.MicroinstructionVisitor() {
+        machine.getValue().acceptMicrosVisitor(new MicroinstructionVisitor() {
             private MicroinstructionTreeItem currentCategory;
         
             @Override
@@ -151,12 +154,12 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
                 currentCategory = MicroinstructionTreeItem.forCategory(category);
                 root.getChildren().add(currentCategory);
             
-                return VisitResult.Okay;
+                return VisitResult.Continue;
             }
         
             @Override
-            public VisitResult visitSubCategory(final String subcategory) {
-                return VisitResult.Okay;
+            public VisitResult visitType(final Class<? extends Microinstruction<?>> clazz) {
+                return VisitResult.Continue;
             }
         
             @Override
@@ -165,7 +168,7 @@ public final class MicroinstructionTreeView extends TitledPane implements Machin
                 
                 currentCategory.getChildren().add(MicroinstructionTreeItem.forLeaf(micro));
             
-                return VisitResult.Okay;
+                return VisitResult.Continue;
             }
         });
         

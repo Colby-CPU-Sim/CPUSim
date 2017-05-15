@@ -22,39 +22,41 @@ package cpusim.model.module;
 import cpusim.model.ExecutionException;
 import cpusim.model.Machine;
 import cpusim.model.assembler.AssembledInstructionCall;
+import cpusim.model.assembler.SourceLine;
 import cpusim.model.util.ValidationException;
 import cpusim.util.LoadException;
-import cpusim.util.SourceLine;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class models RAM.  All addressable units ("cells") have the same
  * number of bits, but that number can be any value from 1 to 64.
  */
-public class RAM extends Module<RAM> {
+public class RAM extends Module<RAM> implements Sized<RAM> {
 
     /** the data stored in the ram cells */
-    private ObservableList<RAMLocation> data;
+    private final ObservableList<RAMLocation> data;
     /** data value that is changed in debug mode and used for backupManager only */
-    private ListProperty<RAMLocation> changedData;
+    private final ListProperty<RAMLocation> changedData;
     /** number of bits per cell.  The first 64-cellSize bits of each data value
      * will be all 0's. That is, the value is not stored in 64-bit 2's complement. */
-    private IntegerProperty cellSize;
+    private final IntegerProperty cellSize;
     /** the number of cells in ram */
-    private ReadOnlyIntegerProperty length;
+    private final ReadOnlyIntegerProperty length;
 
     /** set to true when CPU Sim is running in debug mode */
-    private boolean haltAtBreaks;
+    private final BooleanProperty haltAtBreaks;
     /** all 0s except the rightmost cellSize bits, which are 1s. */
-    private long cellMask;
+    private final ReadOnlyLongProperty cellMask;
 
     /**
      * Constructor
@@ -73,11 +75,19 @@ public class RAM extends Module<RAM> {
         for (int i=0; i<length; i++){
             this.data.add(new RAMLocation(i, 0, this, false, "", null));
         }
-        this.haltAtBreaks = false; //can only fromRootController RAM when not in debug mode
-        cellMask = 0;
-        for (int i = 0; i < cellSize; i++) {
-            cellMask = (cellMask << 1) + 1;
-        }
+
+        //can only set in root controller RAM when not in debug mode
+        this.haltAtBreaks = new SimpleBooleanProperty(this, "haltAtBreaks", false);
+
+        LongProperty cellMaskProp = new SimpleLongProperty(this, "cellMask", 0);
+        cellMaskProp.bind(Bindings.createLongBinding(() -> {
+            long cellMask = 0;
+            for (int i = 0; i < cellSize; i++) {
+                cellMask = (cellMask << 1) + 1;
+            }
+            return cellMask;
+        }, cellSizeProperty()));
+        cellMask = cellMaskProp;
 
         IntegerProperty lengthProperty = new SimpleIntegerProperty(this, "length", length);
         lengthProperty.bind(Bindings.size(this.data));
@@ -138,20 +148,63 @@ public class RAM extends Module<RAM> {
             throw new ExecutionException("Attempted to access RAM " +
                     getName() + " at addresses " + addr + " to " +
                     (addr + numCells - 1) + " which is out of range");
-        assert numBits > 0 && numBits <= 64 :
-                "RAM.getData() was called with numBits = " + numBits;
+        
+        checkArgument(numBits > 0 && numBits <= 64 ,
+                "RAM.getData() was called with numBits = %s", numBits);
+       
         long value = 0;
-        for (int i = addr; i < addr + numCells - 1; i++)
+        for (int i = addr; i < addr + numCells - 1; i++) {
             // Is the "& cellMask" in the next line necessary?
-            value = (value << cellSize.get()) + (data.get(i).getValue() & cellMask);
+            value = (value << cellSize.get()) + (data.get(i).getValue() & getCellMask());
+        }
+        
         // now add the bits from the last cell
         int numBitsLeft = numBits % cellSize.get() == 0 ? cellSize.get() : numBits % cellSize.get();
         long tempMask = (1L << numBitsLeft) - 1;
-        value = (value << numBitsLeft) +
-                (data.get(addr + numCells - 1).getValue() & tempMask);
+        value = (value << numBitsLeft) + (data.get(addr + numCells - 1).getValue() & tempMask);
+        
         // now add sign extension
         value = value << (64 - numBits) >> (64 - numBits);
         return value;
+    }
+
+    /**
+     * Gets an iteration between [start, end)
+     * @param start first address read
+     * @param end one past the last address read
+     * @return Iterator of data through the range
+     */
+    public Iterator<RAMLocation> getDataIterator(long start, long end) {
+        checkArgument(end > start && start >= 0,
+                "Address start %s must be < end %s",
+                start, end);
+
+        return new Iterator<RAMLocation>() {
+            long address = start;
+
+            @Override
+            public boolean hasNext() {
+                return address < end;
+            }
+
+            @Override
+            public RAMLocation next() {
+                RAMLocation out = data.get((int)address);
+                address++;
+                return out;
+            }
+        };
+    }
+
+    /**
+     * Gets an iteration between [start, {@link #getLength()})
+     * @param start first address read
+     * @return Iterator of data through the range
+     *
+     * @see #getDataIterator(long, long)
+     */
+    public Iterator<RAMLocation> getDataIterator(int start) {
+        return getDataIterator(start, getLength());
     }
 
     /**
@@ -169,12 +222,14 @@ public class RAM extends Module<RAM> {
      */
     public void setData(final int addr, long value, final int numBits) {
         int numCells = (numBits + cellSize.get() - 1) / cellSize.get(); //ceil(numBits/cellSize)
-        if (addr < 0 || addr + numCells > data.size())
+        if (addr < 0 || addr + numCells > data.size()) {
             throw new ExecutionException("Attempt to access data in RAM " +
                     getName() + " at addresses " + addr + " to " +
                     (addr + numCells - 1) + " which are out of range");
-        assert numBits > 0 :
-                "RAM.setData() was called with numBits = " + numBits;
+        }
+        
+        checkArgument(numBits > 0,
+                "RAM.setData() was called with numBits = %s", numBits);
 
         //save old values of data for the purpose of backing up
         final ObservableList<RAMLocation> savedData = FXCollections.observableArrayList();
@@ -193,12 +248,12 @@ public class RAM extends Module<RAM> {
                     (tempValue << (cellSize.get() - numBits % numCells)));
             value >>= numBits % numCells;
             for (int j = numCells - 2; j >= 0; j--) {
-                data.get(addr + j).setValue(value & cellMask);
+                data.get(addr + j).setValue(value & getCellMask());
                 value >>= cellSize.get();
             }
         } else {
             for (int j = numCells - 1; j >= 0; j--) {
-                data.get(addr + j).setValue(value & cellMask);
+                data.get(addr + j).setValue(value & getCellMask());
                 value >>= cellSize.get();
             }
         }
@@ -212,7 +267,7 @@ public class RAM extends Module<RAM> {
      * @param value value of the data in long
      */
     public void setData(final int addr, long value) {
-        data.get(addr).setValue(value & cellMask);
+        data.get(addr).setValue(value & getCellMask());
     }
 
     /**
@@ -280,7 +335,9 @@ public class RAM extends Module<RAM> {
      * @return boolean value telling if it's break
      */
     public boolean breakAtAddress(int addr) {
-        return haltAtBreaks && addr >= 0 && addr < data.size() && data.get(addr).getBreak();
+        return haltAtBreaks.get() // break turned on
+                && (addr >= 0 && addr < data.size()) // in range
+                && data.get(addr).getBreak(); // is asked to be breaking
     }
 
     /**
@@ -310,25 +367,37 @@ public class RAM extends Module<RAM> {
     public void setCellSize(int newSize) {
         cellSize.set(newSize);
         
-        int newcellMask = 0;
-        for (int i = 0; i < cellSize.get(); i++) {
-        	newcellMask = (newcellMask << 1) + 1;
-        }
-        
-        cellMask = newcellMask;
-        
         // now update all the values in the data array
         for (int i = 0; i < data.size(); i++) {
-            data.get(i).setValue(data.get(i).getValue() & cellMask);
+            data.get(i).setValue(data.get(i).getValue() & getCellMask());
         }
     }
 
     public ReadOnlyIntegerProperty cellSizeProperty() {
         return cellSize;
     }
+    
+    @Override
+    public int getWidth() {
+        return getCellSize();
+    }
+
+    @Override
+    public ReadOnlyIntegerProperty widthProperty() {
+        return cellSizeProperty();
+    }
 
     public int getLength() {
         return length.get();
+    }
+
+
+    public long getCellMask() {
+        return cellMask.get();
+    }
+
+    public ReadOnlyLongProperty cellMaskProperty() {
+        return cellMask;
     }
 
     /**
@@ -400,7 +469,7 @@ public class RAM extends Module<RAM> {
                 // add instr bits to successive cells
                 long value = instrValue << instrIndex;
                 value >>>= instrLength - (cellSize.get() - cellIndex);
-                cellValue |= (value & cellMask);
+                cellValue |= (value & getCellMask());
                 setData(nextAddr, ~cellValue); // to invoke an ChangeListener
                 setData(nextAddr, cellValue);
                 instrIndex += cellSize.get() - cellIndex;
@@ -414,7 +483,7 @@ public class RAM extends Module<RAM> {
                 long value = instrValue << (64 - (instrLength - instrIndex));
                 value >>>= (64 - (instrLength - instrIndex));
                 value <<= (cellSize.get() - cellIndex) - (instrLength - instrIndex);
-                cellValue |= (value & cellMask);
+                cellValue |= (value & getCellMask());
                 cellIndex += instrLength - instrIndex;
             }
         }
@@ -473,7 +542,16 @@ public class RAM extends Module<RAM> {
      * @param b if true then halt at breaks
      */
     public void setHaltAtBreaks(boolean b) {
-        haltAtBreaks = b;
+        haltAtBreaks.set(b);
+    }
+
+
+    public boolean haltAtBreaks() {
+        return haltAtBreaks.get();
+    }
+
+    public BooleanProperty haltAtBreaksProperty() {
+        return haltAtBreaks;
     }
 
     /**

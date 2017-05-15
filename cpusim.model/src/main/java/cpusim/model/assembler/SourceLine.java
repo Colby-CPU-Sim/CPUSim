@@ -1,10 +1,10 @@
 package cpusim.model.assembler;
 
-import static com.google.common.base.Preconditions.*;
+import com.google.common.base.Strings;
 
 import java.util.Objects;
 
-import com.google.common.base.Strings;
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * stores a file name and a line number.  Used to display the currently
@@ -41,7 +41,7 @@ public class SourceLine {
     
     @Override
     public int hashCode() {
-    	return Objects.hash(Integer.valueOf(line), fileName);
+    	return Objects.hash(line, fileName);
     }
 
     @Override

@@ -8,6 +8,8 @@ import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ObservableCollectionBuilder;
 import javafx.beans.property.*;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -47,9 +49,9 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
                         UUID id,
                         Machine machine,
                         IODirection direction,
-                        RAM memory,
-                        Register data,
-                        Register address){
+                        @Nullable RAM memory,
+                        @Nullable Register data,
+                        @Nullable Register address){
         super(name, id, machine);
         this.direction = new SimpleObjectProperty<>(this, "direction", direction);
         this.memory = new SimpleObjectProperty<>(this, "memory", memory);
@@ -69,8 +71,8 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      */
     public MemoryAccess(MemoryAccess other) {
         this(other.getName(), UUID.randomUUID(), other.getMachine(),
-                other.getDirection(), other.getMemory(),
-                other.getData(), other.getAddress());
+                other.getDirection(), other.getMemory().orElse(null),
+                other.getData().orElse(null), other.getAddress().orElse(null));
     }
 
     @Override
@@ -82,8 +84,8 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public RAM getMemory(){
-        return memory.get();
+    public Optional<RAM> getMemory(){
+        return Optional.ofNullable(memory.get());
     }
 
     /**
@@ -102,8 +104,8 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public Register getData(){
-        return data.get();
+    public Optional<Register> getData(){
+        return Optional.ofNullable(data.get());
     }
 
     /**
@@ -122,8 +124,8 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public Register getAddress(){
-        return address.get();
+    public Optional<Register> getAddress(){
+        return Optional.ofNullable(address.get());
     }
 
     /**
@@ -220,9 +222,9 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
     public String getXMLDescription(String indent) {
         return indent + "<MemoryAccess name=\"" + getHTMLName() +
                 "\" direction=\"" + getDirection() +
-                "\" memory=\"" + getMemory().getID() +
-                "\" data=\"" + getData().getID() +
-                "\" address=\"" + getAddress().getID() +
+//                "\" memory=\"" + getMemory().getID() +
+//                "\" data=\"" + getData().getID() +
+//                "\" address=\"" + getAddress().getID() +
                 "\" id=\"" + getID() + "\" />";
     }
 
@@ -234,17 +236,19 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
     public String getHTMLDescription(String indent) {
         return indent + "<TR><TD>" + getHTMLName() +
                 "</TD><TD>" + getDirection() +
-                "</TD><TD>" + getMemory().getHTMLName() +
-                "</TD><TD>" + getData().getHTMLName() +
-                "</TD><TD>" + getAddress().getHTMLName() +
+//                "</TD><TD>" + getMemory().getHTMLName() +
+//                "</TD><TD>" + getData().getHTMLName() +
+//                "</TD><TD>" + getAddress().getHTMLName() +
                 "</TD></TR>";
     }
 
     @Override
     public MemoryAccess cloneFor(IdentifierMap oldToNew) {
         return new MemoryAccess(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                getDirection(), oldToNew.get(getMemory()),
-                oldToNew.get(getData()), oldToNew.get(getAddress()));
+                getDirection(),
+                oldToNew.get(getMemory().orElse(null)),
+                oldToNew.get(getData().orElse(null)),
+                oldToNew.get(getAddress().orElse(null)));
     }
 
     @Override
@@ -253,9 +257,9 @@ public class MemoryAccess extends Microinstruction<MemoryAccess> {
 
         other.setName(getName());
         other.setDirection(getDirection());
-        other.setMemory(getMemory());
-        other.setData(getData());
-        other.setAddress(getAddress());
+        other.setMemory(getMemory().orElse(null));
+        other.setData(getData().orElse(null));
+        other.setAddress(getAddress().orElse(null));
     }
 
     /**

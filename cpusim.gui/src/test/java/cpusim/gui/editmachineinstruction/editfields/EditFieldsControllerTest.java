@@ -9,8 +9,8 @@ import cpusim.model.Field;
 import cpusim.model.FieldValue;
 import cpusim.model.Machine;
 import cpusim.model.harness.BindMachine;
-import cpusim.model.harness.CPUSimMatchers;
-import cpusim.model.harness.MachineInjectionRule;
+import cpusim.model.harness.FXMachineInjectionRule;
+import cpusim.model.harness.matchers.CPUSimMatchers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -52,7 +52,7 @@ public class EditFieldsControllerTest extends FXHarness {
     private EditFieldsController underTest;
     
     @Rule
-    public MachineInjectionRule machineProperty = new MachineInjectionRule(this);
+    public FXMachineInjectionRule machineProperty = new FXMachineInjectionRule(this);
 
     @Before
     public void setupFields() {

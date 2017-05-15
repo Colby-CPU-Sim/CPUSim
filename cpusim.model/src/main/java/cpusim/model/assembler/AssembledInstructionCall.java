@@ -14,8 +14,6 @@
 
 package cpusim.model.assembler;
 
-import cpusim.util.SourceLine;
-
 public class AssembledInstructionCall
 {
     private int numBits;        //total size of instruction call

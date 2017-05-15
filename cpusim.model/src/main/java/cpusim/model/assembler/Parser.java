@@ -24,7 +24,6 @@ import cpusim.model.assembler.AssemblyException.NameSpaceError;
 import cpusim.model.assembler.AssemblyException.SyntaxError;
 import cpusim.model.assembler.AssemblyException.TypeError;
 import cpusim.model.assembler.AssemblyException.UndefinedOperandError;
-import cpusim.util.SourceLine;
 
 import java.util.ArrayList;
 import java.util.HashMap;

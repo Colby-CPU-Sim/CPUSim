@@ -1,12 +1,14 @@
 package cpusim.model.microinstruction;
 
 import cpusim.model.Machine;
-import cpusim.model.module.Module;
 import cpusim.model.module.ConditionBit;
+import cpusim.model.module.Module;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.MachineComponent;
 import javafx.beans.property.*;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,7 +36,7 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      * @param bit set the conditional bit.
      * @param value size of the relative jump.
      */
-    public SetCondBit(String name, UUID id, Machine machine, ConditionBit bit, boolean value){
+    public SetCondBit(String name, UUID id, Machine machine, @Nullable ConditionBit bit, boolean value){
         super(name, id, machine);
         this.value = new SimpleBooleanProperty(this, "value", value);
         this.bit = new SimpleObjectProperty<>(this, "bit", bit);
@@ -52,16 +54,17 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      * @param bit set the conditional bit.
      * @param value size of the relative jump.
      */
-    public SetCondBit(String name, Machine machine, ConditionBit bit, boolean value){
+    public SetCondBit(String name, Machine machine, @Nullable ConditionBit bit, boolean value){
         this(name, IdentifiedObject.generateRandomID(), machine, bit, value);
     }
     
     /**
      * Copy constructor
-     * @param other
+     * @param other to copy
      */
     public SetCondBit(SetCondBit other) {
-        this(other.getName(), other.getMachine(), other.getBit(), other.getValue());
+        this(other.getName(), other.getMachine(),
+                other.getBit().orElse(null), other.getValue());
     }
 
     @Override
@@ -74,8 +77,8 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      *
      * @return the integer value of the field.
      */
-    public ConditionBit getBit(){
-        return bit.get();
+    public Optional<ConditionBit> getBit() {
+        return Optional.ofNullable(bit.get());
     }
 
     /**
@@ -85,6 +88,10 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      */
     public void setBit(ConditionBit newBit){
         bit.set(newBit);
+    }
+
+    public ObjectProperty<ConditionBit> bitProperty() {
+        return bit;
     }
 
     /**
@@ -103,6 +110,10 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      */
     public void setValue(boolean newValue){
         value.set(newValue);
+    }
+
+    public BooleanProperty valueProperty() {
+        return value;
     }
 
     /**
@@ -129,8 +140,9 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      */
     @Override
     public String getXMLDescription(String indent) {
+        // FIXME PROPERTY-BASED-XML
         return indent + "<SetCondBit name=\"" + getHTMLName() +
-                "\" bit=\"" + getBit().getID() +
+//                "\" bit=\"" + getBit().getID() +
                 "\" value=\"" + (getValue() ? 1 : 0) +
                 "\" id=\"" + getID() + "\" />";
     }
@@ -141,8 +153,9 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
      */
     @Override
     public String getHTMLDescription(String indent){
+        // FIXME PROPERTY-BASED-XML
         return indent + "<TR><TD>" + getHTMLName() +
-                "</TD><TD>" + getBit().getHTMLName() +
+//                "</TD><TD>" + getBit().getHTMLName() +
                 "</TD><TD>" + (getValue() ? 1 : 0) +
                 "</TD></TR>";
     }
@@ -150,7 +163,7 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
     @Override
     public SetCondBit cloneFor(IdentifierMap oldToNew) {
         return new SetCondBit(getName(), UUID.randomUUID(), oldToNew.getNewMachine(),
-                oldToNew.get(getBit()), getValue());
+                oldToNew.get(getBit().orElse(null)), getValue());
     }
 
     @Override
@@ -159,7 +172,7 @@ public class SetCondBit extends Microinstruction<SetCondBit> {
 
         other.setName(getName());
         other.setValue(getValue());
-        other.setBit(getBit());
+        other.setBit(getBit().orElse(null));
     }
 
     /**

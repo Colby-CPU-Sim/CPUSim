@@ -5,6 +5,7 @@ import cpusim.util.ClassCleaner;
 import cpusim.util.MoreFXCollections;
 import javafx.beans.property.*;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -215,10 +216,8 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
     void copyListProperty(MachineComponent.IdentifierMap oldToNew,
                           Base original, Base newValue,
                           Function<? super Base, ListProperty<T>> accessor) {
-        checkNotNull(oldToNew);
-        checkNotNull(original);
-        checkNotNull(newValue);
-        checkNotNull(accessor);
+        checkNotNull(oldToNew, "IdentifierMap == null");
+        checkNotNull(accessor, "accessor function is null");
 
         ReadOnlyListProperty<T> from = accessor.apply(original);
         ListProperty<T> to = accessor.apply(newValue);
@@ -256,8 +255,10 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
          * @param oldValue Value to clone.
          * @return Newly cloned value or value from cache.
          */
-        private MachineComponent unsafeClone(MachineComponent oldValue) {
-            checkNotNull(oldValue);
+        private MachineComponent unsafeClone(@Nullable MachineComponent oldValue) {
+            if (oldValue == null) {
+                return oldValue;
+            }
 
             final UUID oldId = oldValue.getID();
 
@@ -272,11 +273,11 @@ public interface MachineComponent extends ReadOnlyMachineBound, IdentifiedObject
             }
         }
 
-        public MachineComponent clone(final MachineComponent instance) {
+        public MachineComponent clone(@Nullable MachineComponent instance) {
             return unsafeClone(instance);
         }
 
-        public <T extends MachineComponent> T get(final T oldValue) {
+        public <T extends MachineComponent> T get(@Nullable final T oldValue) {
             @SuppressWarnings("unchecked") // UUIDs are unique, this cast will be fine
             final T toReturn = (T)clone(oldValue);
 

@@ -6,9 +6,12 @@ import cpusim.model.module.Module;
 import cpusim.model.module.Register;
 import cpusim.model.util.MachineComponent;
 import cpusim.model.util.ObservableCollectionBuilder;
+import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
 import javafx.beans.property.*;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Common {@link Microinstruction} between {@link Arithmetic} and {@link Logical}
  * @since 2016-12-07
  */
+@ParametersAreNonnullByDefault
 public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperation<T>>
         extends Microinstruction<T> {
 
@@ -68,7 +72,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         this.rhs = new SimpleObjectProperty<>(this, "rhs", rhs);
 
         this.carryBit = new SimpleObjectProperty<>(this, "carryBit", carryBit);
-        this.negativeBit = new SimpleObjectProperty<>(this, "carryBit", negativeBit);
+        this.negativeBit = new SimpleObjectProperty<>(this, "negativeBit", negativeBit);
         this.overflowBit = new SimpleObjectProperty<>(this, "overflowBit", overflowBit);
         this.zeroBit = new SimpleObjectProperty<>(this, "zeroBit", zeroBit);
 
@@ -120,16 +124,16 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public Register getLhs(){
-        return lhs.get();
+    public Optional<Register> getLhs(){
+        return Optional.ofNullable(lhs.get());
     }
 
     /**
      * updates the register used by the microinstruction.
-     * @param newSource1 the new source register for the logical microinstruction.
+     * @param lhs the new source register for the logical microinstruction.
      */
-    public void setLhs(Register newSource1){
-        lhs.set(newSource1);
+    public void setLhs(@Nullable Register lhs){
+        this.lhs.set(lhs);
     }
 
     public ObjectProperty<Register> lhsProperty() {
@@ -140,16 +144,16 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
      * returns the register to be calculated.
      * @return the name of the register.
      */
-    public Register getRhs(){
-        return rhs.get();
+    public Optional<Register> getRhs(){
+        return Optional.ofNullable(rhs.get());
     }
 
     /**
      * updates the register used by the microinstruction.
-     * @param newSource2 the new source register for the logical microinstruction.
+     * @param rhs the new source register for the logical microinstruction.
      */
-    public void setRhs(Register newSource2){
-        rhs.set(newSource2);
+    public void setRhs(@Nullable Register rhs){
+        this.rhs.set(rhs);
     }
 
 
@@ -161,15 +165,15 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
      * returns the register to put result.
      * @return the name of the register.
      */
-    public Register getDestination(){
-        return destination.get();
+    public Optional<Register> getDestination(){
+        return Optional.ofNullable(destination.get());
     }
 
     /**
      * updates the register used by the microinstruction.
      * @param newDestination the new destination for the logical microinstruction.
      */
-    public void setDestination(Register newDestination){
+    public void setDestination(@Nullable Register newDestination){
         destination.set(newDestination);
     }
 
@@ -199,7 +203,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         return carryBit;
     }
 
-    public void setCarryBit(ConditionBit carryBit) {
+    public void setCarryBit(@Nullable ConditionBit carryBit) {
         this.carryBit.set(carryBit);
     }
 
@@ -211,7 +215,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         return negativeBit;
     }
 
-    public void setNegativeBit(ConditionBit negativeBit) {
+    public void setNegativeBit(@Nullable ConditionBit negativeBit) {
         this.negativeBit.set(negativeBit);
     }
 
@@ -223,7 +227,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         return overflowBit;
     }
 
-    public void setOverflowBit(ConditionBit overflowBit) {
+    public void setOverflowBit(@Nullable ConditionBit overflowBit) {
         this.overflowBit.set(overflowBit);
     }
 
@@ -235,7 +239,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         return zeroBit;
     }
 
-    public void setZeroBit(ConditionBit zeroBit) {
+    public void setZeroBit(@Nullable ConditionBit zeroBit) {
         this.zeroBit.set(zeroBit);
     }
 
@@ -245,8 +249,8 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
      */
     @Override
     public void execute() {
-        BigInteger lhs = BigInteger.valueOf(getLhs().getValue());
-        BigInteger rhs = BigInteger.valueOf(getRhs().getValue());
+        BigInteger lhs = BigInteger.valueOf(this.lhs.get().getValue());
+        BigInteger rhs = BigInteger.valueOf(this.rhs.get().getValue());
         BigInteger result = operation.get().apply(lhs, rhs);
 
         // Handle the any set condition bits:
@@ -273,7 +277,7 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
             }
         });
 
-        getDestination().setValue(result.longValue());
+        this.destination.get().setValue(result.longValue());
     }
 
     /**
@@ -294,8 +298,12 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
         // get width of the lhs, rhs, and destination
         // registers, if they are different, then the validity
         // test fails
-        if (!(getLhs().getWidth() == getRhs().getWidth() &&
-                getRhs().getWidth() == getDestination().getWidth())) {
+        Register lhs = Validate.getOptionalProperty(this, ArithmeticLogicOperation::lhsProperty);
+        Register rhs = Validate.getOptionalProperty(this, ArithmeticLogicOperation::rhsProperty);
+        Register dest = Validate.getOptionalProperty(this, ArithmeticLogicOperation::destinationProperty);
+
+        if (!(lhs.getWidth() == rhs.getWidth() &&
+                rhs.getWidth() == dest.getWidth())) {
             throw new ValidationException("At least one of the registers in the " +
                     "microinstruction \"" + getName() +
                     "\" has\na bit width that is different than one " +
@@ -310,9 +318,9 @@ public abstract class ArithmeticLogicOperation<T extends ArithmeticLogicOperatio
 
         other.setName(getName());
 
-        other.setDestination(getDestination());
-        other.setLhs(getLhs());
-        other.setRhs(getRhs());
+        other.setDestination(getDestination().orElse(null));
+        other.setLhs(getLhs().orElse(null));
+        other.setRhs(getRhs().orElse(null));
 
         other.setOperation(getOperation());
 

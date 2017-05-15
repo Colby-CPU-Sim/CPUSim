@@ -22,9 +22,9 @@ package cpusim.gui.fetchsequence;
 
 import cpusim.Mediator;
 import cpusim.gui.util.DragTreeCell;
-import cpusim.model.Machine;
 import cpusim.model.microinstruction.Comment;
 import cpusim.model.microinstruction.Microinstruction;
+import cpusim.model.microinstruction.Microinstructions;
 import cpusim.model.util.IdentifiedObject;
 import cpusim.model.util.Validate;
 import cpusim.model.util.ValidationException;
@@ -85,9 +85,7 @@ public class EditFetchSequenceController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         
         micros = FXCollections.observableArrayList();
-        for (Microinstruction micro : mediator.getMachine().getFetchSequence().getMicros()){
-            micros.add(micro);
-        }
+        micros.addAll(mediator.getMachine().getFetchSequence().get().getMicros());
         
         setUpMicroTableView();
         
@@ -120,7 +118,7 @@ public class EditFetchSequenceController implements Initializable {
             String className = db.getString().split(",")[1];
             Microinstruction micro = null;
 
-            Outer: for (Class<? extends Microinstruction<?>> mc : Machine.getMicroClasses()) {
+            Outer: for (Class<? extends Microinstruction<?>> mc : Microinstructions.getMicroClasses()) {
                 if (mc.getSimpleName().toLowerCase().equals(className)) {
                     // intelliJ says the following is an error, I have no idea why.
                     for (Microinstruction<?> instr : mediator.getMachine().getMicrosUnchecked(mc)) {
@@ -154,7 +152,7 @@ public class EditFetchSequenceController implements Initializable {
             if (commentEditor != null){
                 commitCommentEdit();
             }
-            mediator.getMachine().getFetchSequence().setMicros(micros);
+            mediator.getMachine().getFetchSequence().get().setMicros(micros);
             mediator.setMachineDirty(true);
             ((Stage)implementationFormatPane.getScene().getWindow()).close();
         }
@@ -282,7 +280,7 @@ public class EditFetchSequenceController implements Initializable {
 
         rootNode.setExpanded(true);
 
-        for(Class<? extends Microinstruction<?>> microClass : Machine.getMicroClasses()){
+        for(Class<? extends Microinstruction<?>> microClass : Microinstructions.getMicroClasses()){
             TreeItem<String> classNode = new TreeItem<>(microClass.getSimpleName());
             for (Microinstruction<?> micro : mediator.getMachine().getMicrosUnchecked(microClass)){
                 final TreeItem<String> microNode = new TreeItem<>(micro.getName());

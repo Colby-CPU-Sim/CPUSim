@@ -5,6 +5,7 @@ import cpusim.gui.util.table.EditingNonNegativeIntCell;
 import cpusim.gui.util.table.MachineObjectCellFactories;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
+import cpusim.model.util.Validate;
 import javafx.beans.property.BooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableCell;
@@ -119,7 +120,9 @@ class TransferRtoRTableController extends MicroinstructionTableController<Transf
         // convert the array to an array of TransferRtoRs
 
         for (TransferRtoR micro: getItems()) {
-            Register.validateIsNotReadOnly(micro.getDest(), micro.getName());
+            Register register = Validate.getOptionalProperty(micro, TransferRtoR::destProperty);
+            
+            Register.validateIsNotReadOnly(register, micro.getName());
         }
     }
 

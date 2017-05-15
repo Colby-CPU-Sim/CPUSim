@@ -35,7 +35,6 @@ import cpusim.model.MachineInstruction;
 import cpusim.model.assembler.EQU;
 import cpusim.model.assembler.PunctChar;
 import cpusim.model.iochannel.FileChannel;
-import cpusim.model.iochannel.IOChannel;
 import cpusim.model.microinstruction.IO;
 import cpusim.model.module.RegisterRAMPair;
 import javafx.collections.ObservableList;
@@ -242,9 +241,11 @@ public class MachineWriter {
         out.println("\t<!--............. FileChannels .................-->");
         ObservableList<IO> ios = machine.getMicros(IO.class);
         for (IO io : ios) {
-            IOChannel channel = io.getConnection();
-            if (channel instanceof FileChannel)
+            io.getConnection().ifPresent(channel -> {
+                if (channel instanceof FileChannel) {
                     fileChannelSet.add((FileChannel) channel);
+                }
+            });
         }
         if (fileChannelSet.size() == 0)
             out.println("\t<!-- none -->");
@@ -298,11 +299,12 @@ public class MachineWriter {
         out.println();
         out.println("\t<!--............. fetch sequence ................-->");
         out.println("\t<FetchSequence>");
-        MachineInstruction fetchSequence = machine.getFetchSequence();
-        for (int i = 0; i < fetchSequence.getMicros().size(); i++) {
-            out.println("\t\t<Microinstruction microRef=\"" +
-                    fetchSequence.getMicros().get(i).getID() + "\" />");
-        }
+        machine.getFetchSequence().ifPresent(fetchSequence -> {
+            for (int i = 0; i < fetchSequence.getMicros().size(); i++) {
+                out.println("\t\t<Microinstruction microRef=\"" +
+                        fetchSequence.getMicros().get(i).getID() + "\" />");
+            }
+        });
         out.println("\t</FetchSequence>");
 
         //print the machine instructions
@@ -340,7 +342,7 @@ public class MachineWriter {
         out.println();
         out.println("\t<!--............. indexing info ............-->");
         out.println("\t<IndexingInfo indexFromRight=\"" +
-                    machine.getIndexFromRight() +
+                    machine.isIndexFromRight() +
                     "\" />");
 
         //print the program counter info
