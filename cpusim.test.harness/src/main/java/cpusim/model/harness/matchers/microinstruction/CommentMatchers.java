@@ -13,9 +13,15 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 public abstract class CommentMatchers {
 
     private CommentMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
 
+    /**
+     * Creates a {@link Matcher} for a {@link Comment} micro.
+     *
+     * @return Matcher
+     * @see Comment
+     */
     public static Matcher<Comment> comment(Machine machine, Comment expected) {
         return compose("Comment", microinstruction(machine, expected));
     }

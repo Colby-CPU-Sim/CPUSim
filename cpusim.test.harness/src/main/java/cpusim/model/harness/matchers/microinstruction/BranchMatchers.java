@@ -17,10 +17,11 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  * {@link Matcher Matchers} for the {@link Branch} {@link cpusim.model.microinstruction.Microinstruction}
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class BranchMatchers {
 
     private BranchMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**

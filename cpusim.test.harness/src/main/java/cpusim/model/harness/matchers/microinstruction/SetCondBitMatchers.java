@@ -17,12 +17,19 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  * {@link Matcher Matchers} for {@link SetCondBit}.
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class SetCondBitMatchers {
 
     private SetCondBitMatchers() {
         // no instantiation
     }
 
+    /**
+     * Creates a {@link Matcher} for a {@link SetCondBit} micro.
+     *
+     * @return Matcher
+     * @see SetCondBit
+     */
     public static Matcher<SetCondBit> setCondBit(Machine machine, SetCondBit expected) {
         return compose("Set Condition Bit",
                 microinstruction(machine, expected))
@@ -44,10 +51,7 @@ public abstract class SetCondBitMatchers {
                 machine, bit);
     }
 
-
-    /**
-     * @see SetCondBit#valueProperty()
-     */
+    /** @see SetCondBit#valueProperty() */
     public static Matcher<SetCondBit> value(boolean value) {
         return hasFeature("value",
                 SetCondBit::getValue,

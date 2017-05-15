@@ -23,7 +23,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 public abstract class MemoryAccessMatchers {
 
     private MemoryAccessMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**

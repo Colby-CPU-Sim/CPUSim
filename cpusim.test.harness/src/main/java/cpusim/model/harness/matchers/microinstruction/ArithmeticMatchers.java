@@ -17,6 +17,12 @@ public abstract class ArithmeticMatchers extends ArithmeticLogicOperationMatcher
         // no instantiation
     }
 
+    /**
+     * Creates a {@link Matcher} for a {@link Arithmetic} micro.
+     *
+     * @return Matcher
+     * @see Arithmetic
+     */
     public static Matcher<Arithmetic> arithmetic(Machine machine, Arithmetic expected) {
         return compose("Arithmetic",
                 arithmeticLogicOperation(machine, expected))

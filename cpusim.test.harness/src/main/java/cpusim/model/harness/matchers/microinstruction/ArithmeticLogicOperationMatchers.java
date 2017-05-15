@@ -20,12 +20,20 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  *  Base {@link Matcher Matchers} for {@link ArithmeticLogicOperation}s
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 abstract class ArithmeticLogicOperationMatchers {
 
     ArithmeticLogicOperationMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
 
+    /**
+     * Creates a {@link Matcher} for the base properties of an {@link ArithmeticLogicOperation}
+     * instruction.
+     *
+     * @return Matcher
+     * @see ArithmeticLogicOperation
+     */
     static <T extends ArithmeticLogicOperation<T>>
     ConjunctionMatcher<T> arithmeticLogicOperation(Machine machine, T expected) {
         return microinstruction(machine, expected)
@@ -70,10 +78,7 @@ abstract class ArithmeticLogicOperationMatchers {
                 destination);
     }
 
-
-    /**
-     * @see ArithmeticLogicOperation#lhsProperty()
-     */
+    /** @see ArithmeticLogicOperation#lhsProperty() */
     public static <T extends ArithmeticLogicOperation<T>>
     Matcher<T> lhs(Machine machine, Register lhs) {
         return lhs(machine, Optional.ofNullable(lhs));

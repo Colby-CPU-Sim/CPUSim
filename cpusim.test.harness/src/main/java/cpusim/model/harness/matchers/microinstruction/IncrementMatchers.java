@@ -23,7 +23,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 public abstract class IncrementMatchers {
 
     private IncrementMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**

@@ -19,6 +19,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  *  Matchers for {@link Microinstruction Microinstructions}
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class TransferAtoRMatchers extends TransferMatchers<RegisterArray, Register, TransferAtoR> {
 
     private TransferAtoRMatchers() {
@@ -33,7 +34,7 @@ public abstract class TransferAtoRMatchers extends TransferMatchers<RegisterArra
      */
     public static Matcher<TransferAtoR> transferAtoR(Machine machine, TransferAtoR expected) {
         return compose("Transfer Array -> Register",
-                    INTERNAL.baseProps(machine, expected)
+                    INTERNAL.transfer(machine, expected)
                         .and(source(machine, expected.getSource()))
                         .and(destination(machine, expected.getDest()))
                         .and(index(machine, expected.getIndex()))
@@ -54,6 +55,26 @@ public abstract class TransferAtoRMatchers extends TransferMatchers<RegisterArra
      */
     public static Matcher<TransferAtoR> source(Machine machine, RegisterArray source) {
         return INTERNAL.module(PROPERTY_SOURCE, TransferAtoR::getSource, machine, source);
+    }
+
+    /** @see Transfer#srcStartBitProperty() */
+    public static Matcher<TransferAtoR> sourceStartBit(int bit) {
+        return INTERNAL.h_sourceStartBit(bit);
+    }
+
+    /** @see Transfer#destStartBitProperty() */
+    public static Matcher<TransferAtoR> destStartBit(int bit) {
+        return INTERNAL.h_destStartBit(bit);
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferAtoR> numberOfBits(int size) {
+        return INTERNAL.h_numberOfBits(ArchValue.bits(size));
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferAtoR> numberOfBits(ArchValue size) {
+        return INTERNAL.h_numberOfBits(size);
     }
 
     /**

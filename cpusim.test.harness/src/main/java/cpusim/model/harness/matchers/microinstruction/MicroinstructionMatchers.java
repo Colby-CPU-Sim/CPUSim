@@ -18,17 +18,23 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 public abstract class MicroinstructionMatchers {
     
     MicroinstructionMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
 
-    
-    static <T extends Microinstruction<T>>
+    /**
+     * Creates a {@link Matcher} for the base {@link Microinstruction}.
+     *
+     * @return Matcher
+     * @see Microinstruction
+     */
+    public static <T extends Microinstruction<T>>
     ConjunctionMatcher<T> microinstruction(Machine machine, T expected) {
         return compose(NamedObjectMatchers.<T>named(expected.getName()))
                     .and(cycles(expected.getCycleCount()))
                     .and(boundTo(sameInstance(machine)));
     }
 
+    /** @see Microinstruction#cycleCountProperty() */
     public static <T extends Microinstruction<T>> Matcher<T> cycles(int count) {
         return hasFeature("cycle count", Microinstruction::getCycleCount, is(count));
     }

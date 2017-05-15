@@ -20,6 +20,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  * {@link Matcher Matchers} for {@link SetBits}.
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public abstract class SetBitsMatchers {
 
     private SetBitsMatchers() {

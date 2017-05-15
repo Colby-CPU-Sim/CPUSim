@@ -4,7 +4,6 @@ import cpusim.model.Machine;
 import cpusim.model.harness.matchers.ArchValueMatchers;
 import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.Transfer;
-import cpusim.model.microinstruction.TransferAtoR;
 import cpusim.model.microinstruction.TransferRtoA;
 import cpusim.model.module.Register;
 import cpusim.model.module.RegisterArray;
@@ -20,6 +19,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  *  Matchers for {@link Microinstruction Microinstructions}
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class TransferRtoAMatchers extends TransferMatchers<Register, RegisterArray, TransferRtoA> {
 
     private TransferRtoAMatchers() {
@@ -34,7 +34,7 @@ public abstract class TransferRtoAMatchers extends TransferMatchers<Register, Re
      */
     public static Matcher<TransferRtoA> transferRtoA(Machine machine, TransferRtoA expected) {
         return compose("Transfer Register -> Array",
-                    INTERNAL.baseProps(machine, expected)
+                    INTERNAL.transfer(machine, expected)
                         .and(source(machine, expected.getSource()))
                         .and(destination(machine, expected.getDest()))
                         .and(index(machine, expected.getIndex()))
@@ -71,9 +71,29 @@ public abstract class TransferRtoAMatchers extends TransferMatchers<Register, Re
         return INTERNAL.module(PROPERTY_DESTINATION, TransferRtoA::getDest, machine, destination);
     }
 
+    /** @see Transfer#srcStartBitProperty() */
+    public static Matcher<TransferRtoA> sourceStartBit(int bit) {
+        return INTERNAL.h_sourceStartBit(bit);
+    }
+
+    /** @see Transfer#destStartBitProperty() */
+    public static Matcher<TransferRtoA> destStartBit(int bit) {
+        return INTERNAL.h_destStartBit(bit);
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferRtoA> numberOfBits(int size) {
+        return INTERNAL.h_numberOfBits(ArchValue.bits(size));
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferRtoA> numberOfBits(ArchValue size) {
+        return INTERNAL.h_numberOfBits(size);
+    }
+
 
     /**
-     * @see TransferAtoR#indexProperty()
+     * @see TransferRtoA#indexProperty()
      */
     public static Matcher<TransferRtoA> index(Machine machine, Register index) {
         return INTERNAL.module("index", TransferRtoA::getIndex, machine, index);

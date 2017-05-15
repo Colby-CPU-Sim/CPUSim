@@ -24,7 +24,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 public abstract class IOMatchers {
 
     private IOMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**

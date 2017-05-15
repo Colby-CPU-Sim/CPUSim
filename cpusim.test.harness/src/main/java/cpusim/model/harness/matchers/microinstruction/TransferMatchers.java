@@ -25,7 +25,8 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 
 /**
- * {@link org.hamcrest.Matcher Matchers} for {@link cpusim.model.microinstruction.Transfer}s.
+ * {@link Matcher Matchers} for {@link Transfer}s. This class provides utilities
+ * for the other sub-classes to use easily.
  */
 abstract class TransferMatchers<From extends Module<From> & Sized<From>,
                                 To extends Module<To> & Sized<To>,
@@ -58,30 +59,41 @@ abstract class TransferMatchers<From extends Module<From> & Sized<From>,
     static final String PROPERTY_SOURCE = "source";
     static final String PROPERTY_DESTINATION = "destination";
 
-    ConjunctionMatcher<T> baseProps(Machine machine, T expected) {
+    /**
+     * Provides a {@link Matcher} for the common properties of a {@link Transfer}
+     * operation.
+     *
+     * @return Matcher
+     * @see Transfer
+     */
+    ConjunctionMatcher<T> transfer(Machine machine, T expected) {
         return compose(microinstruction(machine, expected))
-                .and(sourceStartBit(expected.getSrcStartBit()))
-                .and(destStartBit(expected.getDestStartBit()))
-                .and(numberOfBits(expected.getNumBits()));
+                .and(h_sourceStartBit(expected.getSrcStartBit()))
+                .and(h_destStartBit(expected.getDestStartBit()))
+                .and(h_numberOfBits(expected.getNumBits()));
     }
 
-    Matcher<T> sourceStartBit(int bit) {
+    /** @see Transfer#srcStartBitProperty() */
+    Matcher<T> h_sourceStartBit(int bit) {
         return hasFeature("source starting bit",
                 Transfer::getSrcStartBit,
                 equalTo(bit));
     }
 
-    Matcher<T> destStartBit(int bit) {
+    /** @see Transfer#destStartBitProperty() */
+    Matcher<T> h_destStartBit(int bit) {
         return hasFeature("destination starting bit",
                 Transfer::getDestStartBit,
                 equalTo(bit));
     }
 
-    Matcher<T> numberOfBits(int size) {
-        return numberOfBits(ArchValue.bits(size));
+    /** @see Transfer#numBitsProperty() */
+    Matcher<T> h_numberOfBits(int size) {
+        return h_numberOfBits(ArchValue.bits(size));
     }
 
-    Matcher<T> numberOfBits(ArchValue size) {
+    /** @see Transfer#numBitsProperty() */
+    Matcher<T> h_numberOfBits(ArchValue size) {
         return hasFeature("number of bits",
                 ArchValue.wrapAsBits(Transfer::getNumBits),
                 equalTo(size));

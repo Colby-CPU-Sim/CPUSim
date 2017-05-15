@@ -20,7 +20,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 public abstract class DecodeMatchers {
 
     private DecodeMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**

@@ -16,6 +16,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  * {@link Matcher Matchers} for {@link Shift}
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class ShiftMatchers extends TransferMatchers<Register, Register, Shift> {
 
     private ShiftMatchers() {
@@ -32,7 +33,7 @@ public abstract class ShiftMatchers extends TransferMatchers<Register, Register,
      */
     public static Matcher<Shift> shift(Machine machine, Shift expected) {
         return compose("Shift",
-                    INTERNAL.baseProps(machine, expected)
+                    INTERNAL.transfer(machine, expected)
                         .and(source(machine, expected.getSource()))
                         .and(destination(machine, expected.getDest()))
                         .and(type(expected.getType()))
@@ -41,18 +42,14 @@ public abstract class ShiftMatchers extends TransferMatchers<Register, Register,
     }
 
 
-    /**
-     * @see Shift#typeProperty()
-     */
+    /** @see Shift#typeProperty() */
     public static Matcher<Shift> type(Shift.ShiftType type) {
         return hasFeature("type",
                 Shift::getType,
                 equalTo(type));
     }
 
-    /**
-     * @see Shift#directionProperty()
-     */
+    /** @see Shift#directionProperty() */
     public static Matcher<Shift> direction(Shift.ShiftDirection direction) {
         return hasFeature("direction",
                 Shift::getDirection,
@@ -77,32 +74,44 @@ public abstract class ShiftMatchers extends TransferMatchers<Register, Register,
                 ArchValueMatchers.equalTo(distance));
     }
 
-    /**
-     * @see Shift#sourceProperty()
-     */
+    /** @see Shift#sourceProperty() */
     public static Matcher<Shift> source(Machine machine, Optional<Register> source) {
         return source(machine, source.orElse(null));
     }
 
-    /**
-     * @see Shift#sourceProperty()
-     */
+    /** @see Shift#sourceProperty() */
     public static Matcher<Shift> source(Machine machine, Register source) {
         return INTERNAL.module(PROPERTY_SOURCE, Shift::getSource, machine, source);
     }
 
-    /**
-     * @see Shift#destProperty()
-     */
+    /** @see Shift#destProperty() */
     public static Matcher<Shift> destination(Machine machine, Optional<Register> destination) {
         return destination(machine, destination.orElse(null));
     }
 
-    /**
-     * @see Shift#destProperty()
-     */
+    /** @see Shift#destProperty() */
     public static Matcher<Shift> destination(Machine machine, Register destination) {
         return INTERNAL.module(PROPERTY_DESTINATION, Shift::getSource, machine, destination);
+    }
+
+    /** @see cpusim.model.microinstruction.Transfer#srcStartBitProperty() */
+    public static Matcher<Shift> sourceStartBit(int bit) {
+        return INTERNAL.h_sourceStartBit(bit);
+    }
+
+    /** @see cpusim.model.microinstruction.Transfer#destStartBitProperty() */
+    public static Matcher<Shift> destStartBit(int bit) {
+        return INTERNAL.h_destStartBit(bit);
+    }
+
+    /** @see cpusim.model.microinstruction.Transfer#numBitsProperty() */
+    public static Matcher<Shift> numberOfBits(int size) {
+        return INTERNAL.h_numberOfBits(ArchValue.bits(size));
+    }
+
+    /** @see cpusim.model.microinstruction.Transfer#numBitsProperty() */
+    public static Matcher<Shift> numberOfBits(ArchValue size) {
+        return INTERNAL.h_numberOfBits(size);
     }
 
 }

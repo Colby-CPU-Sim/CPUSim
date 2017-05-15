@@ -22,6 +22,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 /**
  *  Base {@link Matcher Matchers} for {@link ArithmeticLogicOperation}s
  */
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
 public abstract class TestMatchers {
 
     TestMatchers() {

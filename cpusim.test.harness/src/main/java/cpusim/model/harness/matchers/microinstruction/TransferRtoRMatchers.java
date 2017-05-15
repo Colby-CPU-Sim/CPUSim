@@ -5,6 +5,7 @@ import cpusim.model.microinstruction.Microinstruction;
 import cpusim.model.microinstruction.Transfer;
 import cpusim.model.microinstruction.TransferRtoR;
 import cpusim.model.module.Register;
+import cpusim.model.util.units.ArchValue;
 import org.hamcrest.Matcher;
 
 import java.util.Optional;
@@ -14,6 +15,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.compose;
 /**
  *  Matchers for {@link Microinstruction Microinstructions}
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class TransferRtoRMatchers extends TransferMatchers<Register, Register, TransferRtoR> {
 
     private TransferRtoRMatchers() {
@@ -28,7 +30,7 @@ public abstract class TransferRtoRMatchers extends TransferMatchers<Register, Re
      */
     public static Matcher<TransferRtoR> transferRtoR(Machine machine, TransferRtoR expected) {
         return compose("Transfer Register -> Register",
-                    INTERNAL.baseProps(machine, expected)
+                    INTERNAL.transfer(machine, expected)
                         .and(source(machine, expected.getSource()))
                         .and(destination(machine, expected.getDest())));
     }
@@ -60,6 +62,27 @@ public abstract class TransferRtoRMatchers extends TransferMatchers<Register, Re
      */
     public static Matcher<TransferRtoR> destination(Machine machine, Register destination) {
         return INTERNAL.module(PROPERTY_DESTINATION, TransferRtoR::getDest, machine, destination);
+    }
+
+
+    /** @see Transfer#srcStartBitProperty() */
+    public static Matcher<TransferRtoR> sourceStartBit(int bit) {
+        return INTERNAL.h_sourceStartBit(bit);
+    }
+
+    /** @see Transfer#destStartBitProperty() */
+    public static Matcher<TransferRtoR> destStartBit(int bit) {
+        return INTERNAL.h_destStartBit(bit);
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferRtoR> numberOfBits(int size) {
+        return INTERNAL.h_numberOfBits(ArchValue.bits(size));
+    }
+
+    /** @see Transfer#numBitsProperty() */
+    public static Matcher<TransferRtoR> numberOfBits(ArchValue size) {
+        return INTERNAL.h_numberOfBits(size);
     }
 
 }

@@ -14,7 +14,7 @@ import static org.hobsoft.hamcrest.compose.ComposeMatchers.hasFeature;
 public abstract class LogicalMatchers extends ArithmeticLogicOperationMatchers {
 
     private LogicalMatchers() {
-        // no instantiation
+        throw new UnsupportedOperationException();
     }
     
     /**
