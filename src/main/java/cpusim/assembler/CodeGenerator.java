@@ -96,8 +96,8 @@ public class CodeGenerator
 
         if (numberOfCells <= 0) {
             throw new AssemblyException.InvalidOperandError("The first operand must be " +
-                    "" + "" + "greater than 0 for the data pseudo-instruction", (Token)
-                    operands.get(0));
+                    "" + "" + "" + "" + "" + "greater than 0 for the data " +
+                    "pseudo-instruction", (Token) operands.get(0));
         }
 
         if (operands.size() == 2) {
@@ -106,33 +106,38 @@ public class CodeGenerator
                         "" + " can use at most 64 bits to store one value", (Token)
                         operands.get(0));
             }
-            long valueToStore = getLong((Token) operands.get(1));
-            //test size of value and throw exception if it won't fit.
-            //allow the bits as unsigned or signed.
-            toBinary(valueToStore, numberOfCells * cellSize, false, true, (Token)
-                    operands.get(1), false);
-            /*
-            //NOTE: The follow code was removed when the RAM cell size was
-            //      allowed to be other than 8 bits.  Now, any data
-            //      directive must refer to at most 64 bits of data total.
-            //first add all the cells of data before the cells containing
-            // the last 64 bits, since those cells will be all 0's or all 1's.
-            int numSpecialCells = (64+cellSize-1)/cellSize;
-            for (int i = 0; i < numberOfCells - numSpecialCells; i++)
-                instructionCallList.add(new AssembledInstructionCall(cellSize,
-                        (valueToStore >= 0 ? 0 : -1),
-                        (i == 0 ? instructionCall.comment : ""),
-                        instructionCall.sourceLine));
-            */
+            else if (numberOfCells * cellSize < 64) {
+                // if numberOfCells*cellSize == 64, the long value has to fit so
+                // there is no need to test.
+                // Otherwise, test size of value and throw an exception if it won't fit.
+                // Allow the bits as unsigned or signed.
+                long valueToStore = getLong((Token) operands.get(1));
+                toBinary(valueToStore, numberOfCells * cellSize, false, true, (Token)
+                        operands.get(1), false);
+                /*
+                //NOTE: The follow code was removed when the RAM cell size was
+                //      allowed to be other than 8 bits.  Now, any data
+                //      directive must refer to at most 64 bits of data total.
+                //first add all the cells of data before the cells containing
+                // the last 64 bits, since those cells will be all 0's or all 1's.
+                int numSpecialCells = (64+cellSize-1)/cellSize;
+                for (int i = 0; i < numberOfCells - numSpecialCells; i++)
+                    instructionCallList.add(new AssembledInstructionCall(cellSize,
+                            (valueToStore >= 0 ? 0 : -1),
+                            (i == 0 ? instructionCall.comment : ""),
+                            instructionCall.sourceLine));
+                */
+            }
             instructionCallList.add(new AssembledInstructionCall(numberOfCells *
-                    cellSize, valueToStore, instructionCall.comment, instructionCall
-                    .sourceLine));
+                    cellSize, getLong((Token) operands.get(1)), instructionCall
+                    .comment, instructionCall.sourceLine));
+
         }
         else { // the pseudo-instruction had some values inside brackets
             int numCellsPerValue = (int) getLong((Token) operands.get(1));
             if (numCellsPerValue * cellSize > 64) {
                 throw new AssemblyException.MemoryError("A data pseudo-instruction" +
-                        " can use at most 64 bits to store one value", (Token)
+                        "" + " can use at most 64 bits to store one value", (Token)
                         operands.get(1));
             }
             if (numCellsPerValue <= 0) {
@@ -170,8 +175,9 @@ public class CodeGenerator
                         cellSize, specificValue, (numValuesGenerated == 0 ?
                         instructionCall.comment : ""), instructionCall.sourceLine));
                 nextIndex++;
-                if( nextIndex >= operands.size())
+                if (nextIndex >= operands.size()) {
                     nextIndex = 2;
+                }
                 numValuesGenerated++;
             }
             //            for (int i = 2; i < operands.size(); i++) {
@@ -330,8 +336,9 @@ public class CodeGenerator
             answer = Convert.fromAnyBaseStringToLong(string);
         } catch (NumberFormatException e) {
             throw new AssemblyException.SyntaxError("The number " + token.contents + " " +
-                    "" + "could not be parsed as a long (64-bit integer)." +
-                    "\n    It might have illegal characters or be too large", token);
+                    "" + "" + "" + "" + "could not be parsed as a long (64-bit integer)" +
+                    "." + "\n  " + "  It might have illegal characters or be too " +
+                    "large", token);
         }
         return answer;
     }

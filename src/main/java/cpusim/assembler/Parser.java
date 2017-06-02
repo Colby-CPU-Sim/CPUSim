@@ -702,7 +702,7 @@ public class Parser {
         node.comment += token.contents + " "; //opcode and a space
         advance(); //advance past the opcode
 
-        List<Field> fields = node.machineInstruction.getInstructionFields();
+        List<Field> fields = node.machineInstruction.getAssemblyFields();
         for (int i = 1; i < fields.size(); i++) {
             //process the next field
             Field field = fields.get(i);

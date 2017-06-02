@@ -10,10 +10,10 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.EditingIntCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.Branch;
 import cpusim.util.Validate;
 import cpusim.util.ValidationException;
@@ -101,7 +101,7 @@ public class BranchTableController
                     @Override
                     public TableCell<Branch, Integer> call(
                             TableColumn<Branch, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<Branch>();
+                        return new EditingIntCell<Branch>();
                     }
                 };
 

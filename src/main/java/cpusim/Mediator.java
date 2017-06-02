@@ -661,6 +661,7 @@ public class Mediator {
      * false if there was an error
      */
     private boolean load(boolean clearing) {
+        clearing = true;
 
         if (machine.get().getCodeStore() == null) {
             Dialogs.createErrorDialog(stage, "Error finding RAM",

@@ -21,7 +21,7 @@ public class Field implements NamedObject, Cloneable {
 
 	public enum Relativity {absolute, pcRelativePreIncr,
                                     pcRelativePostIncr}
-    public enum Type {required, optional, ignored}
+    public enum Type {required, /*optional,*/ ignored}
 
     // The name of the field
     private SimpleStringProperty name;    

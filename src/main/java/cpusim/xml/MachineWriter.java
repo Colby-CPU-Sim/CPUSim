@@ -93,7 +93,8 @@ public class MachineWriter
             " #REQUIRED cellSize CDATA \"8\">" + ls +
             "<!ELEMENT Increment EMPTY>" + ls +
             "<!ATTLIST Increment name CDATA #REQUIRED register IDREF #REQUIRED" +
-            " overflowBit IDREF #IMPLIED delta CDATA #REQUIRED id ID #REQUIRED>" + ls +
+            " overflowBit IDREF #IMPLIED carryBit IDREF #IMPLIED" +
+            " delta CDATA #REQUIRED id ID #REQUIRED>" + ls +
             "<!ELEMENT Arithmetic EMPTY>" + ls +
             "<!ATTLIST Arithmetic name CDATA #REQUIRED type (ADD|SUBTRACT|MULTIPLY|" +
             "DIVIDE) #REQUIRED source1 IDREF #REQUIRED source2 IDREF #REQUIRED" +

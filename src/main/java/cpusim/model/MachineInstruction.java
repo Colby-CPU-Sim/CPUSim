@@ -236,7 +236,7 @@ public class MachineInstruction
      */
     public int[] getRelativeOrderOfFields(){
         
-        //get all instruction colors correponding to positive length fields that arent
+        //get all instruction colors corresponding to positive length fields that aren't
         //the opcode
         List<String> iColors = new ArrayList<>();
         int i = 0;
@@ -246,7 +246,7 @@ public class MachineInstruction
         }
         iColors.remove(0);
 
-        //get all assembly colors correponding to positive length fields that arent
+        //get all assembly colors corresponding to positive length fields that aren't
         //the opcode
         List<String> aColors = new ArrayList<String>();
         i = 0;

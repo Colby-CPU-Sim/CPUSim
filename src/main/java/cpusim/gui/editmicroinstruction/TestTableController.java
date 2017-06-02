@@ -18,11 +18,11 @@
 package cpusim.gui.editmicroinstruction;
 
 import cpusim.Mediator;
-import cpusim.model.Microinstruction;
-import cpusim.gui.util.EditingNonNegativeIntCell;
+import cpusim.gui.util.EditingIntCell;
 import cpusim.gui.util.EditingLongCell;
 import cpusim.gui.util.EditingStrCell;
 import cpusim.gui.util.FXMLLoaderFactory;
+import cpusim.model.Microinstruction;
 import cpusim.model.microinstruction.Test;
 import cpusim.model.module.Register;
 import cpusim.util.Validate;
@@ -123,7 +123,7 @@ public class TestTableController
                     @Override
                     public TableCell call(
                             TableColumn<Test, Integer> setIntegerTableColumn) {
-                        return new EditingNonNegativeIntCell<Test>();
+                        return new EditingIntCell<Test>();
                     }
                 };
         Callback<TableColumn<Test,Long>,TableCell<Test,Long>> cellLongFactory =

@@ -1664,10 +1664,25 @@ public class DesktopController implements Initializable
         return -1;
     }
 
+    /**
+     * returns a set of all the line numbers for the file that have break point circles
+     * next to them.  If the file is not open, then it returns an empty set.
+     * @param fileName the name of the file to be checked for break points
+     * @return a Set of the line numbers where the breakpoints occur.
+     */
     public Set<Integer> getAllBreakPointLineNumbersForFile(String fileName) {
-        return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea) getTabForFile(new
-                File(fileName)).getContent()).getParagraphGraphicFactory())
+        File file = new File(fileName);
+        Optional<Tab> existingTab = textTabPane.getTabs()
+                .stream()
+                .filter(t -> file.equals(((CodePaneTab) t).getFile()))
+                .findFirst();
+        if (existingTab.isPresent()) {
+            return ((LineNumAndBreakpointFactory) ((InlineStyleTextArea)
+                       existingTab.get().getContent()).getParagraphGraphicFactory())
                 .getAllBreakPointLineNumbers();
+        }
+        else
+            return new HashSet<>();
     }
 
 
@@ -1907,7 +1922,7 @@ public class DesktopController implements Initializable
             mediator.getBackupManager().flushBackups();
             mediator.getMachine().getControlUnit().setMicroIndex(0);
             mediator.getMachine().setState(Machine.State.EXECUTION_HALTED,false);
-            debugToolBarController.updateDisplay();
+            //debugToolBarController.updateDisplay();
         }
         RAM codeStore = mediator.getMachine().getCodeStore();
         if (codeStore != null) {
