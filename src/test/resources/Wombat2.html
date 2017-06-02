@@ -1,0 +1,255 @@
+<HTML><HEAD>
+<TITLE>Wombat2</TITLE></HEAD>
+<BODY>
+<CENTER><FONT COLOR="#804040" SIZE="+3"><B><I>
+Wombat2
+</I></B></FONT></CENTER>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="2" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Punctuation preferences</B></font></TD></TR>
+<TR><TD><B>Character</B></TD><TD><B>Use</B></TD></TR>
+<TR><TD>!</TD><TD>symbol</TD></TR>
+<TR><TD>#</TD><TD>symbol</TD></TR>
+<TR><TD>$</TD><TD>symbol</TD></TR>
+<TR><TD>%</TD><TD>symbol</TD></TR>
+<TR><TD>&amp;</TD><TD>symbol</TD></TR>
+<TR><TD>^</TD><TD>symbol</TD></TR>
+<TR><TD>_</TD><TD>symbol</TD></TR>
+<TR><TD>`</TD><TD>symbol</TD></TR>
+<TR><TD>*</TD><TD>symbol</TD></TR>
+<TR><TD>?</TD><TD>symbol</TD></TR>
+<TR><TD>@</TD><TD>symbol</TD></TR>
+<TR><TD>~</TD><TD>symbol</TD></TR>
+<TR><TD>+</TD><TD>symbol</TD></TR>
+<TR><TD>-</TD><TD>symbol</TD></TR>
+<TR><TD>(</TD><TD>token</TD></TR>
+<TR><TD>)</TD><TD>token</TD></TR>
+<TR><TD>,</TD><TD>token</TD></TR>
+<TR><TD>/</TD><TD>token</TD></TR>
+<TR><TD>=</TD><TD>token</TD></TR>
+<TR><TD>[</TD><TD>token</TD></TR>
+<TR><TD>\</TD><TD>token</TD></TR>
+<TR><TD>]</TD><TD>token</TD></TR>
+<TR><TD>{</TD><TD>token</TD></TR>
+<TR><TD>|</TD><TD>token</TD></TR>
+<TR><TD>}</TD><TD>token</TD></TR>
+<TR><TD>.</TD><TD>pseudo</TD></TR>
+<TR><TD>:</TD><TD>label</TD></TR>
+<TR><TD>;</TD><TD>comment</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1"CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="4" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Registers</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Width</B></TD><TD><B>Initial Value</B></TD><TD><B>Read Only</B></TD></TR>
+<TR><TD>buffer1</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>buffer2</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>ir</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>mar</TD><TD>12</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>mdr</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>pc</TD><TD>12</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+<TR><TD>status</TD><TD>3</TD><TD>0</TD><TD>false</TD><TD></TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1"CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="4" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Register Arrays</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Length</B></TD><TD><B>Width</B></TD><TD><B>Registers</B></TD></TR>
+<TR><TD>A</TD><TD>8</TD><TD>16</TD><TD><TABLE bgcolor="#FFC0A0" BORDER="1"CELLPADDING="0" CELLSPACING="3" WIDTH="100%"><TR><TD><B>Name</B></TD><TD><B>Width</B></TD><TD><B>Initial Value</B></TD><TD><B>Read Only</B></TD><B><TR><TD>A[0]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[1]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[2]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[3]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[4]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[5]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[6]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR><TR><TD>A[7]</TD><TD>16</TD><TD>0</TD><TD>false</TD><TD></TD></TR></TABLE><P></P></TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1"CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="4" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Condition Bits</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Register</B></TD><TD><B>Bit</B></TD><TD><B>Halt</B></TD></TR>
+<TR><TD>halt</TD><TD>status</TD><TD>0</TD><TD>true</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1"CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="3" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;RAMs</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Length</B></TD><TD><B>Bits per Cell</B></TD></TR>
+<TR><TD>Main</TD><TD>256</TD><TD>8</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="1" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Indexing Order of Bits in Registers</B></font></TD></TR>
+<TR><TD>From  left to right</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="5" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Set</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Register</B></TD><TD><B>Start Bit</B></TD><TD><B>Number of Bits</B></TD><TD><B>Value</B></TD></TR>
+<TR><TD>clear-buf1</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD><TD>0</TD></TR>
+<TR><TD>clear-mar</TD><TD>mar</TD><TD>0</TD><TD>12</TD><TD>0</TD></TR>
+<TR><TD>clear-pc</TD><TD>pc</TD><TD>0</TD><TD>12</TD><TD>0</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="7" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Test</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Register</B></TD><TD><B>Start Bit</B></TD><TD><B>Number of Bits</B></TD><TD><B>Comparison</B></TD><TD><B>Value</B></TD><TD><B>Omission</B></TD></TR>
+<TR><TD>if(buf1!=0)skip-2</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD><TD>NE</TD><TD>0</TD><TD>2</TD></TR>
+<TR><TD>if(buf1&gt;=0)skip-2</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD><TD>GE</TD><TD>0</TD><TD>2</TD></TR>
+<TR><TD>if(mar=IO)skip3</TD><TD>mar</TD><TD>0</TD><TD>12</TD><TD>EQ</TD><TD>254</TD><TD>3</TD></TR>
+<TR><TD>if(mar=IO)skip4</TD><TD>mar</TD><TD>0</TD><TD>12</TD><TD>EQ</TD><TD>254</TD><TD>4</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="4" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Increment</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Register</B></TD><TD><B>Overflow Bit</B></TD><TD><B>Delta</B></TD></TR>
+<TR><TD>Inc2-pc</TD><TD>pc</TD><TD>halt</TD><TD>(none)</TD><TD>2</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="6" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Shift</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Source</B></TD><TD><B>Destination</B></TD><TD><B>Type</B></TD><TD><B>Direction</B></TD><TD><B>Distance</B></TD></TR>
+<TR><TD>rsa8buf1</TD><TD>buffer1</TD><TD>buffer1</TD><TD>arithmetic</TD><TD>right</TD><TD>8</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="5" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Logical</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Type</B></TD><TD><B>Source1</B></TD><TD><B>Source2</B></TD><TD><B>Destination</B></TD></TR>
+<TR VALIGN="middle"><TD COLSPAN="5"><CENTER>(none)</CENTER></TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="7" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Arithmetic</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Type</B></TD><TD><B>Source1</B></TD><TD><B>Source2</B></TD><TD><B>Destination</B></TD><TD><B>Overflow Bit</B></TD><TD><B>Carry Bit</B></TD></TR>
+<TR><TD>buf1*buf2-&gt;buf1</TD><TD>MULTIPLY</TD><TD>buffer1</TD><TD>buffer2</TD><TD>buffer1</TD><TD>halt</TD><TD>(none)</TD></TR>
+<TR><TD>buf1+buf2-&gt;buf1</TD><TD>ADD</TD><TD>buffer1</TD><TD>buffer2</TD><TD>buffer1</TD><TD>halt</TD><TD>(none)</TD></TR>
+<TR><TD>buf1-buf2-&gt;buf1</TD><TD>SUBTRACT</TD><TD>buffer1</TD><TD>buffer2</TD><TD>buffer1</TD><TD>halt</TD><TD>(none)</TD></TR>
+<TR><TD>buf1/buf2-&gt;buf1</TD><TD>DIVIDE</TD><TD>buffer1</TD><TD>buffer2</TD><TD>buffer1</TD><TD>halt</TD><TD>(none)</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="2" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Branch</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Amount</B></TD></TR>
+<TR VALIGN="middle"><TD COLSPAN="2"><CENTER>(none)</CENTER></TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="6" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;TransferRtoR</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Source</B></TD><TD><B>Src Start Bit</B></TD><TD><B>Destination</B></TD><TD><B>Dest Start Bit</B></TD><TD><B>Number of Bits</B></TD></TR>
+<TR><TD>buffer1-&gt;mar</TD><TD>buffer1</TD><TD>4</TD><TD>mar</TD><TD>0</TD><TD>12</TD></TR>
+<TR><TD>buffer1-&gt;mdr</TD><TD>buffer1</TD><TD>0</TD><TD>mdr</TD><TD>0</TD><TD>16</TD></TR>
+<TR><TD>ir(8-15)-&gt;buf1(0-7)</TD><TD>ir</TD><TD>8</TD><TD>buffer1</TD><TD>0</TD><TD>8</TD></TR>
+<TR><TD>ir(8-15)-&gt;mar</TD><TD>ir</TD><TD>8</TD><TD>mar</TD><TD>4</TD><TD>8</TD></TR>
+<TR><TD>ir(8-15)-&gt;pc</TD><TD>ir</TD><TD>8</TD><TD>pc</TD><TD>4</TD><TD>8</TD></TR>
+<TR><TD>mdr-&gt;buffer1</TD><TD>mdr</TD><TD>0</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD></TR>
+<TR><TD>mdr-&gt;ir</TD><TD>mdr</TD><TD>0</TD><TD>ir</TD><TD>0</TD><TD>16</TD></TR>
+<TR><TD>pc-&gt;mar</TD><TD>pc</TD><TD>0</TD><TD>mar</TD><TD>0</TD><TD>12</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="9" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;TransferRtoA</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Source</B></TD><TD><B>Src Start Bit</B></TD><TD><B>Destination</B></TD><TD><B>Dest Start Bit</B></TD><TD><B>Number of Bits</B></TD><TD><B>Index</B></TD><TD><B>Index Start Bit</B></TD><TD><B>Index Number of Bits</B></TD></TR>
+<TR><TD>buf1-&gt;A[ir(5-7)]</TD><TD>buffer1</TD><TD>0</TD><TD>A</TD><TD>0</TD><TD>16</TD><TD>ir</TD><TD>5</TD><TD>3</TD></TR>
+<TR><TD>buf1-&gt;A[ir(8-10)]</TD><TD>buffer1</TD><TD>0</TD><TD>A</TD><TD>0</TD><TD>16</TD><TD>ir</TD><TD>8</TD><TD>3</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="9" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;TransferAtoR</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Source</B></TD><TD><B>Src Start Bit</B></TD><TD><B>Destination</B></TD><TD><B>Dest Start Bit</B></TD><TD><B>Number of Bits</B></TD><TD><B>Index</B></TD><TD><B>Index Start Bit</B></TD><TD><B>Index Number of Bits</B></TD></TR>
+<TR><TD>A[ir(5-7)]-&gt;buf1</TD><TD>A</TD><TD>0</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD><TD>ir</TD><TD>5</TD><TD>3</TD></TR>
+<TR><TD>A[ir(8-10)]-&gt;buf1</TD><TD>A</TD><TD>0</TD><TD>buffer1</TD><TD>0</TD><TD>16</TD><TD>ir</TD><TD>8</TD><TD>3</TD></TR>
+<TR><TD>A[ir(8-10)]-&gt;buf2</TD><TD>A</TD><TD>0</TD><TD>buffer2</TD><TD>0</TD><TD>16</TD><TD>ir</TD><TD>8</TD><TD>3</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="2" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Decode</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>IR</B></TD></TR>
+<TR><TD>Decode-ir</TD><TD>ir</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="3" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Set Condition Bit</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Bit</B></TD><TD><B>Value</B></TD></TR>
+<TR><TD>set-halt-bit</TD><TD>halt</TD><TD>1</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="5" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;IO</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Direction</B></TD><TD><B>Type</B></TD><TD><B>Buffer</B></TD><TD><B>Connection</B></TD></TR>
+<TR><TD>input-int-&gt;buf1</TD><TD>input</TD><TD>integer</TD><TD>buffer1</TD><TD>[Dialog]</TD></TR>
+<TR><TD>output-buf1-&gt;int</TD><TD>output</TD><TD>integer</TD><TD>buffer1</TD><TD>/Users/djskrien/Desktop/CPUSim4.0b49/test/test.a</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="5" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Memory Access</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Direction</B></TD><TD><B>Memory</B></TD><TD><B>Data</B></TD><TD><B>Address</B></TD></TR>
+<TR><TD>Main[mar]-&gt;mdr</TD><TD>read</TD><TD>Main</TD><TD>mdr</TD><TD>mar</TD></TR>
+<TR><TD>mdr-&gt;Main[mar]</TD><TD>write</TD><TD>Main</TD><TD>mdr</TD><TD>mar</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="2" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;EQUs</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Value</B></TD></TR>
+
+<TR><TD>IO</TD><TD>254</TD></TR>
+<TR><TD>A7</TD><TD>7</TD></TR>
+<TR><TD>A6</TD><TD>6</TD></TR>
+<TR><TD>A5</TD><TD>5</TD></TR>
+<TR><TD>A4</TD><TD>4</TD></TR>
+<TR><TD>A3</TD><TD>3</TD></TR>
+<TR><TD>A2</TD><TD>2</TD></TR>
+<TR><TD>A1</TD><TD>1</TD></TR>
+<TR><TD>A0</TD><TD>0</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="7" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Instruction Format Fields</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Type</B></TD><TD><B>Number of Bits</B></TD><TD><B>Relativity</B></TD><TD><B>Signed</B></TD><TD><B>Default Value</B></TD><TD><B>Values</B></TD></TR>
+
+<TR><TD>sgn5</TD><TD>required</TD><TD>8</TD><TD>absolute</TD><TD>true</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>reg</TD><TD>required</TD><TD>3</TD><TD>absolute</TD><TD>false</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>un3</TD><TD>ignored</TD><TD>3</TD><TD>absolute</TD><TD>true</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>op</TD><TD>required</TD><TD>5</TD><TD>absolute</TD><TD>false</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>un5</TD><TD>ignored</TD><TD>5</TD><TD>absolute</TD><TD>true</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>addr</TD><TD>required</TD><TD>8</TD><TD>absolute</TD><TD>false</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>un8</TD><TD>ignored</TD><TD>8</TD><TD>absolute</TD><TD>true</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+<TR><TD>un11</TD><TD>ignored</TD><TD>11</TD><TD>absolute</TD><TD>true</TD><TD>0</TD><TD>&lt;any&gt;</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="1" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Fetch Sequence</B></font></TD></TR>
+<TR><TD><B>Microinstructions</B></TD></TR>
+<TR><TD>
+pc-&gt;mar<BR>
+Main[mar]-&gt;mdr<BR>
+mdr-&gt;ir<BR>
+Inc2-pc<BR>
+Decode-ir<BR>
+</TD></TR>
+</TABLE><P></P>
+
+<TABLE bgcolor="#FFC0A0" BORDER="1" CELLPADDING="0" CELLSPACING="3" WIDTH="100%">
+<TR VALIGN="middle"><TD bgcolor="#C08060" COLSPAN="4" HEIGHT="35"><FONT  SIZE="+2"><B>&nbsp;Machine Instructions</B></font></TD></TR>
+<TR><TD><B>Name</B></TD><TD><B>Opcode (hex)</B></TD><TD><B>Instruction Format</B></TD><TD><B>Assembly Format</B></TD><TD><B>Microinstructions</B></TD></TR>
+
+    <TR><TD>clear</TD><TD>0E</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#b5eca0">op</td><td align="center" width="19.0%" bgcolor="#d8b39e">reg</td><td align="center" width="50.0%" bgcolor="#b6c089">un8</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="50.0%" bgcolor="#b5eca0">op</td><td align="center" width="50.0%" bgcolor="#d8b39e">reg</td></tr></table></TD><TD><em><font color=gray>; a useless test comment</font></em></font><BR>clear-buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>loadc</TD><TD>0D</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#908fc9">op</td><td align="center" width="19.0%" bgcolor="#d1add1">reg</td><td align="center" width="50.0%" bgcolor="#b7bfbe">sgn5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#908fc9">op</td><td align="center" width="33.0%" bgcolor="#d1add1">reg</td><td align="center" width="33.0%" bgcolor="#b7bfbe">sgn5</td></tr></table></TD><TD>ir(8-15)-&gt;buf1(0-7)<BR>rsa8buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>storei</TD><TD>0C</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#9bd5f9">op</td><td align="center" width="19.0%" bgcolor="#8d86c7">reg</td><td align="center" width="19.0%" bgcolor="#89edac">reg</td><td align="center" width="31.0%" bgcolor="#91f1a0">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#9bd5f9">op</td><td align="center" width="33.0%" bgcolor="#8d86c7">reg</td><td align="center" width="33.0%" bgcolor="#89edac">reg</td></tr></table></TD><TD>A[ir(8-10)]-&gt;buf1<BR>buffer1-&gt;mar<BR>A[ir(5-7)]-&gt;buf1<BR>if(mar=IO)skip3<BR>buffer1-&gt;mdr<BR>mdr-&gt;Main[mar]<BR>End<BR>output-buf1-&gt;int<BR>End<BR></TD></TR>
+
+<TR><TD>loadi</TD><TD>0B</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#f7e2c8">op</td><td align="center" width="19.0%" bgcolor="#cdf3d3">reg</td><td align="center" width="19.0%" bgcolor="#aac18f">reg</td><td align="center" width="31.0%" bgcolor="#d6cac9">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#f7e2c8">op</td><td align="center" width="33.0%" bgcolor="#cdf3d3">reg</td><td align="center" width="33.0%" bgcolor="#aac18f">reg</td></tr></table></TD><TD>A[ir(8-10)]-&gt;buf1<BR>buffer1-&gt;mar<BR>if(mar=IO)skip4<BR>Main[mar]-&gt;mdr<BR>mdr-&gt;buffer1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR>input-int-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>move</TD><TD>0A</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#c7f785">op</td><td align="center" width="19.0%" bgcolor="#c0c1ca">reg</td><td align="center" width="19.0%" bgcolor="#c5f1af">reg</td><td align="center" width="31.0%" bgcolor="#84ca8c">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#c7f785">op</td><td align="center" width="33.0%" bgcolor="#c0c1ca">reg</td><td align="center" width="33.0%" bgcolor="#c5f1af">reg</td></tr></table></TD><TD>A[ir(8-10)]-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>divide</TD><TD>06</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#d5c7e4">op</td><td align="center" width="19.0%" bgcolor="#8ec485">reg</td><td align="center" width="19.0%" bgcolor="#b0dbe3">reg</td><td align="center" width="31.0%" bgcolor="#9b9cbe">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#d5c7e4">op</td><td align="center" width="33.0%" bgcolor="#8ec485">reg</td><td align="center" width="33.0%" bgcolor="#b0dbe3">reg</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>A[ir(8-10)]-&gt;buf2<BR>buf1/buf2-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>multiply</TD><TD>05</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#c7f4b8">op</td><td align="center" width="19.0%" bgcolor="#f8ebec">reg</td><td align="center" width="19.0%" bgcolor="#bca4a4">reg</td><td align="center" width="31.0%" bgcolor="#b6b0a7">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#c7f4b8">op</td><td align="center" width="33.0%" bgcolor="#f8ebec">reg</td><td align="center" width="33.0%" bgcolor="#bca4a4">reg</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>A[ir(8-10)]-&gt;buf2<BR>buf1*buf2-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>subtract</TD><TD>04</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#9eaf90">op</td><td align="center" width="19.0%" bgcolor="#95ae9b">reg</td><td align="center" width="19.0%" bgcolor="#cce4fe">reg</td><td align="center" width="31.0%" bgcolor="#c0a2e1">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#9eaf90">op</td><td align="center" width="33.0%" bgcolor="#95ae9b">reg</td><td align="center" width="33.0%" bgcolor="#cce4fe">reg</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>A[ir(8-10)]-&gt;buf2<BR>buf1-buf2-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>exit</TD><TD>00</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#fa9686">op</td><td align="center" width="69.0%" bgcolor="#c9d7ee">un11</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="100.0%" bgcolor="#fa9686">op</td></tr></table></TD><TD>set-halt-bit<BR>End<BR></TD></TR>
+
+<TR><TD>load</TD><TD>01</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#a0ad84">op</td><td align="center" width="19.0%" bgcolor="#e2c093">reg</td><td align="center" width="50.0%" bgcolor="#adc0d1">addr</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#a0ad84">op</td><td align="center" width="33.0%" bgcolor="#e2c093">reg</td><td align="center" width="33.0%" bgcolor="#adc0d1">addr</td></tr></table></TD><TD>clear-mar<BR>ir(8-15)-&gt;mar<BR>if(mar=IO)skip4<BR>Main[mar]-&gt;mdr<BR>mdr-&gt;buffer1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR>input-int-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>store</TD><TD>02</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#c5ebc4">op</td><td align="center" width="19.0%" bgcolor="#c58dc2">reg</td><td align="center" width="50.0%" bgcolor="#83b4e4">addr</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#c5ebc4">op</td><td align="center" width="33.0%" bgcolor="#c58dc2">reg</td><td align="center" width="33.0%" bgcolor="#83b4e4">addr</td></tr></table></TD><TD>clear-mar<BR>ir(8-15)-&gt;mar<BR>A[ir(5-7)]-&gt;buf1<BR>if(mar=IO)skip3<BR>buffer1-&gt;mdr<BR>mdr-&gt;Main[mar]<BR>End<BR>output-buf1-&gt;int<BR>End<BR></TD></TR>
+
+<TR><TD>add</TD><TD>03</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#a7d4b3">op</td><td align="center" width="19.0%" bgcolor="#9180cf">reg</td><td align="center" width="19.0%" bgcolor="#f0d3b4">reg</td><td align="center" width="31.0%" bgcolor="#e8d990">un5</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#a7d4b3">op</td><td align="center" width="33.0%" bgcolor="#9180cf">reg</td><td align="center" width="33.0%" bgcolor="#f0d3b4">reg</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>A[ir(8-10)]-&gt;buf2<BR>buf1+buf2-&gt;buf1<BR>buf1-&gt;A[ir(5-7)]<BR>End<BR></TD></TR>
+
+<TR><TD>jump</TD><TD>07</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#83d3cd">op</td><td align="center" width="19.0%" bgcolor="#95efbf">un3</td><td align="center" width="50.0%" bgcolor="#e4f8eb">addr</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="50.0%" bgcolor="#83d3cd">op</td><td align="center" width="50.0%" bgcolor="#e4f8eb">addr</td></tr></table></TD><TD>clear-pc<BR>ir(8-15)-&gt;pc<BR>End<BR></TD></TR>
+
+<TR><TD>jmpz</TD><TD>08</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#dbcfdd">op</td><td align="center" width="19.0%" bgcolor="#f4d5fb">reg</td><td align="center" width="50.0%" bgcolor="#a7cc82">addr</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#dbcfdd">op</td><td align="center" width="33.0%" bgcolor="#f4d5fb">reg</td><td align="center" width="33.0%" bgcolor="#a7cc82">addr</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>if(buf1!=0)skip-2<BR>clear-pc<BR>ir(8-15)-&gt;pc<BR>End<BR></TD></TR>
+
+<TR><TD>jmpn</TD><TD>09</TD><TD><table width="100%"><tr><td align="center" width="31.0%" bgcolor="#acecf7">op</td><td align="center" width="19.0%" bgcolor="#f8aff6">reg</td><td align="center" width="50.0%" bgcolor="#e5ce9e">addr</td></tr></table></TD><TD><table width="100%"><tr><td align="center" width="33.0%" bgcolor="#acecf7">op</td><td align="center" width="33.0%" bgcolor="#f8aff6">reg</td><td align="center" width="33.0%" bgcolor="#e5ce9e">addr</td></tr></table></TD><TD>A[ir(5-7)]-&gt;buf1<BR>if(buf1&gt;=0)skip-2<BR>clear-pc<BR>ir(8-15)-&gt;pc<BR>End<BR></TD></TR>
+</TABLE><P></P>
+</BODY></HTML>

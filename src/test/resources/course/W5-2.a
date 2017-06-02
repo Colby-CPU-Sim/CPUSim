@@ -1,0 +1,72 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; This Wombat5 program uses a subroutine to find the largest
+; value in an array on the stack.
+; It reads in an integer n (the size of the array)
+; followed by n more integers (the values in the array).
+; It then calls the subroutine to find the largest,
+; which it outputs.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+n EQU 6
+addr EQU 4
+RA EQU 2
+
+	read A0		; *MAIN*: read n into A0
+	move A0 A1	; copy n into A1
+	load_c A3 1  	; load 1 into A3
+make:	jmpz A0 second	; make: if A[0]=0, go to second
+	read A2		; read next value into A[2]
+	push A2		; push next value
+	subtract A0 A3	; A[0]--
+	jump make	; jump back to make
+second:	push A1		; push n (first param)
+	load_c A3 0	; load 0 into A[3]
+	push A3		; push starting address (second param)
+	call addrOfMax	; call addrOfMax
+	pop A2		; pop function result into A[2]
+	load_i A3 A2	; A[3] = Stack[A[2]]
+	write A3	; output A3
+	stop 		; end of main program
+
+;; function addrOfMax
+;; parameters:  a positive integer n, and the starting addr of array
+;; returns:  addr on stack of max value in the array
+;; It crashes if n <= 0.
+;; The stack frame has the following parts, starting at the bottom:
+;;      n
+;;	starting address of array
+;;	the RA
+;; During execution,
+;;	A[0] = starting addr or max so far
+;;      A[1] = current address (starting at the end)
+;;	A[2] = addr of max so far
+;;	A[3] = 2 or current value
+
+addrOfMax: ;initialize everything
+	load_s A1 n	; *addrOfMax*: load n into A[1]
+	load_c A3 2	; load 2 into A[3]
+	multiply A1 A3	; A[1] = 2*n
+	subtract A1 A3	; A[1] = 2*n - 2
+	load_s A0 addr	; A[0] = starting addr
+	add A1 A0	; A[1] = ending addr
+	move A1 A2	; A[2] = addr of current max (end addr)
+	
+	;; loop to find the max
+loop:	subtract A1 A0	; loop: A[1] = current addr - starting addr
+	jmpz A1 done	; jump to done if A[1] == 0
+	add A1 A0	; restore A[1]
+	load_c A3 2	; put 2 in A3
+	subtract A1 A3	; decrement A[1]
+	load_i A3 A1	; A[3] = Stack[A[1]] (current value)
+	load_i A0 A2	; A[0] = Stack[A[2]] (max value so far)
+	subtract A3 A0	; A[0] = A[0] - A[3]
+	jmpn A3 next	; if current <= max, skip update
+	move A1 A2	; update A[2] to value of A[1]
+next:	load_s A0 addr	; A[0] = starting addr
+	jump loop	; jump to loop
+
+	; pop the frame and return
+done:	pop A1		; pop the RA into A[1]
+	store_s A1 2	; copy RA to top of stack slot
+	store_s A2 4	; copy addr of max under RA
+	return 		; return to the caller

@@ -1,0 +1,66 @@
+;---------------------------------------------------------
+; This JVM2 program reads in a positive integer n and computes
+; the nth Fibonacci number by using a recursive function.
+; Program crashes if n <= 0.
+; Input: positive integer
+; Output: Fibonacci number
+;---------------------------------------------------------
+
+	n EQU 1		; n refers to the parameter n as a local variable 1
+	ans EQU 2	; ans refers to the local variable 2 which stores the answer
+                        ; returned from the recursive function.
+
+MAIN:	iconst_0	; push 0 on the stack for unused param 0
+	input		; input n on stack for factorial's param 1
+	invokev fib	; call fib 
+	output		; output result from top of stack
+	stop		; end of main program
+
+;-------------------------------------------------------------------
+; Function: fib
+; This function uses N1or2 (n=1 or n=2) as the base case. It 
+; recursively calls itself if n>2. 
+; Parameter: int n
+; Returns: nth Fibonacci number
+;-------------------------------------------------------------------
+
+fib:	.data 1 2	; # params on stack
+	.data 1 3 	; # params + other local variables on stack
+	
+	; check if n = 1
+	iload n 	; load local variable 1 (n)
+	bipush 1	; push 1 on top of stack
+	isub		; subtract 1 from n
+	ifeq N1or2	; if result is 0 (n=1), jump to N1or2
+	
+	; check if n = 2
+	iload n 	; load local variable 1 (n)
+	bipush 2	; push 2 on top of stack
+	isub		; subtract 2 from n
+	ifeq N1or2	; if result is 0 (n=2), jump to N1or2
+	
+	; call fib(n-1)
+	iconst_0	; push 0 on the stack for unused param 0
+	iload n		; load local variable 1 (n)
+	bipush 1	; push 1 on top of stack
+	isub		; substract 1 from n
+	invokev fib	; recursive call
+	istore ans	; stores the result returned by fib at local var 2
+	
+	; call fib(n-2)
+	iconst_0	; push 0 on the stack for unused param 0
+	iload n		; load local variable 1 (n)
+	bipush 2	; push 2 on top of stack
+	isub		; subtract 2 from n
+	invokev fib	; recursive call
+	iload ans	; load answer from previous recursive call
+	
+	; fib(n-1) + fib(n-2)
+	iadd		; add the returned values
+	ireturn		; return the result 
+	
+	; if n=1 or n=2	
+N1or2:	bipush 1	; push 1 on top of stack
+	ireturn		; return 1 
+
+	

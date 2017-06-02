@@ -1,0 +1,25 @@
+;-----------------------------------
+; This JVM2 program reads in an integer x,
+; calls the double function to compute
+; 2*x, and outputs the result.
+;-----------------------------------
+
+n EQU 1
+
+;; main program
+iconst_0	; push parameter 0 for the subroutine call
+input		; input n & push onto the stack
+invokev double 	; call double
+output		; output the result from the top of the stack
+stop		; end the program
+
+; This is the double subroutine.
+; Parameters: There are 2 parameters, the unused 0th parameter and n
+; It returns 2*n on top of the stack
+double: .data 1 2	; # params on stack
+	.data 1 2	; # params + # local variables on stack
+	iload n		;load local variable 1 (n)
+	bipush 2	;push the constant 2
+	imul		;multiply 2 and n
+	ireturn		;return 2*n to the caller
+

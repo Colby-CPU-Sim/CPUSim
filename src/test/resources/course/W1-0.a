@@ -1,0 +1,15 @@
+; This Wombat1 program reads in integers and adds them together
+; until a negative number is read in.  Then it outputs
+; the sum (not including the last number).
+       
+Start: read  		; read n -> acc
+       jmpn  Done  	; jump to Done if n < 0.
+       add   sum	; add sum to the acc
+       store sum 	; store the new sum
+       jump  Start	; go back & read in next number
+Done:  load  sum 	; load the final sum
+       write 		; output the final sum
+       stop  		; stop
+
+sum:   .data 2 0 ; 2-byte location where sum is stored
+       .data 8 1 ; test byte

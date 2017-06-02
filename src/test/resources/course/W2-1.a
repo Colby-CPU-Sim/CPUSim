@@ -1,0 +1,36 @@
+; W2-1.a
+; This program reads in two arbitrary (positive or negative)
+; integers m and n and outputs the product of m and n, 
+; without using the multiply machine instruction.
+; It is for the Wombat2 and uses as few memory accesses
+; as possible.
+
+; A0 holds n
+; A1 holds abs(m), which is decremented
+; A2 holds the sum so far
+; A3 holds the constant -1 for decrementing m
+
+	load A3 negOne	; load -1 -> A3
+	read A0 	; read n -> A0
+	read A1		; read m -> A1
+	jmpn A1 fixSign	; if m < 0 jump to fixSign
+	jump clear	; jump to clear
+fixSign: move A1 A2	; fixSign: m -> A2
+	subtract A1 A1	; A1 = A1 - A1 = 0
+	subtract A1 A2	; A1 = A1 - A2 = -m (= abs(m))
+	store A3 sign	; store -1 into sign
+clear:	subtract A2 A2	; clear A2
+Start:	jmpz A1 Done  	; Start: jump to Done if m = 0.
+       	add A2 A0	; add n to the sum in A2
+	add A1 A3	; subtract 1 from m in A1
+       	jump  Start	; go back to Start
+Done:  	load A0 sign 	; Done: load the sign into A0
+	jmpn A0 neg	; if sign < 0 jump to neg
+       	jump pos	; jump to pos
+neg:	subtract A1 A2	; neg: A1 = A1-A2 = -sum
+	move A1 A2	; copy A1 into A2
+pos:	write A2	; pos: output the final sum in A2
+       	stop  		; stop
+
+negOne:	.data 0x2 0xFFF	; negOne: constant -1
+sign:	.data 2 1	; sign: (1 or -1)

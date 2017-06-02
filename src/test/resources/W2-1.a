@@ -1,0 +1,5 @@
+        load A3 negOne      ; load -1 -> A3
+        load A0 IO          ; read n -> A0 
+        load A1 IO          ; read m -> A1
+        jmpn A1 fixSign     ; if m < 0 jump to fixSign
+        jump Clear          ; jump to clear

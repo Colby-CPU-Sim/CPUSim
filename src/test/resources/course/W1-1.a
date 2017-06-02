@@ -1,0 +1,24 @@
+; This Wombat1 program reads in integers
+; until 0 is read in.  Then it outputs
+; the average of all the numbers (not including the
+; sentinel 0).
+	
+	jump Start;	; jump to start
+	stop   		; dummy stop
+Start: 	read  		; start: read n -> acc
+       	jmpz  Done  	; jump to Done if n < 0.
+       	add   sum	; add sum to the acc
+       	store sum 	; store the new sum
+	load counter	; load counter
+	add one		; add 1
+	store counter	; store counter
+       	jump  Start	; go back & read in next number
+Done:  	load  sum 	; done: load the final sum
+	divide counter	; divide by counter
+       	write 		; output the final average
+       	stop  		; stop
+
+sum:   	.data 2 0 ; sum
+counter: .data 2 0 ; counter
+one:	.data 2 1 ;the constant 1
+

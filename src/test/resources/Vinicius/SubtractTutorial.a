@@ -1,0 +1,11 @@
+   load z		;input an integer into the acc
+   store x	;store it in the location x
+   read		;input an integer
+   store y	;store it in location y
+   load x	;load x into the accumulator
+   subtract y	;subtract y from the accumulator
+   write	;output the difference
+   stop		;end the program
+x: .data 2 0	;the storage location for x
+y: .data 2 0	;the storage location for y
+z: .data 2 5
