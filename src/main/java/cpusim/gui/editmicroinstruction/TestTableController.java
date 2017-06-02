@@ -72,16 +72,16 @@ public class TestTableController
         this.currentMicros = machine.getMicros("test");
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
-        this.prototype = new Test("???", machine, r, 0, 1, "EQ", Long.valueOf(0), 0);
+        this.prototype = new Test("???", machine, r, 0, 1, "EQ", 0L, 0);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "testTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "TestTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: testTable.fxml";
+            assert false : "Unable to load file: TestTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

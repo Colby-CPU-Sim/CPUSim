@@ -51,9 +51,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The controller for the Preferences Dialog.
@@ -590,68 +589,34 @@ public class PreferencesController implements Initializable {
             }
 
             String keyString = String.valueOf(t.getCode());
-            if (keyString.contains("DIGIT")) {
-                keyString = keyString.replaceAll("DIGIT", "");
-            }
 
-            if (keyString.length() > 1) {
-                String[] words = keyString.split("_");
-                keyString = "";
-                for (String word : words) {
-                    keyString += word.substring(0, 1) + word.substring(1)
-                            .toLowerCase() + "_";
-                }
-                keyString = keyString.substring(0, keyString.length() - 1);
-            }
+            // Numbers are indicated as DIGIT0 through DIGIT9
+            // and should be indicated as 0 through 9
+            keyString = keyString.replaceAll("DIGIT", "");
 
-            String kbString;
-            if (t.isShiftDown() && t.isAltDown() && t.isControlDown()) {
-                if (System.getProperty("os.name").startsWith("Windows")) {
-                    kbString = DesktopController.SHORTCUT + "-Shift-Alt-" + keyString;
-                }
-                else {
-                    kbString = DesktopController.SHORTCUT + "-Shift-Alt-Ctrl-" +
-                            keyString;
-                }
-            }
-            else if (t.isAltDown() && t.isControlDown()) {
-                if (System.getProperty("os.name").startsWith("Windows")) {
-                    kbString = DesktopController.SHORTCUT + "-Alt-" + keyString;
-                }
-                else {
-                    kbString = DesktopController.SHORTCUT + "-Alt-Ctrl-" + keyString;
-                }
-            }
-            else if (t.isShiftDown() && t.isControlDown()) {
-                if (System.getProperty("os.name").startsWith("Windows")) {
-                    kbString = DesktopController.SHORTCUT + "-Shift-" + keyString;
-                }
-                else {
-                    kbString = DesktopController.SHORTCUT + "-Shift-Ctrl-" +
-                            keyString;
-                }
-            }
-            else if (t.isControlDown()) {
-                if (System.getProperty("os.name").startsWith("Windows")) {
-                    kbString = DesktopController.SHORTCUT + "-" + keyString;
-                }
-                else {
-                    kbString = DesktopController.SHORTCUT + "-Shift-Ctrl-" +
-                            keyString;
-                }
-            }
-            else if (t.isShiftDown() && t.isAltDown()) {
-                kbString = DesktopController.SHORTCUT + "-Shift-Alt-" + keyString;
-            }
-            else if (t.isShiftDown()) {
-                kbString = DesktopController.SHORTCUT + "-Shift-" + keyString;
-            }
-            else if (t.isAltDown()) {
-                kbString = DesktopController.SHORTCUT + "-Alt-" + keyString;
-            }
-            else {
-                kbString = DesktopController.SHORTCUT + "-" + keyString;
-            }
+            // Key codes are all capitalized and multiword codes are split by underscore.
+            // Only the first letter of each word in the keycode should be capitalized
+            keyString = Arrays.stream(keyString.split("_"))
+                    .map(s -> s.charAt(0)+s.substring(1).toLowerCase())
+                    .collect(Collectors.joining("_"));
+
+            // Create the keybinding string in the form 'SHORTCUT-Shift-Alt-Ctrl-KeyString'
+            // omitting modifiers which are not pressed
+            StringJoiner keybindingCodes = new StringJoiner("-");
+            keybindingCodes.add(DesktopController.SHORTCUT);
+
+            if (t.isShiftDown())
+                keybindingCodes.add("Shift");
+            if (t.isAltDown())
+                keybindingCodes.add("Alt");
+            // Only allow Ctrl as an additional modifier on Macs, as on Windows/Linux,
+            // DesktopController.SHORTCUT is already Ctrl
+            if (t.isControlDown() && System.getProperty("os.name").toLowerCase().contains("mac"))
+                keybindingCodes.add("Ctrl");
+
+            keybindingCodes.add(keyString);
+            String kbString = keybindingCodes.toString();
+
             boolean stillListening = false;
 
             // check for duplicate bindings
@@ -665,12 +630,12 @@ public class PreferencesController implements Initializable {
                     Optional<ButtonType> result = Dialogs.createConfirmationDialog(
                             keyPrefsPane.getScene().getWindow(),
                             "Key Binding Conflict",
-                            "The key binding of the menu item '" +
-                                    conflictMenuItem
-                                    + "' already has the key binding '" + kbString
-                                    + "'.  Would you "
-                                    + "like to reassign the key binding of '" +
-                                    conflictMenuItem + "'?").showAndWait();
+                            String.format("The key binding of the menu item '%1$s' " +
+                                            "already has the key binding '%2$s'." +
+                                            "\n\nWould you like to reassign the key " +
+                                            "binding of '%1$s?",
+                                    conflictMenuItem, kbString)
+                    ).showAndWait();
 
                     if (result.get() == ButtonType.OK) {
                         label.setText("          ");

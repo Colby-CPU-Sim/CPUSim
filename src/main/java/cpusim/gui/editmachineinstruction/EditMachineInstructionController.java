@@ -539,7 +539,7 @@ public class EditMachineInstructionController {
         } catch (IOException e) {
             // should never happen
             assert false : "Unable to load file: " +
-                    "gui/editmachineinstruction/editFields/editFields.fxml";
+                    "gui/editmachineinstruction/editFields/EditFields.fxml";
         }
         Scene dialogScene = new Scene(dialogRoot);
         fieldStage.setScene(dialogScene);

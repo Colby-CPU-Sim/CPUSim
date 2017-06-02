@@ -77,13 +77,13 @@ public class ConditionBitTableController extends ModuleController implements Ini
         clones = (Module[]) createClones();
         fixClonesToUseCloneRegisters();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "conditionBitTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ConditionBitTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: conditionBitTable.fxml";
+            assert false : "Unable to load file: ConditionBitTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

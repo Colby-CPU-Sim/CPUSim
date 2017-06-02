@@ -74,17 +74,17 @@ public class SetTableController
         this.currentMicros = machine.getMicros("set");
         Register r = (machine.getAllRegisters().size() == 0 ? null :
                 (Register) machine.getAllRegisters().get(0));
-        this.prototype = new CpusimSet("???", machine, r, 0, 1, 0l);
+        this.prototype = new CpusimSet("???", machine, r, 0, 1, 0L);
         clones = (Microinstruction[]) createClones();
 
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "setTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "SetTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: setTable.fxml";
+            assert false : "Unable to load file: SetTable.fxml";
         }
 
         List<CpusimSet> items = table.getItems();

@@ -72,13 +72,13 @@ public class ShiftTableController
         this.prototype = new Shift("???", machine, r, r,"logical", "left", 1);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "shiftTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ShiftTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: shiftTable.fxml";
+            assert false : "Unable to load file: ShiftTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

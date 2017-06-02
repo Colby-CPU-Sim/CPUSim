@@ -63,13 +63,13 @@ public class RegisterArrayTableController
         this.prototype = new RegisterArray("???",4, 32);
         clones = (Module[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "registerArrayTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "RegisterArrayTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: registerArrayTable.fxml";
+            assert false : "Unable to load file: RegisterArrayTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

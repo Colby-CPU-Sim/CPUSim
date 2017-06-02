@@ -74,13 +74,13 @@ public class ArithmeticTableController
                 NO_CONDITIONBIT, NO_CONDITIONBIT);
         clones = (Microinstruction[]) createClones();
 
-        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "arithmeticTable.fxml");
+        FXMLLoader fxmlLoader = FXMLLoaderFactory.fromRootController(this, "ArithmeticTable.fxml");
 
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
             // should never happen
-            assert false : "Unable to load file: arithmeticTable.fxml";
+            assert false : "Unable to load file: ArithmeticTable.fxml";
         }
 
         for (int i = 0; i < clones.length; i++){

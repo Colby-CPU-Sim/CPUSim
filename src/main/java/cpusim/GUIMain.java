@@ -50,13 +50,14 @@ public class GUIMain extends Application {
 		DesktopController deskController = new DesktopController(mediator, stage);
 		Pane mainPane = null;
 
-		FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(deskController, "desktop.fxml");
+		FXMLLoader fxmlLoader = FXMLLoaderFactory.fromController(deskController,
+                "Desktop.fxml");
 
         try {
             mainPane = fxmlLoader.load();
         } catch (IOException e) {
             // should never happen
-           throw new IllegalStateException("Unable to load file: desktop.fxml", e);
+           throw new IllegalStateException("Unable to load file: Desktop.fxml", e);
         }
         Scene mainScene = new Scene(mainPane);
         stage.setScene(mainScene);
@@ -86,13 +87,6 @@ public class GUIMain extends Application {
         else {
             deskController.open(new File(textFileName));
         }
-
-        // Fixes crash on Windows 10 systems with Intel Chips
-        // See http://stackoverflow.com/questions/31786980/javafx-windows-10-combobox-error
-        // Setting this property will prevent automatic screen readers from working wth the application
-        // and may disable other similar accessibility features
-        System.setProperty("glass.accessible.force", "false");
-
 
         stage.show();
 	}
