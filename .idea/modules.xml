@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFX2015.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFX2015.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFX2015_main.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFX2015_main.iml" group="CPUSimFX2015" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFX2015_package.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFX2015_package.iml" group="CPUSimFX2015" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFX2015_test.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFX2015_test.iml" group="CPUSimFX2015" />
+      <module fileurl="file://$PROJECT_DIR$/CPUSimFXProj.iml" filepath="$PROJECT_DIR$/CPUSimFXProj.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFXProj_main.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFXProj_main.iml" group="CPUSimFXProj" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFXProj_package.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFXProj_package.iml" group="CPUSimFXProj" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CPUSimFXProj_test.iml" filepath="$PROJECT_DIR$/.idea/modules/CPUSimFXProj_test.iml" group="CPUSimFXProj" />
     </modules>
   </component>
 </project>
