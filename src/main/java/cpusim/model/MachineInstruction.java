@@ -271,8 +271,8 @@ public class MachineInstruction
         //assembly fields
         int[] relativePositions = new int[aColors.size()];
         i = 0;
-        for (String color : iColors){
-            relativePositions[i] = aColors.indexOf(color);
+        for (String color : aColors){
+            relativePositions[i] = iColors.indexOf(color);
             i++;
         }
         
