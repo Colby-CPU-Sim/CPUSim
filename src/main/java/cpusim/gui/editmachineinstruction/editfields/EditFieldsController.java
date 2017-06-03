@@ -470,11 +470,11 @@ public class EditFieldsController implements Initializable {
      * @param proposedName a given proposed name
      * @return the unique name
      */
-    public String createUniqueName(ObservableList list, String proposedName)
+    public String createUniqueName(ObservableList<Field> list, String proposedName)
     {
         String oldName;
-        for (Object obj : list) {
-            oldName = obj.toString();
+        for (Field obj : list) {
+            oldName = obj.getName();
             if (oldName != null && oldName.equals(proposedName))
                 return createUniqueName(list, proposedName + "?");
         }
