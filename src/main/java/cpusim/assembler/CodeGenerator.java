@@ -112,7 +112,7 @@ public class CodeGenerator
                 // Otherwise, test size of value and throw an exception if it won't fit.
                 // Allow the bits as unsigned or signed.
                 long valueToStore = getLong((Token) operands.get(1));
-                toBinary(valueToStore, numberOfCells * cellSize, false, true, (Token)
+                toBinaryString(valueToStore, numberOfCells * cellSize, false, true, (Token)
                         operands.get(1), false);
                 /*
                 //NOTE: The follow code was removed when the RAM cell size was
@@ -168,7 +168,7 @@ public class CodeGenerator
                 long specificValue = getLong((Token) operands.get(nextIndex));
                 //test that the value fits in cell size otherwise throw exception
                 //allow the bits as unsigned or signed.
-                toBinary(specificValue, cellSize * numCellsPerValue, false, true,
+                toBinaryString(specificValue, cellSize * numCellsPerValue, false, true,
                         (Token) operands.get(nextIndex), false);
 
                 instructionCallList.add(new AssembledInstructionCall(numCellsPerValue *
@@ -185,7 +185,7 @@ public class CodeGenerator
             //                //test that the value fits in cell size otherwise throw
             // exception
             //                //allow the bits as unsigned or signed.
-            //                toBinary(specificValue, cellSize * numCellsPerValue,
+            //                toBinaryString(specificValue, cellSize * numCellsPerValue,
             // false, true,
             //                        (Token) operands.get(i), false);
             //                instructionCallList.add(new AssembledInstructionCall
@@ -219,20 +219,29 @@ public class CodeGenerator
         //convert opcode to a string in binary of correct field length
         //No exception should be thrown here since the opcode must be legal
         //at this point and fit in the number of bits devoted to it.
-        String opcodePart = toBinary(machineInstruction.getOpcode(),
+        String opcodePart = toBinaryString(machineInstruction.getOpcode(),
                 posFieldLengths[0], false, false, null, true);
 
         //convert all the operands to binary strings of the appropriate size,
         //and add them to an array of Strings
         String[] instrParts = new String[posFieldLengths.length];
         instrParts[0] = opcodePart;
-        for (int i = 1; i < instrParts.length; i++) {
-            int actualIndex = machineInstruction.getRelativeOrderOfFields()[i - 1] + 1;
-            int currentFieldLength = posFieldLengths[actualIndex];
-            boolean currentFieldSign = posLenFieldSigns[actualIndex];
-            long op = getLong(operands.get(i - 1)); //operand index = field index -1
-            instrParts[actualIndex] = toBinary(op, currentFieldLength,
-                    currentFieldSign, true, operands.get(i - 1), false);
+        int[] instrIndexToAssmIndex = machineInstruction.getRelativeOrderOfFields();
+        for (int i = 1; i < instrParts.length; i++) {  // i = 0 refers to the opcode
+            int currentFieldLength = posFieldLengths[i];
+            boolean currentFieldSign = posLenFieldSigns[i];
+            int assmIndex = instrIndexToAssmIndex[i];
+            long op;
+            if (assmIndex >= 0) { //the field's value is an operand of the assembly instr
+                op = getLong(operands.get(instrIndexToAssmIndex[i]));
+                instrParts[i] = toBinaryString(op, currentFieldLength,
+                        currentFieldSign, true, operands.get(instrIndexToAssmIndex[i]), false);
+            }
+            else { // the instr operand is ignored and so not part of the assembly instr
+                op = machineInstruction.getDefaultValue(i);
+                instrParts[i] = toBinaryString(op, currentFieldLength,
+                        currentFieldSign, true, null, false);
+            }
         }
 
         String combinedFields = "";
@@ -282,8 +291,8 @@ public class CodeGenerator
      * @return the string of 0's and 1's representing the decimal value
      * @throws AssemblyException.ValueError if the value doesn't fit
      */
-    private String toBinary(long decimal, int bits, boolean signed, boolean ignoreSign,
-                            Token t, boolean isOpcode) throws AssemblyException
+    private String toBinaryString(long decimal, int bits, boolean signed, boolean ignoreSign,
+                                  Token t, boolean isOpcode) throws AssemblyException
             .ValueError {
         String result;
         long maxUnsignedValue = Long.rotateLeft(1, bits) - 1;

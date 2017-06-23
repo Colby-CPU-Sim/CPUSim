@@ -141,7 +141,7 @@ public class Validate
             opcodeIsNonnegative(instr.getOpcode());
             fieldsListIsNotEmpty(instr);
             firstFieldIsProper(instr);
-            //atMostOnePosLengthFieldIsOptional(instr); //not in this version
+            atMostOnePosLengthFieldIsOptional(instr);
             opcodeFits(instr);
             fieldLengthsAreAtMost64(instr);
             opcodeFieldIsFirst(instr);

@@ -38,12 +38,9 @@ package cpusim.assembler;
 ///////////////////////////////////////////////////////////////////////////////
 // the libraries we need to import
 
-import cpusim.model.Field;
-import cpusim.model.Field.Type;
-import cpusim.model.FieldValue;
+import cpusim.assembler.AssemblyException.*;
 import cpusim.model.Machine;
 import cpusim.model.MachineInstruction;
-import cpusim.assembler.AssemblyException.*;
 import cpusim.util.Convert;
 import cpusim.util.SourceLine;
 
@@ -699,71 +696,79 @@ public class Parser {
         if (node.comment.equals("")) {
             node.comment = "        "; //indent lines with no labels
         }
-        node.comment += token.contents + " "; //opcode and a space
-        advance(); //advance past the opcode
 
-        List<Field> fields = node.machineInstruction.getAssemblyFields();
-        for (int i = 1; i < fields.size(); i++) {
-            //process the next field
-            Field field = fields.get(i);
-            if (field.getNumBits() == 0
-                    && field.getType() == Type.required) {
-                check(field.getName().equals(token.contents), token,
-                        "The token should be \"" +
-                                field.getName() + "\"");
-                addTokenToComments(node, token);
-                advance();
-            }
-            else if (field.getNumBits() == 0) { // type = optional)
-                if (field.getName().equals(token.contents)) {
-                    addTokenToComments(node, token);
-                    advance();
-                }
-            }
-            else if (!(field.getType() == Type.required)) {
-                node.operands.add(new Token(token.filename, Token.Type.CONSTANT,
-                        token.lineNumber, token.columnNumber,
-                        token.offset, "" + field.getDefaultValue(),
-                        true));
-            }
-//            else if(! field.isRequired()) {
-//                check(false, token, "Optional fields of positive length" +
-//                        " are not allowed in this version");
-//            }
-            else if (field.getValues().size() == 0) { //no special values
-                check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.VAR,
-                                Token.Type.CONSTANT}),
-                        token, "The token \"" + token.contents
-                                + "\" is not a legal operand here");
-                node.operands.add(token);
-                addTokenToComments(node, token);
-                advance();
-            }
-            else {
-                check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.VAR,
-                                Token.Type.CONSTANT}),
-                        token, "The token \"" + token.contents
-                                + "\" is not a legal operand here");
-                //check that the token is one of the legal values for this field
-                boolean found = false;
-                for (FieldValue value : field.getValues()) {
-                    if (value.getName().equals(token.contents)) {
-                        found = true;
-                    }
-                }
-                check(found, token, "The token \"" + token.contents
-                        + "\" is not one of the legal" +
-                        " values for this field");
-                node.operands.add(token);
-                addTokenToComments(node, token);
-                advance();
-            }
+        // now add all the tokens on the line, including the opcode and the operands.
+        // no processing of them is done here because of optional operands,
+        // --you can't determine if they've been omitted until all operands have been read
+        // Instead, all the processing is done by the Normalizer, which
+        // gets rid of punctuation (length 0) tokens and adds in the
+        // optional fields, if missing, and ignored fields.
+        while( ! currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.COMMENT, Token.Type
+                                        .EOL, Token.Type.EOF})) {
+            addTokenToComments(node, token);
+            node.operands.add(token);
+            advance();
         }
-
-        //now check for illegal leftover tokens on the line
-        check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.COMMENT, Token.Type
-                        .EOL, Token.Type.EOF}),
-                token, "The token \"" + token.contents + "\" is illegal here");
+//        List<Field> fields = node.machineInstruction.getAssemblyFields();
+//        for (int i = 1; i < fields.size(); i++) {
+//            //process the next field
+//            Field field = fields.get(i);
+//            if (field.getNumBits() == 0
+//                    && field.getType() == Type.required) {
+//                check(field.getName().equals(token.contents), token,
+//                        "The token should be \"" +
+//                                field.getName() + "\"");
+//                addTokenToComments(node, token);
+//                advance();
+//            }
+//            else if (field.getNumBits() == 0) { // type = optional)
+//                if (field.getName().equals(token.contents)) {
+//                    addTokenToComments(node, token);
+//                    advance();
+//                }
+//            }
+//            // never used, since assembly fields don't include any ignored fields
+//            // The ignored fields are added to the assembled instruction by the
+//            // code generator
+//            //else if (field.getType() == Type.ignored) {
+//            //    node.operands.add(new Token(token.filename, Token.Type.CONSTANT,
+//            //            token.lineNumber, token.columnNumber,
+//            //            token.offset, "" + field.getDefaultValue(), true));
+//            //}
+//            else if (field.getValues().size() == 0) { //no special values
+//                check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.VAR,
+//                                Token.Type.CONSTANT}),
+//                        token, "The token \"" + token.contents
+//                                + "\" is not a legal operand here");
+//                node.operands.add(token);
+//                addTokenToComments(node, token);
+//                advance();
+//            }
+//            else {
+//                check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.VAR,
+//                                Token.Type.CONSTANT}),
+//                        token, "The token \"" + token.contents
+//                                + "\" is not a legal operand here");
+//                //check that the token is one of the legal values for this field
+//                boolean found = false;
+//                for (FieldValue value : field.getValues()) {
+//                    if (value.getName().equals(token.contents)) {
+//                        found = true;
+//                    }
+//                }
+//                check(found, token, "The token \"" + token.contents
+//                        + "\" is not one of the legal" +
+//                        " values for this field");
+//                node.operands.add(token);
+//                addTokenToComments(node, token);
+//                advance();
+//            }
+//        }
+//
+//        //now check for illegal leftover tokens on the line
+//        check(currentTokenHasOneOfTypes(new Token.Type[]{Token.Type.COMMENT, Token.Type
+//                        .EOL, Token.Type.EOF}),
+//                token, "The token \"" + token.contents + "\" is illegal here");
     }
 
     private void addTokenToComments(InstructionCall node, Token token) {

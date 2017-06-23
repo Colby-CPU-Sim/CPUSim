@@ -76,7 +76,7 @@ public class AssemblyException extends Exception{
       	 * @param t The Token of code relevant when being reported
     	**/
 		public MemoryError(String message, Token t) {
-			super("MemoryError:\n"+message, t);
+			super("Memory Error:\n"+message, t);
 		}
     	
     }
@@ -90,7 +90,7 @@ public class AssemblyException extends Exception{
       	 * @param t The Token of code relevant when being reported
     	**/
 		public ImportError(String message, Token t) {
-			super("ImportError:\n"+message, t);
+			super("Import Error:\n"+message, t);
 		}
     	
     }
@@ -106,7 +106,7 @@ public class AssemblyException extends Exception{
       	 * @param t The Token of code relevant when being reported
     	**/
 		public ValueError(String message, Token t) {
-			super("ValueError:\n"+message, t);
+			super("Value Error:\n"+message, t);
 		}
     }
     
@@ -120,7 +120,7 @@ public class AssemblyException extends Exception{
       	 * @param t The Token of code relevant when being reported
     	**/
 		public TypeError(String message, Token t) {
-			super("TypeError:\n"+message, t);
+			super("Type Error:\n"+message, t);
 		}
     }
     
@@ -133,7 +133,7 @@ public class AssemblyException extends Exception{
       	 * @param t The Token of code relevant when being reported
     	**/
 		public UndefinedOperandError(String message, Token t) {
-			super("UndefinedOperandError:\n"+message, t);
+			super("Undefined Operand Error:\n"+message, t);
 		}
     }
     /** An Exception thrown when a defined operand is misused. The indicator 
@@ -142,7 +142,7 @@ public class AssemblyException extends Exception{
     public static class InvalidOperandError extends AssemblyException{
 
 		public InvalidOperandError(String message, Token t) {
-			super("InvalidOperandError:\n"+message, t);
+			super("Invalid Operand Error:\n"+message, t);
 		}
     }
     
@@ -150,7 +150,7 @@ public class AssemblyException extends Exception{
     public static class InvalidTokenException extends AssemblyException{
     	
     	public InvalidTokenException(String message, Token t) {
-			super("InvalidTokenException:\n"+message, t);
+			super("Invalid Token Error:\n"+message, t);
 
     	}
     }

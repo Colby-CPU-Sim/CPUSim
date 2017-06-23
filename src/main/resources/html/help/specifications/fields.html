@@ -42,7 +42,9 @@
                 that field in assembly
                 language, in which case the field's default value is used for the operand
                 instead. If the field has
-                length 0 and is <I>optional</I>, then it may be omitted.
+                length 0 and is <I>optional</I>, then it may be omitted.  In each
+                machine instruction, at most one
+                field with length > 0 can be <I>optional</I>.
             </LI>
             <LI>An <I>ignored</I> field is one that is never included as an operand in
                 assembly language. Instead, the

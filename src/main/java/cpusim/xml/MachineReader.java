@@ -1632,7 +1632,7 @@ public class MachineReader implements CPUSimConstants
             Validate.opcodeFits(currentInstruction);
             Validate.firstFieldIsProper(currentInstruction);
             Validate.fieldLengthsAreAtMost64(currentInstruction);
-            //Validate.atMostOnePosLengthFieldIsOptional(currentInstruction);
+            Validate.atMostOnePosLengthFieldIsOptional(currentInstruction);
         } catch (ValidationException e) {
             throw new MachineReaderException((locator == null ? "" : "The error is in " +
                     "the MachineInstruction" + " element ending at line ") +
