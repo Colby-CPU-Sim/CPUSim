@@ -289,7 +289,6 @@ import java.util.prefs.Preferences;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.awt.SystemColor.text;
 import static javafx.scene.input.KeyCode.TAB;
 import static org.fxmisc.wellbehaved.event.EventPattern.keyPressed;
 
@@ -1931,6 +1930,13 @@ public class DesktopController implements Initializable
             mainPane.getChildren().add(1, debugToolBarController);
             debugToolBarController.prefWidthProperty().bind(mainPane.widthProperty());
             debugToolBarController.addButtonAccelerators();
+            // if there is no program counter chosen, warn the user that break points
+            // will not work
+            if (mediator.getMachine().getProgramCounter() == Machine.PLACE_HOLDER_REGISTER)
+                Dialogs.createWariningDialog(stage, "Warning", "You have " +
+                        "not selected a program counter, and so break points will be " +
+                        "ignored.  To set the program counter, use the Breakpoints tab " +
+                        "in the Execute|Options dialog.").showAndWait();
         }
         else {
             debugToolBarController.removeButtonAccelerators();
