@@ -1346,6 +1346,9 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleAssembleLoadRun(ActionEvent event) {
+        if (getOtherSettings().clearConsoleOnRun) {
+            ioConsole.clear();
+        }
         File currFile = getFileToAssemble();
         if (currFile != null) {
             mediator.AssembleLoadRun(currFile.getAbsolutePath());
@@ -1360,6 +1363,10 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleClearAssembleLoadRun(ActionEvent event) {
+        if (getOtherSettings().clearConsoleOnRun) {
+            ioConsole.clear();
+        }
+
         File currFile = getFileToAssemble();
         if (currFile != null) {
             mediator.ClearAssembleLoadRun(currFile.getAbsolutePath());
@@ -1373,6 +1380,9 @@ public class DesktopController implements Initializable
      */
     @FXML
     protected void handleRun(ActionEvent event) {
+        if (getOtherSettings().clearConsoleOnRun) {
+            ioConsole.clear();
+        }
         File currFile = getFileToAssemble();
         if (currFile != null) {
             mediator.Run();

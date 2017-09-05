@@ -129,7 +129,7 @@ public class FileChannel implements IOChannel  {
         }
     }
     
-    public void flush(boolean saveInputBuffers) {}
+    public void flushOutput() {}
 
     /**
      * returns the next Unicode char from input.

@@ -199,9 +199,9 @@ public class IO
             assert false : "IO '" + getName() + "' has an illegal " +
                     "type or direction";
         
-        //addded on 3/20 by Ben Borchard because outputs wouldn't print to the console.
+        //added on 3/20 by Ben Borchard because outputs wouldn't print to the console.
         //I am not sure that this is the correct thing to do...
-        connection.flush(true);
+        connection.flushOutput();
 
     }
 

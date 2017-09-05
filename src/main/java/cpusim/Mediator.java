@@ -2,8 +2,66 @@
  * File: Mediator
  * User: djskrien
  * Date: 5/29/13
- *
+ * <p>
  * Created: 6/4/13
+ * <p>
+ * <p>
+ * File: Mediator
+ * Author:Scott Franchi, Pratap Luitel, Stephen Webel
+ * Date: 11/12/13
+ * <p>
+ * Method Modified: public void clearAssembleLoadRun()
+ * <p>
+ * File: Mediator
+ * Authors: Joseph Harwood and Jake Epstein
+ * Date: 10/14/13
+ * <p>
+ * Added method clearConsole which does exactly that.
+ * <p>
+ * Updated method ResetEverything to also clear the console
+ * to prevent violation of the principle of least astonishment.
+ * <p>
+ * Updated method Run to allow for toggling of clearConsoleOnRun
+ * <p>
+ * <p>
+ * File: Mediator
+ * Author: Pratap Luitel, Scott Franchi, Stephen Webel
+ * Date: 10/27/13
+ * <p>
+ * Fields added:
+ * private SimpleBooleanProperty machineDirty
+ * private File machineFile
+ * private SimpleStringProperty machineDirtyString
+ * private String currentMachineDirectory
+ * <p>
+ * Methods added:
+ * public File getMachineFile()
+ * public void setMachineFile(File file)
+ * public boolean isMachineDirty()
+ * public void setMachineDirty(boolean b)
+ * public SimpleStringProperty getMachineDirtyProperty()
+ * public void setCurrentMachineDirectory(String s)
+ * public String getCurrentMachineDirectory()
+ * private void addMachineStateListeners()
+ * public void saveMachine()
+ * public void saveAsMachine()
+ * public void newMachine()
+ * public void openMachine(File fileToOpen)
+ * <p>
+ * Methods modified:
+ * public boolean Assemble(String programFileName)
+ * public void AssembleLoad(String programFileName)
+ * public void AssembleLoadRun(String programFileName)
+ * public void ClearAssembleLoadRun(String programFileName)
+ * public void Run()
+ * public void Stop()
+ * public void ResetEverything()
+ * private boolean load(boolean clearing)
+ * <p>
+ * Methods removed:
+ * private boolean assemble()
+ * private void run()
+ * private void stop()
  */
 
 /**
@@ -73,7 +131,8 @@
 /*
  * Michael Goldenberg, Jinghui Yu, and Ben Borchard made the following changes on 11/25
  * 
- * 1.) Changed saveAsMachine() method so that the fileChooser dialog has the .cpu file extenstion
+ * 1.) Changed saveAsMachine() method so that the fileChooser dialog has the .cpu file
+ * extenstion
  * filter
  * 
  */
@@ -114,7 +173,8 @@ import java.util.Set;
 /**
  * This class is the repository of global data, such as the current machine.
  */
-public class Mediator {
+public class Mediator
+{
     private static final String NEWLINE = System.lineSeparator();
     private static final String SPACES = "              ";
 
@@ -162,8 +222,7 @@ public class Mediator {
         }
         ObservableList arrays = machine.get().getModule("registerArrays");
         for (Object array : arrays) {
-            ObservableList<Register> registers =
-                    ((RegisterArray) array).registers();
+            ObservableList<Register> registers = ((RegisterArray) array).registers();
             for (Register register : registers) {
                 register.valueProperty().removeListener(listener);
                 register.valueProperty().addListener(listener);
@@ -206,14 +265,16 @@ public class Mediator {
         if (desktopController != null) {
             stage.titleProperty().bind(machineDirtyString.
                     concat(machine.get().getNameProperty()));
-        } else {
+        }
+        else {
             stage.titleProperty().bind(machine.get().getNameProperty());
         }
 
         // In case name ends with .cpu
         String newName = machine.get().getName();
         if (newName.toLowerCase().endsWith(".cpu")) {
-            machine.get().getNameProperty().set(newName.substring(0, newName.length() - 4));
+            machine.get().getNameProperty().set(newName.substring(0, newName.length() -
+                    4));
         }
 
         machine.get().stateProperty().removeListener(backupManager);
@@ -329,14 +390,22 @@ public class Mediator {
      * Used when opening or creating a new machine from the DesktopController
      */
     private void addMachineStateListeners() {
-        machine.get().stateProperty().removeListener(this.desktopController.getHighlightManager());
-        machine.get().stateProperty().addListener(this.desktopController.getHighlightManager());
-        machine.get().stateProperty().removeListener(this.desktopController.getUpdateDisplayManager());
-        machine.get().stateProperty().addListener(this.desktopController.getUpdateDisplayManager());
-        machine.get().stateProperty().removeListener(this.desktopController.getConsoleManager());
-        machine.get().stateProperty().addListener(this.desktopController.getConsoleManager());
-        machine.get().stateProperty().removeListener(this.desktopController.getDebugToolBarController());
-        machine.get().stateProperty().addListener(this.desktopController.getDebugToolBarController());
+        machine.get().stateProperty().removeListener(this.desktopController
+                .getHighlightManager());
+        machine.get().stateProperty().addListener(this.desktopController
+                .getHighlightManager());
+        machine.get().stateProperty().removeListener(this.desktopController
+                .getUpdateDisplayManager());
+        machine.get().stateProperty().addListener(this.desktopController
+                .getUpdateDisplayManager());
+        machine.get().stateProperty().removeListener(this.desktopController
+                .getConsoleManager());
+        machine.get().stateProperty().addListener(this.desktopController
+                .getConsoleManager());
+        machine.get().stateProperty().removeListener(this.desktopController
+                .getDebugToolBarController());
+        machine.get().stateProperty().addListener(this.desktopController
+                .getDebugToolBarController());
     }
 
     /**
@@ -352,13 +421,13 @@ public class Mediator {
         MachineWriter writer = new MachineWriter();
         try {
             writer.writeMachine(machine.get(), machineFile.getName(),
-                    getRegisterRAMPairs(),
-                    new PrintWriter(new FileWriter(machineFile), true));
+                    getRegisterRAMPairs(), new PrintWriter(new FileWriter(machineFile),
+                            true));
             setMachineDirty(false);
             this.desktopController.updateReopenMachineFiles(machineFile);
         } catch (IOException IOe) {
-            Dialogs.createErrorDialog(stage, "Save file error",
-                    "Could not save file for unknown reason").showAndWait();
+            Dialogs.createErrorDialog(stage, "Save file error", "Could not save file " +
+                    "for unknown reason").showAndWait();
         }
     }
 
@@ -370,7 +439,8 @@ public class Mediator {
         this.desktopController.initFileChooser(fileChooser, "Save Machine", false);
 
         //extension filters removed by Ben Borchard on 2/27/14
-        /*fileChooser.getExtensionFilters().add(new ExtensionFilter("Machine File (.cpu)", "*.cpu"));*/
+        /*fileChooser.getExtensionFilters().add(new ExtensionFilter("Machine File (
+        .cpu)", "*.cpu"));*/
 
         File fileToSave = fileChooser.showSaveDialog(stage);
         if (fileToSave == null) {
@@ -387,8 +457,8 @@ public class Mediator {
         MachineWriter writer = new MachineWriter();
         try {
             writer.writeMachine(machine.get(), fileToSave.getName(),
-                    getRegisterRAMPairs(),
-                    new PrintWriter(new FileWriter(fileToSave), true));
+                    getRegisterRAMPairs(), new PrintWriter(new FileWriter(fileToSave),
+                            true));
             setCurrentMachineDirectory(fileToSave.getParent());
             setMachineFile(fileToSave);
             setMachineDirty(false);
@@ -398,12 +468,13 @@ public class Mediator {
             String newName = fileToSave.getName();
             if (newName.toLowerCase().endsWith(".cpu")) {
                 machine.get().setName(newName.substring(0, newName.length() - 4));
-            } else {
+            }
+            else {
                 machine.get().setName(newName);
             }
         } catch (IOException e) {
-            Dialogs.createErrorDialog(stage, "Save file error",
-                    "Could not save file for unknown reason").showAndWait();
+            Dialogs.createErrorDialog(stage, "Save file error", "Could not save file " +
+                    "for unknown reason").showAndWait();
         }
 
 
@@ -445,8 +516,7 @@ public class Mediator {
             String messagePrefix = "Error when reading the machine file \"" +
                     fileToOpen.getName() + "\"";
             if (ex instanceof SAXParseException) {
-                messagePrefix += " at line " +
-                        ((SAXParseException) ex).getLineNumber();
+                messagePrefix += " at line " + ((SAXParseException) ex).getLineNumber();
             }
             errorMessage = messagePrefix + "." + NEWLINE + errorMessage;
             Dialogs.createErrorDialog(stage, "Error reading machine file",
@@ -470,8 +540,8 @@ public class Mediator {
 
         machine = reader.getMachine();
         setMachine(machine);
-        this.desktopController.getHighlightManager().setRegisterRAMPairs(
-                FXCollections.observableList(reader.getRegisterRAMPairs()));
+        this.desktopController.getHighlightManager().setRegisterRAMPairs(FXCollections
+                .observableList(reader.getRegisterRAMPairs()));
 
         addMachineStateListeners();
 
@@ -496,18 +566,18 @@ public class Mediator {
     //CHANGE: returns boolean value
     public boolean Assemble(String programFileName) {
         try {
-            assembler.assemble(programFileName,
-                    (machine.get()).getStartingAddressForLoading());
+            assembler.assemble(programFileName, (machine.get())
+                    .getStartingAddressForLoading());
             return true;
         } catch (AssemblyException ae) {
             //TODO:  Use the catch block from Desktop.assembleCurrentProgram
             //       in version 3.8.3.  In the meanwhile, just display
             //      the error message from the Exception.
             desktopController.highlightToken(ae.token);
-            Dialogs.createErrorDialog(stage, "Assembly error",
-                    ae.getMessage() + System.lineSeparator() + "Error is at line " + (ae.token.lineNumber + 1) +
-                            " and column " + ae.token.columnNumber + ", in file " +
-                            ae.token.filename).showAndWait();
+            Dialogs.createErrorDialog(stage, "Assembly error", ae.getMessage() + System
+                    .lineSeparator() + "Error is at line " + (ae.token.lineNumber + 1)
+                    + " and column " + ae.token.columnNumber + ", in file " + ae.token
+                    .filename).showAndWait();
             return false;
         }
     }
@@ -589,17 +659,9 @@ public class Mediator {
      * Runs the current program.
      * Called from the Execute menu.
      */
-    //CHANGE: run() code replaced body
     public void Run() {
-        // Try running
         machine.get().getControlUnit().reset();
-
-        if (desktopController.getOtherSettings().clearConsoleOnRun) {
-            machine.get().resetAllChannels();
-        } else {
-            machine.get().resetAllChannelsButConsole();
-        }
-
+        machine.get().resetAllChannels();
         machine.get().execute(Machine.RunModes.RUN);
     }
 
@@ -619,14 +681,14 @@ public class Mediator {
         clearRegisters();
         clearRegisterArrays();
         clearRAMs();
-        ClearConsole();
+        resetAllChannels();
     }
 
     /**
      * Clears the console.
      * Called from the Execute menu.
      */
-    public void ClearConsole() {
+    public void resetAllChannels() {
         machine.get().resetAllChannels();
     }
 
@@ -664,13 +726,12 @@ public class Mediator {
         clearing = true;
 
         if (machine.get().getCodeStore() == null) {
-            Dialogs.createErrorDialog(stage, "Error finding RAM",
-                    "The machine has no RAM's and so there is " +
-                    "nowhere to load the assembled code.").showAndWait();
+            Dialogs.createErrorDialog(stage, "Error finding RAM", "The machine has no " +
+                    "RAM's and so there is " + "nowhere to load the assembled code.")
+                    .showAndWait();
             return false;
         }
-        List<AssembledInstructionCall> instrs =
-                assembler.getAssembledInstructions();
+        List<AssembledInstructionCall> instrs = assembler.getAssembledInstructions();
 
         try {
             if (clearing) {
@@ -679,16 +740,16 @@ public class Mediator {
                 clearRAMs();
             }
             RAM codeStore = machine.get().getCodeStore();
-            codeStore.loadAssembledInstructions(instrs,
-                    machine.get().getStartingAddressForLoading());
+            codeStore.loadAssembledInstructions(instrs, machine.get()
+                    .getStartingAddressForLoading());
 
             // remove the old breakpoints and add the new ones
             codeStore.clearAllBreakpoints();
             setBreakPointsInRam();
             return true;
         } catch (LoadException ex) {
-            Dialogs.createErrorDialog(stage, "RAM Load Error",
-                    ex.getMessage()).showAndWait();
+            Dialogs.createErrorDialog(stage, "RAM Load Error", ex.getMessage())
+                    .showAndWait();
             return false;
         }
     }
@@ -722,32 +783,43 @@ public class Mediator {
                     }
                     i++;
                     continue;
-                } else {
+                }
+                else {
                     if (dataChunkBeginAddress != -1) {
-                        ramInMIF += "[" + Convert.fromLongToHexadecimalString(
-                                dataChunkBeginAddress, ram.getCellSize()) + ".." +
-                                Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
-                                Convert.fromLongToTwosComplementString(ramLoc.getValue(),
-                                        ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
+                        ramInMIF += "[" + Convert.fromLongToHexadecimalString
+                                (dataChunkBeginAddress, ram.getCellSize()) + ".." +
+                                Convert.fromLongToHexadecimalString(i, ram
+                                        .getNumAddrBits()) + "]:  " + Convert
+                                .fromLongToTwosComplementString(ramLoc.getValue(), ram
+                                        .getCellSize()) + ";" + SPACES + "-- " + ramLoc
+                                .getComment() + NEWLINE;
                         dataChunkBeginAddress = -1;
-                    } else {
-                        ramInMIF += Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits())
-                                + "        :  " + Convert.fromLongToTwosComplementString(ramLoc.getValue(),
-                                ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
+                    }
+                    else {
+                        ramInMIF += Convert.fromLongToHexadecimalString(i, ram
+                                .getNumAddrBits()) + "        :  " + Convert
+                                .fromLongToTwosComplementString(ramLoc.getValue(), ram
+                                        .getCellSize()) + ";" + SPACES + "-- " + ramLoc
+                                .getComment() + NEWLINE;
                     }
                 }
-            } else {
+            }
+            else {
                 if (dataChunkBeginAddress != -1) {
-                    ramInMIF += "[" + Convert.fromLongToHexadecimalString(
-                            dataChunkBeginAddress, ram.getCellSize()) + ".." +
-                            Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:  " +
-                            Convert.fromLongToTwosComplementString(ramLoc.getValue(),
-                                    ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
+                    ramInMIF += "[" + Convert.fromLongToHexadecimalString
+                            (dataChunkBeginAddress, ram.getCellSize()) + ".." + Convert
+                            .fromLongToHexadecimalString(i, ram.getNumAddrBits()) + "]:" +
+                            "  " + Convert.fromLongToTwosComplementString(ramLoc
+                            .getValue(), ram.getCellSize()) + ";" + SPACES + "-- " +
+                            ramLoc.getComment() + NEWLINE;
                     dataChunkBeginAddress = -1;
-                } else {
-                    ramInMIF += Convert.fromLongToHexadecimalString(i, ram.getNumAddrBits())
-                            + "        :  " + Convert.fromLongToTwosComplementString(ramLoc.getValue(),
-                            ram.getCellSize()) + ";" + SPACES + "-- " + ramLoc.getComment() + NEWLINE;
+                }
+                else {
+                    ramInMIF += Convert.fromLongToHexadecimalString(i, ram
+                            .getNumAddrBits()) + "        :  " + Convert
+                            .fromLongToTwosComplementString(ramLoc.getValue(), ram
+                                    .getCellSize()) + ";" + SPACES + "-- " + ramLoc
+                            .getComment() + NEWLINE;
                 }
             }
             i++;
@@ -769,8 +841,10 @@ public class Mediator {
             ramInIntelHex += Convert.fromLongToHexadecimalString(bytesNeeded, 8);
             ramInIntelHex += Convert.fromLongToHexadecimalString(ramLoc.getAddress(), 16);
             ramInIntelHex += "00";
-            ramInIntelHex += Convert.fromLongToHexadecimalString(ramLoc.getValue(), bytesNeeded * 8);
-            ramInIntelHex += getCheckSumString(bytesNeeded, (int) ramLoc.getAddress(), ramLoc.getValue());
+            ramInIntelHex += Convert.fromLongToHexadecimalString(ramLoc.getValue(),
+                    bytesNeeded * 8);
+            ramInIntelHex += getCheckSumString(bytesNeeded, (int) ramLoc.getAddress(),
+                    ramLoc.getValue());
             ramInIntelHex += NEWLINE;
         }
 
@@ -813,8 +887,8 @@ public class Mediator {
 
             if (tokens.size() == 4) {
                 if (!tokens.get(1).equals("=")) {
-                    throw (new MIFReaderException("Equals sign missing or in incorrect "
-                            + "position on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Equals sign missing or in incorrect " +
+                            "" + "position on line " + scanner.getLineNumber()));
                 }
                 if (!tokens.get(3).equals(";")) {
                     throw (new MIFReaderException("Semicolon missing or in incorrect "
@@ -824,16 +898,18 @@ public class Mediator {
                     try {
                         depth = Integer.parseInt(tokens.get(2));
                     } catch (NumberFormatException nfe) {
-                        throw (new MIFReaderException("The value for depth assigned on line "
-                                + scanner.getLineNumber() + " should be a valid integer"));
+                        throw (new MIFReaderException("The value for depth assigned on " +
+                                "line " + scanner.getLineNumber() + " should be a valid" +
+                                " integer"));
                     }
                 }
                 if (tokens.get(0).toLowerCase().equals("width")) {
                     try {
                         width = Integer.parseInt(tokens.get(2));
                     } catch (NumberFormatException nfe) {
-                        throw (new MIFReaderException("The value for width assigned on line "
-                                + scanner.getLineNumber() + " should be a valid integer"));
+                        throw (new MIFReaderException("The value for width assigned on " +
+                                "line " + scanner.getLineNumber() + " should be a valid" +
+                                " integer"));
                     }
                 }
                 if (tokens.get(0).toLowerCase().equals("address_radix")) {
@@ -849,8 +925,8 @@ public class Mediator {
                     }
                     if (!addressRadix.equals("hex") && !addressRadix.equals("dec") &&
                             !addressRadix.equals("bin")) {
-                        throw (new MIFReaderException("unknown radix '" + addressRadix +
-                                "' found on line " + scanner.getLineNumber()));
+                        throw (new MIFReaderException("unknown radix '" + addressRadix
+                                + "' found on line " + scanner.getLineNumber()));
                     }
                 }
                 if (tokens.get(0).toLowerCase().equals("data_radix")) {
@@ -866,35 +942,39 @@ public class Mediator {
                     }
                     if (!dataRadix.equals("hex") && !dataRadix.equals("dec") &&
                             !dataRadix.equals("bin")) {
-                        throw (new MIFReaderException("unknown radix " + dataRadix +
-                                " found on line " + scanner.getLineNumber()));
+                        throw (new MIFReaderException("unknown radix " + dataRadix + " " +
+                                "found on line " + scanner.getLineNumber()));
                     }
                 }
 
-            } else if (tokens.size() == 1) {
+            }
+            else if (tokens.size() == 1) {
                 if (tokens.get(0).toLowerCase().equals("content")) {
                     break;
-                } else {
-                    throw (new MIFReaderException("Unknown indicator " + tokens.get(0) + " on"
-                            + "line " + scanner.getLineNumber()));
                 }
-            } else if (tokens.size() != 0) {
-                throw (new MIFReaderException("Parse error on line " + scanner.getLineNumber()));
+                else {
+                    throw (new MIFReaderException("Unknown indicator " + tokens.get(0)
+                            + " on" + "line " + scanner.getLineNumber()));
+                }
+            }
+            else if (tokens.size() != 0) {
+                throw (new MIFReaderException("Parse error on line " + scanner
+                        .getLineNumber()));
             }
 
         }
 
         if (depth > ram.getLength()) {
-            Dialogs.createWariningDialog(stage, "Warning",
-                    "There is more data being loaded into the ram"
-                            + "than the ram has room for.  This means that not all of the information"
-                            + "in the file will be loaded into ram").showAndWait();
+            Dialogs.createWariningDialog(stage, "Warning", "There is more data being " +
+                    "loaded into the ram" + "than the ram has room for.  This means " +
+                    "that not all of the information" + "in the file will be loaded " +
+                    "into ram").showAndWait();
         }
 
         if (width != ram.getCellSize()) {
-            throw (new MIFReaderException("The specified width does not match the "
-                    + "cell size of the ram and therefor the data from the file"
-                    + " cannot be loaded"));
+            throw (new MIFReaderException("The specified width does not match the " +
+                    "cell size of the ram and therefor the data from the file" + " " +
+                    "cannot be loaded"));
         }
 
         //look for the begin indicator
@@ -925,68 +1005,81 @@ public class Mediator {
 
             if (tokens.size() < 4) {
                 if (tokens.size() == 2) {
-                    if (tokens.get(0).toLowerCase().equals("end") && tokens.get(1).equals(";")) {
+                    if (tokens.get(0).toLowerCase().equals("end") && tokens.get(1)
+                            .equals(";")) {
                         break;
-                    } else {
-                        throw (new MIFReaderException("Unknown indicator " + tokens.get(0) + " on"
-                                + "line " + scanner.getLineNumber()));
+                    }
+                    else {
+                        throw (new MIFReaderException("Unknown indicator " + tokens.get
+                                (0) + " on" + "line " + scanner.getLineNumber()));
                     }
                 }
-                throw (new MIFReaderException("Parse error on line " + scanner.getLineNumber()));
+                throw (new MIFReaderException("Parse error on line " + scanner
+                        .getLineNumber()));
             }
             if (tokens.get(1).equals(":")) {
                 try {
                     if (addressRadix.equals("hex")) {
                         startAddr = Integer.parseInt(tokens.get(0), 16);
-                    } else if (addressRadix.equals("dec")) {
+                    }
+                    else if (addressRadix.equals("dec")) {
                         startAddr = Integer.parseInt(tokens.get(0));
-                    } else {
+                    }
+                    else {
                         startAddr = Integer.parseInt(tokens.get(0), 2);
                     }
                 } catch (NumberFormatException e) {
-                    throw (new MIFReaderException("Invalid address value" + tokens.get(0) +
-                            "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Invalid address value" + tokens.get
+                            (0) + "on line " + scanner.getLineNumber()));
                 }
                 dataBeginIndex = 2;
-            } else if (tokens.get(0).equals("[")) {
+            }
+            else if (tokens.get(0).equals("[")) {
                 if (!tokens.get(2).equals("..")) {
-                    throw (new MIFReaderException("Parse error on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Parse error on line " + scanner
+                            .getLineNumber()));
                 }
                 if (!tokens.get(4).equals("]")) {
-                    throw (new MIFReaderException("Closed bracket is missing or misplaced "
-                            + "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Closed bracket is missing or " +
+                            "misplaced " + "on line " + scanner.getLineNumber()));
                 }
                 if (!tokens.get(5).equals(":")) {
-                    throw (new MIFReaderException("Colon is missing or misplaced "
-                            + "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Colon is missing or misplaced " +
+                            "on line " + scanner.getLineNumber()));
                 }
                 try {
                     if (addressRadix.equals("hex")) {
                         startAddr = Integer.parseInt(tokens.get(1), 16);
-                    } else if (addressRadix.equals("dec")) {
+                    }
+                    else if (addressRadix.equals("dec")) {
                         startAddr = Integer.parseInt(tokens.get(1));
-                    } else {
+                    }
+                    else {
                         startAddr = Integer.parseInt(tokens.get(1), 2);
                     }
                 } catch (NumberFormatException e) {
-                    throw (new MIFReaderException("Invalid address value" + tokens.get(1) +
-                            "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Invalid address value" + tokens.get
+                            (1) + "on line " + scanner.getLineNumber()));
                 }
                 try {
                     if (addressRadix.equals("hex")) {
                         endAddr = Integer.parseInt(tokens.get(3), 16);
-                    } else if (addressRadix.equals("dec")) {
+                    }
+                    else if (addressRadix.equals("dec")) {
                         endAddr = Integer.parseInt(tokens.get(3));
-                    } else {
+                    }
+                    else {
                         endAddr = Integer.parseInt(tokens.get(3), 2);
                     }
                 } catch (NumberFormatException e) {
-                    throw (new MIFReaderException("Invalid address value" + tokens.get(3) +
-                            "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Invalid address value" + tokens.get
+                            (3) + "on line " + scanner.getLineNumber()));
                 }
                 dataBeginIndex = 6;
-            } else {
-                throw (new MIFReaderException("Parse error on line " + scanner.getLineNumber()));
+            }
+            else {
+                throw (new MIFReaderException("Parse error on line " + scanner
+                        .getLineNumber()));
             }
             while (true) {
                 if (tokens.get(dataBeginIndex).equals(";")) {
@@ -998,14 +1091,16 @@ public class Mediator {
                 try {
                     if (dataRadix.equals("hex")) {
                         data.add(Long.parseLong(tokens.get(dataBeginIndex), 16));
-                    } else if (addressRadix.equals("dec")) {
+                    }
+                    else if (addressRadix.equals("dec")) {
                         data.add(Long.parseLong(tokens.get(dataBeginIndex)));
-                    } else {
+                    }
+                    else {
                         data.add(Long.parseLong(tokens.get(dataBeginIndex), 2));
                     }
                 } catch (NumberFormatException e) {
-                    throw (new MIFReaderException("Invalid data value" + tokens.get(dataBeginIndex) +
-                            "on line " + scanner.getLineNumber()));
+                    throw (new MIFReaderException("Invalid data value" + tokens.get
+                            (dataBeginIndex) + "on line " + scanner.getLineNumber()));
                 }
                 if (dataBeginIndex == tokens.size() - 1) {
                     break;
@@ -1024,17 +1119,19 @@ public class Mediator {
                     if (ram.data().size() == ramToBe.size()) {
                         break;
                     }
-                    ramToBe.add(new RAMLocation(startAddr + k, value, ram, false, comment,
-                            new SourceLine(scanner.getLineNumber(), pathName)));
+                    ramToBe.add(new RAMLocation(startAddr + k, value, ram, false,
+                            comment, new SourceLine(scanner.getLineNumber(), pathName)));
                     k++;
                 }
-            } else {
+            }
+            else {
                 while (startAddr + k != endAddr + 1) {
                     if (ram.data().size() == ramToBe.size()) {
                         break;
                     }
-                    ramToBe.add(new RAMLocation(startAddr + k, data.get(k % data.size()), ram,
-                            false, comment, new SourceLine(scanner.getLineNumber(), pathName)));
+                    ramToBe.add(new RAMLocation(startAddr + k, data.get(k % data.size()
+                    ), ram, false, comment, new SourceLine(scanner.getLineNumber(),
+                            pathName)));
                     k++;
                 }
             }
@@ -1075,22 +1172,22 @@ public class Mediator {
         int lineNumber = 1;
         for (String line : lines) {
             if (line.length() % 2 != 1) {
-                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                        "There is an even number of characters on"
-                                + "line " + lineNumber + ", which is not allowed in"
-                                + " intel hex format").showAndWait();
+                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "There is an " +
+                        "even number of characters on" + "line " + lineNumber + ", " +
+                        "which is not allowed in" + " intel hex format").showAndWait();
             }
             if (line.charAt(0) != ':') {
-                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                        "line " + lineNumber + " does not start with"
-                                + "a colon as it should").showAndWait();
+                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "line " +
+                        lineNumber + " does not start with" + "a colon as it should")
+                        .showAndWait();
             }
-            int bytesOfData = (int) Convert.fromHexadecimalStringToLong(line.substring(1, 3), 8);
+            int bytesOfData = (int) Convert.fromHexadecimalStringToLong(line.substring
+                    (1, 3), 8);
             if (line.length() != 11 + 2 * bytesOfData) {
-                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                        "Line " + lineNumber +
-                                " specifies " + bytesOfData + " bytes of data but contains " +
-                                (line.length() - 11) + " bytes of data.").showAndWait();
+                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "Line " +
+                        lineNumber + " specifies " + bytesOfData + " bytes of data but " +
+                        "contains " + (line.length() - 11) + " bytes of data.")
+                        .showAndWait();
             }
             if (line.substring(7, 9).equals("01")) {
                 int i = 0;
@@ -1107,11 +1204,10 @@ public class Mediator {
 
             int recordType = Integer.parseInt(line.substring(7, 9), 16);
             if (!(recordType == 0 || recordType == 1)) {
-                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                        "Line " + lineNumber +
-                                " has a record type other than data record (00)" +
-                                " or end of file record (01), which CPUSim means CPUSim cannot"
-                                + "parse this file.").showAndWait();
+                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "Line " +
+                        lineNumber + " has a record type other than data record (00)" +
+                        " or end of file record (01), which CPUSim means CPUSim cannot"
+                        + "parse this file.").showAndWait();
             }
             // check the checksum for the line
             // first get all the chars after the colon into a byte array
@@ -1124,22 +1220,21 @@ public class Mediator {
             for (byte b : byteArray)
                 sum += b;
             if ((sum & 255) != 0) {
-                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                        "Line " + lineNumber +
-                                " has an incorrect checksum value.").showAndWait();
+                Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "Line " +
+                        lineNumber + " has an incorrect checksum value.").showAndWait();
             }
-            long data = Convert.fromHexadecimalStringToLong(line.substring(9, 9 + bytesOfData * 2),
-                    bytesOfData * 8);
+            long data = Convert.fromHexadecimalStringToLong(line.substring(9, 9 +
+                    bytesOfData * 2), bytesOfData * 8);
 
-            ramToBe.add(new RAMLocation(address, data, ram, false, "", new SourceLine(lineNumber,
-                    pathName)));
+            ramToBe.add(new RAMLocation(address, data, ram, false, "", new SourceLine
+                    (lineNumber, pathName)));
 
             lineNumber++;
         }
         // if we get here, there must not have been an end-of-line
         // record type, so throw an exception
-        Dialogs.createErrorDialog(stage, "Intel Hex Parse Error",
-                "The file is missing an end-of-line record.").showAndWait();
+        Dialogs.createErrorDialog(stage, "Intel Hex Parse Error", "The file is missing " +
+                "an end-of-line record.").showAndWait();
     }
 
     /**
@@ -1166,8 +1261,8 @@ public class Mediator {
         for (RAMLocation rLoc : ram.data()) {
             if (rLoc.getSourceLine() != null) {
                 SourceLine sourceLine = rLoc.getSourceLine();
-                Set<Integer> breakPoints = desktopController.getAllBreakPointLineNumbersForFile(
-                        sourceLine.getFileName());
+                Set<Integer> breakPoints = desktopController
+                        .getAllBreakPointLineNumbersForFile(sourceLine.getFileName());
                 rLoc.setBreak(breakPoints.contains(sourceLine.getLine()));
             }
         }

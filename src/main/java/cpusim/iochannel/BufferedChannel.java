@@ -8,7 +8,7 @@
  * update: changed for CS361 Project 6 Stephen Terrence Ian
  * Changed to help enable multiple input and output capability.
  * 
- * Added the flush method.
+ * Added the flushOutput method.
  */
 package cpusim.iochannel;
 
@@ -91,26 +91,19 @@ public class BufferedChannel implements IOChannel {
 	}
 
 	/**
-	 * Resets the state.  Does nothing unless the state is a console channel, 
-        * in which case it clears the console.
+	 * Resets the Channel's state.
 	 */
         @Override
 	public void reset() {
-            //reset the console channel if that is the state
-            if (this.state.getClass().equals(ConsoleChannel.class)){
-                ((ConsoleChannel)this.state).getIOConsole().clear();
-            }
+            this.inputBuffer = "";
         }
 
 	/**
 	 * Flushes the left-over outputs to channel.
 	 */
         @Override
-	public void flush(boolean saveInputBuffers) {
-		if(!saveInputBuffers) {
-			this.inputBuffer = "";
-		}
-		if (!this.outputBuffer.isEmpty()) {
+	public void flushOutput() {
+		if (! this.outputBuffer.isEmpty()) {
 			state.writeString("Output: " + this.outputBuffer
 					+ LINE_SEPARATOR);
 			this.outputBuffer = "";

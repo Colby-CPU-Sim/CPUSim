@@ -10,7 +10,7 @@
  * Class: CS 361
  * Project 7
  * 
- * added flush(boolean saveInputBuffers):void method signature
+ * added flushOutput(boolean saveInputBuffers):void method signature
  */
 
 package cpusim.iochannel;
@@ -32,7 +32,7 @@ public interface IOChannel extends CPUSimConstants {
      * @return the long value that was input
      * @throws ExecutionException if it cannot read a long.
      */
-    public long readLong(int numBits);
+    long readLong(int numBits);
 
     /**
      * returns the next ASCII char from input.
@@ -40,7 +40,7 @@ public interface IOChannel extends CPUSimConstants {
      * @return the ASCII character read
      * @throws ExecutionException if it cannot read an ASCII char.
      */
-    public char readAscii();
+    char readAscii();
 
     /**
      * returns the next Unicode char from input.
@@ -48,14 +48,14 @@ public interface IOChannel extends CPUSimConstants {
      * @return the Unicode character read
      * @throws ExecutionException if it cannot read an Unicode char.
      */
-    public char readUnicode();
+    char readUnicode();
 
     /**
      * writes the given long value to the output
      *
      * @param value the long value to be output
      */
-    public void writeLong(long value);
+    void writeLong(long value);
 
     /**
      * writes the given long value to the output as an ASCII value
@@ -63,7 +63,7 @@ public interface IOChannel extends CPUSimConstants {
      * @param longValue the long value to be output
      * @throws ExecutionException if the long is not an ASCII char
      */
-    public void writeAscii(long longValue);
+    void writeAscii(long longValue);
 
     /**
      * writes the given long value to the output as a Unicode value
@@ -71,21 +71,16 @@ public interface IOChannel extends CPUSimConstants {
      * @param longValue the long value to be output
      * @throws ExecutionException if the long is not an Unicode char
      */
-    public void writeUnicode(long longValue);
+    void writeUnicode(long longValue);
 
     
     /**
-     * Give any output that hasn't already been
+     * Output any output values that hasn't already been
      * outputted.
-     * 
-     * @param saveInputBuffers - In debug mode we don't want
-     * the buffers to be emptied every time we come to a 
-     * breakpoint. In regular running, we do want the 
-     * input buffers flushed.
      */
-    public void flush(boolean saveInputBuffers);
+    void flushOutput();
 
     /** reset the input and output */
-    public void reset();
+    void reset();
 
 }

@@ -433,7 +433,6 @@ public class Normalizer
                                 "value \"" + op.contents + "\" is not one of the " +
                                 "acceptable " + "field values", op);
                     }
-                    i++;
                 }
             }
             currAddressInBits += instrCall.getLength();

@@ -79,7 +79,7 @@ public class UpdateDisplayManager
         }
         else {
             mediator.getMachine().getControlUnit().reset();
-            mediator.getMachine().resetAllChannelsButConsole();
+            mediator.getMachine().resetAllChannels();
         }
     }
 }

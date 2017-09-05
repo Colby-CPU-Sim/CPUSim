@@ -737,16 +737,6 @@ public class Machine extends Module implements Serializable, CPUSimConstants {
         }
     }
 
-    public void resetAllChannelsButConsole() {
-        ObservableList ios = getMicros("io");
-        for (Object io : ios) {
-            IOChannel channel = ((IO) io).getConnection();
-            if (channel != CONSOLE_CHANNEL) {
-                channel.reset();
-            }
-        }
-    }
-
     //--------------------------------
     // JRL (11.3.00) clearAllRegisters
     public void clearAllRegisters() {

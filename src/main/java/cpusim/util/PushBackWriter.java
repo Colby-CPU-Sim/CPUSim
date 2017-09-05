@@ -76,7 +76,7 @@ public class PushBackWriter {
     }
 
     /**
-     * write the whole buffer the a file and flush the buffer
+     * write the whole buffer the a file and flushOutput the buffer
      * @throws IOException
      */
     public void writeBufToFile() throws IOException {
@@ -85,7 +85,7 @@ public class PushBackWriter {
     }
 
     /**
-     * flush the writer
+     * flushOutput the writer
      * @throws IOException
      */
     public void flush() throws IOException {
