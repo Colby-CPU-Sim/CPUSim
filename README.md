@@ -13,6 +13,8 @@ using Swing). Version 4 should run on any platform that has the Java runtime env
 installed on it. Version 3 should run on any platform that has JRE version 1.5 or later installed on it. Version 4 is 
 backwards compatible with version 3 in that all machines created in version 3 can be loaded and run in version 4.
 
+If you just want to run CPU Sim, you can download the necessary jar files from (the CPU Sim home page)[http://cs.colby.edu/djskrien/CPUSim/].
+
 ## Features
 
 The CPU Sim application is a fully-integrated development environment that includes the following features.
