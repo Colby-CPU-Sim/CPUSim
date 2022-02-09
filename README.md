@@ -13,7 +13,7 @@ using Swing). Version 4 should run on any platform that has the Java runtime env
 installed on it. Version 3 should run on any platform that has JRE version 1.5 or later installed on it. Version 4 is 
 backwards compatible with version 3 in that all machines created in version 3 can be loaded and run in version 4.
 
-If you just want to run CPU Sim, you can download the necessary jar files from (the CPU Sim home page)[http://cs.colby.edu/djskrien/CPUSim/].
+If you just want to run CPU Sim, you can download the necessary jar files from [the CPU Sim home page](http://cs.colby.edu/djskrien/CPUSim/).
 
 ## Features
 
@@ -52,10 +52,10 @@ Journal of Computing in Higher Education, 6(1), 3-13.
 This article describes version 2.2 of CPU Sim.
 
 SKRIEN, D. 2001. CPU Sim 3.1: A tool for simulating computer architectures for computer organization classes. 
-(ACM Journal of Educational Resources in Computing (JERIC))[http://www.acm.org/pubs/jeric/] 1(4), 46-59. 
+[ACM Journal of Educational Resources in Computing (JERIC)](http://www.acm.org/pubs/jeric/) 1(4), 46-59. 
 This issue of JERIC is a special one devoted to computer architecture simulators.
 
-I also presented a (faculty poster)[http://www.cs.wpi.edu/%7Ecew/sigcse2002posters/skrien.html] at SIGCSE 2002 about 
+I also presented a [faculty poster](http://www.cs.wpi.edu/%7Ecew/sigcse2002posters/skrien.html) at SIGCSE 2002 about 
 CPU Sim 3.1. 
 
 ## Development
@@ -71,7 +71,7 @@ For all development environments, clone the repository: `git clone https://githu
 
 #### Within IntelliJ
 
-Most developers will use (IntelliJ Idea)[https://www.jetbrains.com/idea/] by JetBrains. To develop with IntelliJ, 
+Most developers will use [IntelliJ Idea](https://www.jetbrains.com/idea/) by JetBrains. To develop with IntelliJ, 
 download and install IntelliJ. 
 
 1. Open IntelliJ
